@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
-import { Check, ArrowLeft, Download, Shield, Zap, Sparkles, HelpCircle, Lock } from "lucide-react";
+import { Check, ArrowLeft, Download, Shield, Zap, Sparkles, HelpCircle, Lock, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
@@ -19,6 +19,7 @@ import { FAQ } from "@/components/FAQ";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { useI18n } from "@/i18n/I18nContext";
 import { formatCurrencyAmount, type Currency } from "@/i18n";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useRegionTier } from "@/hooks/useRegionTier";
@@ -166,7 +167,46 @@ const ProductDynamic = () => {
           availability="InStock"
           isPhysical={false}
         />
-        <div className="min-h-dvh bg-background" />
+        <Navbar />
+        <main className="min-h-dvh bg-background pt-4 pb-16">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex items-center gap-1 text-sm text-muted-foreground mb-4">
+              <Skeleton className="h-4 w-24" />
+            </div>
+            <div className="grid md:grid-cols-2 gap-8 items-start">
+              <div className="space-y-4">
+                <Skeleton className="w-full aspect-square rounded-2xl" />
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {[1, 2, 3, 4].map((i) => (
+                    <Skeleton key={i} className="w-20 h-20 rounded-lg shrink-0" />
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-48" />
+                  <Skeleton className="h-10 w-full" />
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
+                </div>
+                <Skeleton className="h-12 w-48" />
+                <div className="grid grid-cols-3 gap-2">
+                  <Skeleton className="h-16 rounded-lg" />
+                  <Skeleton className="h-16 rounded-lg" />
+                  <Skeleton className="h-16 rounded-lg" />
+                </div>
+                <Skeleton className="h-32 w-full rounded-xl" />
+                <Skeleton className="h-14 w-full rounded-xl" />
+              </div>
+            </div>
+          </div>
+        </main>
       </>
     );
   }

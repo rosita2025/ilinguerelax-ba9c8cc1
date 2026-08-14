@@ -485,6 +485,56 @@ export default function Checkout() {
   }
 
 
+  if (loadingDb) {
+    return (
+      <div className="min-h-screen bg-secondary/30">
+        <Helmet>
+          <title>Cargando Pago... | iLingue Relax</title>
+        </Helmet>
+        <header className="sticky top-0 z-30 w-full bg-background/80 backdrop-blur-md border-b border-border/50 h-[44px] sm:h-[52px]">
+          <div className="max-w-6xl mx-auto h-full px-4 flex items-center">
+            <Skeleton className="h-6 w-32" />
+          </div>
+        </header>
+        <div className="max-w-6xl mx-auto px-4 py-6 md:py-10">
+          <div className="grid lg:grid-cols-[1fr_380px] gap-8 items-start">
+            <div className="space-y-6">
+              <Card className="p-6">
+                <div className="space-y-4">
+                  <Skeleton className="h-8 w-48" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                </div>
+              </Card>
+              <Card className="p-6">
+                <div className="space-y-4">
+                  <Skeleton className="h-8 w-48" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <Skeleton className="h-24 rounded-xl" />
+                    <Skeleton className="h-24 rounded-xl" />
+                  </div>
+                </div>
+              </Card>
+            </div>
+            <div className="space-y-6">
+              <Card className="p-6">
+                <div className="space-y-4">
+                  <Skeleton className="h-6 w-32" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-20 w-full" />
+                  </div>
+                  <Skeleton className="h-8 w-full" />
+                </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (slugUnknown) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-6">

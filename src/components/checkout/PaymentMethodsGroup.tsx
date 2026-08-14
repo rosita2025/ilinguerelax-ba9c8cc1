@@ -1459,7 +1459,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "Pague pelo seu banco ou carteira em moeda local. Confirmação imediata."
         : language === "fr" ? "Payez depuis votre banque en monnaie locale. Confirmation immédiate."
         : "Paga desde tu banco o billetera en moneda local. Confirmación inmediata."),
-      badge: priceBadge,
+      badge: finalPriceLabel,
+
       badges: dlocalBadges(country, "transfer", 6).length
         ? dlocalBadges(country, "transfer", 6)
         : [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }],

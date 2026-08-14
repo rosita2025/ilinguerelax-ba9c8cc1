@@ -12,6 +12,9 @@ interface DBProduct {
   price_usd: number;
   price_pen: number | null;
   cover_image_url: string | null;
+  price_pen: number | null;
+  price_usd_latam: number | null;
+  price_usd_tienda: number | null;
   is_upsell: boolean;
   active: boolean;
   sort_order: number;
@@ -43,6 +46,9 @@ function toProduct(p: DBProduct): Product {
     rating: 4.9,
     reviews: 0,
     price: Number(p.price_usd) || 0,
+    pricePen: p.price_pen,
+    priceUsdLatam: p.price_usd_latam,
+    priceUsdTienda: p.price_usd_tienda,
     originalPrice: null,
     discount: null,
     badge: p.is_upsell ? "🎁 Upsell" : "🆕 Nuevo",
@@ -74,7 +80,7 @@ export function useDigitalProducts() {
       try {
         const result = await supabase
           .from("digital_products")
-          .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, cover_image_url, is_upsell, active, sort_order")
+          .select("id, sku, name, description, learner_language, target_language, price_usd, price_pen, price_usd_latam, price_usd_tienda, cover_image_url, is_upsell, active, sort_order")
           .order("sort_order", { ascending: true });
         data = result.data as DBProduct[] | null;
         error = result.error;

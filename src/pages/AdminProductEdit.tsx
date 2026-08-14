@@ -1124,9 +1124,6 @@ const AdminProductEdit = () => {
                             placeholder={baseUsdRef.toString()}
                           />
                         </div>
-                            (Ref: ${product.price_usd} USD)
-                          </p>
-                        </div>
                         {exchangeRates[code as Currency] && (
                           <p className="text-[8px] text-muted-foreground/50 border-t border-muted-foreground/10 pt-0.5">
                             Tasa: 1 USD = {exchangeRates[code as Currency]} {code}

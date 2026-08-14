@@ -1430,7 +1430,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "USDT / Binance Pay · Verificação 1-24h pela Supervisora Rosa"
         : language === "fr" ? "USDT / Binance Pay · Vérification 1-24h par la Superviseure Rosa"
         : "USDT / Binance Pay · Verificación 1-24h por Supervisora Rosa",
-      badge: `USD $${totalUsd}`,
+      badge: finalPriceLabel,
     },
     {
       id: "clabe",

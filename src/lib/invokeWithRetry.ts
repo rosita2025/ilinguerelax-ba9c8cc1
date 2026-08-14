@@ -155,11 +155,19 @@ export async function invokeWithRetry<T = unknown>(
       lastError = error;
       if (!error) return { data: data as T, error: null };
       if (attempt >= attempts || !isRetryable(error, data)) {
+        if (isNetworkFailure(error)) {
+          const direct = await directFetchFallback<T>(fnName, invokeArgs);
+          if (!direct.error) return direct;
+        }
         return { data: data as T, error: await withEdgeDetail(error) };
       }
     } catch (err) {
       lastError = err;
       if (attempt >= attempts || !isRetryable(err, null)) {
+        if (isNetworkFailure(err)) {
+          const direct = await directFetchFallback<T>(fnName, invokeArgs);
+          if (!direct.error) return direct;
+        }
         return { data: null, error: await withEdgeDetail(err) };
       }
     }
@@ -173,7 +181,12 @@ export async function invokeWithRetry<T = unknown>(
     }
   }
 
-  // Should not reach here, but keep TS happy.
+  // Último intento directo antes de rendirnos.
+  if (isNetworkFailure(lastError)) {
+    const direct = await directFetchFallback<T>(fnName, invokeArgs);
+    if (!direct.error) return direct;
+  }
+
   try {
     reportClientError({
       source: "invokeWithRetry",
@@ -184,3 +197,4 @@ export async function invokeWithRetry<T = unknown>(
 
   return { data: lastData as T | null, error: lastError };
 }
+

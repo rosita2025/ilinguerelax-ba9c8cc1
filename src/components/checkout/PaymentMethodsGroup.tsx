@@ -1478,7 +1478,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         : language === "pt" ? "Gere um voucher e pague em dinheiro em uma loja ou agente."
         : language === "fr" ? "Recevez un bon et payez en espèces dans un point de vente."
         : "Genera un cupón y paga en efectivo en una tienda o agente cercano."),
-      badge: priceBadge,
+      badge: finalPriceLabel,
+
       badges: dlocalBadges(country, "cash", 6).length
         ? dlocalBadges(country, "cash", 6)
         : [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }],

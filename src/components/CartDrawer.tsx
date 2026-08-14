@@ -430,7 +430,6 @@ export const CartDrawer = () => {
                 className="w-full mt-2 h-10 text-sm font-bold"
               >
                 {visibleInternalItems.some(i => i.isPhysical) ? t.configureShipping : t.securePayment}
-                Ir al checkout
                 <ArrowRight className="w-4 h-4 ml-1.5" />
               </Button>
             </div>

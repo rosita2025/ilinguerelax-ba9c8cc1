@@ -2096,39 +2096,27 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
             {m.id === "binance" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
-                <div className="text-center space-y-1">
-                  <p className="text-xs uppercase tracking-wider text-neutral-500">
-                    {language === "en" ? "Send payment to" : language === "pt" ? "Enviar pagamento para" : language === "fr" ? "Envoyer le paiement à" : "Envía el pago a"}
-                  </p>
-                  <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{binanceCfg.holder_name}</p>
-                  <p className="text-[11px] text-neutral-500">{binanceCfg.network}</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <img
-                    src={binanceCfg.qr_url}
-                    alt="Binance Pay QR"
-                    className="w-48 h-48 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white object-contain p-2"
-                    loading="lazy"
-                  />
-                </div>
-
-                {binanceCfg.pay_id && (
-                  <div className="rounded-lg bg-[#F0B90B]/10 border border-[#F0B90B]/40 p-3 space-y-1 text-center">
-                    <p className="text-[11px] uppercase tracking-wider text-neutral-500">Binance Pay ID</p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(binanceCfg.pay_id).catch(() => {});
-                        toast({ description: t.copied });
-                      }}
-                      className="w-full inline-flex items-center justify-center gap-2 text-xl font-mono font-bold text-[#a37800] dark:text-[#F0B90B] hover:opacity-80 transition"
-                    >
-                      <span>{binanceCfg.pay_id}</span>
-                      <Copy className="w-4 h-4 shrink-0" />
-                    </button>
+                <div className="bg-[#F0B90B]/5 dark:bg-[#F0B90B]/10 border border-[#F0B90B]/20 dark:border-[#F0B90B]/30 rounded-xl p-4 sm:p-5 space-y-4 text-center">
+                  <div className="flex flex-col items-center gap-2 text-[#b38a08] dark:text-[#F0B90B]">
+                    <div className="w-12 h-12 rounded-full bg-[#F0B90B]/10 dark:bg-[#F0B90B]/20 flex items-center justify-center shrink-0 mb-1">
+                      <Wallet className="w-6 h-6" />
+                    </div>
+                    <p className="font-bold text-lg leading-tight">Binance Pay / USDT</p>
+                    <p className="text-xs opacity-80">Red: {binanceCfg.network} • {binanceCfg.holder_name}</p>
                   </div>
-                )}
+
+                  <div className="flex justify-center py-2">
+                    <div className="relative group">
+                      <img
+                        src={binanceCfg.qr_url}
+                        alt="Binance Pay QR"
+                        className="w-44 h-44 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white object-contain p-2 shadow-sm"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-xl pointer-events-none" />
+                    </div>
+                  </div>
+
 
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 space-y-1.5">
                   <p className="text-[11px] uppercase tracking-wider text-neutral-500 text-center">

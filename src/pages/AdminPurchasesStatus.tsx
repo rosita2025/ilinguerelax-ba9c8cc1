@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart";
+type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart" | "shopify";
 type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "abandoned" | "unknown";
 
 interface Row {

@@ -2328,7 +2328,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
             <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
           ) : selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) ? (
             <><Lock className="w-4 h-4" /> {language === "en"
-              ? "Continue to payment"
+              ? "Checkout Securely"
               : language === "pt"
                 ? "Continuar para pagamento"
                 : language === "fr"

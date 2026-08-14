@@ -192,7 +192,7 @@ export const exchangeRates: Record<Currency, number> = {
   EUR: 0.90,
   BRL: 5.50,
   MXN: 18.5, 
-  COP: 3950,
+  COP: 4100,
   ARS: 960, 
 
   GBP: 0.78,

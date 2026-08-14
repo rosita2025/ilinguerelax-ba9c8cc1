@@ -13,6 +13,8 @@ import {
   Package,
   Download,
   Gift,
+  Truck,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -354,11 +356,34 @@ export default function OrderStatus() {
             )}
 
             <div className="rounded-xl border bg-card p-5 space-y-5">
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <div className="text-xs text-muted-foreground">Pedido</div>
                   <div className="font-semibold">{result.orderNumber}</div>
                 </div>
+                {result.tracking_number && (
+                  <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-lg p-3 flex-1 min-w-[240px]">
+                    <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-bold text-sm mb-1">
+                      <Truck className="w-4 h-4" /> Seguimiento de envío
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="text-[10px] uppercase text-emerald-600/70 font-bold">Transportista</div>
+                        <div className="text-xs font-medium truncate">{result.shipping_provider || "Amazon / Local Courier"}</div>
+                      </div>
+                      <div className="text-right min-w-0">
+                        <div className="text-[10px] uppercase text-emerald-600/70 font-bold">Número / Enlace</div>
+                        <div className="text-xs font-mono font-bold truncate max-w-[150px]">
+                          {result.tracking_number.startsWith('http') ? (
+                            <a href={result.tracking_number} target="_blank" rel="noopener noreferrer" className="underline flex items-center gap-1">
+                              Rastrear <ExternalLink className="w-3 h-3" />
+                            </a>
+                          ) : result.tracking_number}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
 

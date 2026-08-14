@@ -91,12 +91,15 @@ export function useLocalCurrencyForSku(usdAmount: number, skuOrId?: string | nul
  * Returns a resolver `(idOrSku) => overrides` for use inside .map() loops
  * without breaking React hook rules. Backed by LivePricesProvider.
  */
-export function useSkuOverridesResolver(): (idOrSku?: string | null) => LocalPriceOverrides {
+export function useSkuOverridesResolver(): (idOrSku?: string | null) => { local_prices: LocalPriceOverrides; local_usd_prices: LocalPriceOverrides } {
   const { prices } = useLivePrices();
   return (idOrSku?: string | null) => {
     const sku = resolveAdminSku(idOrSku);
-    if (!sku) return null;
-    return (prices[sku]?.local_prices ?? null) as LocalPriceOverrides;
+    if (!sku) return { local_prices: null, local_usd_prices: null };
+    return {
+      local_prices: (prices[sku]?.local_prices ?? null) as LocalPriceOverrides,
+      local_usd_prices: (prices[sku]?.local_usd_prices ?? null) as LocalPriceOverrides,
+    };
   };
 }
 

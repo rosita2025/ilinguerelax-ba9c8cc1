@@ -2118,20 +2118,37 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   </div>
                 </div>
 
-                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 space-y-1.5">
-                  <p className="text-[11px] uppercase tracking-wider text-neutral-500 text-center">
-                    {language === "en" ? "Wallet address" : language === "pt" ? "Endereço da carteira" : language === "fr" ? "Adresse du portefeuille" : "Dirección de wallet"}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={copyBinance}
-                    className="w-full inline-flex items-center justify-center gap-2 text-sm font-mono font-semibold text-primary hover:opacity-80 transition break-all px-2"
-                  >
-                    <span className="break-all">{binanceCfg.address}</span>
-                    {copiedBinance ? <Check className="w-4 h-4 text-green-600 shrink-0" /> : <Copy className="w-4 h-4 shrink-0" />}
-                  </button>
-                  <p className="text-[11px] text-neutral-500 text-center">{copiedBinance ? t.copied : (language === "en" ? "Tap to copy" : language === "pt" ? "Toque para copiar" : language === "fr" ? "Touchez pour copier" : "Toca para copiar")}</p>
-                </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                    {binanceCfg.pay_id && (
+                      <div className="rounded-lg bg-white/50 dark:bg-black/20 p-3 border border-[#F0B90B]/10">
+                        <p className="text-[10px] uppercase tracking-wider font-bold text-[#b38a08]/70">Binance Pay ID</p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(binanceCfg.pay_id).catch(() => {});
+                            toast({ description: t.copied });
+                          }}
+                          className="w-full inline-flex items-center justify-between gap-2 text-base font-mono font-bold text-neutral-900 dark:text-neutral-100 hover:opacity-80 transition"
+                        >
+                          <span>{binanceCfg.pay_id}</span>
+                          <Copy className="w-3.5 h-3.5 shrink-0 opacity-50" />
+                        </button>
+                      </div>
+                    )}
+
+                    <div className="rounded-lg bg-white/50 dark:bg-black/20 p-3 border border-[#F0B90B]/10 overflow-hidden">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-[#b38a08]/70">Wallet Address</p>
+                      <button
+                        type="button"
+                        onClick={copyBinance}
+                        className="w-full inline-flex items-center justify-between gap-2 text-[13px] font-mono font-bold text-neutral-900 dark:text-neutral-100 hover:opacity-80 transition"
+                      >
+                        <span className="truncate">{binanceCfg.address.slice(0, 8)}...{binanceCfg.address.slice(-6)}</span>
+                        {copiedBinance ? <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> : <Copy className="w-3.5 h-3.5 shrink-0 opacity-50" />}
+                      </button>
+                    </div>
+                  </div>
+
 
 
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">

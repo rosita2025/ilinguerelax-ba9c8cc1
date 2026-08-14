@@ -360,6 +360,11 @@ export function BuyerInfoForm() {
                     <option value="GB">United Kingdom 🇬🇧</option>
                     <option value="AU">Australia 🇦🇺</option>
                     <option value="NZ">New Zealand 🇳🇿</option>
+                    <option value="PE">Perú 🇵🇪</option>
+                    <option value="CO">Colombia 🇨🇴</option>
+                    <option value="MX">México 🇲🇽</option>
+                    <option value="AR">Argentina 🇦🇷</option>
+                    <option value="CL">Chile 🇨🇱</option>
                   </select>
                 </div>
               </label>

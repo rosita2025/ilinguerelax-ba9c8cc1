@@ -325,6 +325,7 @@ const en: CheckoutUIStrings = {
 
 const pt: CheckoutUIStrings = {
   verifiedReviewNotice: "Avaliações verificadas: ⭐⭐⭐⭐⭐ 5/5. Entrega digital exatamente rápida e sem atrasos.",
+  securePayment: "Pagamento seguro",
   stripeSSL: "Stripe SSL · Pagamento seguro",
   stripeSslMP: "Stripe SSL · Mercado Pago",
 

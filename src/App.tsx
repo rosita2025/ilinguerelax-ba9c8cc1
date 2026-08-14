@@ -78,6 +78,7 @@ const AdminManualPayments = lazy(() => import("./pages/AdminManualPayments"));
 const AdminProducts = lazy(() => import("./pages/AdminProducts"));
 const AdminProductEdit = lazy(() => import("./pages/AdminProductEdit"));
 const AdminEmailTest = lazy(() => import("./pages/AdminEmailTest"));
+const AdminPhysicalOrders = lazy(() => import("./pages/AdminPhysicalOrders"));
 
 const AdminPurchasesStatus = lazy(() => import("./pages/AdminPurchasesStatus"));
 const AdminCheckoutAbuse = lazy(() => import("./pages/AdminCheckoutAbuse"));

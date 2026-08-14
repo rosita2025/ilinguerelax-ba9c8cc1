@@ -134,7 +134,7 @@ export function MercadoPagoButton() {
           </>
         ) : (
           <>
-            Pagar con Mercado Pago · S/ {totalPen}
+            Pagar con Mercado Pago · S/ {totalPen} (≈ ${total.toFixed(2)} USD)
           </>
         )}
       </button>

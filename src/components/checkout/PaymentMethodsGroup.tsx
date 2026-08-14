@@ -2037,49 +2037,58 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
             {m.id === "yape" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
-                <div className="text-center space-y-1">
-                  <p className="text-xs uppercase tracking-wider text-neutral-500">{t.sendPaymentTo}</p>
-                  <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{YAPE_NAME}</p>
-                  <button
-                    type="button"
-                    onClick={copyPhone}
-                    className="inline-flex items-center gap-2 text-xl font-mono font-bold text-primary hover:opacity-80 transition"
-                  >
-                    {YAPE_PHONE}
-                    {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
-                  </button>
-                  <p className="text-[11px] text-neutral-500">{copied ? t.copied : t.tapToCopy}</p>
-                </div>
+                <div className="bg-[#742282]/5 dark:bg-[#742282]/10 border border-[#742282]/20 dark:border-[#742282]/30 rounded-xl p-4 sm:p-5 space-y-4">
+                  <div className="flex items-center gap-3 text-[#742282] dark:text-[#a356b1]">
+                    <div className="w-10 h-10 rounded-full bg-[#742282]/10 dark:bg-[#742282]/20 flex items-center justify-center shrink-0">
+                      <Smartphone className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-base leading-tight">Yape o Plin (Perú)</p>
+                      <p className="text-xs opacity-80">Pago inmediato sin comisiones</p>
+                    </div>
+                  </div>
 
-                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
-                  <p className="text-xs text-neutral-500">{t.amountToPay}</p>
-                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted)}</p>
-                  <p className="text-[11px] text-neutral-500 mt-1">{t.sendEquivalentSoles}</p>
-                </div>
+                  <div className="space-y-3 bg-white/50 dark:bg-black/20 p-4 rounded-lg border border-[#742282]/10">
+                    <div className="text-center">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-[#742282]/70 dark:text-[#a356b1]/70">Número de celular</p>
+                      <button
+                        type="button"
+                        onClick={copyPhone}
+                        className="inline-flex items-center gap-2 text-2xl font-mono font-bold text-[#742282] dark:text-[#c484d3] hover:opacity-80 transition"
+                      >
+                        {YAPE_PHONE}
+                        {copied ? <Check className="w-5 h-5 text-emerald-600 shrink-0" /> : <Copy className="w-5 h-5 shrink-0" />}
+                      </button>
+                      <p className="text-[10px] text-neutral-500 mt-0.5">{copied ? t.copied : t.tapToCopy}</p>
+                    </div>
+                    
+                    <div className="pt-3 border-t border-[#742282]/10 text-center">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-[#742282]/70 dark:text-[#a356b1]/70">Titular</p>
+                      <p className="font-bold text-sm text-neutral-900 dark:text-neutral-100">{YAPE_NAME}</p>
+                    </div>
+                  </div>
 
-                <ol className="text-xs text-neutral-600 dark:text-neutral-300 space-y-1.5 list-decimal list-inside">
-                  <li>{t.yapeStep1}</li>
-                  <li>{t.yapeStep2(penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted), YAPE_PHONE, YAPE_NAME)}</li>
-                  <li>{t.yapeStep3}</li>
-                  <li>{t.yapeStep4}</li>
-                </ol>
+                  <div className="rounded-lg bg-white/50 dark:bg-black/20 p-3 text-center border border-[#742282]/10">
+                    <p className="text-xs text-[#742282]/70 dark:text-[#a356b1]/70 uppercase tracking-wider font-bold">{t.amountToPay}</p>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted)}</p>
+                    <p className="text-[11px] text-neutral-500 mt-1">{t.sendEquivalentSoles}</p>
+                  </div>
+
+                  <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-[#742282]/90 dark:text-[#c484d3]/90 italic">
+                    <MessageCircle className="w-4 h-4 mt-0.5 shrink-0 text-[#25D366]" />
+                    <p>
+                      <strong>Importante:</strong> Envía tu captura de pantalla a <span className="font-bold">hola@ilinguerelax.com</span> o por WhatsApp para habilitar tu descarga al instante.
+                    </p>
+                  </div>
+                </div>
 
                 <button
                   type="button"
                   onClick={handleManualPaid}
-                  className="w-full bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-white dark:text-neutral-900 text-white font-semibold py-3 rounded-xl transition-colors"
+                  className="w-full bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-white dark:text-neutral-900 text-white font-semibold py-4 rounded-xl transition-colors shadow-lg"
                 >
                   {t.alreadyPaid}
                 </button>
-
-                <a
-                  href={WHATSAPP_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full text-xs text-[#25D366] hover:underline"
-                >
-                  <MessageCircle className="w-3.5 h-3.5" /> {t.sendReceiptWA}
-                </a>
 
                 <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
               </div>

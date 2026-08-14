@@ -150,6 +150,10 @@ const en: CheckoutStatusStrings = {
   shippingEligibility: "Shipping eligibility confirmed",
   shippingEligibilityDesc: "Your order is eligible for international shipping to Peru, Colombia, Mexico, Argentina, and more.",
   paymentMethodConfirmed: "Payment method confirmed",
+  digitalDeliveredFirst: "Digital material sent (immediate)",
+  physicalInProgress: "Physical shipping in preparation",
+  trackingComingSoon: "Tracking code will be sent soon",
+
 
   paymentPending: "Payment pending",
   pendingDesc:

@@ -239,6 +239,7 @@ Deno.serve(async (req) => {
         else if (status === "pending" || status === "processing") mapped = "pending";
         else if (status === "failed" || status === "requires_payment_method") mapped = "refused";
         else if (status === "canceled") mapped = "cancelled";
+        else if (status === "abandoned") mapped = "abandoned";
 
         rows.push({
           id: `st-${r.id}`, 

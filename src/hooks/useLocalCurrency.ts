@@ -89,7 +89,7 @@ export function resolveAdminSku(idOrSku?: string | null): string | null {
  */
 export function useLocalCurrencyForSku(usdAmount: number, skuOrId?: string | null): LocalPrice {
   const overrides = useLocalOverrides(resolveAdminSku(skuOrId)) as LocalPriceOverrides;
-  return useLocalCurrency(usdAmount, overrides);
+  return useLocalCurrency(usdAmount, overrides, overrides.local_usd_prices);
 }
 
 /**

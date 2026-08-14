@@ -286,7 +286,8 @@ Deno.serve(async (req) => {
           transaction: d.transaction || d.transaction_code || d.hottok || null,
           raw_status: status,
           mapped_status: (status === "approved" || status === "complete" || status === "succeeded" || status === "Purchase") ? "approved" : 
-                         (status === "pending" || status === "processing" || status === "InitiateCheckout") ? "pending" :
+                         (status === "pending" || status === "processing") ? "pending" :
+                         (status === "InitiateCheckout" || status === "abandoned") ? "abandoned" :
                          (status === "refunded") ? "refunded" : 
                          (status === "chargeback") ? "chargeback" :
                          (status === "expired" || status === "canceled" || status === "failed") ? "cancelled" : "unknown",

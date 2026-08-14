@@ -53,7 +53,7 @@ export const ResenasWhatsAppCoreano = () => {
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
               ))}
-              <span className="ml-2 text-sm font-semibold text-foreground">5.0 · Reseñas verificadas</span>
+              <span className="ml-2 text-sm font-semibold text-foreground">5.0/5.0 · Reseñas verificadas</span>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto text-pretty text-sm md:text-base">
               Conversaciones auténticas atendidas por <strong>Supervisora Rosa</strong> y <strong>Asistente Crady</strong>. Desliza para ver más.

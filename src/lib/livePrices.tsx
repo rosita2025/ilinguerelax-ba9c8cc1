@@ -193,8 +193,11 @@ export function LivePricesProvider({ children }: { children: ReactNode }) {
       prices,
       getLivePrice: (slugOrSku: string) => prices[slugOrSku],
       getLocalOverrides: (slugOrSku?: string | null) => {
-        if (!slugOrSku) return null;
-        return prices[slugOrSku]?.local_prices ?? null;
+        if (!slugOrSku) return { local_prices: null, local_usd_prices: null };
+        return {
+          local_prices: prices[slugOrSku]?.local_prices ?? null,
+          local_usd_prices: prices[slugOrSku]?.local_usd_prices ?? null,
+        };
       },
     }),
     [version, prices],

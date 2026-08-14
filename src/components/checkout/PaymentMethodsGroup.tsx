@@ -1378,6 +1378,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     { label: "Google Pay", bg: "#ffffff", color: "#1F2937" },
     ...(enabledStripeKeys.has("stripe_link") ? [{ label: "Link", bg: "#00D66F", color: "#0A2540" }] : []),
   ];
+  const STRIPE_VISIBLE_METHODS = getStripeVisibleMethods(language);
   const dynamicStripeRows: PaymentMethodRow[] = methodsConfig.enabledMethodKeys
     .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link")
     .map((key) => ({ id: "card", methodKey: key, badge: priceBadge, ...STRIPE_VISIBLE_METHODS[key] }));

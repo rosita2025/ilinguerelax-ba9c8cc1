@@ -975,13 +975,14 @@ const AdminProductEdit = () => {
 
             <div className="border-t pt-4 mt-2 space-y-3">
               <div>
-                <h3 className="font-semibold text-sm">💱 Precios exactos por moneda (LATAM)</h3>
+                <h3 className="font-semibold text-sm">💱 Precios exactos por moneda (Global)</h3>
                 <p className="text-[11px] text-muted-foreground">
-                  Fija el monto <b>exacto</b> (ej: 199.00). El sistema detecta el país por IP y muestra este valor sin errores de redondeo. Dejar vacío = conversión automática.
+                  Fija el monto <b>exacto</b> (ej: 199.00). El sistema detecta el país por IP y usa este valor manual. Si se deja vacío, se usa la conversión automática desde USD.
                 </p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 {[
+                  // LATAM
                   { code: "MXN", flag: "🇲🇽", label: "México" },
                   { code: "COP", flag: "🇨🇴", label: "Colombia" },
                   { code: "ARS", flag: "🇦🇷", label: "Argentina" },
@@ -996,6 +997,14 @@ const AdminProductEdit = () => {
                   { code: "HNL", flag: "🇭🇳", label: "Honduras" },
                   { code: "NIO", flag: "🇳🇮", label: "Nicaragua" },
                   { code: "VES", flag: "🇻🇪", label: "Venezuela" },
+                  // Global / Anglosphere / Europe
+                  { code: "EUR", flag: "🇪🇺", label: "Europa" },
+                  { code: "GBP", flag: "🇬🇧", label: "Reino Unido" },
+                  { code: "CAD", flag: "🇨🇦", label: "Canadá" },
+                  { code: "AUD", flag: "🇦🇺", label: "Australia" },
+                  { code: "NZD", flag: "🇳🇿", label: "Nueva Zelanda" },
+                  // Asia
+                  { code: "JPY", flag: "🇯🇵", label: "Japón" },
                 ].map(({ code, flag, label }) => {
                   const regionPrice = (() => {
                     const baseUsd = product.price_usd_latam ?? product.price_usd ?? 0;

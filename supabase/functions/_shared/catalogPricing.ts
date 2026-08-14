@@ -325,7 +325,7 @@ export function localTotalFromPricing(
   
   // Shipping logic must mirror OrderSummary.tsx / PaymentMethodsGroup.tsx
   const isPhysical = pricing.items.some(i => (i as any).is_physical || (i as any).isPhysical);
-  const isLatam = ["AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "PA", "PY", "PE", "PR", "UY"].includes(code);
+  const isLatam = tierForCountry(code) === "latam";
   const shippingCost = isLatam ? 9 : 8;
   const shippingUsd = isPhysical ? (pricing.totalUsd >= 50 ? 0 : shippingCost) : 0;
   const shippingLocal = shippingUsd * rate;

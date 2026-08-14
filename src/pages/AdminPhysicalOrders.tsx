@@ -16,7 +16,10 @@ import {
   AlertCircle,
   Save,
   ClipboardCopy,
-  Mail
+  Mail,
+  Upload,
+  Image as ImageIcon,
+  FileText
 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +43,7 @@ interface PhysicalOrder {
   status: string;
   tracking_number: string | null;
   shipping_provider: string | null;
+  shipping_proof_url: string | null;
 }
 
 const AdminPhysicalOrders = () => {
@@ -85,6 +89,7 @@ const AdminPhysicalOrders = () => {
             status: r.status || "pending",
             tracking_number: r.tracking_number,
             shipping_provider: r.shipping_provider,
+            shipping_proof_url: r.shipping_proof_url,
           });
         }
       });
@@ -105,6 +110,7 @@ const AdminPhysicalOrders = () => {
           status: r.status || "paid",
           tracking_number: r.tracking_number,
           shipping_provider: r.shipping_provider,
+          shipping_proof_url: r.shipping_proof_url,
         });
       });
 
@@ -120,8 +126,8 @@ const AdminPhysicalOrders = () => {
     if (adminKey) loadOrders();
   }, [adminKey]);
 
-  const updateTracking = async (order: PhysicalOrder, tracking: string, provider: string) => {
-    if (!tracking && !provider) {
+  const updateTracking = async (order: PhysicalOrder, tracking: string, provider: string, proofUrl?: string) => {
+    if (!tracking && !provider && !proofUrl) {
       toast.error("Ingresa al menos un dato de seguimiento");
       return;
     }
@@ -135,6 +141,7 @@ const AdminPhysicalOrders = () => {
           orderId: order.order_ref || order.id,
           trackingNumber: tracking,
           shipping_provider: provider,
+          shippingProofUrl: proofUrl,
           source: order.source,
         },
       });
@@ -255,49 +262,46 @@ const AdminPhysicalOrders = () => {
                   <p className="text-muted-foreground">{order.products}</p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4 items-end border-t pt-4">
+                <div className="grid md:grid-cols-3 gap-4 items-end border-t pt-4">
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase text-muted-foreground flex items-center gap-1">
-                      <Truck className="w-3 h-3" /> Transportista / Proveedor
+                      <Truck className="w-3 h-3" /> Transportista
                     </label>
                     <Input 
-                      placeholder="Ej: Amazon, DHL, FedEx..." 
+                      placeholder="Ej: Amazon, DHL..." 
                       defaultValue={order.shipping_provider || ""}
                       id={`provider-${order.id}`}
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase text-muted-foreground flex items-center gap-1">
-                      <ExternalLink className="w-3 h-3" /> Número de Seguimiento (Tracking)
+                      <ExternalLink className="w-3 h-3" /> Tracking
+                    </label>
+                    <Input 
+                      placeholder="ID o enlace..." 
+                      defaultValue={order.tracking_number || ""}
+                      id={`tracking-${order.id}`}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase text-muted-foreground flex items-center gap-1">
+                      <Upload className="w-3 h-3" /> Comprobante (URL)
                     </label>
                     <div className="flex gap-2">
                       <Input 
-                        placeholder="Pegar ID o enlace de seguimiento..." 
-                        defaultValue={order.tracking_number || ""}
-                        id={`tracking-${order.id}`}
+                        placeholder="URL de imagen o PDF..." 
+                        defaultValue={order.shipping_proof_url || ""}
+                        id={`proof-${order.id}`}
                       />
                       <div className="flex gap-1">
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          title="Copiar tracking"
-                          onClick={() => {
-                            const val = (document.getElementById(`tracking-${order.id}`) as HTMLInputElement).value;
-                            if (val) {
-                              navigator.clipboard.writeText(val);
-                              toast.success("Copiado al portapapeles");
-                            }
-                          }}
-                        >
-                          <ClipboardCopy className="w-4 h-4" />
-                        </Button>
                         <Button 
                           size="sm" 
                           disabled={saving === order.id}
                           onClick={() => {
                             const t = (document.getElementById(`tracking-${order.id}`) as HTMLInputElement).value;
                             const p = (document.getElementById(`provider-${order.id}`) as HTMLInputElement).value;
-                            updateTracking(order, t, p);
+                            const pr = (document.getElementById(`proof-${order.id}`) as HTMLInputElement).value;
+                            updateTracking(order, t, p, pr);
                           }}
                         >
                           {saving === order.id ? (

@@ -1430,6 +1430,7 @@ export type Database = {
           payment_reference: string | null
           payment_reference_at: string | null
           payment_reference_source: string | null
+          shipping_proof_url: string | null
           shipping_provider: string | null
           status: string
           tracking_number: string | null
@@ -1454,6 +1455,7 @@ export type Database = {
           payment_reference?: string | null
           payment_reference_at?: string | null
           payment_reference_source?: string | null
+          shipping_proof_url?: string | null
           shipping_provider?: string | null
           status?: string
           tracking_number?: string | null
@@ -1478,6 +1480,7 @@ export type Database = {
           payment_reference?: string | null
           payment_reference_at?: string | null
           payment_reference_source?: string | null
+          shipping_proof_url?: string | null
           shipping_provider?: string | null
           status?: string
           tracking_number?: string | null
@@ -2122,6 +2125,7 @@ export type Database = {
           order_created_at: string
           product_key: string
           product_name: string
+          shipping_proof_url: string | null
           shipping_provider: string | null
           shopify_order_id: string
           tracking_number: string | null
@@ -2134,6 +2138,7 @@ export type Database = {
           order_created_at: string
           product_key?: string
           product_name: string
+          shipping_proof_url?: string | null
           shipping_provider?: string | null
           shopify_order_id: string
           tracking_number?: string | null
@@ -2146,6 +2151,7 @@ export type Database = {
           order_created_at?: string
           product_key?: string
           product_name?: string
+          shipping_proof_url?: string | null
           shipping_provider?: string | null
           shopify_order_id?: string
           tracking_number?: string | null

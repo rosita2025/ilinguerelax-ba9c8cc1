@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   if (csrfBlock) return csrfBlock;
 
   try {
-    const { adminKey, action, orderId, trackingNumber, shippingProvider, source } = await req.json().catch(() => ({}));
+    const { adminKey, action, orderId, trackingNumber, shippingProvider, source, shippingProofUrl } = await req.json().catch(() => ({}));
     const expected = Deno.env.get("ADMIN_REVIEW_KEY");
     if (!expected || adminKey !== expected) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -27,8 +27,8 @@ Deno.serve(async (req) => {
 
     // Acción: Actualizar tracking
     if (action === "update_tracking" && orderId) {
-      if (!trackingNumber && !shippingProvider) {
-        throw new Error("Tracking number or provider is required");
+      if (!trackingNumber && !shippingProvider && !shippingProofUrl) {
+        throw new Error("Tracking number, provider, or proof URL is required");
       }
 
       const table = source === "manual" ? "manual_payments" : 
@@ -42,7 +42,8 @@ Deno.serve(async (req) => {
         .from(table)
         .update({ 
           tracking_number: trackingNumber || null,
-          shipping_provider: shippingProvider || null 
+          shipping_provider: shippingProvider || null,
+          shipping_proof_url: shippingProofUrl || null
         })
         .eq(idField, orderId);
 
@@ -55,6 +56,7 @@ Deno.serve(async (req) => {
         details: { 
           trackingNumber, 
           shippingProvider, 
+          shippingProofUrl,
           source,
           updated_at: new Date().toISOString()
         }

@@ -33,7 +33,7 @@ import { saveDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
 import { extractEdgeErrorMessage, looksTechnical } from "@/lib/edgeError";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
 
 const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
@@ -1500,9 +1500,11 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     },
     {
       id: "hotmart_separator",
-      id_raw: "hotmart",
       title: "HOTMART",
       isSeparator: true,
+      icon: CreditCard,
+      sub: "",
+      badge: "",
     },
     {
       id: "hotmart",

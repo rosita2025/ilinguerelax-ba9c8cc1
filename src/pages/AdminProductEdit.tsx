@@ -380,7 +380,7 @@ const AdminProductEdit = () => {
               Object.entries(product.local_usd_prices).forEach(([code, amount]) => {
                 const numAmount = Number(amount);
                 if (!isNaN(numAmount) && numAmount > 0) {
-                  normalizedLocalUsdPrices[code] = Math.round(numAmount * 100) / 100;
+                  normalizedLocalUsdPrices[code] = Math.round(Number(amount) * 100) / 100;
                 }
               });
             }

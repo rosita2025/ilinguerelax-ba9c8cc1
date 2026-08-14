@@ -77,21 +77,27 @@ export async function markAbandonedCartConverted(email?: string): Promise<void> 
         last_activity: new Date().toISOString(),
         items: [] // Limpiar items para asegurar que no se envíen recordatorios
       })
-      .ilike("email", cleanEmail)
-      .eq("converted", false);
+      .ilike("email", cleanEmail); // Quitamos eq("converted", false) para forzar limpieza total
+
     if (pErr) console.error("[abandoned-cart] mark persistent converted failed:", pErr);
 
     // 2. Marcar en abandoned_carts (legacy fallback)
-    const { error: aErr } = await supabase
+    await supabase
       .from("abandoned_carts")
       .update({ 
         converted: true, 
         is_completed: true, 
         updated_at: new Date().toISOString() 
       })
-      .ilike("customer_email", cleanEmail)
-      .eq("converted", false);
-    if (aErr) console.error("[abandoned-cart] mark legacy converted failed:", aErr);
+      .ilike("customer_email", cleanEmail);
+
+    // 3. Limpiar colas de recordatorios pendientes
+    await supabase
+      .from("newsletter_drip_sends")
+      .update({ status: 'skipped', metadata: { reason: 'converted_by_purchase' } })
+      .ilike("email", cleanEmail)
+      .eq("status", "pending");
+
   } catch (e) {
     console.error("[abandoned-cart] mark converted exception:", e);
   }

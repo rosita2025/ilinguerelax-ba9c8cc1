@@ -36,7 +36,6 @@ interface OrderStatusResult {
   orderNumber?: string;
   stage?: "pending" | "paid" | "delivered";
   outcome?: "approved" | "rejected" | "processing";
-  /** true cuando el cliente abrió la pasarela y nunca completó el pago. */
   abandoned?: boolean;
 
   provider?: string | null;
@@ -46,6 +45,8 @@ interface OrderStatusResult {
   createdAt?: string | null;
   deliveredAt?: string | null;
   timeline?: TimelineItem[];
+  tracking_number?: string | null;
+  shipping_provider?: string | null;
 }
 
 const EVENT_LABEL: Record<string, string> = {

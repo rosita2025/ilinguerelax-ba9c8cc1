@@ -131,6 +131,7 @@ export function sumItemsLocal(
   const currency = detectCurrency((country || "US").toUpperCase());
   const rate = exchangeRates[currency] ?? 1;
   let amount = 0;
+  let usdReference = 0;
   for (const it of items) {
     const { local_prices, local_usd_prices } = resolver(it.sku ?? it.id);
     const override = local_prices && local_prices[currency];
@@ -140,6 +141,7 @@ export function sumItemsLocal(
     const perUnit = typeof override === "number" && override > 0 ? override : activeUsd * rate;
     
     amount += perUnit * (it.quantity || 1);
+    usdReference += activeUsd * (it.quantity || 1);
   }
-  return { amount, currency, isUsd: currency === "USD" };
+  return { amount, currency, isUsd: currency === "USD", usdReference };
 }

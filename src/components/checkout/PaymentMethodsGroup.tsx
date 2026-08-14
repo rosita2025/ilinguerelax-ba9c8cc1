@@ -350,7 +350,6 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   void local; // Silenciar advertencia si no se usa local.isUsd etc directamente
 
   // Replicating exactly the logic from OrderSummary.tsx
-  // Replicating exactly the logic from OrderSummary.tsx
   const localItemsSum = sumItemsLocal(
     items.map((i) => ({ id: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
     countryCode,

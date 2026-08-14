@@ -410,6 +410,7 @@ const pt: CheckoutUIStrings = {
   included: "Inclusos",
   total: "Total",
   inYourCurrency: "na sua moeda",
+  acceptedMethods: "MÉTODOS DE PAGAMENTO ACEITOS:",
 
   sslEncryption: "Criptografia SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Peru",
@@ -512,6 +513,7 @@ const fr: CheckoutUIStrings = {
   included: "Incluses",
   total: "Total",
   inYourCurrency: "dans votre monnaie",
+  acceptedMethods: "MODES DE PAIEMENT ACCEPTÉS :",
 
   sslEncryption: "Chiffrement SSL Stripe",
   mercadoPagoPeru: "Mercado Pago Pérou",

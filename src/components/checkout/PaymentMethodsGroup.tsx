@@ -2366,12 +2366,12 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
             <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
           ) : selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) ? (
             <><Lock className="w-4 h-4" /> {language === "en"
-              ? "Checkout Securely"
+              ? `Checkout Securely · ${finalPriceLabel}`
               : language === "pt"
-                ? "Continuar para pagamento"
+                ? `Continuar para pagamento · ${finalPriceLabel}`
                 : language === "fr"
-                  ? "Continuer vers le paiement"
-                  : "Continuar de Pago"}</>
+                  ? `Continuer vers le paiement · ${finalPriceLabel}`
+                  : `Continuar de Pago · ${finalPriceLabel}`}</>
           ) : (
             <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? `Checkout with Hotmart · ${finalPriceLabel}` : `Pagar con Hotmart · ${finalPriceLabel}`) : `${t.buyNow} · ${finalPriceLabel}`}</>
           )}

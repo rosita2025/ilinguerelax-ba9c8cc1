@@ -33,8 +33,8 @@ export const PixelDebugger = () => {
     }
 
     // Intercept fbq calls
-    const originalFbq = window.fbq;
-    window.fbq = function(...args: any[]) {
+    const originalFbq = (window as any).fbq;
+    (window as any).fbq = function(...args: any[]) {
       if (args[0] === 'track') {
         const eventName = args[1];
         const params = args[2];
@@ -57,7 +57,7 @@ export const PixelDebugger = () => {
     };
 
     return () => {
-      window.fbq = originalFbq;
+      (window as any).fbq = originalFbq;
     };
   }, []);
 
@@ -110,9 +110,14 @@ export const PixelDebugger = () => {
                   filteredEvents.map((event, i) => {
                     const value = event.params?.value;
                     const currency = event.params?.currency;
+                    
+                    // Extraer SKU(s) para comparar con USD Regional
+                    const skus = Array.isArray(event.params?.content_ids) ? event.params.content_ids : [];
+                    const contentName = event.params?.content_name || "";
+                    
                     const isCorrectFormat = typeof value === 'number' && 
-                                          Number(value).toFixed(2) === String(value) ||
-                                          (typeof value === 'number' && String(value).split('.')[1]?.length === 2);
+                                          (value.toFixed(2) === String(value) || 
+                                           (String(value).includes('.') && String(value).split('.')[1].length === 2));
                     
                     return (
                       <TableRow key={i} className="text-xs group hover:bg-teal-500/5 transition-colors">
@@ -140,16 +145,19 @@ export const PixelDebugger = () => {
                               )}
                             </div>
                             {value !== undefined && (
-                              <div className="flex items-center gap-1 text-[9px]">
+                              <div className="flex flex-col items-end gap-1 mt-1 text-[9px]">
                                 {isCorrectFormat ? (
-                                  <span className="flex items-center gap-0.5 text-green-600">
+                                  <span className="flex items-center gap-0.5 text-green-600 font-medium">
                                     <CheckCircle2 className="w-2.5 h-2.5" /> 2 decimals OK
                                   </span>
                                 ) : (
-                                  <span className="flex items-center gap-0.5 text-amber-500 font-bold">
-                                    <AlertCircle className="w-2.5 h-2.5" /> CHECK FORMAT
+                                  <span className="flex items-center gap-0.5 text-red-500 font-bold animate-pulse">
+                                    <AlertCircle className="w-2.5 h-2.5" /> ERROR: NO 2 DECIMALS
                                   </span>
                                 )}
+                                <span className="text-[8px] text-muted-foreground italic">
+                                  ROAS Precision Check
+                                </span>
                               </div>
                             )}
                           </div>

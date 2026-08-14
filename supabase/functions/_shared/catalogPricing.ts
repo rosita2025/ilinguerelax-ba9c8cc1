@@ -115,7 +115,16 @@ function serviceClient() {
   );
 }
 
-function pickTierPrice(row: Record<string, unknown>, tier: RegionTier): number {
+function pickTierPrice(row: Record<string, unknown>, tier: RegionTier, currency?: string | null): number {
+  // Si se especifica una moneda y existe un override USD regional para ella, esa es la verdad absoluta.
+  if (currency) {
+    const localUsdPrices = (row.local_usd_prices ?? null) as Record<string, number> | null;
+    const regionalUsd = localUsdPrices?.[currency.toUpperCase()];
+    if (typeof regionalUsd === "number" && regionalUsd > 0) {
+      return regionalUsd;
+    }
+  }
+
   const global = Number(row.price_usd) || 0;
   const latam = row.price_usd_latam != null ? Number(row.price_usd_latam) : global;
   const tienda = row.price_usd_tienda != null ? Number(row.price_usd_tienda) : latam;
@@ -146,6 +155,7 @@ export async function resolveServerPricing(opts: {
   items: Array<{ id: string; quantity: number; price?: number | null }>;
   country?: string | null;
   couponCode?: string | null;
+  currency?: string | null;
 }): Promise<ResolvedPricing> {
   const tier = tierForCountry(opts.country);
   const supabase = serviceClient();
@@ -158,6 +168,9 @@ export async function resolveServerPricing(opts: {
     }))
     .filter((i) => i.id);
   if (!wanted.length) throw new PricingError("Carrito vacío");
+
+  const currencyHint = opts.currency;
+
 
   const skus = Array.from(new Set(wanted.map((i) => normalizeSku(i.id)).filter(Boolean))) as string[];
 
@@ -217,7 +230,7 @@ export async function resolveServerPricing(opts: {
     const isUpsell = item.id.toLowerCase().startsWith("upsell-");
 
     // Precio mínimo autoritativo del catálogo para este país.
-    let unit = pickTierPrice(row, tier);
+    let unit = pickTierPrice(row, tier, currencyHint);
 
     if (isUpsell) {
       const pct = maxDiscount.get(sku) ?? DEFAULT_UPSELL_DISCOUNT_PCT;

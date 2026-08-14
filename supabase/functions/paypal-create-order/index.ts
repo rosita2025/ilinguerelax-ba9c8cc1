@@ -65,7 +65,8 @@ Deno.serve(async (req) => {
       pricing = await resolveServerPricing({
         items: bodyItems,
         country: country,
-        couponCode: couponCode
+        couponCode: couponCode,
+        currency: currencyReq
       });
     } catch (e) {
       if (e instanceof PricingError) {

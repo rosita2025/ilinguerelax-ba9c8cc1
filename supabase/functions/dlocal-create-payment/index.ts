@@ -62,6 +62,7 @@ Deno.serve(async (req) => {
         items: body.items.map((i) => ({ id: i.id, quantity: i.quantity, price: i.price })),
         country: body.country,
         couponCode: body.couponCode,
+        currency: body.currency,
       });
     } catch (e) {
       if (e instanceof PricingError) return json({ error: e.message }, 400);

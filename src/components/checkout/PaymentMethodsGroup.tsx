@@ -370,12 +370,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     : (local.formatted || formatLocalDirect(localTotalAmount, countryCode));
 
   const penBadge = (penTotals && !isGlobalGateway) ? formatPen(penTotals.total) : null;
-  const isActuallyShowingLocal = !penBadge && !local.loading;
+  const isActuallyShowingLocal = !local.loading;
   
   // Badge principal: SIEMPRE en moneda local del país EXCEPTO en países restringidos (AR/HN) 
   // o cuando se usa un gateway global, donde se fuerza USD.
   const priceBadge = penBadge ?? localFormatted;
-  const usdSuffix = isActuallyShowingLocal ? (local.isUsd ? ` (≈ ${localFormatted})` : ` (≈ $${totalUsd} USD)`) : "";
+  const usdSuffix = isActuallyShowingLocal 
+    ? (local.isUsd ? ` (≈ USD $${totalUsd})` : ` (≈ $${totalUsd} USD)`) 
+    : "";
   const finalPriceLabel = `${priceBadge}${usdSuffix}`;
   const localBadge = "";
 

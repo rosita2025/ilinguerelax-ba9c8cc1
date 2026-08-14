@@ -2116,7 +2116,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-xl pointer-events-none" />
                     </div>
                   </div>
-
+                </div>
 
                 <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 space-y-1.5">
                   <p className="text-[11px] uppercase tracking-wider text-neutral-500 text-center">

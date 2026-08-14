@@ -101,6 +101,7 @@ export interface CheckoutUIStrings {
   included: string;
   total: string;
   inYourCurrency: string;
+  acceptedMethods: string;
 
   // Footer
   sslEncryption: string;
@@ -306,6 +307,7 @@ const en: CheckoutUIStrings = {
   included: "Included",
   total: "Total",
   inYourCurrency: "in your currency",
+  acceptedMethods: "ACCEPTED PAYMENT METHODS:",
 
   sslEncryption: "SSL Stripe encryption",
   mercadoPagoPeru: "Mercado Pago Peru",

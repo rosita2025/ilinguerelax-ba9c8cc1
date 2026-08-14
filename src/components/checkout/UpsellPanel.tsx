@@ -36,7 +36,8 @@ function Price({
   sku?: string;
 }) {
   const { country } = useRegionTier();
-  const local = useLocalCurrencyForSku(usd, sku);
+  const overrides = useLocalOverrides(sku);
+  const local = useLocalCurrency(usd, (overrides as any)?.local_prices, (overrides as any)?.local_usd_prices);
   const isPeru = country === "PE";
 
   let label: string;

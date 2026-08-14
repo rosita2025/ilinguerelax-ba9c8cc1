@@ -121,32 +121,36 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
     phase: Phase,
   ): Promise<T> {
     const correlationId = correlationIdRef.current;
-    let lastErr: unknown = null;
-    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-      try {
-        const { data, error } = await invokeEdge<T>(fnName, {
-          body: { ...body, correlationId },
-          headers: { "x-correlation-id": correlationId },
-        }, { attempts: 2 });
-        if (error) throw new Error((error as Error)?.message || `Error en ${fnName}`);
-        console.info(`[paypal] ${fnName} ok`, { correlationId, attempt });
-        return data as T;
-      } catch (e) {
-        lastErr = e;
-        console.warn(`[paypal] ${fnName} attempt ${attempt} failed`, { correlationId, error: (e as Error).message });
-        if (attempt < MAX_ATTEMPTS) {
-          setErr({
-            message: `${friendlyMessage(phase, (e as Error).message)} Reintentando (${attempt}/${MAX_ATTEMPTS})…`,
-            phase,
-            attempt,
-            canRetry: false,
-          });
-          // Exponential backoff: 600ms, 1500ms
-          await wait(attempt === 1 ? 600 : 1500);
-        }
+    
+    // We use the shared invokeWithRetry which already has the directFetchFallback
+    // for "Failed to send" errors.
+    const { data, error } = await invokeEdge<T>(fnName, {
+      method: "POST",
+      body: { ...body, correlationId },
+      headers: { "x-correlation-id": correlationId },
+    }, { 
+      attempts: MAX_ATTEMPTS,
+      onAttemptError: (info) => {
+        console.warn(`[paypal] ${fnName} attempt ${info.attempt} failed`, { 
+          correlationId, 
+          error: (info.error as Error)?.message 
+        });
+        setErr({
+          message: `${friendlyMessage(phase, (info.error as Error)?.message)} Reintentando…`,
+          phase,
+          attempt: info.attempt,
+          canRetry: false,
+        });
       }
+    });
+
+    if (error) {
+      console.error(`[paypal] ${fnName} exhausted all attempts`, { correlationId, error });
+      throw error;
     }
-    throw lastErr instanceof Error ? lastErr : new Error("Error desconocido");
+    
+    console.info(`[paypal] ${fnName} ok`, { correlationId });
+    return data as T;
   }
 
   useEffect(() => {

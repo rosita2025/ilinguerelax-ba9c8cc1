@@ -384,7 +384,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   // o cuando se usa un gateway global, donde se fuerza USD.
   const priceBadge = penBadge ?? localTotalLabel;
   const usdSuffix = isActuallyShowingLocal 
-    ? ` ≈ USD $${currentUsdRef.toFixed(2)}`
+    ? ` ≈ USD $${localTotalAmount === localSubtotalAmount ? currentUsdRef.toFixed(2) : (localTotalAmount / (exchangeRates[countryCode] || 1)).toFixed(2)}`
     : "";
   const finalPriceLabel = `${priceBadge}${usdSuffix}`;
   const localBadge = "";

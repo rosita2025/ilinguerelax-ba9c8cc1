@@ -21,6 +21,7 @@ interface Row {
   provider: Provider;
   received_at: string;
   email: string | null;
+  name: string | null;
   amount: number | null;
   currency: string | null;
   product: string | null;
@@ -29,7 +30,8 @@ interface Row {
   mapped_status: Mapped;
   failure_reason: string | null;
   failed_step: string | null;
-  payload: unknown;
+  payload: any;
+  is_merged?: boolean;
 }
 
 const PROVIDER_META: Record<Provider, { label: string; icon: typeof CreditCard; color: string }> = {
@@ -267,22 +269,30 @@ const AdminPurchasesStatus = () => {
                         <Badge className={`${sMeta.className} font-normal`}>
                           <SIcon className="w-3 h-3 mr-1" />{sMeta.label}
                         </Badge>
+                        {r.is_merged && (
+                          <Badge variant="outline" className="text-[10px] h-5 border-amber-200 text-amber-600 bg-amber-50 font-normal">
+                            Unificado
+                          </Badge>
+                        )}
                         <span className="text-[11px] text-muted-foreground">{fmtDate(r.received_at)}</span>
                         {r.amount != null && (
-                          <span className="text-[11px] font-medium">
-                            {r.amount} {r.currency ?? ""}
+                          <span className="text-[11px] font-medium bg-muted/50 px-1 rounded">
+                            {r.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })} {r.currency ?? ""}
                           </span>
                         )}
                       </div>
-                      <div className="text-sm font-medium truncate">{r.email ?? "—"}</div>
+                      <div className="text-sm font-semibold flex items-center gap-2">
+                        <span className="truncate max-w-[150px]">{r.name ?? "Sin Nombre"}</span>
+                        <span className="text-muted-foreground font-normal truncate opacity-70">&lt;{r.email ?? "—"}&gt;</span>
+                      </div>
                       <div className="text-xs text-muted-foreground truncate">
                         {r.product ?? "—"} {r.transaction && <span className="opacity-60">· {r.transaction}</span>}
                       </div>
                       {(r.failure_reason || r.failed_step) && (
-                        <div className="mt-1 text-xs">
+                        <div className="mt-1 text-[11px] leading-tight space-y-0.5">
                           {r.failure_reason && (
-                            <div className="text-red-700">
-                              <span className="font-medium">Motivo:</span> {r.failure_reason}
+                            <div className="text-red-700 font-medium">
+                              {r.failure_reason}
                             </div>
                           )}
                           {r.failed_step && (

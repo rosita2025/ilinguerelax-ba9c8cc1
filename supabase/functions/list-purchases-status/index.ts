@@ -163,9 +163,9 @@ Deno.serve(async (req) => {
         const { mapped: m, reason } = mapMp(status, detail);
         rows.push({
           id: `mp-${r.id}`, provider: "mercadopago", received_at: r.created_at,
-          email: r.email ?? d.payer_email ?? d.customer_email ?? null,
-          name: r.name ?? d.payer_name ?? d.customer_name ?? null,
-          country: r.country || d.country || d.country_id || null,
+          email: r.email || d.payer_email || d.customer_email || d.email || null,
+          name: r.name || d.payer_name || d.customer_name || d.name || null,
+          country: r.country || d.country || d.country_id || d.payer_country || null,
           amount: d.amount ?? d.transaction_amount ?? null,
           currency: d.currency ?? d.currency_id ?? null,
           product: d.product ?? d.description ?? d.items_summary ?? null,
@@ -241,9 +241,9 @@ Deno.serve(async (req) => {
           id: `st-${r.id}`, 
           provider: "stripe", 
           received_at: r.created_at,
-          email: r.email || d.customer_email || d.email || d.payer_email || null,
-          name: r.name || d.customer_name || d.name || d.payer_name || null,
-          country: r.country || d.customer_country || d.country || null,
+          email: r.email || d.customer_email || d.email || d.payer_email || d.buyer_email || null,
+          name: r.name || d.customer_name || d.name || d.payer_name || d.buyer_name || null,
+          country: r.country || d.customer_country || d.country || d.buyer_country || null,
           amount: r.value || d.amount || d.transaction_amount || null,
           currency: r.currency || d.currency || d.currency_id || null,
           product: r.product_id || d.items_summary || d.product_name || d.description || null,
@@ -263,11 +263,15 @@ Deno.serve(async (req) => {
       const { data } = await admin
         .from("funnel_events")
         .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider, email, name, country")
-        .or("provider.eq.hotmart,referrer.ilike.%hotmart-webhook%,referrer.ilike.%\"provider\":\"hotmart\"%,event_name.ilike.purchase%,session_id.ilike.HP%,referrer.ilike.%\"hottok\":%")
+        .or("provider.eq.hotmart,referrer.ilike.%hotmart-webhook%,referrer.ilike.%\"provider\":\"hotmart\"%,event_name.ilike.purchase%,session_id.ilike.HP%,referrer.ilike.%\"hottok\":%,event_name.eq.InitiateCheckout")
         .order("created_at", { ascending: false })
         .limit(take);
 
       for (const r of data ?? []) {
+        // Only process if it's explicitly hotmart OR session_id looks like Hotmart (HP...)
+        const isLikelyHotmart = r.provider === "hotmart" || (r.session_id && r.session_id.startsWith("HP")) || (r.referrer && r.referrer.includes("hotmart"));
+        if (!isLikelyHotmart) continue;
+
         let d: any = {};
         try { d = JSON.parse(r.referrer || "{}"); } catch { d = {}; }
         
@@ -278,12 +282,12 @@ Deno.serve(async (req) => {
           id: `hm-${r.id}`, 
           provider: "hotmart", 
           received_at: r.created_at,
-          email: r.email || d.email || d.buyer_email || d.payer_email || null,
-          name: r.name || d.name || d.buyer_name || d.payer_name || null,
-          country: r.country || d.country || d.buyer_address_country || null,
+          email: r.email || d.email || d.buyer_email || d.payer_email || d.buyer?.email || null,
+          name: r.name || d.name || d.buyer_name || d.payer_name || d.buyer?.name || null,
+          country: r.country || d.country || d.buyer_address_country || d.buyer?.address?.country || null,
           amount: r.value || d.amount || d.value || null,
           currency: r.currency || d.currency || null,
-          product: r.product_id || d.product_name || d.name || null,
+          product: r.product_id || d.product_name || d.name || d.product?.name || null,
           transaction: r.session_id || d.transaction || d.transaction_code || d.hottok || null,
           raw_status: status,
           mapped_status: (status === "approved" || status === "complete" || status === "succeeded" || status === "Purchase") ? "approved" : 
@@ -378,7 +382,12 @@ Deno.serve(async (req) => {
         emailToApproved.add(row.email.toLowerCase());
       }
       
-      const key = (row.provider === "hotmart" && row.transaction) ? `hotmart:${row.transaction.substring(0, 12)}` : (row.transaction ? `${row.provider}:${row.transaction}` : `${row.provider}:${row.email}:${row.product}`);
+      // Hotmart IDs are typically HP followed by digits, we truncate to 12 to normalize across events
+      let key = (row.transaction ? `${row.provider}:${row.transaction}` : `${row.provider}:${row.email}:${row.product}`);
+      if (row.provider === "hotmart" && row.transaction && row.transaction.startsWith("HP")) {
+        key = `hotmart:${row.transaction.substring(0, 12)}`;
+      }
+      
       const existing = dedup.get(key);
       
       if (!existing) {
@@ -393,9 +402,16 @@ Deno.serve(async (req) => {
 
       if (statusPriority[row.mapped_status] > statusPriority[existing.mapped_status]) {
         row.is_merged = true;
+        // Keep the best name/email if the new one is null
+        row.name = row.name || existing.name;
+        row.email = row.email || existing.email;
+        row.country = row.country || existing.country;
         dedup.set(key, row);
       } else {
         existing.is_merged = true;
+        existing.name = existing.name || row.name;
+        existing.email = existing.email || row.email;
+        existing.country = existing.country || row.country;
       }
     }
 

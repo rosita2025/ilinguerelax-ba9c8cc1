@@ -232,6 +232,17 @@ Deno.serve(async (req) => {
       currency,
       country: country ?? null,
       provider: "dlocalgo",
+      email: customerEmail || null,
+      name: customerName || null,
+      referrer: JSON.stringify({
+        ...payment,
+        localAmount: amount,
+        localCurrency: currency,
+        payer_name: customerName,
+        payer_email: customerEmail,
+        status: status,
+        provider: "dlocalgo"
+      })
     }).then(({ error }) => { if (error) console.error("dLocal funnel log failed:", error.message); });
 
 

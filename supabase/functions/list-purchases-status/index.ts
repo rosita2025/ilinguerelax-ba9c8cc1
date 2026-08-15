@@ -58,7 +58,6 @@ const PAYPAL_STEPS: Record<string, { step: string; reason?: string; mapped: Mapp
   "PAYMENT.CAPTURE.REVERSED":      { step: "Revertido (chargeback)", mapped: "chargeback" },
 };
 
-
 function mapManual(status: string): Mapped {
   const s = (status || "").toLowerCase();
   if (s === "approved" || s === "verified") return "approved";
@@ -130,6 +129,7 @@ Deno.serve(async (req) => {
           provider: "shopify",
           received_at: r.order_created_at,
           email: r.customer_name, 
+          name: null,
           amount: null,
           currency: "USD",
           product: r.product_name,
@@ -147,14 +147,12 @@ Deno.serve(async (req) => {
     if (!provider || provider === "mercadopago") {
       const { data } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, referrer, email, provider")
+        .select("id, created_at, event_name, referrer, email, name, provider")
         .or("provider.eq.mercadopago,referrer.ilike.%\"provider\":\"mercadopago\"%,event_name.ilike.mp_%")
         .order("created_at", { ascending: false })
         .limit(take);
 
-      const seen = new Set<string>();
       for (const r of data ?? []) {
-        if (seen.has(r.id)) continue; seen.add(r.id);
         let d: any = {};
         try { d = JSON.parse(r.referrer || "{}"); } catch { d = {}; }
         
@@ -164,6 +162,7 @@ Deno.serve(async (req) => {
         rows.push({
           id: `mp-${r.id}`, provider: "mercadopago", received_at: r.created_at,
           email: r.email ?? d.payer_email ?? d.customer_email ?? null,
+          name: r.name ?? d.payer_name ?? d.customer_name ?? null,
           amount: d.amount ?? d.transaction_amount ?? null,
           currency: d.currency ?? d.currency_id ?? null,
           product: d.product ?? d.description ?? d.items_summary ?? null,
@@ -189,12 +188,14 @@ Deno.serve(async (req) => {
         const meta = PAYPAL_STEPS[r.event_type] ?? { step: r.event_type, mapped: "unknown" as Mapped };
         const p: any = r.payload ?? {};
         const resource = p?.resource ?? {};
-        const email = resource?.payer?.email_address ?? resource?.payer?.email ?? null;
+        const payer = resource?.payer ?? {};
+        const email = payer?.email_address ?? payer?.email ?? null;
+        const name = payer?.name?.given_name ? `${payer.name.given_name} ${payer.name.surname || ""}` : null;
         const amt = resource?.amount?.value ?? resource?.purchase_units?.[0]?.amount?.value ?? null;
         const cur = resource?.amount?.currency_code ?? resource?.purchase_units?.[0]?.amount?.currency_code ?? null;
         rows.push({
           id: `pp-${r.id}`, provider: "paypal", received_at: r.created_at,
-          email, amount: amt ? Number(amt) : null, currency: cur,
+          email, name, amount: amt ? Number(amt) : null, currency: cur,
           product: resource?.purchase_units?.[0]?.description ?? null,
           transaction: r.resource_id ?? r.correlation_id,
           raw_status: r.event_type,
@@ -209,7 +210,7 @@ Deno.serve(async (req) => {
     if (!provider || provider === "stripe") {
       const { data: stripeEvents } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, referrer, email, product_id, value, currency, provider")
+        .select("id, created_at, event_name, referrer, email, name, product_id, value, currency, provider")
         .or("provider.eq.stripe,referrer.ilike.%\"provider\":\"stripe\"%,event_name.eq.Purchase,event_name.eq.InitiateCheckout,event_name.eq.BeginCheckout")
         .order("created_at", { ascending: false })
         .limit(take);
@@ -236,6 +237,7 @@ Deno.serve(async (req) => {
           provider: "stripe", 
           received_at: r.created_at,
           email: r.email || d.customer_email || d.email || null,
+          name: r.name || d.customer_name || d.name || null,
           amount: r.value || d.amount || null,
           currency: r.currency || d.currency || null,
           product: r.product_id || d.items_summary || d.product_name || null,
@@ -253,7 +255,7 @@ Deno.serve(async (req) => {
     if (!provider || provider === "hotmart") {
       const { data } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider, email")
+        .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider, email, name")
         .or("provider.eq.hotmart,referrer.ilike.%hotmart-webhook%,referrer.ilike.%\"provider\":\"hotmart\"%,event_name.ilike.purchase%,session_id.ilike.HP%")
         .order("created_at", { ascending: false })
         .limit(take);
@@ -270,6 +272,7 @@ Deno.serve(async (req) => {
           provider: "hotmart", 
           received_at: r.created_at,
           email: r.email || d.email || d.buyer_email || null,
+          name: r.name || d.name || d.buyer_name || null,
           amount: r.value || d.amount || d.value || null,
           currency: r.currency || d.currency || null,
           product: r.product_id || d.product_name || d.name || null,
@@ -293,7 +296,7 @@ Deno.serve(async (req) => {
     if (!provider || provider === "dlocalgo") {
       const { data } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider, email")
+        .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider, email, name")
         .or("provider.eq.dlocalgo,referrer.ilike.%\"provider\":\"dlocalgo\"%,event_name.ilike.dlocal_%")
         .order("created_at", { ascending: false })
         .limit(take);
@@ -310,8 +313,9 @@ Deno.serve(async (req) => {
           provider: "dlocalgo",
           received_at: r.created_at,
           email: r.email || d.customer_email || d.email || null,
-          amount: r.value || d.amount || null,
-          currency: r.currency || d.currency || null,
+          name: r.name || d.customer_name || d.payer_name || d.name || null,
+          amount: d.localAmount || r.value || d.amount || null,
+          currency: d.localCurrency || r.currency || d.currency || null,
           product: r.product_id || d.items_summary || d.product_name || null,
           transaction: r.session_id || d.payment_id || d.order_id || null,
           raw_status: status,
@@ -333,6 +337,7 @@ Deno.serve(async (req) => {
         .limit(take);
       
       for (const r of data ?? []) {
+        const buyer = r.buyer || {};
         const items = Array.isArray(r.items) ? r.items : [];
         const productSummary = items.map((it: any) => it.id).join(", ");
         
@@ -341,6 +346,7 @@ Deno.serve(async (req) => {
           provider: "internal_cart",
           received_at: r.last_activity,
           email: r.email,
+          name: buyer.fullName || buyer.name || null,
           amount: null,
           currency: null,
           product: productSummary || "Carrito vacío",
@@ -354,16 +360,62 @@ Deno.serve(async (req) => {
       }
     }
 
-    // ─── Manual (Yape/Plin/Binance) se gestionan en /admin/manual-payments ─
-    // Excluidos de este dashboard para evitar duplicación.
+    // ─── Global Deduplication & Internal Cart Cleanup ──────────────────
+    const dedup = new Map<string, Row>();
+    const emailToApproved = new Set<string>();
+
+    // First pass: identify approved emails and build dedup map
+    for (const row of rows) {
+      if (row.mapped_status === "approved" && row.email) {
+        emailToApproved.add(row.email.toLowerCase());
+      }
+      
+      const key = row.transaction ? `${row.provider}:${row.transaction}` : `${row.provider}:${row.email}:${row.product}`;
+      const existing = dedup.get(key);
+      
+      if (!existing) {
+        dedup.set(key, row);
+        continue;
+      }
+
+      // Prioritize status: approved > pending > refused > abandoned
+      const statusPriority: Record<Mapped, number> = {
+        approved: 10,
+        pending: 5,
+        refused: 3,
+        chargeback: 2,
+        refunded: 2,
+        blocked: 2,
+        cancelled: 1,
+        abandoned: 0,
+        unknown: 0
+      };
+
+      if (statusPriority[row.mapped_status] > statusPriority[existing.mapped_status]) {
+        row.is_merged = true;
+        dedup.set(key, row);
+      } else {
+        existing.is_merged = true;
+      }
+    }
+
+    // Filter out internal carts if user already has an approved payment
+    let filtered = Array.from(dedup.values());
+    filtered = filtered.filter(r => {
+      if (r.provider === "internal_cart" && r.email && emailToApproved.has(r.email.toLowerCase())) {
+        return false;
+      }
+      return true;
+    });
 
     // ─── Filter + sort ────────────────────────────────────────────────
-    let filtered = rows;
     if (mapped && mapped !== "all") filtered = filtered.filter((r) => r.mapped_status === mapped);
     if (s) filtered = filtered.filter((r) =>
       (r.email ?? "").toLowerCase().includes(s) ||
+      (r.name ?? "").toLowerCase().includes(s) ||
       (r.transaction ?? "").toLowerCase().includes(s) ||
       (r.product ?? "").toLowerCase().includes(s));
+    
     filtered.sort((a, b) => b.received_at.localeCompare(a.received_at));
 
     const summary = filtered.reduce((acc: Record<string, number>, r) => {

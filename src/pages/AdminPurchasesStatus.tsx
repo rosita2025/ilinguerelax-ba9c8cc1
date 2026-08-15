@@ -272,9 +272,9 @@ const AdminPurchasesStatus = () => {
                         <Badge className={`${sMeta.className} font-normal`}>
                           <SIcon className="w-3 h-3 mr-1" />{sMeta.label}
                         </Badge>
-                        {(r.country || r.payload?.customer_country || r.payload?.country) && (
+                        {(r.country || r.payload?.customer_country || r.payload?.country || r.payload?.buyer_country || r.payload?.buyer?.address?.country) && (
                           <Badge variant="outline" className="bg-slate-50 text-slate-600 font-normal">
-                            {r.country || r.payload?.customer_country || r.payload?.country}
+                            {r.country || r.payload?.customer_country || r.payload?.country || r.payload?.buyer_country || r.payload?.buyer?.address?.country}
                           </Badge>
                         )}
                         {r.is_merged && (

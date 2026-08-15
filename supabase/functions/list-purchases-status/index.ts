@@ -135,34 +135,27 @@ Deno.serve(async (req) => {
     if (!provider || provider === "mercadopago") {
       const { data } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_type, event_data, email")
-        .like("event_type", "mp_%")
-        .or("event_type.eq.mp_approved,event_type.eq.mp_pending,event_type.eq.mp_rejected,event_type.eq.mp_in_process,event_type.eq.mp_refunded,event_type.eq.mp_cancelled,event_type.eq.mp_charged_back,event_type.eq.purchase")
+        .select("id, created_at, event_name, referrer, email, provider")
+        .or("provider.eq.mercadopago,referrer.ilike.%\"provider\":\"mercadopago\"%,event_name.ilike.mp_%")
         .order("created_at", { ascending: false })
         .limit(take);
-      // Also include event_type=purchase from MP (approved path)
-      const { data: purchases } = await admin
-        .from("funnel_events")
-        .select("id, created_at, event_type, event_data, email")
-        .eq("event_type", "purchase")
-        .contains("event_data", { provider: "mercadopago" } as any)
-        .order("created_at", { ascending: false })
-        .limit(take);
-      const all = [...(data ?? []), ...(purchases ?? [])];
+
       const seen = new Set<string>();
-      for (const r of all) {
+      for (const r of data ?? []) {
         if (seen.has(r.id)) continue; seen.add(r.id);
-        const d: any = r.event_data ?? {};
-        const status = d.status ?? (r.event_type === "purchase" ? "approved" : r.event_type.replace(/^mp_/, ""));
+        let d: any = {};
+        try { d = JSON.parse(r.referrer || "{}"); } catch { d = {}; }
+        
+        const status = d.status ?? (r.event_name.toLowerCase() === "purchase" ? "approved" : r.event_name.toLowerCase().replace(/^mp_/, ""));
         const detail = d.status_detail;
         const { mapped: m, reason } = mapMp(status, detail);
         rows.push({
           id: `mp-${r.id}`, provider: "mercadopago", received_at: r.created_at,
-          email: r.email ?? d.payer_email ?? null,
+          email: r.email ?? d.payer_email ?? d.customer_email ?? null,
           amount: d.amount ?? d.transaction_amount ?? null,
           currency: d.currency ?? d.currency_id ?? null,
-          product: d.product ?? d.description ?? null,
-          transaction: d.payment_id ?? d.mp_id ?? null,
+          product: d.product ?? d.description ?? d.items_summary ?? null,
+          transaction: d.payment_id ?? d.mp_id ?? d.transaction ?? null,
           raw_status: `${status}${detail ? ` · ${detail}` : ""}`,
           mapped_status: m, failure_reason: reason,
           failed_step: m === "pending" ? "Esperando confirmación del banco" :
@@ -203,32 +196,18 @@ Deno.serve(async (req) => {
 
     // ─── Stripe (funnel_events) ───────────────────────────────────────
     if (!provider || provider === "stripe") {
-      const { data } = await admin
+      const { data: stripeEvents } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, event_data, email, product_id, value, currency, referrer")
-        .or("event_data->>provider.eq.stripe,referrer.ilike.%\"provider\":\"stripe\"%,event_name.eq.Purchase")
+        .select("id, created_at, event_name, referrer, email, product_id, value, currency, provider")
+        .or("provider.eq.stripe,referrer.ilike.%\"provider\":\"stripe\"%,event_name.eq.Purchase,event_name.eq.InitiateCheckout,event_name.eq.BeginCheckout")
         .order("created_at", { ascending: false })
         .limit(take);
 
-      // Add Abandoned Checkout detection for Stripe/Global
-      const { data: abandoned } = await admin
-        .from("funnel_events")
-        .select("id, created_at, event_name, event_data, email, product_id, value, currency, country, referrer")
-        .in("event_name", ["InitiateCheckout", "BeginCheckout"])
-        .order("created_at", { ascending: false })
-        .limit(take);
-      
-      const allStripe = [...(data ?? []), ...(abandoned ?? [])];
-      
-      // Filter out InitiateCheckout events if a Purchase exists for the same session/email
-      // (This is a naive filter, but helps reduce noise)
-      const purchaseEmails = new Set((data ?? []).map(p => p.email).filter(Boolean));
+      const purchaseEmails = new Set((stripeEvents ?? []).filter(r => r.event_name === "Purchase").map(p => p.email).filter(Boolean));
 
-      for (const r of allStripe) {
-        let d: any = r.event_data ?? {};
-        if (Object.keys(d).length === 0 && r.referrer) {
-          try { d = JSON.parse(r.referrer); } catch { d = {}; }
-        }
+      for (const r of stripeEvents ?? []) {
+        let d: any = {};
+        try { d = JSON.parse(r.referrer || "{}"); } catch { d = {}; }
         
         const isAbandoned = r.event_name === "InitiateCheckout" || r.event_name === "BeginCheckout";
         if (isAbandoned && r.email && purchaseEmails.has(r.email)) continue;
@@ -263,16 +242,16 @@ Deno.serve(async (req) => {
     if (!provider || provider === "hotmart") {
       const { data } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, event_data, email, product_id, value, currency, referrer")
-        .or("event_name.ilike.purchase,event_name.ilike.InitiateCheckout,event_name.ilike.Purchase")
-        .or("event_data->>provider.eq.hotmart,referrer.ilike.%hotmart-webhook%,referrer.ilike.%\"provider\":\"hotmart\"%")
+        .select("id, created_at, event_name, referrer, email, product_id, value, currency, provider")
+        .or("provider.eq.hotmart,referrer.ilike.%hotmart-webhook%,referrer.ilike.%\"provider\":\"hotmart\"%,event_name.ilike.purchase%")
         .order("created_at", { ascending: false })
         .limit(take);
 
       for (const r of data ?? []) {
-        const d: any = r.event_data ?? {};
-        // Match both 'Purchase' and 'purchase' lowercase
-        const isPurchase = r.event_name.toLowerCase() === "purchase";
+        let d: any = {};
+        try { d = JSON.parse(r.referrer || "{}"); } catch { d = {}; }
+        
+        const isPurchase = r.event_name.toLowerCase().includes("purchase");
         const status = d.status || (isPurchase ? "approved" : "pending");
         
         rows.push({

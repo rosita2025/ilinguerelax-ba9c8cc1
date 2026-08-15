@@ -61,8 +61,10 @@ async function verifySignature(req: Request, dataId: string): Promise<boolean> {
   ];
   for (const m of manifests) {
     const expected = await hmacSha256Hex(secret, m);
-    // Constant-time compare not critical here (HMAC output length is fixed)
     if (expected === v1) return true;
+    else {
+      console.log(`HMAC mismatch for manifest: ${m}. Expected: ${expected}, Received: ${v1}`);
+    }
   }
   return false;
 }

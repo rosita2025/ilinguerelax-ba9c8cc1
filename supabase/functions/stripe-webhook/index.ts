@@ -159,6 +159,7 @@ async function recordStripePurchase(params: {
     session_id: eventKey,
     page_path: "/payment-success",
     country: customerCountry || null,
+    provider: "stripe",
     referrer: JSON.stringify({
       provider: "stripe",
       event_type: eventType,

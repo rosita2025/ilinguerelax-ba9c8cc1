@@ -63,6 +63,7 @@ const AdminPurchasesStatus = () => {
   const [rows, setRows] = useState<Row[]>([]);
   const [summary, setSummary] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
+  const [lastSync, setLastSync] = useState<Date | null>(null);
   const [provider, setProvider] = useState<Provider | "all">("all");
   const [mapped, setMapped] = useState<Mapped | "all">("all");
   const [search, setSearch] = useState("");
@@ -135,6 +136,7 @@ const AdminPurchasesStatus = () => {
       rows.sort((a, b) => String(b.received_at ?? "").localeCompare(String(a.received_at ?? "")));
       setRows(rows);
       setSummary((data as any)?.summary ?? {});
+      setLastSync(new Date());
 
     } catch (e) {
       toast.error("Error al cargar", { description: (e as Error).message });
@@ -168,8 +170,13 @@ const AdminPurchasesStatus = () => {
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div>
             <h1 className="text-lg sm:text-xl font-bold">Estado de compras · Todas las pasarelas</h1>
-            <p className="text-xs text-muted-foreground">
-              Hotmart · Stripe · Mercado Pago · PayPal. Muestra por qué quedó bloqueado y qué paso falló. (Yape/Plin/Binance en <a href="/admin/manual-payments" className="underline">Entregas manuales</a>.)
+            <p className="text-xs text-muted-foreground flex items-center gap-2">
+              Hotmart · Stripe · Mercado Pago · PayPal. Muestra por qué quedó bloqueado y qué paso falló. 
+              {lastSync && (
+                <span className="bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-sm border border-emerald-100 animate-in fade-in slide-in-from-top-1">
+                  Sincronizado: {lastSync.toLocaleTimeString()}
+                </span>
+              )}
             </p>
           </div>
           <Button size="sm" variant="outline" onClick={load} disabled={loading}>

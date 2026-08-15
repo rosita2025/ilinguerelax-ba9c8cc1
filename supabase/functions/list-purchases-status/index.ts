@@ -15,6 +15,7 @@ interface Row {
   received_at: string;
   email: string | null;
   name: string | null;
+  country?: string | null;
   amount: number | null;
   currency: string | null;
   product: string | null;
@@ -130,6 +131,7 @@ Deno.serve(async (req) => {
           received_at: r.order_created_at,
           email: r.customer_name, 
           name: null,
+          country: r.country || null,
           amount: null,
           currency: "USD",
           product: r.product_name,
@@ -163,6 +165,7 @@ Deno.serve(async (req) => {
           id: `mp-${r.id}`, provider: "mercadopago", received_at: r.created_at,
           email: r.email ?? d.payer_email ?? d.customer_email ?? null,
           name: r.name ?? d.payer_name ?? d.customer_name ?? null,
+          country: r.country || d.country || d.country_id || null,
           amount: d.amount ?? d.transaction_amount ?? null,
           currency: d.currency ?? d.currency_id ?? null,
           product: d.product ?? d.description ?? d.items_summary ?? null,
@@ -195,7 +198,9 @@ Deno.serve(async (req) => {
         const cur = resource?.amount?.currency_code ?? resource?.purchase_units?.[0]?.amount?.currency_code ?? null;
         rows.push({
           id: `pp-${r.id}`, provider: "paypal", received_at: r.created_at,
-          email, name, amount: amt ? Number(amt) : null, currency: cur,
+          email, name, 
+          country: resource?.payer?.address?.country_code || null,
+          amount: amt ? Number(amt) : null, currency: cur,
           product: resource?.purchase_units?.[0]?.description ?? null,
           transaction: r.resource_id ?? r.correlation_id,
           raw_status: r.event_type,
@@ -210,7 +215,7 @@ Deno.serve(async (req) => {
     if (!provider || provider === "stripe") {
       const { data: stripeEvents } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, referrer, email, name, product_id, value, currency, provider")
+        .select("id, created_at, event_name, referrer, email, name, country, product_id, value, currency, provider")
         .or("provider.eq.stripe,referrer.ilike.%\"provider\":\"stripe\"%,event_name.eq.Purchase,event_name.eq.InitiateCheckout,event_name.eq.BeginCheckout")
         .order("created_at", { ascending: false })
         .limit(take);
@@ -236,16 +241,18 @@ Deno.serve(async (req) => {
           id: `st-${r.id}`, 
           provider: "stripe", 
           received_at: r.created_at,
-          email: r.email || d.customer_email || d.email || null,
-          name: r.name || d.customer_name || d.name || null,
-          amount: r.value || d.amount || null,
-          currency: r.currency || d.currency || null,
-          product: r.product_id || d.items_summary || d.product_name || null,
-          transaction: d.payment_intent_id || d.session_id || d.id || null,
+          email: r.email || d.customer_email || d.email || d.payer_email || null,
+          name: r.name || d.customer_name || d.name || d.payer_name || null,
+          country: r.country || d.customer_country || d.country || null,
+          amount: r.value || d.amount || d.transaction_amount || null,
+          currency: r.currency || d.currency || d.currency_id || null,
+          product: r.product_id || d.items_summary || d.product_name || d.description || null,
+          transaction: d.payment_intent_id || d.session_id || d.id || d.payment_id || null,
           raw_status: status,
           mapped_status: mapped,
-          failure_reason: d.failure_message || d.last_payment_error?.message || null,
-          failed_step: r.event_name === "InitiateCheckout" ? "Checkout iniciado (Stripe)" : null,
+          failure_reason: d.failure_message || d.last_payment_error?.message || d.status_detail || null,
+          failed_step: r.event_name === "InitiateCheckout" ? "Checkout iniciado (Stripe)" : 
+                       mapped === "refused" ? "Pago fallido en pasarela" : null,
           payload: d,
         });
       }
@@ -255,8 +262,8 @@ Deno.serve(async (req) => {
     if (!provider || provider === "hotmart") {
       const { data } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider, email, name")
-        .or("provider.eq.hotmart,referrer.ilike.%hotmart-webhook%,referrer.ilike.%\"provider\":\"hotmart\"%,event_name.ilike.purchase%,session_id.ilike.HP%")
+        .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider, email, name, country")
+        .or("provider.eq.hotmart,referrer.ilike.%hotmart-webhook%,referrer.ilike.%\"provider\":\"hotmart\"%,event_name.ilike.purchase%,session_id.ilike.HP%,referrer.ilike.%\"hottok\":%")
         .order("created_at", { ascending: false })
         .limit(take);
 
@@ -271,8 +278,9 @@ Deno.serve(async (req) => {
           id: `hm-${r.id}`, 
           provider: "hotmart", 
           received_at: r.created_at,
-          email: r.email || d.email || d.buyer_email || null,
-          name: r.name || d.name || d.buyer_name || null,
+          email: r.email || d.email || d.buyer_email || d.payer_email || null,
+          name: r.name || d.name || d.buyer_name || d.payer_name || null,
+          country: r.country || d.country || d.buyer_address_country || null,
           amount: r.value || d.amount || d.value || null,
           currency: r.currency || d.currency || null,
           product: r.product_id || d.product_name || d.name || null,
@@ -296,7 +304,7 @@ Deno.serve(async (req) => {
     if (!provider || provider === "dlocalgo") {
       const { data } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider, email, name")
+        .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider, email, name, country")
         .or("provider.eq.dlocalgo,referrer.ilike.%\"provider\":\"dlocalgo\"%,event_name.ilike.dlocal_%")
         .order("created_at", { ascending: false })
         .limit(take);
@@ -314,6 +322,7 @@ Deno.serve(async (req) => {
           received_at: r.created_at,
           email: r.email || d.customer_email || d.email || null,
           name: r.name || d.customer_name || d.payer_name || d.name || null,
+          country: r.country || d.country || d.payer_address_country || null,
           amount: d.localAmount || r.value || d.amount || null,
           currency: d.localCurrency || r.currency || d.currency || null,
           product: r.product_id || d.items_summary || d.product_name || null,

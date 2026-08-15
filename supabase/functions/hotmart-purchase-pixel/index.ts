@@ -313,8 +313,8 @@ serve(async (req) => {
       await supabase.from("funnel_events").insert({
         event_name: isApproved ? "Purchase" : `hotmart_${mappedStatus}`,
         product_id: product.id,
-        value: product.value,
-        currency: "USD",
+        value: product.value || body.data?.purchase?.price?.value || body.purchase?.price?.value || 0,
+        currency: body.data?.purchase?.price?.currency_code || body.purchase?.price?.currency_code || "USD",
         session_id: transactionCode || body.data?.purchase?.transaction || body.purchase?.transaction || body.transaction,
         page_path: "/hotmart-success",
         country: body.data?.buyer?.address?.country || body.buyer?.address?.country || null,

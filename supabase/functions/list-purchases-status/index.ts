@@ -382,7 +382,12 @@ Deno.serve(async (req) => {
         emailToApproved.add(row.email.toLowerCase());
       }
       
-      const key = (row.provider === "hotmart" && row.transaction) ? `hotmart:${row.transaction.substring(0, 12)}` : (row.transaction ? `${row.provider}:${row.transaction}` : `${row.provider}:${row.email}:${row.product}`);
+      // Hotmart IDs are typically HP followed by digits, we truncate to 12 to normalize across events
+      let key = (row.transaction ? `${row.provider}:${row.transaction}` : `${row.provider}:${row.email}:${row.product}`);
+      if (row.provider === "hotmart" && row.transaction && row.transaction.startsWith("HP")) {
+        key = `hotmart:${row.transaction.substring(0, 12)}`;
+      }
+      
       const existing = dedup.get(key);
       
       if (!existing) {
@@ -397,9 +402,16 @@ Deno.serve(async (req) => {
 
       if (statusPriority[row.mapped_status] > statusPriority[existing.mapped_status]) {
         row.is_merged = true;
+        // Keep the best name/email if the new one is null
+        row.name = row.name || existing.name;
+        row.email = row.email || existing.email;
+        row.country = row.country || existing.country;
         dedup.set(key, row);
       } else {
         existing.is_merged = true;
+        existing.name = existing.name || row.name;
+        existing.email = existing.email || row.email;
+        existing.country = existing.country || row.country;
       }
     }
 

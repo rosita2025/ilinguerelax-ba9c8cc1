@@ -321,6 +321,7 @@ Deno.serve(async (req) => {
           received_at: r.created_at,
           email: r.email || d.customer_email || d.email || null,
           name: r.name || d.customer_name || d.payer_name || d.name || null,
+          country: r.country || d.country || d.payer_address_country || null,
           amount: d.localAmount || r.value || d.amount || null,
           currency: d.localCurrency || r.currency || d.currency || null,
           product: r.product_id || d.items_summary || d.product_name || null,

@@ -78,6 +78,8 @@ const AdminPurchasesStatus = () => {
   const [resendOnSave, setResendOnSave] = useState(true);
   const [saving, setSaving] = useState(false);
   const [statusSaving, setStatusSaving] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const changeStatus = async (id: string, next: Mapped) => {
     setStatusSaving(id);
@@ -251,7 +253,7 @@ const AdminPurchasesStatus = () => {
             {rows.length === 0 && !loading && (
               <div className="p-6 text-center text-sm text-muted-foreground">Sin resultados con estos filtros.</div>
             )}
-            {rows.map((r) => {
+            {rows.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((r) => {
               const pMeta = PROVIDER_META[r.provider];
               const sMeta = STATUS_META[r.mapped_status];
               const PIcon = pMeta.icon; const SIcon = sMeta.icon;
@@ -359,6 +361,33 @@ const AdminPurchasesStatus = () => {
               );
             })}
           </div>
+          {rows.length > itemsPerPage && (
+            <div className="p-3 bg-muted/20 flex items-center justify-between border-t">
+              <span className="text-xs text-muted-foreground">
+                Mostrando {Math.min(rows.length, (currentPage - 1) * itemsPerPage + 1)} - {Math.min(rows.length, currentPage * itemsPerPage)} de {rows.length}
+              </span>
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="h-8 px-2"
+                >
+                  Anterior
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => setCurrentPage(p => Math.min(Math.ceil(rows.length / itemsPerPage), p + 1))}
+                  disabled={currentPage >= Math.ceil(rows.length / itemsPerPage)}
+                  className="h-8 px-2"
+                >
+                  Siguiente
+                </Button>
+              </div>
+            </div>
+          )}
         </Card>
       </div>
     </div>

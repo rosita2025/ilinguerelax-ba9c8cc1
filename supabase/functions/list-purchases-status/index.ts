@@ -184,7 +184,6 @@ Deno.serve(async (req) => {
         .limit(take);
 
       for (const r of data ?? []) {
-      for (const r of data ?? []) {
         const meta = PAYPAL_STEPS[r.event_type] ?? { step: r.event_type, mapped: "unknown" as Mapped };
         const p: any = r.payload ?? {};
         const resource = p?.resource ?? {};

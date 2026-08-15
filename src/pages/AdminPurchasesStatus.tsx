@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart" | "shopify";
+type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart" | "shopify" | "dlocalgo" | "internal_cart";
 type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "abandoned" | "unknown";
 
 interface Row {
@@ -39,6 +39,8 @@ const PROVIDER_META: Record<Provider, { label: string; icon: typeof CreditCard; 
   manual:      { label: "Yape / Plin",   icon: Banknote,    color: "bg-emerald-100 text-emerald-800" },
   hotmart:     { label: "Hotmart",       icon: ShoppingBag, color: "bg-orange-100 text-orange-800" },
   shopify:     { label: "Shopify / Físico", icon: Box,      color: "bg-teal-100 text-teal-800" },
+  dlocalgo:    { label: "dLocal Go",     icon: Wallet,   color: "bg-indigo-100 text-indigo-800" },
+  internal_cart: { label: "Carrito Interno", icon: Clock,  color: "bg-amber-100 text-amber-800" },
 };
 
 const STATUS_META: Record<Mapped, { label: string; className: string; icon: typeof CheckCircle2 }> = {
@@ -215,6 +217,8 @@ const AdminPurchasesStatus = () => {
                 <option value="paypal">PayPal</option>
                 <option value="stripe">Stripe</option>
                 <option value="hotmart">Hotmart</option>
+                <option value="dlocalgo">dLocal Go</option>
+                <option value="internal_cart">Carrito Interno</option>
                 <option value="shopify">Shopify / Físico</option>
                 <option value="manual">Yape / Plin</option>
                 

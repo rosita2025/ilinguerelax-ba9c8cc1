@@ -251,7 +251,7 @@ Deno.serve(async (req) => {
     if (!provider || provider === "hotmart") {
       const { data } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider")
+        .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider, email")
         .or("provider.eq.hotmart,referrer.ilike.%hotmart-webhook%,referrer.ilike.%\"provider\":\"hotmart\"%,event_name.ilike.purchase%,session_id.ilike.HP%")
         .order("created_at", { ascending: false })
         .limit(take);
@@ -291,7 +291,7 @@ Deno.serve(async (req) => {
     if (!provider || provider === "dlocalgo") {
       const { data } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider")
+        .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider, email")
         .or("provider.eq.dlocalgo,referrer.ilike.%\"provider\":\"dlocalgo\"%,event_name.ilike.dlocal_%")
         .order("created_at", { ascending: false })
         .limit(take);

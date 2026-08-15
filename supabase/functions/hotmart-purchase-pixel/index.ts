@@ -304,6 +304,7 @@ serve(async (req) => {
         page_path: "/hotmart-success",
         country: body.data?.buyer?.address?.country || body.buyer?.address?.country || null,
         provider: "hotmart",
+        email: buyerEmail,
         referrer: JSON.stringify(meta).slice(0, 2000),
         event_data: meta
       });

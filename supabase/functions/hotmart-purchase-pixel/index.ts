@@ -302,7 +302,7 @@ serve(async (req) => {
       const meta = {
         provider: "hotmart",
         event_type: event || "purchase",
-        status: "approved",
+        status: mappedStatus,
         transaction: transactionCode,
         email: buyerEmail,
         name: buyerName,
@@ -311,7 +311,7 @@ serve(async (req) => {
       };
 
       await supabase.from("funnel_events").insert({
-        event_name: "Purchase",
+        event_name: isApproved ? "Purchase" : `hotmart_${mappedStatus}`,
         product_id: product.id,
         value: product.value,
         currency: "USD",
@@ -320,6 +320,7 @@ serve(async (req) => {
         country: body.data?.buyer?.address?.country || body.buyer?.address?.country || null,
         provider: "hotmart",
         email: buyerEmail,
+        name: buyerName,
         referrer: JSON.stringify(meta).slice(0, 2000),
         event_data: meta
       });

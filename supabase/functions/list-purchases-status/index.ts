@@ -6,7 +6,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = adminCorsHeaders;
 
-type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart" | "shopify";
+type Provider = "mercadopago" | "paypal" | "stripe" | "manual" | "hotmart" | "shopify" | "dlocalgo" | "internal_cart";
 type Mapped = "approved" | "pending" | "refused" | "refunded" | "chargeback" | "cancelled" | "blocked" | "abandoned" | "unknown";
 
 interface Row {
@@ -82,6 +82,16 @@ function mapMp(status: string, statusDetail?: string): { mapped: Mapped; reason:
   if (s === "cancelled") return { mapped: "cancelled", reason: null };
   if (s === "charged_back") return { mapped: "chargeback", reason: null };
   return { mapped: "unknown", reason: null };
+}
+
+function mapDlocal(status: string): Mapped {
+  const s = (status || "").toUpperCase();
+  if (s === "PAID" || s === "SETTLED") return "approved";
+  if (s === "PENDING") return "pending";
+  if (s === "REJECTED") return "refused";
+  if (s === "CANCELLED") return "cancelled";
+  if (s === "REFUNDED") return "refunded";
+  return "unknown";
 }
 
 Deno.serve(async (req) => {
@@ -242,8 +252,8 @@ Deno.serve(async (req) => {
     if (!provider || provider === "hotmart") {
       const { data } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, referrer, email, product_id, value, currency, provider")
-        .or("provider.eq.hotmart,referrer.ilike.%hotmart-webhook%,referrer.ilike.%\"provider\":\"hotmart\"%,event_name.ilike.purchase%")
+        .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider")
+        .or("provider.eq.hotmart,referrer.ilike.%hotmart-webhook%,referrer.ilike.%\"provider\":\"hotmart\"%,event_name.ilike.purchase%,session_id.ilike.HP%")
         .order("created_at", { ascending: false })
         .limit(take);
 
@@ -262,7 +272,7 @@ Deno.serve(async (req) => {
           amount: r.value || d.amount || d.value || null,
           currency: r.currency || d.currency || null,
           product: r.product_id || d.product_name || d.name || null,
-          transaction: d.transaction || d.transaction_code || d.hottok || null,
+          transaction: r.session_id || d.transaction || d.transaction_code || d.hottok || null,
           raw_status: status,
           mapped_status: (status === "approved" || status === "complete" || status === "succeeded" || status === "Purchase") ? "approved" : 
                          (status === "pending" || status === "processing") ? "pending" :
@@ -274,6 +284,71 @@ Deno.serve(async (req) => {
           failed_step: r.event_name === "InitiateCheckout" ? "Checkout iniciado (Hotmart)" : 
                        isPurchase ? "Compra (Hotmart)" : null,
           payload: d,
+        });
+      }
+    }
+
+    // ─── dLocal Go (funnel_events) ────────────────────────────────────
+    if (!provider || provider === "dlocalgo") {
+      const { data } = await admin
+        .from("funnel_events")
+        .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider")
+        .or("provider.eq.dlocalgo,referrer.ilike.%\"provider\":\"dlocalgo\"%,event_name.ilike.dlocal_%")
+        .order("created_at", { ascending: false })
+        .limit(take);
+
+      for (const r of data ?? []) {
+        let d: any = {};
+        try { d = JSON.parse(r.referrer || "{}"); } catch { d = {}; }
+        
+        const status = d.status || r.event_name.replace(/^dlocal_/, "").toUpperCase();
+        const mapped = mapDlocal(status);
+        
+        rows.push({
+          id: `dl-${r.id}`,
+          provider: "dlocalgo",
+          received_at: r.created_at,
+          email: r.email || d.customer_email || d.email || null,
+          amount: r.value || d.amount || null,
+          currency: r.currency || d.currency || null,
+          product: r.product_id || d.items_summary || d.product_name || null,
+          transaction: r.session_id || d.payment_id || d.order_id || null,
+          raw_status: status,
+          mapped_status: mapped,
+          failure_reason: d.detail || d.error_reason || null,
+          failed_step: mapped === "pending" ? "Esperando pago en efectivo/transf" : null,
+          payload: d,
+        });
+      }
+    }
+
+    // ─── Carritos Abandonados (persistent_carts) ───────────────────────
+    if (!provider || provider === "internal_cart") {
+      const { data } = await admin
+        .from("persistent_carts")
+        .select("id, email, buyer, items, country, language, last_activity, converted")
+        .eq("converted", false)
+        .order("last_activity", { ascending: false })
+        .limit(take);
+      
+      for (const r of data ?? []) {
+        const items = Array.isArray(r.items) ? r.items : [];
+        const productSummary = items.map((it: any) => it.id).join(", ");
+        
+        rows.push({
+          id: `cart-${r.id}`,
+          provider: "internal_cart",
+          received_at: r.last_activity,
+          email: r.email,
+          amount: null,
+          currency: null,
+          product: productSummary || "Carrito vacío",
+          transaction: r.cart_token || null,
+          raw_status: "abandoned",
+          mapped_status: "abandoned",
+          failure_reason: null,
+          failed_step: "Abandono en checkout interno",
+          payload: r,
         });
       }
     }

@@ -215,6 +215,9 @@ Deno.serve(async (req) => {
 
     let logged: Record<string, unknown> | null = null;
 
+    switch (type) {
+      case "payment": {
+        const payment = await fetchPayment(dataId);
         const payerEmail = payment.metadata?.customer_email || payment.payer?.email;
         const payerName = [payment.payer?.first_name, payment.payer?.last_name].filter(Boolean).join(" ") || payment.metadata?.customer_name || payerEmail?.split("@")[0] || null;
         

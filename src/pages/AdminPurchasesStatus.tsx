@@ -21,6 +21,7 @@ interface Row {
   provider: Provider;
   received_at: string;
   email: string | null;
+  name: string | null;
   amount: number | null;
   currency: string | null;
   product: string | null;
@@ -29,7 +30,8 @@ interface Row {
   mapped_status: Mapped;
   failure_reason: string | null;
   failed_step: string | null;
-  payload: unknown;
+  payload: any;
+  is_merged?: boolean;
 }
 
 const PROVIDER_META: Record<Provider, { label: string; icon: typeof CreditCard; color: string }> = {

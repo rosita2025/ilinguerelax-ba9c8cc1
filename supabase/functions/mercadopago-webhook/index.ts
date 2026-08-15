@@ -222,7 +222,7 @@ Deno.serve(async (req) => {
         const payerName = [payment.payer?.first_name, payment.payer?.last_name].filter(Boolean).join(" ") || payment.metadata?.customer_name || payerEmail?.split("@")[0] || null;
         
         logged = {
-          event_name: payment.status === "approved" ? "Purchase" : `mp_${payment.status}`,
+          event_type: payment.status === "approved" ? "Purchase" : `mp_${payment.status}`,
           email: payerEmail,
           name: payerName,
           country: payment.payer?.address?.country_id || "PE",

@@ -411,4 +411,37 @@ const AdminProducts = () => {
   );
 };
 
+const PaginationControls = ({ total, current, onChange, itemsPerPage }: { total: number; current: number; onChange: (p: number) => void; itemsPerPage: number }) => {
+  if (total <= itemsPerPage) return null;
+  const maxPage = Math.ceil(total / itemsPerPage);
+  
+  return (
+    <div className="flex items-center justify-between px-2 py-4 border-t border-border mt-2">
+      <span className="text-xs text-muted-foreground">
+        Mostrando {Math.min(total, (current - 1) * itemsPerPage + 1)} - {Math.min(total, current * itemsPerPage)} de {total}
+      </span>
+      <div className="flex gap-2">
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={() => onChange(Math.max(1, current - 1))}
+          disabled={current === 1}
+          className="h-8 px-2"
+        >
+          Anterior
+        </Button>
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={() => onChange(Math.min(maxPage, current + 1))}
+          disabled={current >= maxPage}
+          className="h-8 px-2"
+        >
+          Siguiente
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 export default AdminProducts;

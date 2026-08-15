@@ -334,7 +334,7 @@ async function handlePaidCheckoutSession(session: any, eventType: string) {
   }
 
   const customerEmail = session.customer_email || session.customer_details?.email || session.metadata?.customer_email;
-  const customerName = session.customer_details?.name || session.metadata?.customer_name || session.metadata?.name || "Valued Customer";
+  const customerName = session.customer_details?.name || session.metadata?.customer_name || session.metadata?.name || (customerEmail ? customerEmail.split("@")[0] : "Cliente");
   if (!customerEmail) {
     console.log("No customer email found in session");
     return { delivered: false, reason: "missing_email" };
@@ -402,7 +402,7 @@ async function handleSucceededPaymentIntent(paymentIntent: any, eventType: strin
   }
 
   const customerEmail = paymentIntent.receipt_email || metadata.customer_email;
-  const customerName = metadata.customer_name || metadata.name || "Valued Customer";
+  const customerName = metadata.customer_name || metadata.name || (customerEmail ? customerEmail.split("@")[0] : "Cliente");
   if (!customerEmail) {
     console.log("[stripe-webhook] payment_intent.succeeded missing customer email", { paymentIntentId: paymentIntent.id });
     return { delivered: false, reason: "missing_email" };

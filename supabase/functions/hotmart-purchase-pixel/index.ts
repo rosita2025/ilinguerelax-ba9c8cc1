@@ -303,6 +303,7 @@ serve(async (req) => {
         session_id: transactionCode,
         page_path: "/hotmart-success",
         country: body.data?.buyer?.address?.country || body.buyer?.address?.country || null,
+        provider: "hotmart",
         referrer: JSON.stringify(meta).slice(0, 2000),
         event_data: meta
       });

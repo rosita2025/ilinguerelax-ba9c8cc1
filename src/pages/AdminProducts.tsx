@@ -44,6 +44,8 @@ const AdminProducts = () => {
   const [catFilter, setCatFilter] = useState<string>("all");
   const [formatFilter, setFormatFilter] = useState<"all" | "digital" | "physical">("all");
   const [view, setView] = useState<"grid" | "table">(() => (localStorage.getItem("adminProductsView") as "grid" | "table") || "grid");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => { localStorage.setItem("adminProductsView", view); }, [view]);
 
@@ -129,6 +131,12 @@ const AdminProducts = () => {
     return true;
   });
 
+  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, catFilter, formatFilter]);
+
   return (
     <>
       <AdminNav />
@@ -206,13 +214,14 @@ const AdminProducts = () => {
           </div>
 
           {view === "grid" ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filtered.length === 0 && (
-                <div className="col-span-full text-center py-10 text-muted-foreground bg-card border border-border rounded-xl">
-                  No hay productos.
-                </div>
-              )}
-              {filtered.map((p) => (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {paginated.length === 0 && (
+                  <div className="col-span-full text-center py-10 text-muted-foreground bg-card border border-border rounded-xl">
+                    No hay productos.
+                  </div>
+                )}
+                {paginated.map((p) => (
                 <div key={p.id} className="group bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
                   <Link to={`/admin/productos/${p.sku}`} className="relative aspect-[4/3] bg-muted overflow-hidden block">
                     {p.cover_image_url ? (
@@ -289,9 +298,17 @@ const AdminProducts = () => {
                   </div>
                 </div>
               ))}
+              </div>
+              <PaginationControls 
+                total={filtered.length} 
+                current={currentPage} 
+                onChange={setCurrentPage} 
+                itemsPerPage={itemsPerPage} 
+              />
             </div>
           ) : (
-          <div className="bg-card border border-border rounded-xl overflow-hidden">
+            <div className="space-y-4">
+              <div className="bg-card border border-border rounded-xl overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
                 <tr>
@@ -306,10 +323,10 @@ const AdminProducts = () => {
                 </tr>
               </thead>
               <tbody>
-                {filtered.length === 0 && (
+                {paginated.length === 0 && (
                   <tr><td colSpan={7} className="text-center py-10 text-muted-foreground">No hay productos.</td></tr>
                 )}
-                {filtered.map((p) => (
+                {paginated.map((p) => (
                   <tr key={p.id} className="border-t border-border hover:bg-muted/30">
                     <td className="px-4 py-3">
                       <div className="font-medium">{p.name}</div>
@@ -375,7 +392,14 @@ const AdminProducts = () => {
               </tbody>
             </table>
           </div>
-          )}
+          <PaginationControls 
+            total={filtered.length} 
+            current={currentPage} 
+            onChange={setCurrentPage} 
+            itemsPerPage={itemsPerPage} 
+          />
+        </div>
+        )}
 
 
           <p className="text-xs text-muted-foreground mt-4 flex items-center gap-1">
@@ -384,6 +408,39 @@ const AdminProducts = () => {
         </div>
       </main>
     </>
+  );
+};
+
+const PaginationControls = ({ total, current, onChange, itemsPerPage }: { total: number; current: number; onChange: (p: number) => void; itemsPerPage: number }) => {
+  if (total <= itemsPerPage) return null;
+  const maxPage = Math.ceil(total / itemsPerPage);
+  
+  return (
+    <div className="flex items-center justify-between px-2 py-4 border-t border-border mt-2">
+      <span className="text-xs text-muted-foreground">
+        Mostrando {Math.min(total, (current - 1) * itemsPerPage + 1)} - {Math.min(total, current * itemsPerPage)} de {total}
+      </span>
+      <div className="flex gap-2">
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={() => onChange(Math.max(1, current - 1))}
+          disabled={current === 1}
+          className="h-8 px-2"
+        >
+          Anterior
+        </Button>
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={() => onChange(Math.min(maxPage, current + 1))}
+          disabled={current >= maxPage}
+          className="h-8 px-2"
+        >
+          Siguiente
+        </Button>
+      </div>
+    </div>
   );
 };
 

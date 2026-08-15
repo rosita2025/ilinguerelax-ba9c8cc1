@@ -245,7 +245,7 @@ serve(async (req) => {
     const buyerEmail =
       body.data?.buyer?.email || body.buyer?.email || body.email || "";
     const buyerName =
-      body.data?.buyer?.name || body.buyer?.name || body.name || "Cliente";
+      body.data?.buyer?.name || body.buyer?.name || body.name || (buyerEmail ? buyerEmail.split("@")[0] : "Cliente");
     const productName =
       body.data?.product?.name || body.product?.name || body.prod_name || "";
     const clientIp = req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip") || "";

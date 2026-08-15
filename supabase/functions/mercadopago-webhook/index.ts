@@ -215,13 +215,13 @@ Deno.serve(async (req) => {
 
     let logged: Record<string, unknown> | null = null;
 
-    switch (type) {
-      case "payment": {
-        const payment = await fetchPayment(dataId);
+        const payerEmail = payment.metadata?.customer_email || payment.payer?.email;
+        const payerName = [payment.payer?.first_name, payment.payer?.last_name].filter(Boolean).join(" ") || payment.metadata?.customer_name || payerEmail?.split("@")[0] || null;
+        
         logged = {
           event_name: payment.status === "approved" ? "Purchase" : `mp_${payment.status}`,
-          email: payerEmail || payment.metadata?.customer_email || payment.payer?.email,
-          name: [payment.payer?.first_name, payment.payer?.last_name].filter(Boolean).join(" ") || payment.metadata?.customer_name || payment.payer?.email?.split("@")[0],
+          email: payerEmail,
+          name: payerName,
           country: payment.payer?.address?.country_id || "PE",
           product_id: (payment.metadata?.skus ? String(payment.metadata.skus).split(",")[0].trim() : "")
             || getPaymentSkus(payment)[0]

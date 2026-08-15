@@ -14,15 +14,17 @@ interface Row {
   provider: Provider;
   received_at: string;
   email: string | null;
+  name: string | null;
   amount: number | null;
   currency: string | null;
   product: string | null;
   transaction: string | null;
   raw_status: string;
   mapped_status: Mapped;
-  failure_reason: string | null;   // human readable "why blocked"
-  failed_step: string | null;      // which step failed
-  payload: unknown;
+  failure_reason: string | null;
+  failed_step: string | null;
+  payload: any;
+  is_merged?: boolean;
 }
 
 // Mercado Pago status_detail → Spanish reason

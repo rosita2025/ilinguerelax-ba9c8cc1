@@ -378,7 +378,7 @@ Deno.serve(async (req) => {
         emailToApproved.add(row.email.toLowerCase());
       }
       
-      const key = (row.provider === 'hotmart' && row.transaction) ? `hotmart:${row.transaction}` : (row.transaction ? `${row.provider}:${row.transaction}` : `${row.provider}:${row.email}:${row.product}`);
+      const key = row.transaction ? `${row.provider}:${row.transaction}` : `${row.provider}:${row.email}:${row.product}`;
       const existing = dedup.get(key);
       
       if (!existing) {

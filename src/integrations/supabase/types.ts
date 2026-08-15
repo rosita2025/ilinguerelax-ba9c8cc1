@@ -1314,11 +1314,13 @@ export type Database = {
           country: string | null
           created_at: string
           currency: string | null
+          email: string | null
           error_reason: string | null
           event_name: string
           id: string
           ip: string | null
           is_bot: boolean
+          name: string | null
           page_path: string | null
           product_id: string | null
           provider: string | null
@@ -1333,11 +1335,13 @@ export type Database = {
           country?: string | null
           created_at?: string
           currency?: string | null
+          email?: string | null
           error_reason?: string | null
           event_name: string
           id?: string
           ip?: string | null
           is_bot?: boolean
+          name?: string | null
           page_path?: string | null
           product_id?: string | null
           provider?: string | null
@@ -1352,11 +1356,13 @@ export type Database = {
           country?: string | null
           created_at?: string
           currency?: string | null
+          email?: string | null
           error_reason?: string | null
           event_name?: string
           id?: string
           ip?: string | null
           is_bot?: boolean
+          name?: string | null
           page_path?: string | null
           product_id?: string | null
           provider?: string | null

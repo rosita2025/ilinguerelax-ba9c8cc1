@@ -392,7 +392,14 @@ const AdminProducts = () => {
               </tbody>
             </table>
           </div>
-          )}
+          <PaginationControls 
+            total={filtered.length} 
+            current={currentPage} 
+            onChange={setCurrentPage} 
+            itemsPerPage={itemsPerPage} 
+          />
+        </div>
+        )}
 
 
           <p className="text-xs text-muted-foreground mt-4 flex items-center gap-1">

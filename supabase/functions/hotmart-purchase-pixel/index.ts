@@ -242,10 +242,11 @@ serve(async (req) => {
     }
 
     // Extract buyer info (Hotmart webhook format)
-    const buyerEmail =
-      body.data?.buyer?.email || body.buyer?.email || body.email || "";
-    const buyerName =
-      body.data?.buyer?.name || body.buyer?.name || body.name || (buyerEmail ? buyerEmail.split("@")[0] : "Cliente");
+    const buyer = body.data?.buyer || body.buyer || {};
+    const buyerEmail = buyer.email || body.email || body.buyer_email || body.payer_email || "";
+    const buyerName = buyer.name || body.name || body.buyer_name || body.payer_name || (buyerEmail ? buyerEmail.split("@")[0] : "Cliente");
+    const buyerCountry = buyer.address?.country || body.buyer_address_country || body.data?.buyer?.address?.country || null;
+
     const productName =
       body.data?.product?.name || body.product?.name || body.prod_name || "";
     const clientIp = req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip") || "";
@@ -317,7 +318,7 @@ serve(async (req) => {
         currency: body.data?.purchase?.price?.currency_code || body.purchase?.price?.currency_code || "USD",
         session_id: transactionCode || body.data?.purchase?.transaction || body.purchase?.transaction || body.transaction,
         page_path: "/hotmart-success",
-        country: body.data?.buyer?.address?.country || body.buyer?.address?.country || null,
+        country: buyerCountry,
         provider: "hotmart",
         email: buyerEmail,
         name: buyerName,

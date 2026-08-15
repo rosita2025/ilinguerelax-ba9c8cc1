@@ -290,8 +290,12 @@ const AdminPurchasesStatus = () => {
                         )}
                       </div>
                       <div className="text-sm font-semibold flex items-center gap-2">
-                        <span className="truncate max-w-[150px]">{r.name ?? "Sin Nombre"}</span>
-                        <span className="text-muted-foreground font-normal truncate opacity-70">&lt;{r.email ?? "—"}&gt;</span>
+                        <span className="truncate max-w-[150px]">
+                          {r.name || r.payload?.buyer_name || r.payload?.buyer?.name || r.payload?.customer_name || "Sin Nombre"}
+                        </span>
+                        <span className="text-muted-foreground font-normal truncate opacity-70">
+                          &lt;{r.email || r.payload?.buyer_email || r.payload?.buyer?.email || r.payload?.customer_email || "—"}&gt;
+                        </span>
                       </div>
                       <div className="text-xs text-muted-foreground truncate">
                         {r.product ?? "—"} {r.transaction && <span className="opacity-60">· {r.transaction}</span>}

@@ -282,9 +282,9 @@ Deno.serve(async (req) => {
           id: `hm-${r.id}`, 
           provider: "hotmart", 
           received_at: r.created_at,
-          email: r.email || d.email || d.buyer_email || d.payer_email || d.buyer?.email || null,
-          name: r.name || d.name || d.buyer_name || d.payer_name || d.buyer?.name || null,
-          country: r.country || d.country || d.buyer_address_country || d.buyer?.address?.country || null,
+          email: r.email || d.email || d.buyer_email || d.payer_email || d.buyer?.email || d.buyer_email || null,
+          name: r.name || d.name || d.buyer_name || d.payer_name || d.buyer?.name || d.buyer_name || null,
+          country: r.country || d.country || d.buyer_address_country || d.buyer?.address?.country || d.buyer_address_country || null,
           amount: r.value || d.amount || d.value || null,
           currency: r.currency || d.currency || null,
           product: r.product_id || d.product_name || d.name || d.product?.name || null,
@@ -387,7 +387,8 @@ Deno.serve(async (req) => {
       // Internal cart uses email:product or just email as key for deduplication against purchases
       let key = (row.transaction ? `${row.provider}:${row.transaction}` : `${row.provider}:${row.email}:${row.product}`);
       if (row.provider === "hotmart" && row.transaction && row.transaction.startsWith("HP")) {
-        key = `hotmart:${row.transaction.substring(0, 12)}`;
+        // Truncate HP transaction IDs to 12 chars to handle suffixes (C1, C2)
+        key = `hotmart:${row.transaction.replace(/[^a-zA-Z0-9]/g, '').substring(0, 12)}`;
       } else if (row.provider === "internal_cart" && row.email) {
         // Abandoned carts are deduplicated globally by email to be replaced by ANY approved purchase from ANY provider
         key = `global-sync:${row.email.toLowerCase()}`;

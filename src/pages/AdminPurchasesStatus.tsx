@@ -22,6 +22,7 @@ interface Row {
   received_at: string;
   email: string | null;
   name: string | null;
+  country?: string | null;
   amount: number | null;
   currency: string | null;
   product: string | null;
@@ -269,6 +270,11 @@ const AdminPurchasesStatus = () => {
                         <Badge className={`${sMeta.className} font-normal`}>
                           <SIcon className="w-3 h-3 mr-1" />{sMeta.label}
                         </Badge>
+                        {(r.country || r.payload?.customer_country || r.payload?.country) && (
+                          <Badge variant="outline" className="bg-slate-50 text-slate-600 font-normal">
+                            {r.country || r.payload?.customer_country || r.payload?.country}
+                          </Badge>
+                        )}
                         {r.is_merged && (
                           <Badge variant="outline" className="text-[10px] h-5 border-amber-200 text-amber-600 bg-amber-50 font-normal">
                             Unificado

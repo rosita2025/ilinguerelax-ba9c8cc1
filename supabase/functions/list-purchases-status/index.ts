@@ -263,7 +263,7 @@ Deno.serve(async (req) => {
       const { data } = await admin
         .from("funnel_events")
         .select("id, created_at, event_name, referrer, session_id, product_id, value, currency, provider, email, name, country")
-        .or("provider.eq.hotmart,referrer.ilike.%hotmart-webhook%,referrer.ilike.%\"provider\":\"hotmart\"%,event_name.ilike.purchase%,session_id.ilike.HP%,referrer.ilike.%\"hottok\":%,session_id.ilike.%HP1413567978%,referrer.ilike.%HP1413567978%")
+        .or("provider.eq.hotmart,referrer.ilike.%hotmart-webhook%,referrer.ilike.%\"provider\":\"hotmart\"%,event_name.ilike.purchase%,session_id.ilike.HP%,referrer.ilike.%\"hottok\":%")
         .order("created_at", { ascending: false })
         .limit(take);
 
@@ -378,7 +378,7 @@ Deno.serve(async (req) => {
         emailToApproved.add(row.email.toLowerCase());
       }
       
-      const key = row.transaction ? `${row.provider}:${row.transaction}` : `${row.provider}:${row.email}:${row.product}`;
+      const key = (row.provider === "hotmart" && row.transaction) ? `hotmart:${row.transaction.substring(0, 12)}` : (row.transaction ? `${row.provider}:${row.transaction}` : `${row.provider}:${row.email}:${row.product}`);
       const existing = dedup.get(key);
       
       if (!existing) {

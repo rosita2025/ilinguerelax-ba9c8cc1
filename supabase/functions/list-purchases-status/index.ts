@@ -131,6 +131,7 @@ Deno.serve(async (req) => {
           received_at: r.order_created_at,
           email: r.customer_name, 
           name: null,
+          country: r.country || null,
           amount: null,
           currency: "USD",
           product: r.product_name,

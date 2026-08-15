@@ -359,11 +359,12 @@ Deno.serve(async (req) => {
           provider: "internal_cart",
           received_at: r.last_activity,
           email: r.email,
-          name: buyer.fullName || buyer.name || null,
+          name: buyer.fullName || buyer.name || buyer.customerName || null,
+          country: r.country || buyer.country || null,
           amount: null,
           currency: null,
           product: productSummary || "Carrito vacío",
-          transaction: r.cart_token || null,
+          transaction: r.id, // Use persistent_cart id for deduplication if session_id is missing
           raw_status: "abandoned",
           mapped_status: "abandoned",
           failure_reason: null,
@@ -383,9 +384,21 @@ Deno.serve(async (req) => {
       }
       
       // Hotmart IDs are typically HP followed by digits, we truncate to 12 to normalize across events
+      // Internal cart uses email:product or just email as key for deduplication against purchases
       let key = (row.transaction ? `${row.provider}:${row.transaction}` : `${row.provider}:${row.email}:${row.product}`);
       if (row.provider === "hotmart" && row.transaction && row.transaction.startsWith("HP")) {
         key = `hotmart:${row.transaction.substring(0, 12)}`;
+      } else if (row.provider === "internal_cart" && row.email) {
+        // Abandoned carts are deduplicated globally by email to be replaced by ANY approved purchase from ANY provider
+        key = `global-sync:${row.email.toLowerCase()}`;
+      } else if (row.email) {
+        // Purchases also check the global-sync key to override abandoned carts
+        const globalKey = `global-sync:${row.email.toLowerCase()}`;
+        const existingGlobal = dedup.get(globalKey);
+        if (existingGlobal && existingGlobal.provider === "internal_cart") {
+          // This purchase will supersede the abandoned cart
+          key = globalKey;
+        }
       }
       
       const existing = dedup.get(key);

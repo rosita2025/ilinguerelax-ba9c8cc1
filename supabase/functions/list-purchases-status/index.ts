@@ -364,57 +364,10 @@ Deno.serve(async (req) => {
     const dedup = new Map<string, Row>();
     const emailToApproved = new Set<string>();
 
-    // First pass: identify approved emails and build dedup map
     for (const row of rows) {
       if (row.mapped_status === "approved" && row.email) {
         emailToApproved.add(row.email.toLowerCase());
       }
-      
-      const key = `${row.provider}:${row.transaction || row.email}`;
-      const existing = dedup.get(key);
-      if (!existing) {
-        dedup.set(key, row);
-      } else {
-        const priority: Record<Mapped, number> = {
-          approved: 4, pending: 3, refused: 2, blocked: 2,
-          refunded: 1, chargeback: 1, cancelled: 0, abandoned: 0, unknown: 0
-        };
-        if (priority[row.mapped_status] > priority[existing.mapped_status]) {
-          dedup.set(key, { ...row, is_merged: true });
-        }
-      }
-    }
-
-    let finalRows = Array.from(dedup.values());
-    
-    // Internal cart cleanup: if an email has an approved purchase, hide its abandoned carts
-    finalRows = finalRows.filter(r => {
-      if (r.provider === "internal_cart" && r.email && emailToApproved.has(r.email.toLowerCase())) {
-        return false;
-      }
-      return true;
-    });
-
-    if (mapped) finalRows = finalRows.filter(r => r.mapped_status === mapped);
-    if (s) {
-      finalRows = finalRows.filter(r => 
-        (r.email && r.email.toLowerCase().includes(s)) ||
-        (r.name && r.name.toLowerCase().includes(s)) ||
-        (r.transaction && r.transaction.toLowerCase().includes(s)) ||
-        (r.product && r.product.toLowerCase().includes(s))
-      );
-    }
-
-    return new Response(JSON.stringify({ rows: finalRows.slice(0, take) }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  } catch (e) {
-    console.error("[list-purchases-status] error:", e);
-    return new Response(JSON.stringify({ error: e.message }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-});
       
       const key = row.transaction ? `${row.provider}:${row.transaction}` : `${row.provider}:${row.email}:${row.product}`;
       const existing = dedup.get(key);
@@ -424,17 +377,9 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      // Prioritize status: approved > pending > refused > abandoned
       const statusPriority: Record<Mapped, number> = {
-        approved: 10,
-        pending: 5,
-        refused: 3,
-        chargeback: 2,
-        refunded: 2,
-        blocked: 2,
-        cancelled: 1,
-        abandoned: 0,
-        unknown: 0
+        approved: 10, pending: 5, refused: 3, chargeback: 2, refunded: 2,
+        blocked: 2, cancelled: 1, abandoned: 0, unknown: 0
       };
 
       if (statusPriority[row.mapped_status] > statusPriority[existing.mapped_status]) {
@@ -445,7 +390,6 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Filter out internal carts if user already has an approved payment
     let filtered = Array.from(dedup.values());
     filtered = filtered.filter(r => {
       if (r.provider === "internal_cart" && r.email && emailToApproved.has(r.email.toLowerCase())) {
@@ -454,7 +398,6 @@ Deno.serve(async (req) => {
       return true;
     });
 
-    // ─── Filter + sort ────────────────────────────────────────────────
     if (mapped && mapped !== "all") filtered = filtered.filter((r) => r.mapped_status === mapped);
     if (s) filtered = filtered.filter((r) =>
       (r.email ?? "").toLowerCase().includes(s) ||

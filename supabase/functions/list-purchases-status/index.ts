@@ -163,9 +163,9 @@ Deno.serve(async (req) => {
         const { mapped: m, reason } = mapMp(status, detail);
         rows.push({
           id: `mp-${r.id}`, provider: "mercadopago", received_at: r.created_at,
-          email: r.email ?? d.payer_email ?? d.customer_email ?? null,
-          name: r.name ?? d.payer_name ?? d.customer_name ?? null,
-          country: r.country || d.country || d.country_id || null,
+          email: r.email || d.payer_email || d.customer_email || d.email || null,
+          name: r.name || d.payer_name || d.customer_name || d.name || null,
+          country: r.country || d.country || d.country_id || d.payer_country || null,
           amount: d.amount ?? d.transaction_amount ?? null,
           currency: d.currency ?? d.currency_id ?? null,
           product: d.product ?? d.description ?? d.items_summary ?? null,

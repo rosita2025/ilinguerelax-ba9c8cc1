@@ -220,13 +220,25 @@ serve(async (req) => {
     // Extract event type - Hotmart webhook format
     const event = body.event || body.data?.event || "";
     
-    // Only process approved purchases
-    if (event && !event.includes("PURCHASE_APPROVED") && !event.includes("PURCHASE_COMPLETE")) {
-      console.log(`Ignoring non-purchase event: ${event}`);
-      return new Response(
-        JSON.stringify({ success: true, message: "Event ignored" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // Map Hotmart statuses to unified status
+    const isApproved = event.includes("PURCHASE_APPROVED") || event.includes("PURCHASE_COMPLETE");
+    const isRefunded = event.includes("PURCHASE_REFUNDED");
+    const isChargeback = event.includes("PURCHASE_CHARGEBACK");
+    const isRefused = event.includes("PURCHASE_REFUSED") || event.includes("PURCHASE_REJECTED");
+    const isPending = event.includes("PURCHASE_BILLET_PRINTED") || event.includes("PURCHASE_WAITING_PAYMENT");
+    const isCancelled = event.includes("PURCHASE_CANCELED") || event.includes("PURCHASE_EXPIRED");
+
+    // Unified status for admin panel
+    const mappedStatus = isApproved ? "approved" :
+                         isRefunded ? "refunded" :
+                         isChargeback ? "chargeback" :
+                         isRefused ? "refused" :
+                         isPending ? "pending" :
+                         isCancelled ? "cancelled" : "unknown";
+    
+    // We process everything for the admin panel sync, but only send CAPI for approved purchases
+    if (!isApproved) {
+      console.log(`Processing non-purchase event for sync: ${event}`);
     }
 
     // Extract buyer info (Hotmart webhook format)
@@ -267,17 +279,20 @@ serve(async (req) => {
       );
     }
 
-    // Send Purchase event to Facebook CAPI
-    const sourceUrl = "https://ilinguerelax.com/hotmart-success";
-    const result = await sendFacebookPurchaseEvent(
-      accessToken,
-      product,
-      buyerEmail,
-      buyerName,
-      sourceUrl,
-      clientIp,
-      userAgent,
-    );
+    // Only send Purchase event to Facebook CAPI if approved
+    let facebookResult = null;
+    if (isApproved) {
+      const sourceUrl = "https://ilinguerelax.com/hotmart-success";
+      facebookResult = await sendFacebookPurchaseEvent(
+        accessToken,
+        product,
+        buyerEmail,
+        buyerName,
+        sourceUrl,
+        clientIp,
+        userAgent,
+      );
+    }
 
     try {
       const supabase = createClient(
@@ -287,7 +302,7 @@ serve(async (req) => {
       const meta = {
         provider: "hotmart",
         event_type: event || "purchase",
-        status: "approved",
+        status: mappedStatus,
         transaction: transactionCode,
         email: buyerEmail,
         name: buyerName,
@@ -296,7 +311,7 @@ serve(async (req) => {
       };
 
       await supabase.from("funnel_events").insert({
-        event_name: "Purchase",
+        event_name: isApproved ? "Purchase" : `hotmart_${mappedStatus}`,
         product_id: product.id,
         value: product.value,
         currency: "USD",
@@ -305,6 +320,7 @@ serve(async (req) => {
         country: body.data?.buyer?.address?.country || body.buyer?.address?.country || null,
         provider: "hotmart",
         email: buyerEmail,
+        name: buyerName,
         referrer: JSON.stringify(meta).slice(0, 2000),
         event_data: meta
       });
@@ -317,7 +333,8 @@ serve(async (req) => {
         success: true,
         product: product.name,
         value: product.value,
-        facebook_response: result,
+        status: mappedStatus,
+        facebook_response: facebookResult,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

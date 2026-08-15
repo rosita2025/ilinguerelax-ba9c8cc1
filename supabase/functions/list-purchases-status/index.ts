@@ -147,7 +147,7 @@ Deno.serve(async (req) => {
     if (!provider || provider === "mercadopago") {
       const { data } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, referrer, email, name, provider")
+        .select("id, created_at, event_name, referrer, email, name, provider, product_id, value, currency, session_id")
         .or("provider.eq.mercadopago,referrer.ilike.%\"provider\":\"mercadopago\"%,event_name.ilike.mp_%")
         .order("created_at", { ascending: false })
         .limit(take);
@@ -364,7 +364,6 @@ Deno.serve(async (req) => {
     const dedup = new Map<string, Row>();
     const emailToApproved = new Set<string>();
 
-    // First pass: identify approved emails and build dedup map
     for (const row of rows) {
       if (row.mapped_status === "approved" && row.email) {
         emailToApproved.add(row.email.toLowerCase());
@@ -378,17 +377,9 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      // Prioritize status: approved > pending > refused > abandoned
       const statusPriority: Record<Mapped, number> = {
-        approved: 10,
-        pending: 5,
-        refused: 3,
-        chargeback: 2,
-        refunded: 2,
-        blocked: 2,
-        cancelled: 1,
-        abandoned: 0,
-        unknown: 0
+        approved: 10, pending: 5, refused: 3, chargeback: 2, refunded: 2,
+        blocked: 2, cancelled: 1, abandoned: 0, unknown: 0
       };
 
       if (statusPriority[row.mapped_status] > statusPriority[existing.mapped_status]) {
@@ -399,7 +390,6 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Filter out internal carts if user already has an approved payment
     let filtered = Array.from(dedup.values());
     filtered = filtered.filter(r => {
       if (r.provider === "internal_cart" && r.email && emailToApproved.has(r.email.toLowerCase())) {
@@ -408,7 +398,6 @@ Deno.serve(async (req) => {
       return true;
     });
 
-    // ─── Filter + sort ────────────────────────────────────────────────
     if (mapped && mapped !== "all") filtered = filtered.filter((r) => r.mapped_status === mapped);
     if (s) filtered = filtered.filter((r) =>
       (r.email ?? "").toLowerCase().includes(s) ||

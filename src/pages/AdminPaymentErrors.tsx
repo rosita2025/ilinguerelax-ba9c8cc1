@@ -76,6 +76,8 @@ export default function AdminPaymentErrors() {
   const [provider, setProvider] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -98,6 +100,10 @@ export default function AdminPaymentErrors() {
       setLoading(false);
     }
   }, [hours, provider, toast]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [hours, provider]);
 
   useEffect(() => {
     void load();
@@ -202,7 +208,7 @@ export default function AdminPaymentErrors() {
             <>
               {/* Móvil: tarjetas legibles en lugar de tabla comprimida */}
               <ul className="divide-y md:hidden">
-                {rows.map((r) => (
+                {rows.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((r) => (
                   <li key={r.id} className="p-3 space-y-1 text-sm">
                     <div className="flex items-start justify-between gap-2">
                       <span className="font-medium break-words">
@@ -245,7 +251,7 @@ export default function AdminPaymentErrors() {
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((r) => (
+                    {rows.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((r) => (
                       <tr key={r.id} className="border-t align-top">
                         <td className="p-2 whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
                         <td className="p-2 max-w-[240px]">
@@ -266,6 +272,34 @@ export default function AdminPaymentErrors() {
                   </tbody>
                 </table>
               </div>
+
+              {total > itemsPerPage && (
+                <div className="p-3 bg-muted/20 flex items-center justify-between border-t">
+                  <span className="text-xs text-muted-foreground">
+                    Mostrando {Math.min(total, (currentPage - 1) * itemsPerPage + 1)} - {Math.min(total, currentPage * itemsPerPage)} de {total}
+                  </span>
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="h-8 px-2"
+                    >
+                      Anterior
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => setCurrentPage(p => Math.min(Math.ceil(total / itemsPerPage), p + 1))}
+                      disabled={currentPage >= Math.ceil(total / itemsPerPage)}
+                      className="h-8 px-2"
+                    >
+                      Siguiente
+                    </Button>
+                  </div>
+                </div>
+              )}
             </>
           )}
 

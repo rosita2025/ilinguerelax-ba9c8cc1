@@ -147,7 +147,7 @@ Deno.serve(async (req) => {
     if (!provider || provider === "mercadopago") {
       const { data } = await admin
         .from("funnel_events")
-        .select("id, created_at, event_name, referrer, email, name, provider")
+        .select("id, created_at, event_name, referrer, email, name, provider, product_id, value, currency, session_id")
         .or("provider.eq.mercadopago,referrer.ilike.%\"provider\":\"mercadopago\"%,event_name.ilike.mp_%")
         .order("created_at", { ascending: false })
         .limit(take);
@@ -369,6 +369,52 @@ Deno.serve(async (req) => {
       if (row.mapped_status === "approved" && row.email) {
         emailToApproved.add(row.email.toLowerCase());
       }
+      
+      const key = `${row.provider}:${row.transaction || row.email}`;
+      const existing = dedup.get(key);
+      if (!existing) {
+        dedup.set(key, row);
+      } else {
+        const priority: Record<Mapped, number> = {
+          approved: 4, pending: 3, refused: 2, blocked: 2,
+          refunded: 1, chargeback: 1, cancelled: 0, abandoned: 0, unknown: 0
+        };
+        if (priority[row.mapped_status] > priority[existing.mapped_status]) {
+          dedup.set(key, { ...row, is_merged: true });
+        }
+      }
+    }
+
+    let finalRows = Array.from(dedup.values());
+    
+    // Internal cart cleanup: if an email has an approved purchase, hide its abandoned carts
+    finalRows = finalRows.filter(r => {
+      if (r.provider === "internal_cart" && r.email && emailToApproved.has(r.email.toLowerCase())) {
+        return false;
+      }
+      return true;
+    });
+
+    if (mapped) finalRows = finalRows.filter(r => r.mapped_status === mapped);
+    if (s) {
+      finalRows = finalRows.filter(r => 
+        (r.email && r.email.toLowerCase().includes(s)) ||
+        (r.name && r.name.toLowerCase().includes(s)) ||
+        (r.transaction && r.transaction.toLowerCase().includes(s)) ||
+        (r.product && r.product.toLowerCase().includes(s))
+      );
+    }
+
+    return new Response(JSON.stringify({ rows: finalRows.slice(0, take) }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (e) {
+    console.error("[list-purchases-status] error:", e);
+    return new Response(JSON.stringify({ error: e.message }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
       
       const key = row.transaction ? `${row.provider}:${row.transaction}` : `${row.provider}:${row.email}:${row.product}`;
       const existing = dedup.get(key);

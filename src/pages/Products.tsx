@@ -505,9 +505,13 @@ const Products = () => {
 
                       {/* CTA */}
                       <Link to={getProductLink(product)}>
-                        <Button variant="hero" size="lg" className="w-full">
+                        <Button
+                          variant="hero"
+                          size="lg"
+                          className="w-full text-sm font-black tracking-wide h-12 shadow-md hover:shadow-lg transition-all"
+                        >
                           Ver Detalles
-                          <ArrowRight className="w-4 h-4" />
+                          <ArrowRight className="w-4 h-4 ml-1.5" />
                         </Button>
                       </Link>
                     </>

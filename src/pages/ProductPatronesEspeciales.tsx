@@ -344,7 +344,7 @@ const ProductPatronesEspeciales = () => {
                 </div>
                 <div className="flex items-baseline flex-wrap gap-x-3 gap-y-2 mb-2">
                   <span className="text-3xl sm:text-4xl md:text-6xl font-black text-foreground leading-none">{(isPeru && pricePen && Number(pricePen) > 0) ? `S/ ${Number(pricePen).toFixed(2)}` : priceLabel}</span>
-                  <span className="text-lg sm:text-xl md:text-2xl text-muted-foreground line-through">{(isPeru && pricePen && Number(pricePen) > 0) ? `S/ ${(Number(pricePen) * 2.5).toFixed(2)}` : originalLabel}</span>
+                  <span className="text-lg sm:text-xl md:text-2xl text-muted-foreground line-through opacity-70">{(isPeru && pricePen && Number(pricePen) > 0) ? `S/ ${(Number(pricePen) * 2.5).toFixed(2)}` : originalLabel}</span>
                   <span className="px-2.5 py-1 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs sm:text-sm font-bold shadow-lg whitespace-nowrap">
                     AHORRA 75%
                   </span>

@@ -65,7 +65,9 @@ export function useLocalCurrency(usdAmount: number, overrides?: LocalPriceOverri
   const rate = exchangeRates[currency] ?? 1;
   const amount = hasOverride ? (override as number) : activeUsdAmount * rate;
   const isUsd = currency === "USD";
-  const formatted = formatPrice(activeUsdAmount, currency, overrides as any);
+  
+  // Custom fix: for PEN, if there is a manual override, use it as formatting source to avoid rate discrepancies
+  const formatted = formatPrice(activeUsdAmount, currency, overrides as any, localUsdPrices as any);
 
   return {
     country: upper,

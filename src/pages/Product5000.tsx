@@ -200,8 +200,8 @@ const Product5000 = () => {
   const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
   // Fuente única: los labels del hook (respetan los montos exactos por moneda
   // fijados en /admin/productos/:sku y el formato local punto/coma).
-  const displayPrice = tier.priceLabel;
-  const displayOriginalPrice = tier.originalLabel;
+  const displayPrice = (isPeru && pricePen && Number(pricePen) > 0) ? `S/ ${Number(pricePen).toFixed(2)}` : tier.priceLabel;
+  const displayOriginalPrice = (isPeru && pricePen && Number(pricePen) > 0) ? `S/ ${(Number(pricePen) * 2.5).toFixed(2)}` : tier.originalLabel;
   const regionLabel = isPeru ? "PE" : isLatam ? "LATAM" : "Global";
   const buyUrl = TIENDA_CHECKOUT_5000;
   const safePriceLabel = pricing5000Ready ? displayPrice : "Cargando precio…";

@@ -76,6 +76,8 @@ const ProductDynamic = () => {
   const [activeImage, setActiveImage] = useState<string>("");
   
   const { t } = useI18n();
+  const navigate = useNavigate();
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
 
   useEffect(() => {
     if (!slug) return;

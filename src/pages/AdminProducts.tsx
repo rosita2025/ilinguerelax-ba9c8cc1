@@ -423,6 +423,9 @@ const AdminProducts = () => {
                             <a href={p.hotmart_url} target="_blank" rel="noreferrer" className="text-[#EF4E23]">H</a>
                           </Button>
                         )}
+                        <Button size="sm" variant="ghost" onClick={() => duplicate(p.sku)} title="Clonar">
+                          <Plus className="w-4 h-4" />
+                        </Button>
                         <Button size="sm" variant="ghost" asChild title="Editar">
                           <Link to={`/admin/productos/${p.sku}`}><Pencil className="w-4 h-4" /></Link>
                         </Button>

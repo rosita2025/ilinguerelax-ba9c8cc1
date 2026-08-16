@@ -557,7 +557,7 @@ const ProductDynamic = () => {
               price={displayFormatted}
               originalPrice={originalFormatted}
               currencyCode={displayCurrencyCode}
-              flag={isPEN ? "🇵🇪" : (local.flag || "🌍")}
+              flag={flag}
               rating={reviewsRating}
               reviewCount={reviewsCount}
               showReviews={reviewsCount > 0}

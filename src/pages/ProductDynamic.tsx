@@ -218,7 +218,7 @@ const ProductDynamic = () => {
   // (`digital_products`) + la moneda local del visitante. El hero y el sticky
   // bar leen exactamente el mismo par (etiqueta, moneda) para que nunca haya
   // dos precios distintos en la misma página.
-  const isPEN = local.country === "PE";
+  // isPEN ya declarado arriba
   const displayPrice = (isPEN && product?.price_pen != null && Number(product.price_pen) > 0) 
     ? Number(product.price_pen) 
     : (local.amount || 0);

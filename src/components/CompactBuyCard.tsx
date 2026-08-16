@@ -57,7 +57,7 @@ export const CompactBuyCard = ({
           <div className="flex items-baseline justify-center gap-2 mt-2">
             <span className="text-3xl font-black text-foreground">{price}</span>
             {originalPrice && (
-              <span className="text-base text-muted-foreground line-through">{originalPrice}</span>
+              <span className="text-base text-muted-foreground line-through opacity-70">{originalPrice}</span>
             )}
             {discountLabel && (
               <span className="px-1.5 py-0.5 rounded-md bg-accent/15 text-accent text-[10px] font-bold">

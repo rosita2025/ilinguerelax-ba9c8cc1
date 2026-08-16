@@ -558,12 +558,15 @@ const ProductSpanish5000Digital = () => {
       </Suspense>
 
       <StickyBuyBar
+        sku={ADMIN_SKU_SP5K}
         productName="Spanish 5,000 Words — Digital PDF"
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}
         currencyCode={tier.currencyCode}
         flag={flag}
-        buyUrl={useTiendaOnly ? TIENDA_PATH_SP5K : (tier.hotmartUrl || HOTMART_SP5K_LATAM)}
+        usdValue={currentPrice}
+        localUsdPrices={pricing.localUsdPrices}
+        buyUrl={useTiendaOnly ? undefined : (tier.hotmartUrl || HOTMART_SP5K_LATAM)}
         onBuyClick={handleBuyNow}
         ctaText={useTiendaOnly ? `GET IT NOW — ${tier.priceLabel}` : `BUY ON HOTMART — ${tier.priceLabel}`}
 

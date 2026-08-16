@@ -531,7 +531,7 @@ const Product5000 = () => {
                     </span>
                   )}
                   {pricing5000Ready && (
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                    <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 shadow-sm">
                       {displayCurrency} · {regionLabel}
                     </span>
                   )}

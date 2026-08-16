@@ -193,7 +193,8 @@ export function useCardPrice(): CardPriceFormatter {
       const overridePen = row?.local_prices?.["PEN"];
       if (typeof overridePen === "number" && overridePen > 0) return formatCurrencyAmount(overridePen * ORIGINAL_MULTIPLIER, "PEN");
 
-      return formatPrice(originalUsd, "PEN");
+      const tierUsdValForPen = tierUsd(row, originalUsd / ORIGINAL_MULTIPLIER);
+      return formatCurrencyAmount(tierUsdValForPen * ORIGINAL_MULTIPLIER * (exchangeRates["PEN"] ?? 3.75), "PEN");
     }
 
     if (typeof override === "number" && override > 0) {

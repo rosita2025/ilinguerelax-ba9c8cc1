@@ -300,8 +300,8 @@ const ProductSpanish5000Digital = () => {
               <div className="p-5 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
                 <div className="flex items-end gap-3 flex-wrap">
                   <span className="text-4xl md:text-5xl font-black text-foreground">{tier.priceLabel}</span>
-                  <span className="text-xl text-muted-foreground line-through mb-1">{tier.originalLabel}</span>
-                  <span className="px-2 py-1 rounded-md bg-red-500 text-white text-xs font-black">
+                  <span className="text-xl text-muted-foreground line-through mb-1 opacity-70">{tier.originalLabel}</span>
+                  <span className="px-2 py-1 rounded-md bg-red-500 text-white text-xs font-black shadow-sm">
                     SAVE {DISCOUNT_PCT}%
                   </span>
                 </div>

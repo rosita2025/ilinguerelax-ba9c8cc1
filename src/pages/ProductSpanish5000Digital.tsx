@@ -144,7 +144,7 @@ const ProductSpanish5000Digital = () => {
   const currentPrice = tier.priceUsd;
   const pricingReady = tier.loaded;
   const { useTiendaOnly, useHotmartLatam, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen } = tier;
-  const localizedPrice = tier.isPeru && pricePen ? `S/${pricePen.toFixed(2)}` : formatPrice(currentPrice);
+  const localizedPrice = (tier.isPeru && pricePen && Number(pricePen) > 0) ? `S/${Number(pricePen).toFixed(2)}` : formatPrice(currentPrice);
   const localizedOriginal = formatPrice(ORIGINAL_PRICE);
   const flag = countryToFlag(countryCode);
 

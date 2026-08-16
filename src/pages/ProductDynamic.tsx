@@ -118,7 +118,17 @@ const ProductDynamic = () => {
 
   const region = useRegionTier();
   const pricingReady = loading === false && product !== null;
-  const isPEN = region.country?.toUpperCase() === "PE";
+  const upperCountry = region.country?.toUpperCase() || "";
+  const isPEN = upperCountry === "PE";
+  const flag = (() => {
+    if (!upperCountry || upperCountry.length !== 2) return "🌍";
+    const base = 0x1f1e6;
+    const A = "A".charCodeAt(0);
+    return String.fromCodePoint(
+      base + upperCountry.charCodeAt(0) - A,
+      base + upperCountry.charCodeAt(1) - A
+    );
+  })();
 
   const effectiveUsd = product
     ? (region.tier === "tienda" && product.price_usd_tienda != null

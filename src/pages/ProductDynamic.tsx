@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams, Link, Navigate } from "react-router-dom";
+import { useParams, Link, Navigate, useNavigate } from "react-router-dom";
 import { Check, ArrowLeft, Download, Shield, Zap, Sparkles, HelpCircle, Lock, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { SEO } from "@/components/SEO";

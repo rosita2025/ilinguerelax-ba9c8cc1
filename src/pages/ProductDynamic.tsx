@@ -547,13 +547,42 @@ const ProductDynamic = () => {
               price={displayFormatted}
               originalPrice={originalFormatted}
               currencyCode={displayCurrencyCode}
-              flag={isPEN ? "🇵🇪" : undefined}
+              flag={isPEN ? "🇵🇪" : (local.flag || "🌍")}
               rating={reviewsRating}
               reviewCount={reviewsCount}
               showReviews={reviewsCount > 0}
               productName={product.name}
               ctaText={"Comprar ahora"}
-              buyUrl={`/checkouts/${product.sku}`}
+              onBuyClick={() => {
+                trackHotmartEvent("InitiateCheckout", {
+                  content_name: product.name,
+                  content_category: "Digital Book",
+                  content_ids: [product.sku],
+                  content_type: "product",
+                  value: effectiveUsd,
+                  currency: "USD",
+                  num_items: 1,
+                });
+                
+                addItem({
+                  id: product.sku,
+                  name: product.name,
+                  price: effectiveUsd,
+                  regionPrices: {
+                    latam: product.price_usd_latam || product.price_usd,
+                    global: product.price_usd,
+                    tienda: product.price_usd_tienda || product.price_usd
+                  },
+                  pricePen: product.price_pen || undefined,
+                  localPrices: product.local_prices || undefined,
+                  localUsdPrices: product.local_usd_prices || undefined,
+                  image: product.cover_image_url || "/placeholder.svg",
+                  description: product.description || "",
+                  quantity: 1,
+                });
+                
+                navigate(`/checkouts/${product.sku}`);
+              }}
               usdValue={effectiveUsd}
               localUsdPrices={product.local_usd_prices}
             />

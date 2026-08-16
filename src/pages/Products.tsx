@@ -486,22 +486,21 @@ const Products = () => {
                   ) : (
                     <>
                       {/* Price */}
-                      <div className="flex items-baseline gap-2 mb-6">
-                        <span className="text-3xl font-bold text-foreground">
-                          {cardPrice.format(product.slug || product.id, priceFor(product))}
-                        </span>
-                        {product.isPhysical && (
-                          <span className="text-sm text-muted-foreground">
-                            (valor pack: ${product.id === "5000-book" ? "31.99" : "49.99"})
+                      <div className="flex flex-col gap-1 mb-6">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-3xl font-black text-foreground">
+                            {cardPrice.format(product.slug || product.id, priceFor(product))}
                           </span>
-                        )}
-                        {product.originalPrice && !product.isPhysical && product.originalPrice > product.price && (
-                          <span className="text-lg text-muted-foreground line-through">
-                            {cardPrice.formatOriginal(product.slug, product.originalPrice)}
-                          </span>
-                        )}
-                        <span className="text-sm text-accent font-medium">{cardPrice.currencyLabel(product.slug)}</span>
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
+                          {(product.originalPrice || priceFor(product) > 0) && (
+                            <span className="text-lg text-muted-foreground line-through opacity-70">
+                              {cardPrice.formatOriginal(product.slug || product.id, product.originalPrice || priceFor(product) * 2.5)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-accent uppercase tracking-wider">{cardPrice.currencyLabel(product.slug)}</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 shadow-sm">{cardPrice.regionLabel}</span>
+                        </div>
                       </div>
 
                       {/* CTA */}

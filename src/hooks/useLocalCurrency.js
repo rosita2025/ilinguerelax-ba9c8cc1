@@ -25,7 +25,7 @@ export function useLocalCurrency(usdAmount, overrides, localUsdPrices) {
     const rate = exchangeRates[currency] ?? 1;
     const amount = hasOverride ? override : activeUsdAmount * rate;
     const isUsd = currency === "USD";
-    const formatted = formatPrice(activeUsdAmount, currency, overrides ?? undefined);
+    const formatted = formatPrice(activeUsdAmount, currency, overrides ?? undefined, localUsdPrices ?? undefined);
     return {
         country: upper,
         currency,

@@ -166,7 +166,9 @@ export function useCardPrice(): CardPriceFormatter {
       const overridePen = row?.local_prices?.["PEN"];
       if (typeof overridePen === "number" && overridePen > 0) return formatCurrencyAmount(overridePen, "PEN");
 
-      return formatPrice(fallbackUsd, "PEN", row?.local_prices, row?.local_usd_prices);
+      // Si no hay PEN manual, convertimos el USD regional al PEN actual
+      const tierUsdValForPen = tierUsd(row, fallbackUsd);
+      return formatPrice(tierUsdValForPen, "PEN", row?.local_prices, row?.local_usd_prices);
     }
 
     // Resto → USD del tier convertido, respetando el monto manual por moneda.

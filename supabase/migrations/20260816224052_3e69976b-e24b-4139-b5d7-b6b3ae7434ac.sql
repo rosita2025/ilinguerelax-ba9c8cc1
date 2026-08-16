@@ -1,0 +1,1 @@
+UPDATE public.digital_products SET price_pen = 114.00 WHERE sku = 'spanish-relax-structural-spanish-grammar-a1-c1-book-physical-n9ct';

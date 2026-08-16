@@ -117,6 +117,50 @@ const AdminProducts = () => {
     }
   };
 
+  const duplicate = async (sourceSku: string) => {
+    const source = products.find(p => p.sku === sourceSku);
+    if (!source) return;
+    
+    const newName = `${source.name} (Copia)`;
+    const newSku = `${source.sku}-copy-${Math.random().toString(36).substring(2, 6)}`;
+    
+    if (!confirm(`¿Crear una copia del producto "${source.name}"?\nSe heredarán precios, exclusiones y configuración, pero deberás configurar el nuevo SKU y Drive URL.`)) return;
+    
+    setLoading(true);
+    try {
+      // Fetch full product details including local_prices
+      const { data: fullSource } = await supabase.functions.invoke("manage-products", {
+        body: { action: "list", adminKey },
+      });
+      const sourceDetails = fullSource?.products?.find((p: any) => p.sku === sourceSku);
+      
+      if (!sourceDetails) throw new Error("No se pudo obtener el detalle del producto original");
+
+      const { data, error } = await supabase.functions.invoke("manage-products", {
+        body: { 
+          action: "upsert", 
+          adminKey,
+          product: {
+            ...sourceDetails,
+            sku: newSku,
+            name: newName,
+            active: false, // Borrador
+            drive_url: null, // Forzar nuevo link
+            access_key: null,
+            sort_order: (products.reduce((max, p) => Math.max(max, p.sort_order), 0)) + 1
+          }
+        },
+      });
+      
+      if (error) throw error;
+      toast({ title: "Producto duplicado", description: "Editando la nueva copia..." });
+      window.location.href = `/admin/productos/${newSku}`;
+    } catch (e: any) {
+      toast({ title: "Error al duplicar", description: e?.message, variant: "destructive" });
+      setLoading(false);
+    }
+  };
+
   const categories = useMemo(() => {
     const set = new Set<string>();
     for (const p of products) set.add(`${p.learner_language}-${p.target_language}`);
@@ -271,27 +315,30 @@ const AdminProducts = () => {
                     </div>
 
                     <div className="mt-auto flex flex-wrap gap-1">
-                      <Button size="sm" variant="outline" className="h-8 text-xs flex-1" asChild>
+                      <Button size="sm" variant="outline" className="h-8 text-[10px] flex-1 px-1" asChild>
                         <a href={`/products/${p.sku}`} target="_blank" rel="noreferrer">
                           <ExternalLink className="w-3 h-3 mr-1" /> Ver
                         </a>
                       </Button>
-                      <Button size="sm" variant="outline" className="h-8 text-xs flex-1" asChild>
+                      <Button size="sm" variant="outline" className="h-8 text-[10px] flex-1 px-1" asChild>
                         <a href={`/checkouts/${p.sku}`} target="_blank" rel="noreferrer">
-                          <ShoppingCart className="w-3 h-3 mr-1" /> Checkout
+                          <ShoppingCart className="w-3 h-3 mr-1" /> Pay
                         </a>
                       </Button>
-                      <Button size="sm" variant="default" className="h-8 text-xs flex-1" asChild>
+                      <Button size="sm" variant="outline" className="h-8 text-[10px] flex-1 px-1" onClick={() => duplicate(p.sku)}>
+                        <Plus className="w-3 h-3 mr-1" /> Clon
+                      </Button>
+                      <Button size="sm" variant="default" className="h-8 text-[10px] flex-1 px-1" asChild>
                         <Link to={`/admin/productos/${p.sku}`}>
-                          <Pencil className="w-3 h-3 mr-1" /> Editar
+                          <Pencil className="w-3 h-3 mr-1" /> Edit
                         </Link>
                       </Button>
                     </div>
                     <div className="flex gap-1 mt-1">
-                      <Button size="sm" variant="ghost" className="h-7 text-xs flex-1" onClick={() => toggle(p.sku, p.active)}>
+                      <Button size="sm" variant="ghost" className="h-7 text-[10px] flex-1" onClick={() => toggle(p.sku, p.active)}>
                         {p.active ? <><EyeOff className="w-3 h-3 mr-1" /> Ocultar</> : <><Eye className="w-3 h-3 mr-1" /> Publicar</>}
                       </Button>
-                      <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => remove(p.sku, p.name)}>
+                      <Button size="sm" variant="ghost" className="h-7 text-[10px] text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => remove(p.sku, p.name)}>
                         <Trash2 className="w-3 h-3" />
                       </Button>
                     </div>
@@ -376,6 +423,9 @@ const AdminProducts = () => {
                             <a href={p.hotmart_url} target="_blank" rel="noreferrer" className="text-[#EF4E23]">H</a>
                           </Button>
                         )}
+                        <Button size="sm" variant="ghost" onClick={() => duplicate(p.sku)} title="Clonar">
+                          <Plus className="w-4 h-4" />
+                        </Button>
                         <Button size="sm" variant="ghost" asChild title="Editar">
                           <Link to={`/admin/productos/${p.sku}`}><Pencil className="w-4 h-4" /></Link>
                         </Button>

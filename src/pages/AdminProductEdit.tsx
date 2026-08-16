@@ -198,15 +198,57 @@ const AdminProductEdit = () => {
     toast({ title: "Borrador descartado" });
   };
 
-  // Auto-sugerir precio PEN desde USD (solo si está vacío) al crear
+  // Auto-sugerir precios regionales y SEO cuando cambia el precio base (solo en productos nuevos)
   useEffect(() => {
-    if (!isNew) return;
-    if (product.price_usd > 0 && (product.price_pen == null || product.price_pen === 0)) {
-      const suggested = Math.round(product.price_usd * 3.75 * 10) / 10; // ~S/ 3.75 por USD
-      setProduct((p) => ({ ...p, price_pen: suggested }));
-    }
+    if (!isNew || product.price_usd <= 0) return;
+
+    setProduct((p) => {
+      // 1. Sugerir PEN si está vacío
+      const suggestedPen = p.price_pen == null || p.price_pen === 0
+        ? Math.round(p.price_usd * 3.75 * 10) / 10
+        : p.price_pen;
+
+      // 2. Generar sugerencias para local_prices (moneda local)
+      const nextLocalPrices = { ...(p.local_prices || {}) };
+      
+      // Lista de monedas clave para auto-poblar (LATAM + Principales)
+      const autoPopulate = ["EUR", "MXN", "COP", "ARS", "CLP", "BRL", "PEN"];
+      
+      autoPopulate.forEach(code => {
+        if (!nextLocalPrices[code]) {
+          const rate = exchangeRates[code as Currency];
+          if (rate) {
+            const raw = p.price_usd * rate;
+            // Rounding logic similar to the manual suggestion button
+            let rounded = raw;
+            if (code === "COP") rounded = Math.round(raw / 100) * 100;
+            else if (["CLP", "BRL", "PEN"].includes(code)) rounded = Math.round(raw * 10) / 10;
+            else rounded = Math.round(raw);
+            
+            nextLocalPrices[code] = rounded;
+          }
+        }
+      });
+
+      // 3. SEO Metadata defaults based on name
+      const nextMeta = { ...(p.gallery_metadata || {}) };
+      if (!nextMeta.gallery_title && p.name) {
+        nextMeta.gallery_title = `Vista previa: ${p.name}`;
+      }
+      if (!nextMeta.keywords && p.name) {
+        const lang = LANGS.find(l => l.code === p.target_language)?.label.split(" ")[0] || "";
+        nextMeta.keywords = `${p.name.toLowerCase()}, aprender ${lang.toLowerCase()}, curso digital, iLingue Relax`;
+      }
+
+      return { 
+        ...p, 
+        price_pen: suggestedPen, 
+        local_prices: nextLocalPrices,
+        gallery_metadata: nextMeta
+      };
+    });
     // eslint-disable-next-line
-  }, [product.price_usd]);
+  }, [product.price_usd, isNew]);
 
   const availableUpsells = useMemo(
     () => allProducts.filter((p) => p.sku !== product.sku && !upsells.find((u) => u.upsell_sku === p.sku)),

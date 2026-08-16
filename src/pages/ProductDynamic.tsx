@@ -425,10 +425,41 @@ const ProductDynamic = () => {
                 return (
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Button asChild size="lg" className="w-full text-lg h-14 shadow-lg shadow-primary/20">
-                        <Link to={`/checkouts/${product.sku}`}>
-                          Comprar ahora
-                        </Link>
+                      <Button
+                        size="lg"
+                        className="w-full text-lg h-14 shadow-lg shadow-primary/20"
+                        onClick={() => {
+                          trackHotmartEvent("InitiateCheckout", {
+                            content_name: product.name,
+                            content_category: "Digital Book",
+                            content_ids: [product.sku],
+                            content_type: "product",
+                            value: effectiveUsd,
+                            currency: "USD",
+                            num_items: 1,
+                          });
+                          
+                          addItem({
+                            id: product.sku,
+                            name: product.name,
+                            price: effectiveUsd,
+                            regionPrices: {
+                              latam: product.price_usd_latam || product.price_usd,
+                              global: product.price_usd,
+                              tienda: product.price_usd_tienda || product.price_usd
+                            },
+                            pricePen: product.price_pen || undefined,
+                            localPrices: product.local_prices || undefined,
+                            localUsdPrices: product.local_usd_prices || undefined,
+                            image: product.cover_image_url || "/placeholder.svg",
+                            description: product.description || "",
+                            quantity: 1,
+                          });
+                          
+                          navigate(`/checkouts/${product.sku}`);
+                        }}
+                      >
+                        Comprar ahora
                       </Button>
                       <StockAlert count={7} className="mt-2 w-full justify-center" />
                     </div>

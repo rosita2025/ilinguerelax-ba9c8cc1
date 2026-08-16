@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams, Link, Navigate } from "react-router-dom";
+import { useParams, Link, Navigate, useNavigate } from "react-router-dom";
 import { Check, ArrowLeft, Download, Shield, Zap, Sparkles, HelpCircle, Lock, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { SEO } from "@/components/SEO";
@@ -76,6 +77,8 @@ const ProductDynamic = () => {
   const [activeImage, setActiveImage] = useState<string>("");
   
   const { t } = useI18n();
+  const navigate = useNavigate();
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
 
   useEffect(() => {
     if (!slug) return;
@@ -113,8 +116,20 @@ const ProductDynamic = () => {
     };
   }, [slug]);
 
-  // Pick the correct USD price based on visitor region (tienda VE/CU/NI, LATAM, or global).
   const region = useRegionTier();
+  const pricingReady = loading === false && product !== null;
+  const upperCountry = region.country?.toUpperCase() || "";
+  const isPEN = upperCountry === "PE";
+  const flag = (() => {
+    if (!upperCountry || upperCountry.length !== 2) return "🌍";
+    const base = 0x1f1e6;
+    const A = "A".charCodeAt(0);
+    return String.fromCodePoint(
+      base + upperCountry.charCodeAt(0) - A,
+      base + upperCountry.charCodeAt(1) - A
+    );
+  })();
+
   const effectiveUsd = product
     ? (region.tier === "tienda" && product.price_usd_tienda != null
         ? Number(product.price_usd_tienda)
@@ -216,7 +231,7 @@ const ProductDynamic = () => {
   // (`digital_products`) + la moneda local del visitante. El hero y el sticky
   // bar leen exactamente el mismo par (etiqueta, moneda) para que nunca haya
   // dos precios distintos en la misma página.
-  const isPEN = local.country === "PE";
+  // isPEN ya declarado arriba
   const displayPrice = (isPEN && product?.price_pen != null && Number(product.price_pen) > 0) 
     ? Number(product.price_pen) 
     : (local.amount || 0);
@@ -423,10 +438,41 @@ const ProductDynamic = () => {
                 return (
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Button asChild size="lg" className="w-full text-lg h-14 shadow-lg shadow-primary/20">
-                        <Link to={`/checkouts/${product.sku}`}>
-                          Comprar ahora
-                        </Link>
+                      <Button
+                        size="lg"
+                        className="w-full text-lg h-14 shadow-lg shadow-primary/20"
+                        onClick={() => {
+                          trackHotmartEvent("InitiateCheckout", {
+                            content_name: product.name,
+                            content_category: "Digital Book",
+                            content_ids: [product.sku],
+                            content_type: "product",
+                            value: effectiveUsd,
+                            currency: "USD",
+                            num_items: 1,
+                          });
+                          
+                          addItem({
+                            id: product.sku,
+                            name: product.name,
+                            price: effectiveUsd,
+                            regionPrices: {
+                              latam: product.price_usd_latam || product.price_usd,
+                              global: product.price_usd,
+                              tienda: product.price_usd_tienda || product.price_usd
+                            },
+                            pricePen: product.price_pen || undefined,
+                            localPrices: product.local_prices || undefined,
+                            localUsdPrices: product.local_usd_prices || undefined,
+                            image: product.cover_image_url || "/placeholder.svg",
+                            description: product.description || "",
+                            quantity: 1,
+                          });
+                          
+                          navigate(`/checkouts/${product.sku}`);
+                        }}
+                      >
+                        Comprar ahora
                       </Button>
                       <StockAlert count={7} className="mt-2 w-full justify-center" />
                     </div>
@@ -511,13 +557,42 @@ const ProductDynamic = () => {
               price={displayFormatted}
               originalPrice={originalFormatted}
               currencyCode={displayCurrencyCode}
-              flag={isPEN ? "🇵🇪" : undefined}
+              flag={flag}
               rating={reviewsRating}
               reviewCount={reviewsCount}
               showReviews={reviewsCount > 0}
               productName={product.name}
               ctaText={"Comprar ahora"}
-              buyUrl={`/checkouts/${product.sku}`}
+              onBuyClick={() => {
+                trackHotmartEvent("InitiateCheckout", {
+                  content_name: product.name,
+                  content_category: "Digital Book",
+                  content_ids: [product.sku],
+                  content_type: "product",
+                  value: effectiveUsd,
+                  currency: "USD",
+                  num_items: 1,
+                });
+                
+                addItem({
+                  id: product.sku,
+                  name: product.name,
+                  price: effectiveUsd,
+                  regionPrices: {
+                    latam: product.price_usd_latam || product.price_usd,
+                    global: product.price_usd,
+                    tienda: product.price_usd_tienda || product.price_usd
+                  },
+                  pricePen: product.price_pen || undefined,
+                  localPrices: product.local_prices || undefined,
+                  localUsdPrices: product.local_usd_prices || undefined,
+                  image: product.cover_image_url || "/placeholder.svg",
+                  description: product.description || "",
+                  quantity: 1,
+                });
+                
+                navigate(`/checkouts/${product.sku}`);
+              }}
               usdValue={effectiveUsd}
               localUsdPrices={product.local_usd_prices}
             />

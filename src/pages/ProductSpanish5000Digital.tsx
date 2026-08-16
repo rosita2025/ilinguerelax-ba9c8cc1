@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, Suspense } from "react";
+import { useMemo, useRef, useState, Suspense, useEffect } from "react";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -174,7 +174,12 @@ const ProductSpanish5000Digital = () => {
     name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
     price: currentPrice,
     pricePen: pricePen ?? undefined,
-    regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
+    regionPrices: { 
+      latam: priceLatamUsd, 
+      global: priceGlobalUsd, 
+      tienda: priceTiendaUsd 
+    },
+    localUsdPrices: pricing.localUsdPrices ?? undefined,
     image: "/images/product-5000-spanish.webp",
     description: "5,000 vocabulary words in Spanish with English pronunciation",
     quantity: 1,
@@ -553,12 +558,15 @@ const ProductSpanish5000Digital = () => {
       </Suspense>
 
       <StickyBuyBar
+        sku={ADMIN_SKU_SP5K}
         productName="Spanish 5,000 Words — Digital PDF"
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}
         currencyCode={tier.currencyCode}
         flag={flag}
-        buyUrl={useTiendaOnly ? TIENDA_PATH_SP5K : (tier.hotmartUrl || HOTMART_SP5K_LATAM)}
+        usdValue={currentPrice}
+        localUsdPrices={pricing.localUsdPrices}
+        buyUrl={useTiendaOnly ? undefined : (tier.hotmartUrl || HOTMART_SP5K_LATAM)}
         onBuyClick={handleBuyNow}
         ctaText={useTiendaOnly ? `GET IT NOW — ${tier.priceLabel}` : `BUY ON HOTMART — ${tier.priceLabel}`}
 

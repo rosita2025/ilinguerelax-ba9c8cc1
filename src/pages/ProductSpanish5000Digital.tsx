@@ -174,7 +174,12 @@ const ProductSpanish5000Digital = () => {
     name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
     price: currentPrice,
     pricePen: pricePen ?? undefined,
-    regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
+    regionPrices: { 
+      latam: priceLatamUsd, 
+      global: priceGlobalUsd, 
+      tienda: priceTiendaUsd 
+    },
+    localUsdPrices: pricing.localUsdPrices ?? undefined,
     image: "/images/product-5000-spanish.webp",
     description: "5,000 vocabulary words in Spanish with English pronunciation",
     quantity: 1,

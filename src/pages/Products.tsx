@@ -349,6 +349,22 @@ const Products = () => {
                   </span>
                 </div>
 
+                {/* Format tags (Digital / Physical) - Top Left */}
+                <div className="absolute top-4 left-4 z-10 flex flex-col gap-1.5">
+                  {(() => {
+                    const formats = product.formats ?? (product.isPhysical ? ['physical'] : ['digital']);
+                    return formats.map(f => (
+                      <span key={f} className={cn(
+                        "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm",
+                        f === 'physical' ? "bg-orange-500 text-white" : "bg-primary text-primary-foreground"
+                      )}>
+                        {f === 'physical' ? <BookOpen className="w-3 h-3" /> : <Download className="w-3 h-3" />}
+                        {f}
+                      </span>
+                    ));
+                  })()}
+                </div>
+
                 {/* Product Image Area */}
                 <div className="relative h-72 bg-gradient-to-br from-primary/5 to-accent/5 flex items-center justify-center p-8">
                   <ProductCoverImage

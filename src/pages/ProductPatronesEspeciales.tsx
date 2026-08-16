@@ -366,9 +366,9 @@ const ProductPatronesEspeciales = () => {
                     className="w-full mb-4 text-lg py-6 shadow-2xl"
                     onClick={handleBuy}
                   >
-                    <ShoppingCart className="w-6 h-6 mr-2" />
-                    Comprar en tienda online
-                    <ArrowRight className="w-6 h-6 ml-2" />
+                    <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
+                    Comprar ahora
+                    <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
                   </Button>
                 </motion.div>
               ) : (
@@ -379,9 +379,9 @@ const ProductPatronesEspeciales = () => {
                     className="w-full mb-4 text-lg py-6 shadow-2xl"
                     onClick={handleBuy}
                   >
-                    <ShoppingCart className="w-6 h-6 mr-2" />
+                    <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
                     ¡QUIERO COMPRAR AHORA!
-                    <ArrowRight className="w-6 h-6 ml-2" />
+                    <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
                   </Button>
                 </motion.div>
               )}

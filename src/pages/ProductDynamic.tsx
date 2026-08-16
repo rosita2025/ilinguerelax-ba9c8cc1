@@ -113,8 +113,10 @@ const ProductDynamic = () => {
     };
   }, [slug]);
 
-  // Pick the correct USD price based on visitor region (tienda VE/CU/NI, LATAM, or global).
   const region = useRegionTier();
+  const pricingReady = loading === false && product !== null;
+  const isPEN = region.country?.toUpperCase() === "PE";
+
   const effectiveUsd = product
     ? (region.tier === "tienda" && product.price_usd_tienda != null
         ? Number(product.price_usd_tienda)

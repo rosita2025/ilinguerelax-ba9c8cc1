@@ -146,14 +146,18 @@ const ProductPatronesEspeciales = () => {
       num_items: 1,
     });
     addItem({
-      id: "patrones-especiales-ingles",
+      id: "patrones-ingles",
       name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés (PDF)",
       price: PRICE_USD,
+      regionPrices: { 
+        latam: LATAM_USD, 
+        global: GLOBAL_USD, 
+        tienda: TIENDA_USD 
+      },
       pricePen: pricingAdmin.pricePen ?? undefined,
-      regionPrices: { latam: LATAM_USD, global: GLOBAL_USD, tienda: TIENDA_USD },
       localUsdPrices: pricingAdmin.localUsdPrices ?? undefined,
-      image: "/images/product-patrones-especiales.webp",
-      description: "Guía PDF de patrones, alfabeto y combinaciones del inglés",
+      image: productImage,
+      description: "Alfabeto y combinaciones secretas de sonidos en inglés",
       quantity: 1,
     });
     toast.success("Producto agregado al carrito", {

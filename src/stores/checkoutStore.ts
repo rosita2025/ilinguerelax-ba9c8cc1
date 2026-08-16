@@ -49,8 +49,15 @@ export function calcTotalsPen(
 ): { subtotal: number; discount: number; total: number } | null {
   if ((country || "").toUpperCase() !== "PE") return null;
   if (items.length === 0) return null;
-  if (!items.every((i) => typeof i.pricePen === "number" && (i.pricePen as number) > 0)) return null;
-  const subtotal = items.reduce((s, i) => s + (i.pricePen as number) * i.quantity, 0);
+  if (!items.every((i) => {
+    const penOverride = i.localPrices?.["PEN"];
+    return (typeof i.pricePen === "number" && i.pricePen > 0) || (typeof penOverride === "number" && penOverride > 0);
+  })) return null;
+  const subtotal = items.reduce((s, i) => {
+    const penOverride = i.localPrices?.["PEN"];
+    const penPrice = (typeof i.pricePen === "number" && i.pricePen > 0) ? i.pricePen : (penOverride || 0);
+    return s + penPrice * i.quantity;
+  }, 0);
   const discount = (subtotal * couponPercent) / 100;
   const total = Math.max(0, subtotal - discount);
   return {

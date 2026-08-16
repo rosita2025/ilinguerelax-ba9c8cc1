@@ -161,6 +161,11 @@ export function useCardPrice(): CardPriceFormatter {
     if (isPeru) {
       const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
       if (pen) return formatCurrencyAmount(pen, "PEN");
+      
+      // Fallback a override manual en local_prices si existe para PEN
+      const overridePen = row?.local_prices?.["PEN"];
+      if (typeof overridePen === "number" && overridePen > 0) return formatCurrencyAmount(overridePen, "PEN");
+
       return formatPrice(fallbackUsd, "PEN", row?.local_prices, row?.local_usd_prices);
     }
 
@@ -182,6 +187,10 @@ export function useCardPrice(): CardPriceFormatter {
     if (isPeru) {
       const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
       if (pen) return formatCurrencyAmount(pen * ORIGINAL_MULTIPLIER, "PEN");
+      
+      const overridePen = row?.local_prices?.["PEN"];
+      if (typeof overridePen === "number" && overridePen > 0) return formatCurrencyAmount(overridePen * ORIGINAL_MULTIPLIER, "PEN");
+
       return formatPrice(originalUsd, "PEN");
     }
 

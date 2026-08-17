@@ -41,6 +41,8 @@ interface StickyBuyBarProps {
   usdValue?: number;
   /** Regional USD overrides for specific currencies. */
   localUsdPrices?: Record<string, number> | null;
+  /** Short high-conversion testimonials to rotate. */
+  testimonials?: string[];
 }
 
 export const StickyBuyBar = ({

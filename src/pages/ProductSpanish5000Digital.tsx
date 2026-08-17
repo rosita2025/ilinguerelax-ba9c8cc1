@@ -38,6 +38,10 @@ import previewSpanishVocab from "@/assets/preview-spanish-vocab.png";
 import previewSpanishPhrases from "@/assets/preview-spanish-phrases.webp";
 import previewSpanishIndex from "@/assets/preview-spanish-index.png";
 import { PinterestSave } from "@/components/PinterestSave";
+import plannerPreviewAsset from "@/assets/previews/spanish-daily-planner-preview.png.asset.json";
+import examPreviewAsset from "@/assets/previews/spanish-exam-preview.png.asset.json";
+import grammarPreviewAsset from "@/assets/previews/spanish-grammar-preview.png.asset.json";
+import verbsPreviewAsset from "@/assets/previews/spanish-verbs-preview.png.asset.json";
 
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
@@ -72,23 +76,26 @@ const bonuses = [
     title: "BONUS #1 · Spanish Exam Test",
     subtitle: "Measure your progress with self-graded tests.",
     image: bonus1Image,
+    previewImage: examPreviewAsset.url,
     value: "$19",
   },
   {
     title: "BONUS #2 · Daily Planner",
     subtitle: "A printable planner to keep your study routine consistent.",
     image: bonus2Image,
+    previewImage: plannerPreviewAsset.url,
     value: "$14",
   },
   {
     title: "BONUS #3 · Pronunciation Guide",
     subtitle: "A guide with the tricky Spanish sounds and how to master them.",
     image: bonus3Image,
+    previewImage: verbsPreviewAsset.url,
     value: "$17",
   },
 ];
 
-const BonusPreviewDialog = ({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) => (
+const BonusPreviewDialog = ({ title, subtitle, previewImage, children }: { title: string; subtitle: string; previewImage?: string; children?: React.ReactNode }) => (
   <Dialog>
     <DialogTrigger asChild>
       <Button variant="outline" size="sm" className="mt-3 w-full gap-1.5">
@@ -106,7 +113,15 @@ const BonusPreviewDialog = ({ title, subtitle, children }: { title: string; subt
             PREVIEW · ilinguerelax.com
           </span>
         </div>
-        <div className="relative p-6 md:p-8">{children}</div>
+        <div className="relative p-6 md:p-8">
+          {previewImage ? (
+            <img 
+              src={previewImage} 
+              alt={title} 
+              className="w-full h-auto rounded-md shadow-sm border border-slate-100" 
+            />
+          ) : children}
+        </div>
       </div>
       <p className="text-xs text-center text-muted-foreground mt-2">
         This is a 1-page sample. Full PDF delivered after purchase.
@@ -428,19 +443,19 @@ const ProductSpanish5000Digital = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { 
-                img: previewSpanishIndex, 
-                title: "Structured A1-C1 Path", 
-                desc: "A clear roadmap showing you exactly what to study and in what order to reach fluency." 
+                img: examPreviewAsset.url, 
+                title: "Spanish Exam Test", 
+                desc: "Real tests to measure your vocabulary and grammar progress." 
               },
               { 
-                img: previewSpanishVocab, 
-                title: "Vocabulary with Pronunciation", 
-                desc: "Every word is written the way it actually sounds in English. No phonetic symbols to learn." 
+                img: grammarPreviewAsset.url, 
+                title: "Grammar Mastery", 
+                desc: "Clear explanations of Ser vs Estar and essential sentence structures." 
               },
               { 
-                img: previewSpanishPhrases, 
-                title: "Practical Exercises", 
-                desc: "Real-world examples and exercises to reinforce what you've learned and build confidence." 
+                img: verbsPreviewAsset.url, 
+                title: "Verb Tables", 
+                desc: "Comprehensive tables covering present, past, and future tenses." 
               },
             ].map((item, i) => (
               <motion.div 
@@ -517,6 +532,7 @@ const ProductSpanish5000Digital = () => {
                 <BonusPreviewDialog 
                   title={bonus.title} 
                   subtitle={bonus.subtitle}
+                  previewImage={bonus.previewImage}
                 >
                   <div className="space-y-4">
                     <h4 className="font-bold text-lg text-slate-900">{bonus.title} — Preview Content</h4>

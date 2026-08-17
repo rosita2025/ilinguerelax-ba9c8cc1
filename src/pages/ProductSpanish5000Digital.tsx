@@ -506,9 +506,8 @@ const ProductSpanish5000Digital = () => {
         </div>
       </section>
 
-
-
       <Suspense fallback={<div className="h-40" />}>
+
         <FAQ
           title="Frequently Asked Questions"
           subtitle="Everything about the digital PDF, learning materials, and delivery."

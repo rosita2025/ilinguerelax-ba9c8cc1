@@ -97,9 +97,12 @@ export const Hero = () => {
       <div className="relative container px-4 md:px-6 py-20 md:py-32">
         <div className="max-w-4xl mx-auto text-center">
           {/* Logo Badge */}
-          <div className="inline-flex items-center gap-3 mb-8 animate-fade-in">
+          <div className="inline-flex flex-col items-center gap-2 mb-8 animate-fade-in">
             <span className="text-2xl md:text-3xl font-bold text-primary-foreground tracking-tight">
-              iLingue <span className="font-light">Relax</span>
+              iLingue <span className="font-light">Relax</span> <span className="text-accent ml-1">App</span>
+            </span>
+            <span className="bg-accent/20 text-accent text-xs font-semibold px-3 py-1 rounded-full border border-accent/30 uppercase tracking-widest">
+              Muy Pronto / Coming Soon
             </span>
           </div>
 

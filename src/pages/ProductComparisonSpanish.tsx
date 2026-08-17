@@ -150,12 +150,12 @@ const ProductComparisonSpanish = () => {
 
               <Button
                 onClick={() => navigate(product.url)}
-                size="xl"
-                className={`w-full py-8 text-lg font-black rounded-2xl shadow-lg transition-transform active:scale-95 ${
+                size="lg"
+                className={`w-full py-6 text-base font-black rounded-xl shadow-md transition-transform active:scale-95 ${
                   product.popular ? "bg-primary text-primary-foreground" : "variant-outline"
                 }`}
               >
-                <ShoppingCart className="w-5 h-5 mr-2" />
+                <ShoppingCart className="w-4 h-4 mr-2" />
                 {product.cta}
               </Button>
 

@@ -44,7 +44,7 @@ const ProductComparisonSpanish = () => {
     {
       title: "Digital Edition",
       subtitle: "5,000 Spanish Words",
-      price: 22,
+      price: tier.priceUsd || 22,
       originalPrice: 35,
       description: "Perfect for studying on your phone, tablet or computer. Instant access to everything.",
       image: "/images/product-5000-spanish-digital.webp",
@@ -63,7 +63,7 @@ const ProductComparisonSpanish = () => {
     {
       title: "Physical + Digital",
       subtitle: "The Master Bundle",
-      price: 34.99,
+      price: 34.99, // Physical always fixed at base USD if not overridden elsewhere
       originalPrice: 54,
       description: "The complete experience. A high-quality printed book for your shelf plus the digital version.",
       image: "/images/product-5000-spanish-physical.webp",

@@ -534,11 +534,17 @@ export const StickyBuyBar = ({
                   </motion.div>
                 </AnimatePresence>
                 {showReviews && (
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground opacity-60">
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     {renderStars()}
-                    <span>({reviewCount}+)</span>
+                    <span className="text-foreground font-bold tabular-nums">{rating != null ? rating.toFixed(2) : "4.65"}</span>
+                    <span>({reviewCount != null ? reviewCount : 800}+)</span>
+                    <span className="ml-1 inline-flex items-center gap-0.5 text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/25">
+                      <TrendingUp className="w-3 h-3" />
+                      {lang === "en" ? "Most popular" : "Más popular"}
+                    </span>
                   </div>
                 )}
+
               </div>
             ) : showReviews && (
               <div className="flex items-center gap-1.5 text-sm">

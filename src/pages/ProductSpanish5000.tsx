@@ -337,7 +337,7 @@ const ProductSpanish5000 = () => {
                   variant="outline"
                   size="lg"
                   onClick={() => {
-                    document.getElementById("digital-only")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    window.location.href = "/products/5-000-words-spanish-with-pronunciation-english-nwna";
                   }}
                   className="w-full mt-3 text-sm md:text-base py-4 h-auto min-h-[52px] whitespace-normal border-2 border-purple-500/40 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10"
                 >

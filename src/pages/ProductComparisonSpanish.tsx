@@ -126,16 +126,16 @@ const ProductComparisonSpanish = () => {
               )}
 
               <div className="mb-8">
-                <h2 className="text-2xl font-black mb-1">{product.title}</h2>
-                <p className="text-muted-foreground font-bold">{product.subtitle}</p>
+                <h2 className="text-xl font-black mb-1">{product.title}</h2>
+                <p className="text-muted-foreground text-sm font-bold">{product.subtitle}</p>
               </div>
 
-              <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-black">${product.price}</span>
-                <span className="text-xl line-through text-muted-foreground opacity-70">${product.originalPrice}</span>
+              <div className="flex items-baseline gap-2 mb-5">
+                <span className="text-3xl font-black">${product.price}</span>
+                <span className="text-lg line-through text-muted-foreground opacity-70">${product.originalPrice}</span>
               </div>
 
-              <p className="text-muted-foreground mb-8 text-sm leading-relaxed">
+              <p className="text-muted-foreground mb-6 text-xs leading-relaxed">
                 {product.description}
               </p>
 

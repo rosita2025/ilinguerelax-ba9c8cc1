@@ -487,38 +487,6 @@ const ProductSpanish5000Digital = () => {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-14 md:py-20 bg-gradient-to-br from-primary/10 via-background to-accent/10">
-        <div className="container px-4 md:px-6 max-w-3xl text-center">
-          <h2 className="text-3xl md:text-5xl font-black mb-4">
-            Ready to speak Spanish with confidence?
-          </h2>
-          <p className="text-muted-foreground text-base md:text-lg mb-6">
-            5,000 essential Spanish words · English pronunciation · The Complete System.
-            <br />
-            <span className="text-accent font-bold mt-2 inline-block">⚠️ Price will increase when Audio Edition is released.</span>
-          </p>
-          <div className="flex items-baseline justify-center gap-3 mb-4">
-            <span className="text-5xl font-black">{tier.priceLabel}</span>
-            <span className="text-xl line-through text-muted-foreground">{tier.originalLabel}</span>
-            <span className="px-2 py-1 rounded-md bg-red-500 text-white text-xs font-black">-{DISCOUNT_PCT}%</span>
-          </div>
-          <Button
-            onClick={handleBuyNow}
-            disabled={isRedirecting || !pricingReady}
-            size="lg"
-            className="h-14 px-8 text-base font-black shadow-hero"
-          >
-            <ShoppingCart className="w-5 h-5 mr-2" />
-            {isRedirecting ? "Redirecting…" : `GET IT NOW — ${tier.priceLabel}`}
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
-
-          <p className="text-xs text-muted-foreground mt-3 flex items-center justify-center gap-1">
-            <Shield className="w-3 h-3" /> Secure checkout · 7-day money-back guarantee
-          </p>
-        </div>
-      </section>
 
       <Suspense fallback={<div className="h-40" />}>
         <FAQ

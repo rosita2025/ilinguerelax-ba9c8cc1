@@ -73,7 +73,18 @@ export const StickyBuyBar = ({
   sku,
   usdValue,
   localUsdPrices,
+  testimonials,
 }: StickyBuyBarProps & { sku?: string }) => {
+  const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
+
+  useEffect(() => {
+    if (!testimonials || testimonials.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentTestimonialIndex((prev) => (prev + 1) % testimonials.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [testimonials]);
+
   // Long currencies (COP$119.900, AR$35.990) need extra-tight layout on mobile
   const isLongPrice = price.length > 7;
   const isVeryLongPrice = price.length > 10;

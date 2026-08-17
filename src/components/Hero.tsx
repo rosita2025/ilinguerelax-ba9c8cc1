@@ -74,19 +74,19 @@ export const Hero = () => {
           loop={true}
           className="w-full h-full"
         >
-          <SwiperSlide>
+          <SwiperSlide className="flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <img
               src={appPreview1.url}
               alt="iLingue Relax App"
-              className="w-full h-full object-cover object-center"
+              className="max-h-[70vh] md:max-h-[80vh] w-auto object-contain transition-transform duration-700 hover:scale-105"
               loading="eager"
             />
           </SwiperSlide>
-          <SwiperSlide>
+          <SwiperSlide className="flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <img
               src={appPreview2.url}
               alt="2,000 Korean Words"
-              className="w-full h-full object-cover object-center"
+              className="max-h-[70vh] md:max-h-[80vh] w-auto object-contain transition-transform duration-700 hover:scale-105"
               loading="lazy"
             />
           </SwiperSlide>

@@ -516,67 +516,6 @@ const ProductSpanish5000Digital = () => {
         </div>
       </section>
 
-      {/* Bonuses Section */}
-      <section className="py-12 md:py-20 bg-background relative overflow-hidden">
-        <div className="container px-4 md:px-6">
-          <div className="text-center mb-10 md:mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-black mb-4">
-              <Gift className="w-4 h-4" /> EVERYTHING INCLUDED
-            </div>
-            <h2 className="text-3xl md:text-5xl font-black mb-4">Added to your download at no extra cost</h2>
-            <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
-              We've included these specialized resources to accelerate your learning and keep you consistent every single day.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {bonuses.map((bonus, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="relative flex flex-col p-6 rounded-3xl border border-border bg-card shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="absolute -top-3 -right-3 px-3 py-1 rounded-full bg-emerald-500 text-white text-[10px] font-black shadow-lg z-10">
-                  VALUE {bonus.value}
-                </div>
-                <div className="relative aspect-video rounded-xl overflow-hidden mb-6 border border-border bg-muted">
-                  <img 
-                    src={bonus.image} 
-                    alt={bonus.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="font-bold text-xl mb-2 text-foreground">{bonus.title}</h3>
-                <p className="text-sm text-muted-foreground mb-6 flex-grow">
-                  {bonus.subtitle}
-                </p>
-                <BonusPreviewDialog 
-                  title={bonus.title} 
-                  subtitle={bonus.subtitle}
-                  previewImage={bonus.previewImage}
-                >
-                  <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-slate-100 shadow-sm">
-                    {bonus.previewImage ? (
-                      <img 
-                        src={bonus.previewImage} 
-                        alt={bonus.title} 
-                        className="w-full h-auto" 
-                      />
-                    ) : (
-                      <div className="h-64 flex items-center justify-center bg-slate-50">
-                        <FileText className="w-12 h-12 text-slate-300" />
-                      </div>
-                    )}
-                  </div>
-                </BonusPreviewDialog>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* How it works */}
       <section className="py-10 md:py-14 bg-muted/30">

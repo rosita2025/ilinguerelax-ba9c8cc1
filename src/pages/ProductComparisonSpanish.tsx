@@ -1,21 +1,50 @@
 import { motion } from "framer-motion";
-import { ShoppingCart, Check, Smartphone, Download, Shield } from "lucide-react";
+import { ShoppingCart, Check, Smartphone, Download, Shield, ArrowRight, Package } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { useI18n } from "@/i18n/I18nContext";
+import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
 
 const ProductComparisonSpanish = () => {
   const navigate = useNavigate();
-  const { formatPrice } = useI18n();
+  const { formatPrice, countryCode } = useI18n();
+  const ADMIN_SKU = "5-000-spanish-words-with-english-pronunciation-digital";
+  const pricing = useAdminPricing(ADMIN_SKU);
+  const tier = useCountryTierRouting(ADMIN_SKU, {
+    fallbackPriceGlobalUsd: 22,
+    fallbackPriceLatamUsd: 19,
+    fallbackPricePen: 45,
+  });
+
+  const shortTestimonials = [
+    "Best Spanish book I've found!",
+    "Finally understood Ser vs Estar.",
+    "Fast delivery & secure payment.",
+    "The pronunciation guide is a life saver!",
+    "Perfect for A1 to C1 levels."
+  ];
+
+  const countryToFlag = (cc: string): string => {
+    if (!cc || cc.length !== 2) return "🌍";
+    const base = 0x1f1e6;
+    const A = "A".charCodeAt(0);
+    return String.fromCodePoint(
+      base + cc.toUpperCase().charCodeAt(0) - A,
+      base + cc.toUpperCase().charCodeAt(1) - A,
+    );
+  };
+  const flag = countryToFlag(countryCode);
 
   const products = [
     {
       title: "Digital Edition",
       subtitle: "5,000 Spanish Words",
-      price: 22,
+      price: tier.priceUsd || 22,
       originalPrice: 35,
       description: "Perfect for studying on your phone, tablet or computer. Instant access to everything.",
       image: "/images/product-5000-spanish-digital.webp",
@@ -34,7 +63,7 @@ const ProductComparisonSpanish = () => {
     {
       title: "Physical + Digital",
       subtitle: "The Master Bundle",
-      price: 34.99,
+      price: 34.99, // Physical always fixed at base USD if not overridden elsewhere
       originalPrice: 54,
       description: "The complete experience. A high-quality printed book for your shelf plus the digital version.",
       image: "/images/product-5000-spanish-physical.webp",
@@ -79,7 +108,7 @@ const ProductComparisonSpanish = () => {
           </motion.p>
         </div>
 
-        <div className="container max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div id="comparison-cards" className="container max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
           {products.map((product, i) => (
             <motion.div
               key={product.url}
@@ -160,6 +189,28 @@ const ProductComparisonSpanish = () => {
           </div>
         </div>
       </section>
+
+      <StickyBuyBar
+        sku={ADMIN_SKU}
+        productName="Spanish Mastery System · Select Edition"
+        price={tier.priceLabel}
+        originalPrice={tier.originalLabel}
+        currencyCode={tier.currencyCode}
+        flag={flag}
+        usdValue={tier.priceUsd}
+        localUsdPrices={pricing.localUsdPrices}
+        onBuyClick={() => {
+          const el = document.getElementById('comparison-cards');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }}
+        ctaText="CHOOSE EDITION"
+        testimonials={shortTestimonials}
+        lang="en"
+        rating={4.8}
+        reviewCount={500}
+        calmMode
+        dismissible
+      />
 
       <Footer />
     </main>

@@ -389,13 +389,13 @@ const ProductSpanish5000Digital = () => {
               </h3>
               <ul className="space-y-3">
                 {[
-                  "5,000 Spanish Words + Pronunciation 250 Pages",
-                  "Complete A1–C1 Grammar Guide — 250 Pages",
-                  "1,000 Essential Spanish Verbs + English Pronunciation",
-                  "500 Spanish Questions for Practice + English Pronunciation",
-                  "Practical Exercises",
-                  "Structured Study Plan",
-                  "Practice Materials",
+                  "5,000 Spanish Words + Pronunciation (250 Pages) $43 now $30",
+                  "Complete A1–C1 Grammar Guide — 250 Pages $34 now $25",
+                  "1,000 Essential Spanish Verbs + English Pronunciation $27 now $20",
+                  "500 Spanish Questions for Practice + English Pronunciation $25 now $15",
+                  "Practical Exercises $20 now $10",
+                  "Structured Study Plan FREE",
+                  "Practice Materials FREE",
                   "Progressive A1 → C1 — Learning Path"
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-base">
@@ -417,15 +417,17 @@ const ProductSpanish5000Digital = () => {
               
               <div className="relative pt-6 border-t border-primary/10">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-black mb-3">
-                  <Zap className="w-4 h-4" /> 🚀 Phase 2 — Audio Edition
+                  <Zap className="w-4 h-4" /> 🚀 Updates & Audio
                 </div>
-                <h4 className="font-bold text-base mb-2 text-foreground">Coming soon:</h4>
-                <p className="text-sm text-muted-foreground italic mb-4">
-                  An enhanced version with audio pronunciation to help you improve listening and speaking skills.
+                <h4 className="font-bold text-base mb-2 text-foreground">Free Updates & Future Audio:</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Recibirás actualizaciones gratuitas del material directamente en tu correo de forma automática. 
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  The Audio Edition will include everything in the Spanish Mastery System plus audio resources for pronunciation practice.
-                </p>
+                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                  <p className="text-xs font-bold text-red-600">
+                    ⚠️ Próximamente subirá el precio con la inclusión del Audio Edition.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -446,37 +448,37 @@ const ProductSpanish5000Digital = () => {
             {[
               { 
                 img: previewSpanishVocab, 
-                title: "5,000 Spanish Words + Pronunciation (250 Pages)", 
+                title: "5,000 Spanish Words + Pronunciation (250 Pages) $43 now $30", 
                 desc: "Every word is written the way it actually sounds in English. No phonetic symbols to learn." 
               },
               { 
                 img: grammarPreviewAsset.url, 
-                title: "Complete A1–C1 Grammar Guide — 250 Pages", 
+                title: "Complete A1–C1 Grammar Guide — 250 Pages $34 now $25", 
                 desc: "Clear explanations of Ser vs Estar and essential sentence structures." 
               },
               { 
                 img: verbsV2PreviewAsset.url, 
-                title: "1,000 Essential Spanish Verbs + English Pronunciation", 
+                title: "1,000 Essential Spanish Verbs + English Pronunciation $27 now $20", 
                 desc: "Comprehensive tables covering present, past, and future tenses with English pronunciation." 
               },
               { 
                 img: questionsPreviewAsset.url, 
-                title: "500 Spanish Questions for Practice + English Pronunciation", 
+                title: "500 Spanish Questions for Practice + English Pronunciation $25 now $15", 
                 desc: "Real-world conversational questions to build fluency and confidence." 
               },
               { 
                 img: previewSpanishPhrases, 
-                title: "Practical Exercises", 
+                title: "Practical Exercises $20 now $10", 
                 desc: "Real-world examples and exercises to reinforce what you've learned and build confidence." 
               },
               { 
                 img: plannerPreviewAsset.url, 
-                title: "Structured Study Plan", 
+                title: "Structured Study Plan FREE", 
                 desc: "A step-by-step 4-step daily method to keep your routine consistent." 
               },
               { 
                 img: examPreviewAsset.url, 
-                title: "Practice Materials", 
+                title: "Practice Materials FREE", 
                 desc: "Real tests to measure your vocabulary and grammar progress." 
               },
             ].map((item, i) => (

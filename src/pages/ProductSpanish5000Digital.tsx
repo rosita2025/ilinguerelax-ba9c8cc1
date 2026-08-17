@@ -484,11 +484,28 @@ const ProductSpanish5000Digital = () => {
       {/* Reviews */}
       <section className="py-10 md:py-14">
         <div className="container px-4 md:px-6">
+          <div className="mb-6 rounded-2xl border border-primary/20 bg-primary/5 p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-4 justify-between">
+            <div>
+              <p className="text-sm font-bold text-foreground">
+                These reviews are from readers of the printed book.
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Want the physical book and get the digital version free? This digital page does not include the printed book.
+              </p>
+            </div>
+            <a
+              href="/products/5-000-spanish-words-with-english-pronunciation-physical"
+              className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-extrabold text-primary-foreground shadow-md hover:opacity-90 transition whitespace-nowrap"
+            >
+              Get Physical Book + Free Digital — $44 USD
+            </a>
+          </div>
           <Suspense fallback={<div className="h-40" />}>
             <LooxStyleReviews />
           </Suspense>
         </div>
       </section>
+
 
 
       <Suspense fallback={<div className="h-40" />}>

@@ -82,13 +82,14 @@ const countryToFlag = (cc: string): string => {
 
 const ProductSpanish5000Digital = () => {
   const shortTestimonials = [
-    "Mejor libro que he comprado",
-    "Por fin entendí Ser vs Estar",
-    "Envío instantáneo y seguro",
-    "La pronunciación ayuda mucho",
-    "Perfecto de A1 a C1",
-    "Todo en un solo PDF"
+    "\"Best Spanish PDF I've bought\" — Sarah, USA",
+    "\"Finally understood Ser vs Estar\" — Mark, UK",
+    "\"Instant download, no waiting\" — Julie, Canada",
+    "\"The pronunciation makes it easy\" — Tom, USA",
+    "\"Perfect from A1 to C1\" — Anna, Ireland",
+    "\"Everything in one single PDF\" — David, Australia"
   ];
+
   const [isRedirecting, setIsRedirecting] = useState(false);
   const lockRef = useRef(false);
   const { currency, countryCode, formatPrice } = useI18n();
@@ -545,7 +546,7 @@ const ProductSpanish5000Digital = () => {
         rating={4.8}
         reviewCount={500}
         calmMode
-        dismissible
+
       />
       <ScrollToTop />
       <WhatsAppButton />

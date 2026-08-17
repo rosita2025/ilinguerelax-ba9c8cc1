@@ -148,8 +148,9 @@ export const StickyBuyBar = ({
   }, [dismissed]);
 
   // Auto-collapse to floating circle when user scrolls down (gives back page space),
-  // auto-expand again when user scrolls back up. Customer can also tap the circle.
+  // auto-expand again when user scrolls back up. Only when the bar is dismissible.
   useEffect(() => {
+    if (!dismissible) return;
     let lastY = window.scrollY;
     const onScroll = () => {
       const y = window.scrollY;
@@ -163,7 +164,8 @@ export const StickyBuyBar = ({
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [dismissible]);
+
 
   // Publish the sticky bar's real height as a CSS variable so floating
   // buttons (WhatsApp, ScrollToTop) can position themselves safely above it

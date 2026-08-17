@@ -1,17 +1,17 @@
-# Plan: Remove Bonuses Section
+# Plan: Clean up unused assets and imports in Spanish Mastery System page
 
-The user wants to completely remove the "Bonuses Section" from the Spanish Mastery System product page (`src/pages/ProductSpanish5000Digital.tsx`). This includes the header "Added to your download at no extra cost" and the individual bonus cards (Spanish Exam Test, Daily Planner, and 1,000 Essential Verbs).
+The user requested to remove unused imports (`previewSpanishIndex`) and confirmed a list of assets that were modified or removed in previous turns. I will clean up the imports and constants in `src/pages/ProductSpanish5000Digital.tsx` to match the current state of the page.
 
 ## Proposed Changes
 
-### Frontend
+### Frontend Edits
 
-- **src/pages/ProductSpanish5000Digital.tsx**
-    - Remove the entire `<section>` containing the bonuses (lines 517-577 approx).
-    - Remove the `bonuses` constant array if it's no longer used.
-    - Remove the `BonusPreviewDialog` component if it's no longer used.
+#### [src/pages/ProductSpanish5000Digital.tsx](src/pages/ProductSpanish5000Digital.tsx)
+- Remove unused import `previewSpanishIndex`.
+- Remove unused imports `bonus1Image`, `bonus2Image`, and `bonus3Image`.
+- Ensure the `Look Inside` gallery and `What's Included` lists accurately reflect the requested content and pricing. (Already done in previous turns, but I'll verify the cleanup).
 
 ## Technical Details
-
-- Clean up unused imports related to bonuses (e.g., `Gift`, `bonus1Image`, `bonus2Image`, `bonus3Image`).
-- Ensure no other parts of the page rely on the removed section or components.
+- The user explicitly said "borra" (delete) for `previewSpanishIndex`.
+- Previous turns removed the Bonuses section, so `bonus1Image`, `bonus2Image`, and `bonus3Image` are no longer needed.
+- No functional logic changes, just asset and import cleanup.

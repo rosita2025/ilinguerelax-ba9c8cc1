@@ -85,7 +85,7 @@ const ProductComparisonSpanish = () => {
     <main className="min-h-screen bg-background">
       <SEO 
         title="Spanish 5,000 Words · Choose Your Edition"
-        description="Choose between the Digital PDF edition or the Physical Book + Digital Bundle. Master 5,000 Spanish words with English pronunciation."
+        description="Choose between the Digital PDF edition ($30) or the Physical Book + Digital Bundle ($44.00). Master 5,000 Spanish words with English pronunciation."
       />
       <Navbar />
       

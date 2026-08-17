@@ -143,7 +143,7 @@ export const StickyBuyBar = ({
   // so customers always come back to the price/CTA without losing the page.
   useEffect(() => {
     if (!dismissed) return;
-    const id = setTimeout(() => setDismissed(false), 15000);
+    const id = setTimeout(() => setDismissed(false), 20000); // Wait 20s before returning automatically
     return () => clearTimeout(id);
   }, [dismissed]);
 

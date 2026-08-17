@@ -30,17 +30,17 @@ export const Hero = () => {
           loop={true}
           className="w-full h-full"
         >
-          <SwiperSlide className="flex items-center justify-center bg-black/5 backdrop-blur-sm">
+          <SwiperSlide key="slide-1" className="flex items-center justify-center bg-black/5 backdrop-blur-sm">
             <img
-              src={appPreview1.url}
+              src={`${appPreview1.url}?v=${new Date().getTime()}`}
               alt="iLingue Relax App Preview 1"
               className="h-full w-full object-contain transition-transform duration-700"
               loading="eager"
             />
           </SwiperSlide>
-          <SwiperSlide className="flex items-center justify-center bg-black/5 backdrop-blur-sm">
+          <SwiperSlide key="slide-2" className="flex items-center justify-center bg-black/5 backdrop-blur-sm">
             <img
-              src={appPreview2.url}
+              src={`${appPreview2.url}?v=${new Date().getTime()}`}
               alt="iLingue Relax App Preview 2"
               className="h-full w-full object-contain transition-transform duration-700"
               loading="lazy"

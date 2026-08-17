@@ -41,6 +41,7 @@ const Product500Preguntas = lazy(() => import("./pages/Product500Preguntas"));
 
 const ProductPatronesEspeciales = lazy(() => import("./pages/ProductPatronesEspeciales"));
 const ProductCoreanoRelax = lazy(() => import("./pages/ProductCoreanoRelax"));
+const ProductComparisonSpanish = lazy(() => import("./pages/ProductComparisonSpanish"));
 // Páginas de descarga heredadas eliminadas: ahora todo pasa por /mi-descarga?t=<token>
 
 const MiDescarga = lazy(() => import("./pages/MiDescarga"));

@@ -117,35 +117,35 @@ const ProductSpanishMastery = () => {
               <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/20 blur-3xl rounded-full" />
             </div>
 
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-widest border border-primary/20">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest border border-primary/20">
                   Full Bundle Access
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black leading-tight">
+                <h1 className="text-3xl md:text-4xl font-black leading-tight">
                   Spanish Mastery <span className="text-primary">System</span>
                 </h1>
-                <p className="text-lg text-muted-foreground font-medium">
-                  The definitive collection for English speakers. From zero to C1 with our structural method and 5,000 essential words.
+                <p className="text-base text-muted-foreground font-medium">
+                  The definitive collection for English speakers. Zero to C1 with our structural method.
                 </p>
               </div>
 
-              <div className="p-8 rounded-[2.5rem] border-4 border-primary/20 bg-card shadow-2xl relative overflow-hidden">
+              <div className="p-6 rounded-2xl border border-primary/20 bg-card shadow-lg relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-2xl -mr-16 -mt-16 rounded-full" />
                 
                 <div className="relative z-10">
-                  <div className="flex items-baseline gap-3 mb-6">
-                    <span className="text-5xl font-black">{tier.priceLabel}</span>
-                    <span className="text-xl line-through text-muted-foreground opacity-50">{tier.originalLabel}</span>
+                  <div className="flex items-baseline gap-2 mb-4">
+                    <span className="text-3xl font-black">{tier.priceLabel}</span>
+                    <span className="text-lg line-through text-muted-foreground opacity-50">{tier.originalLabel}</span>
                   </div>
 
                   <Button
                     onClick={handleBuyNow}
                     disabled={isRedirecting || !pricingReady}
-                    size="xl"
-                    className="w-full h-16 text-lg font-black rounded-2xl shadow-hero bg-primary hover:bg-primary/90"
+                    size="lg"
+                    className="w-full h-14 text-base font-black rounded-xl shadow-md bg-primary hover:bg-primary/90"
                   >
-                    <Zap className="w-5 h-5 mr-2 fill-current" />
+                    <Zap className="w-4 h-4 mr-2 fill-current" />
                     {isRedirecting ? "Connecting..." : "BUY MASTERY SYSTEM"}
                   </Button>
                   

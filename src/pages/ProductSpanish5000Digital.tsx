@@ -352,24 +352,6 @@ const ProductSpanish5000Digital = () => {
               </div>
             </div>
 
-            {/* Right: Purchase Card (Fast Purchase focus) */}
-            <div className="lg:sticky lg:top-24 space-y-6">
-
-              {/* Physical Upgrade Shortened */}
-              <div className="p-6 rounded-2xl border border-dashed border-primary/30 bg-primary/5 flex items-center justify-between gap-4">
-                <div>
-                  <h4 className="font-bold text-sm">Want the printed version?</h4>
-                  <p className="text-xs text-muted-foreground">Get the book + PDF for $44.00</p>
-                </div>
-                <Button 
-                  variant="link" 
-                  className="text-primary font-bold text-sm h-auto p-0"
-                  onClick={() => window.location.href = "/products/5-000-spanish-words-with-english-pronunciation-bundle"}
-                >
-                  Upgrade <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              </div>
-            </div>
           </div>
         </div>
       </section>

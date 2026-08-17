@@ -1,0 +1,169 @@
+import { motion } from "framer-motion";
+import { ShoppingCart, Check, Smartphone, Download, Shield } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { SEO } from "@/components/SEO";
+import { useI18n } from "@/i18n/I18nContext";
+
+const ProductComparisonSpanish = () => {
+  const navigate = useNavigate();
+  const { formatPrice } = useI18n();
+
+  const products = [
+    {
+      title: "Digital Edition",
+      subtitle: "5,000 Spanish Words",
+      price: 22,
+      originalPrice: 35,
+      description: "Perfect for studying on your phone, tablet or computer. Instant access to everything.",
+      image: "/images/product-5000-spanish-digital.webp",
+      url: "/products/5-000-spanish-words-with-english-pronunciation-digital",
+      features: [
+        "5,000 words with pronunciation",
+        "Complete A1-C1 Grammar Guide",
+        "1,000 Essential Verbs",
+        "500 Practice Questions",
+        "Instant PDF Download",
+        "Lifetime Updates FREE"
+      ],
+      cta: "GET DIGITAL — $22",
+      popular: false
+    },
+    {
+      title: "Physical + Digital",
+      subtitle: "The Master Bundle",
+      price: 34.99,
+      originalPrice: 54,
+      description: "The complete experience. A high-quality printed book for your shelf plus the digital version.",
+      image: "/images/product-5000-spanish-physical.webp",
+      url: "/products/5-000-spanish-words-with-english-pronunciation-physical",
+      features: [
+        "Everything in Digital Edition",
+        "Premium Printed Book",
+        "Digital PDF Version FREE",
+        "Shipped to your door",
+        "3 Exclusive Bonuses",
+        "Best Value for money"
+      ],
+      cta: "GET BUNDLE — $34.99",
+      popular: true
+    }
+  ];
+
+  return (
+    <main className="min-h-screen bg-background">
+      <SEO 
+        title="Spanish 5,000 Words · Choose Your Edition"
+        description="Choose between the Digital PDF edition or the Physical Book + Digital Bundle. Master 5,000 Spanish words with English pronunciation."
+      />
+      <Navbar />
+      
+      <section className="pt-20 pb-16 px-4">
+        <div className="container max-w-6xl mx-auto text-center mb-16">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-4xl md:text-6xl font-black mb-6"
+          >
+            Start Speaking Spanish <span className="text-primary">Today</span>
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-lg text-muted-foreground max-w-2xl mx-auto"
+          >
+            Choose the version that best fits your learning style. Both include the complete 5,000-word system with English pronunciation.
+          </motion.p>
+        </div>
+
+        <div className="container max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+          {products.map((product, i) => (
+            <motion.div
+              key={product.url}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.1 }}
+              className={`relative flex flex-col p-8 rounded-[2rem] border-2 transition-all duration-300 ${
+                product.popular 
+                ? "border-primary bg-primary/5 shadow-xl scale-105 z-10" 
+                : "border-border bg-card hover:border-primary/50"
+              }`}
+            >
+              {product.popular && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground text-sm font-black rounded-full shadow-lg">
+                  MOST POPULAR
+                </div>
+              )}
+
+              <div className="mb-8">
+                <h2 className="text-2xl font-black mb-1">{product.title}</h2>
+                <p className="text-muted-foreground font-bold">{product.subtitle}</p>
+              </div>
+
+              <div className="flex items-baseline gap-3 mb-6">
+                <span className="text-5xl font-black">${product.price}</span>
+                <span className="text-xl line-through text-muted-foreground opacity-70">${product.originalPrice}</span>
+              </div>
+
+              <p className="text-muted-foreground mb-8 text-sm leading-relaxed">
+                {product.description}
+              </p>
+
+              <ul className="space-y-4 mb-10 flex-grow">
+                {product.features.map(feature => (
+                  <li key={feature} className="flex items-start gap-3 text-sm font-medium">
+                    <Check className="w-5 h-5 text-primary shrink-0" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+
+              <Button
+                onClick={() => navigate(product.url)}
+                size="xl"
+                className={`w-full py-8 text-lg font-black rounded-2xl shadow-lg transition-transform active:scale-95 ${
+                  product.popular ? "bg-primary text-primary-foreground" : "variant-outline"
+                }`}
+              >
+                <ShoppingCart className="w-5 h-5 mr-2" />
+                {product.cta}
+              </Button>
+
+              <div className="mt-6 flex items-center justify-center gap-4 text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
+                <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Secure</span>
+                <span className="flex items-center gap-1"><Download className="w-3 h-3" /> Instant</span>
+                <span className="flex items-center gap-1"><Smartphone className="w-3 h-3" /> Multi-device</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="mt-20 text-center max-w-3xl mx-auto px-4 py-12 rounded-[2.5rem] bg-muted/30 border border-border">
+          <h3 className="text-2xl font-black mb-4">Not sure which one to pick?</h3>
+          <p className="text-muted-foreground mb-8 leading-relaxed">
+            The <strong>Master Bundle</strong> is our customers' favorite because it gives you the best of both worlds: a real book to study at home and a digital copy to carry in your pocket. Plus, shipping is worldwide!
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <div className="flex items-center gap-2">
+              <div className="flex shrink-0">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="text-emerald-500">★</span>
+                ))}
+              </div>
+              <span className="text-sm font-bold">4.8/5 Rating</span>
+            </div>
+            <div className="w-px h-4 bg-border hidden sm:block" />
+            <span className="text-sm font-bold">500+ Satisfied Learners</span>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </main>
+  );
+};
+
+export default ProductComparisonSpanish;

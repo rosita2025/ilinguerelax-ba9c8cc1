@@ -41,6 +41,7 @@ const Product500Preguntas = lazy(() => import("./pages/Product500Preguntas"));
 
 const ProductPatronesEspeciales = lazy(() => import("./pages/ProductPatronesEspeciales"));
 const ProductCoreanoRelax = lazy(() => import("./pages/ProductCoreanoRelax"));
+const ProductComparisonSpanish = lazy(() => import("./pages/ProductComparisonSpanish"));
 // Páginas de descarga heredadas eliminadas: ahora todo pasa por /mi-descarga?t=<token>
 
 const MiDescarga = lazy(() => import("./pages/MiDescarga"));
@@ -242,7 +243,8 @@ const App = () => (
                   <Route path="/products/5-000-palabras-libro-fisico" element={<Product5000Book />} />
                   <Route path="/products/8-000-palabras-libro-fisico" element={<Product8000Book />} />
                   <Route path="/products/5-000-spanish-words-with-english-pronunciation-physical" element={<ProductSpanish5000 />} />
-                  <Route path="/products/5-000-spanish-words-with-english-pronunciation" element={<Navigate to="/products/5-000-spanish-words-with-english-pronunciation-physical" replace />} />
+                  <Route path="/products/5-000-spanish-words-with-english-pronunciation" element={<ProductComparisonSpanish />} />
+                  <Route path="/products/5-000-words-spanish-with-pronunciation-english-nwna" element={<ProductSpanish5000Digital />} />
                   <Route path="/products/5-000-spanish-words-with-english-pronunciation-digital" element={<ProductSpanish5000Digital />} />
                   <Route path="/products/3-000-spanish-verbs-mastery-physical-book-preorder" element={<ProductSpanish3000VerbsBook />} />
                   <Route path="/products/spanish-grammar-patterns-a1-c1-mastery-preorder" element={<ProductSpanishGrammarPatterns />} />

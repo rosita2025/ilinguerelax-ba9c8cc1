@@ -345,5 +345,25 @@
       <g:custom_label_0>Español</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
+    <item>
+      <g:id>5-000-words-spanish-with-pronunciation-english-nwna</g:id>
+      <g:title>5,000 words spanish with pronunciation english</g:title>
+      <g:description></g:description>
+      <g:link>https://ilinguerelax.com/products/5-000-words-spanish-with-pronunciation-english-nwna</g:link>
+      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-words-spanish-with-pronunciation-english-nwna/1786953893318-68t3e.webp</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in stock</g:availability>
+      <g:price>30.00 USD</g:price>
+      <g:brand>iLingue Relax</g:brand>
+      <g:mpn>5-000-words-spanish-with-pronunciation-english-nwna</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:adult>no</g:adult>
+      <g:content_language>es</g:content_language>
+      <g:target_country>US</g:target_country>
+      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
+      <g:product_type>Libros Digitales &gt; Idiomas &gt; Español</g:product_type>
+      <g:custom_label_0>Español</g:custom_label_0>
+      <g:custom_label_1>Digital</g:custom_label_1>
+    </item>
   </channel>
 </rss>

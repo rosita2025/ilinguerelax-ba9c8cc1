@@ -7,7 +7,7 @@ import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import {
   Check, BookOpen, Sparkles, Brain, Download, Zap, Shield, ShoppingCart,
-  Star, Eye, Globe, Smartphone, FileText, CreditCard, ArrowRight,
+  Star, Eye, Globe, Smartphone, FileText, CreditCard, ArrowRight, Package,
 } from "lucide-react";
 
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";

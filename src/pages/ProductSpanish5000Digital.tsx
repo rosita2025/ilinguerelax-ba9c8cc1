@@ -296,7 +296,7 @@ const ProductSpanish5000Digital = () => {
                   Add to cart
                 </Button>
                 <p className="text-[11px] text-center text-muted-foreground mt-2 flex items-center justify-center gap-1">
-                  <Shield className="w-3 h-3" /> Secure checkout by Stripe · 30-day money-back guarantee
+                  <Shield className="w-3 h-3" /> Secure checkout by Stripe · 7-day money-back guarantee
                 </p>
               </div>
 
@@ -538,7 +538,7 @@ const ProductSpanish5000Digital = () => {
           </Button>
 
           <p className="text-xs text-muted-foreground mt-3 flex items-center justify-center gap-1">
-            <Shield className="w-3 h-3" /> Secure checkout · 30-day money-back guarantee
+            <Shield className="w-3 h-3" /> Secure checkout · 7-day money-back guarantee
           </p>
         </div>
       </section>
@@ -570,7 +570,7 @@ const ProductSpanish5000Digital = () => {
             },
             {
               question: "Do you offer a refund?",
-              answer: "Yes. 30-day money-back guarantee, no questions asked. Just email hola@ilinguerelax.com.",
+              answer: "Yes. 7-day money-back guarantee, no questions asked. Just email hola@ilinguerelax.com.",
               icon: Shield,
             },
           ]}

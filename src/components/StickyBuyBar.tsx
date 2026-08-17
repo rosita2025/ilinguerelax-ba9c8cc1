@@ -368,7 +368,20 @@ export const StickyBuyBar = ({
           </div>
           {/* Row: Reviews or Mini-Testimonials */}
           {testimonials && testimonials.length > 0 ? (
-            <div className="flex items-center justify-center gap-1.5 min-h-[24px]">
+            <div className="flex flex-col items-center gap-0.5 min-h-[34px]">
+              <div className="flex items-center gap-1 text-[10px]">
+                {renderStars()}
+                <span className="text-foreground font-bold tabular-nums">
+                  {rating != null ? rating.toFixed(2) : "4.65"}
+                </span>
+                <span className="text-muted-foreground">
+                  ({reviewCount != null ? reviewCount : 800})
+                </span>
+                <span className="ml-1 inline-flex items-center gap-0.5 text-[9px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/25">
+                  <TrendingUp className="w-2.5 h-2.5" />
+                  {lang === "en" ? "Most popular" : "Más popular"}
+                </span>
+              </div>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentTestimonialIndex}
@@ -383,6 +396,7 @@ export const StickyBuyBar = ({
               </AnimatePresence>
             </div>
           ) : showReviews && (
+
             <div className="flex items-center gap-1.5 text-[11px]">
               {renderStars()}
               <span className="text-foreground font-bold tabular-nums">

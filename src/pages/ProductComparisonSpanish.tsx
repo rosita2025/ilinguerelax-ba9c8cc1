@@ -106,21 +106,21 @@ const ProductComparisonSpanish = () => {
           </motion.p>
         </div>
 
-        <div id="comparison-cards" className="container max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
+        <div id="comparison-cards" className="container max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
           {products.map((product, i) => (
             <motion.div
               key={product.url}
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.1 }}
-              className={`relative flex flex-col p-8 rounded-[2rem] border-2 transition-all duration-300 ${
+              className={`relative flex flex-col p-6 rounded-2xl border transition-all duration-300 ${
                 product.popular 
-                ? "border-primary bg-primary/5 shadow-xl scale-105 z-10" 
-                : "border-border bg-card hover:border-primary/50"
+                ? "border-primary bg-primary/5 shadow-lg z-10" 
+                : "border-border bg-card hover:border-primary/40"
               }`}
             >
               {product.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground text-sm font-black rounded-full shadow-lg">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-primary text-primary-foreground text-[10px] font-black rounded-full shadow-md">
                   MOST POPULAR
                 </div>
               )}

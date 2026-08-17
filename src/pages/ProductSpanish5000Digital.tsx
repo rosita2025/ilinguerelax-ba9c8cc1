@@ -383,58 +383,45 @@ const ProductSpanish5000Digital = () => {
             </p>
           </div>
 
-          {/* Promo total badge */}
-          <div className="max-w-2xl mx-auto mb-10 p-5 rounded-2xl border-2 border-primary/30 bg-primary/5 text-center">
-            <div className="inline-block px-3 py-1 mb-3 rounded-full bg-accent text-accent-foreground text-[11px] font-black uppercase tracking-wider">
-              Limited Promo
-            </div>
-            <div className="flex items-baseline justify-center gap-3">
-              <span className="text-xl line-through text-muted-foreground">Before $149</span>
-              <span className="text-4xl font-black text-foreground">Now $97 USD</span>
-            </div>
-            <p className="text-sm text-muted-foreground mt-3 font-medium">
-              ✅ Free lifetime updates · 🎧 Audio Edition coming soon
-            </p>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { 
                 img: previewSpanishVocab, 
-                title: "5,000 Spanish Words + Pronunciation (250 Pages) — Before $43, Now $30", 
+                title: "5,000 Spanish Words + Pronunciation (250 Pages) — Included", 
                 desc: "Every word is written the way it actually sounds in English. No phonetic symbols to learn." 
               },
               { 
                 img: grammarPreviewAsset.url, 
-                title: "Complete A1–C1 Grammar Guide (250 Pages) — Before $34, Now $25", 
+                title: "Complete A1–C1 Grammar Guide (250 Pages) — Included", 
                 desc: "Clear explanations of Ser vs Estar and essential sentence structures." 
               },
               { 
                 img: verbsV2PreviewAsset.url, 
-                title: "1,000 Essential Spanish Verbs + English Pronunciation — Before $27, Now $20", 
+                title: "1,000 Essential Spanish Verbs + English Pronunciation — Included", 
                 desc: "Comprehensive tables covering present, past, and future tenses with English pronunciation." 
               },
               { 
                 img: questionsPreviewAsset.url, 
-                title: "500 Spanish Questions for Practice + English Pronunciation — Before $25, Now $12", 
+                title: "500 Spanish Questions for Practice + English Pronunciation — Included", 
                 desc: "Real-world conversational questions to build fluency and confidence." 
               },
               { 
                 img: previewSpanishPhrases, 
-                title: "Practical Exercises — Before $20, Now $10", 
+                title: "Practical Exercises — Included", 
                 desc: "Real-world examples and exercises to reinforce what you've learned and build confidence." 
               },
 
               { 
                 img: plannerPreviewAsset.url, 
-                title: "Structured Study Plan FREE", 
+                title: "Structured Study Plan — Included", 
                 desc: "A step-by-step 4-step daily method to keep your routine consistent." 
               },
               { 
                 img: examPreviewAsset.url, 
-                title: "Practice Materials FREE", 
+                title: "Practice Materials — Included", 
                 desc: "Real tests to measure your vocabulary and grammar progress." 
               },
+
             ].map((item, i) => (
               <motion.div 
                 key={i}

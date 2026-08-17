@@ -1,11 +1,14 @@
 import { motion } from "framer-motion";
-import { ShoppingCart, Check, Smartphone, Download, Shield } from "lucide-react";
+import { ShoppingCart, Check, Smartphone, Download, Shield, ArrowRight, Package } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { useI18n } from "@/i18n/I18nContext";
+import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
 
 const ProductComparisonSpanish = () => {
   const navigate = useNavigate();

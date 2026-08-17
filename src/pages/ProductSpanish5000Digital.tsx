@@ -547,7 +547,9 @@ const ProductSpanish5000Digital = () => {
             },
           ]}
         />
+        </div>
       </Suspense>
+
 
       <Suspense fallback={<div className="h-20" />}>
         <Footer />

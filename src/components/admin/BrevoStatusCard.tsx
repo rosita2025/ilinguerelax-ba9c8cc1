@@ -32,8 +32,10 @@ export const BrevoStatusCard = () => {
       const adminKey = localStorage.getItem("admin_review_key") || "";
       
       const { data, error } = await supabase.functions.invoke("brevo-account-stats", {
-        body: { adminKey, days: 7 }
+        body: { adminKey, days: 7 },
+        headers: { "x-admin-csrf": "1" } // Bypass CSRF for initial fetch if adminInvoke not used
       });
+
 
       if (error) throw error;
       setStatus(data);

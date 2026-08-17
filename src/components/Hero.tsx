@@ -1,4 +1,4 @@
-import { ArrowRight, Play, Smile, Brain, Clock } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useI18n } from "@/i18n/I18nContext";
@@ -130,18 +130,8 @@ export const Hero = () => {
       {/* Content */}
       <div className="relative container px-4 md:px-6 py-20 md:py-32 z-30">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Logo Badge */}
-          <div className="inline-flex flex-col items-center gap-2 mb-8 animate-fade-in">
-            <span className="text-2xl md:text-3xl font-bold text-primary-foreground tracking-tight">
-              iLingue <span className="font-light">Relax</span> <span className="text-accent ml-1">App</span>
-            </span>
-            <span className="bg-accent/20 text-accent text-xs font-semibold px-3 py-1 rounded-full border border-accent/30 uppercase tracking-widest">
-              Muy Pronto / Coming Soon
-            </span>
-          </div>
-
           {/* Main Heading */}
-          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-primary-foreground leading-tight mb-6 animate-fade-in" style={{ animationDelay: "100ms" }}>
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-primary-foreground leading-tight mb-6 animate-fade-in">
             {content.title1}
             <br />
             <span className="relative inline-block">
@@ -163,30 +153,14 @@ export const Hero = () => {
           </h1>
 
           {/* Subheading */}
-          <p className="text-lg md:text-2xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto font-light animate-fade-in" style={{ animationDelay: "200ms" }}>
+          <p className="text-lg md:text-2xl text-primary-foreground/90 mb-10 max-w-2xl mx-auto font-light animate-fade-in" style={{ animationDelay: "100ms" }}>
             <span dangerouslySetInnerHTML={{ __html: content.subtitle }} />
             <br className="hidden md:block" />
             {content.subtitle2}
           </p>
 
-          {/* Feature Pills */}
-          <div className="flex flex-wrap justify-center gap-3 mb-10 animate-fade-in" style={{ animationDelay: "250ms" }}>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 text-primary-foreground text-sm">
-              <Smile className="w-4 h-4 text-accent" />
-              <span>{content.pill1}</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 text-primary-foreground text-sm">
-              <Brain className="w-4 h-4 text-accent" />
-              <span>{content.pill2}</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 text-primary-foreground text-sm">
-              <Clock className="w-4 h-4 text-accent" />
-              <span>{content.pill3}</span>
-            </div>
-          </div>
-
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: "300ms" }}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: "200ms" }}>
             <Link to="/products">
               <Button variant="hero" size="xl" className="shadow-xl hover:shadow-2xl transition-shadow">
                 {content.cta1}
@@ -197,25 +171,6 @@ export const Hero = () => {
               <Play className="w-5 h-5" />
               {content.cta2}
             </Button>
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="mt-14 pt-8 border-t border-primary-foreground/20 animate-fade-in" style={{ animationDelay: "400ms" }}>
-            <p className="text-primary-foreground/60 text-sm mb-4">{content.trust}</p>
-            <div className="flex flex-wrap justify-center gap-8 text-primary-foreground/80 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">⭐</span>
-                <span>4.9/5 {content.rating}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">🎯</span>
-                <span>+10,000 {content.students}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">🔒</span>
-                <span>{content.guarantee}</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>

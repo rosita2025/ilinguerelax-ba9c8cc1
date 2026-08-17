@@ -159,9 +159,9 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
       },
       {
         icon: Package,
-        title: "Livres physiques — Amazon (jusqu'à 30 jours)",
+        title: "Livres physiques — Amazon (7 jours)",
         content:
-          "Les livres physiques sont vendus et expédiés via Amazon, et leur politique de retour permet un remboursement jusqu'à 30 jours après la livraison. Elle s'applique en cas de livre endommagé, perdu, défectueux ou ne répondant pas à vos attentes. Les retours et remboursements sont gérés et garantis directement par Amazon.",
+          "Les livres physiques sont vendus et expédiés via Amazon, et leur politique de retour permet un remboursement jusqu'à 7 jours après la livraison. Elle s'applique en cas de livre endommagé, perdu, défectueux ou ne répondant pas à vos attentes. Les retours et remboursements sont gérés et garantis directement par Amazon.",
       },
       {
         icon: RefreshCw,

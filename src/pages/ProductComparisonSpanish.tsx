@@ -48,12 +48,13 @@ const ProductComparisonSpanish = () => {
       originalPrice: 43,
       description: "Perfect for studying on your phone, tablet or computer. Instant access to everything.",
       image: "/images/product-5000-spanish-digital.webp",
-      url: "/products/5-000-words-spanish-with-pronunciation-english-nwna",
+      url: "/products/5-000-spanish-words-with-english-pronunciation-digital",
       features: [
         "5,000 words with pronunciation",
-        "Essential A1-C1 Vocabulary",
+        "Complete A1-C1 Grammar Guide",
+        "1,000 Essential Verbs",
+        "500 Practice Questions",
         "Instant PDF Download",
-        "7-Day Refund Guarantee",
         "Lifetime Updates FREE"
       ],
       cta: "GET DIGITAL — $30",
@@ -62,7 +63,7 @@ const ProductComparisonSpanish = () => {
     {
       title: "Physical + Digital",
       subtitle: "The Master Bundle",
-      price: 44.00,
+      price: 44.00, // Physical updated to $44.00
       originalPrice: 59,
       description: "The complete experience. A high-quality printed book for your shelf plus the digital version.",
       image: "/images/product-5000-spanish-physical.webp",
@@ -72,6 +73,7 @@ const ProductComparisonSpanish = () => {
         "Premium Printed Book",
         "Digital PDF Version FREE",
         "Shipped to your door",
+        "3 Exclusive Bonuses",
         "Best Value for money"
       ],
       cta: "GET BUNDLE — $44.00",
@@ -106,36 +108,36 @@ const ProductComparisonSpanish = () => {
           </motion.p>
         </div>
 
-        <div id="comparison-cards" className="container max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
+        <div id="comparison-cards" className="container max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
           {products.map((product, i) => (
             <motion.div
               key={product.url}
-              initial={{ opacity: 0, scale: 0.98 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.1 }}
-              className={`relative flex flex-col p-6 rounded-2xl border transition-all duration-300 ${
+              className={`relative flex flex-col p-8 rounded-[2rem] border-2 transition-all duration-300 ${
                 product.popular 
-                ? "border-primary bg-primary/5 shadow-lg z-10" 
-                : "border-border bg-card hover:border-primary/40"
+                ? "border-primary bg-primary/5 shadow-xl scale-105 z-10" 
+                : "border-border bg-card hover:border-primary/50"
               }`}
             >
               {product.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-primary text-primary-foreground text-[10px] font-black rounded-full shadow-md">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground text-sm font-black rounded-full shadow-lg">
                   MOST POPULAR
                 </div>
               )}
 
               <div className="mb-8">
-                <h2 className="text-xl font-black mb-1">{product.title}</h2>
-                <p className="text-muted-foreground text-sm font-bold">{product.subtitle}</p>
+                <h2 className="text-2xl font-black mb-1">{product.title}</h2>
+                <p className="text-muted-foreground font-bold">{product.subtitle}</p>
               </div>
 
-              <div className="flex items-baseline gap-2 mb-5">
-                <span className="text-3xl font-black">${product.price}</span>
-                <span className="text-lg line-through text-muted-foreground opacity-70">${product.originalPrice}</span>
+              <div className="flex items-baseline gap-3 mb-6">
+                <span className="text-5xl font-black">${product.price}</span>
+                <span className="text-xl line-through text-muted-foreground opacity-70">${product.originalPrice}</span>
               </div>
 
-              <p className="text-muted-foreground mb-6 text-xs leading-relaxed">
+              <p className="text-muted-foreground mb-8 text-sm leading-relaxed">
                 {product.description}
               </p>
 
@@ -150,12 +152,12 @@ const ProductComparisonSpanish = () => {
 
               <Button
                 onClick={() => navigate(product.url)}
-                size="lg"
-                className={`w-full py-6 text-base font-black rounded-xl shadow-md transition-transform active:scale-95 ${
+                size="xl"
+                className={`w-full py-8 text-lg font-black rounded-2xl shadow-lg transition-transform active:scale-95 ${
                   product.popular ? "bg-primary text-primary-foreground" : "variant-outline"
                 }`}
               >
-                <ShoppingCart className="w-4 h-4 mr-2" />
+                <ShoppingCart className="w-5 h-5 mr-2" />
                 {product.cta}
               </Button>
 

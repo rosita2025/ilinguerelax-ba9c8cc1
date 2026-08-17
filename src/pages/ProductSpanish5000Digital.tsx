@@ -567,7 +567,7 @@ const ProductSpanish5000Digital = () => {
 
       <StickyBuyBar
         sku={ADMIN_SKU_SP5K}
-        productName="Spanish 5,000 Words — Digital PDF"
+        productName="Spanish Mastery System"
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}
         currencyCode={tier.currencyCode}

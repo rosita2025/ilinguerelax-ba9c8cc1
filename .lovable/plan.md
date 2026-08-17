@@ -1,32 +1,35 @@
-# Plan: Minimalist & Compact Design Overhaul
+# Plan: Direct UI Shrink & Refinement
 
-The user finds the current elements "too large" and "ugly". I will transition the design to a more minimal, Apple-like aesthetic that emphasizes compactness, high-quality typography, and subtle accents.
+The user is unhappy with the "huge" and "ugly" cards. I will immediately shrink all oversized elements, reduce padding, and simplify the design to be more professional and compact.
 
 ## Proposed Changes
 
-### 1. `src/pages/ProductSpanishMastery.tsx` ($97 Bundle)
-- **Refined Hero**: Change grid from `lg:grid-cols-2` to a more balanced layout where the image is slightly smaller (e.g., `lg:grid-cols-[0.8fr,1.2fr]`).
-- **Elegant Purchase Card**: Remove heavy borders and shadow-2xl. Use a simple, clean card with `p-5`, `rounded-xl`, and a subtle border.
-- **Typography**: Downscale H1 from `text-5xl` to `text-3xl` (desktop) to make it feel more sophisticated.
+### 1. Shrink Purchase Cards
+- In `ProductSpanishMastery.tsx` and `ProductSpanish5000Digital.tsx`:
+    - Reduce padding from `p-8` to `p-5`.
+    - Change border radius from `rounded-[2.5rem]` to `rounded-xl`.
+    - Reduce border thickness from `border-4` to `border`.
+    - Remove `shadow-2xl` and use `shadow-sm`.
+    - Shrink the price text from `text-5xl` to `text-3xl`.
 
-### 2. `src/pages/ProductSpanish5000Digital.tsx` ($30 Solo Digital)
-- **Compact Layout**: Tighten the entire hero section. Reduce the sticky image size.
-- **Micro-Copy**: Use smaller font sizes for secondary information to create a better hierarchy.
-- **Buy Section**: Make the price and button block more compact, fitting better into the flow without being an "oversized" card.
+### 2. Compact Comparison Layout
+- In `ProductComparisonSpanish.tsx`:
+    - Reduce card padding from `p-8` to `p-5`.
+    - Change radius from `rounded-[2rem]` to `rounded-xl`.
+    - Remove `scale-105` on the popular card to stop it from feeling "huge".
+    - Reduce button height.
 
-### 3. `src/pages/ProductComparisonSpanish.tsx` (Comparison View)
-- **Minimal Cards**: Remove `border-4` and `rounded-[2.5rem]`. Use `border`, `rounded-xl`, and `p-5`.
-- **Vertical Spacing**: Reduce gaps to avoid excessive scrolling.
+### 3. Tighten Hero Sections
+- Reduce vertical padding in hero sections.
+- Make product images smaller in the grid.
 
-### 4. `src/components/StickyBuyBar.tsx`
-- **Mobile optimization**: Ensure the bar is as slim as possible while remaining functional.
+### 4. Typography Clean-up
+- Decrease main heading sizes by one step (e.g., `text-5xl` -> `text-4xl`).
 
 ## Technical Details
-- Use `text-2xl` to `text-3xl` for main headings.
-- Standardize on `rounded-xl` for a more modern, less "bubbly" look.
-- Use `bg-card` with very subtle `shadow-sm` instead of `shadow-2xl`.
+- Focus on Tailwind classes: `p-5`, `rounded-xl`, `border`, `shadow-sm`, `text-3xl`.
+- Ensure mobile layout remains usable but compact.
 
-## Verification Plan
-- Preview all pages to ensure the "huge" elements are gone.
-- Confirm that the layout feels "premium" and "compact".
-- Check mobile responsiveness to ensure text fits comfortably.
+## Verification
+- Verify that no element feels "massive" or "oversized".
+- Confirm that the total page length (scroll) is reduced.

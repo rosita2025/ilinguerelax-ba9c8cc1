@@ -182,14 +182,14 @@ const ProductSpanishMastery = () => {
         </div>
       </section>
 
-      <section className="py-20 bg-muted/30">
+      <section className="py-12 bg-muted/30">
         <div className="container px-4 text-center">
-          <h2 className="text-3xl md:text-5xl font-black mb-12">The Mastery Components</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto text-left">
-            <div className="p-8 rounded-3xl bg-card border border-border shadow-sm">
-              <BookOpen className="w-10 h-10 text-primary mb-6" />
-              <h3 className="text-xl font-black mb-4">Vocabulary Core</h3>
-              <p className="text-muted-foreground text-sm font-medium">5,000 essential words with English pronunciation to build your base fast.</p>
+          <h2 className="text-2xl md:text-3xl font-black mb-8">The Mastery Components</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto text-left">
+            <div className="p-6 rounded-2xl bg-card border border-border shadow-sm">
+              <BookOpen className="w-8 h-8 text-primary mb-4" />
+              <h3 className="text-lg font-black mb-2">Vocabulary Core</h3>
+              <p className="text-muted-foreground text-xs font-medium">5,000 essential words with English pronunciation to build your base fast.</p>
             </div>
             <div className="p-8 rounded-3xl bg-card border border-border shadow-sm">
               <Zap className="w-10 h-10 text-primary mb-6" />

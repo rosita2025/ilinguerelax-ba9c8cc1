@@ -107,12 +107,12 @@ const ProductSpanishMastery = () => {
 
       <section className="pt-6 pb-12">
         <div className="container px-4">
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-[0.9fr,1.1fr] gap-8 items-center">
             <div className="relative">
               <img
                 src={productDigitalImage}
                 alt="Spanish Mastery System Bundle"
-                className="w-full h-auto rounded-3xl shadow-hero border-4 border-primary/10"
+                className="w-full h-auto rounded-2xl shadow-lg border border-primary/10"
               />
               <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/20 blur-3xl rounded-full" />
             </div>

@@ -47,8 +47,8 @@ const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then
 
 
 const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/aFa5kC2OIchv2mA8m98IU0e";
-const PRICE = 22;
-const ORIGINAL_PRICE = 35;
+const PRICE = 30;
+const ORIGINAL_PRICE = 43;
 const DISCOUNT_PCT = Math.round(((ORIGINAL_PRICE - PRICE) / ORIGINAL_PRICE) * 100);
 
 const features = [
@@ -99,7 +99,7 @@ const ProductSpanish5000Digital = () => {
   const tier = useCountryTierRouting(ADMIN_SKU_SP5K, {
     tiendaPath: TIENDA_PATH_SP5K,
     fallbackHotmartUrl: HOTMART_SP5K_LATAM,
-    fallbackPriceGlobalUsd: 22,
+    fallbackPriceGlobalUsd: 30,
     fallbackPriceLatamUsd: 19,
     fallbackPriceTiendaUsd: 10,
     fallbackPricePen: 45,
@@ -387,7 +387,7 @@ const ProductSpanish5000Digital = () => {
                     className="w-full border-primary/30 hover:bg-primary/5 text-primary font-bold"
                     onClick={() => window.location.href = "/products/5-000-spanish-words-with-english-pronunciation"}
                   >
-                    UPGRADE TO PHYSICAL · {formatPrice(34.99)}
+                    UPGRADE TO PHYSICAL · {formatPrice(44.00)}
                   </Button>
                 </div>
               </div>

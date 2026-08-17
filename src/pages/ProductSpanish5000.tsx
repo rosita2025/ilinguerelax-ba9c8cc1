@@ -130,10 +130,10 @@ const ProductSpanish5000 = () => {
   // Mostramos la moneda local de esos países (USD, CAD, GBP, AUD, NZD); cualquier
   // otro país ve el precio en USD. El cobro siempre se realiza en USD.
   const SHIPPING_CURRENCIES = ["USD", "CAD", "GBP", "AUD", "NZD"];
-  const detected = useCampaignPrice(34.99, 54);
+  const detected = useCampaignPrice(44.00, 59);
   const campaign = SHIPPING_CURRENCIES.includes(detected.currency)
     ? detected
-    : { ...detected, currency: "USD" as const, symbol: "$", price: "$34.99", originalPrice: "$54.00" };
+    : { ...detected, currency: "USD" as const, symbol: "$", price: "$44.00", originalPrice: "$59.00" };
 
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({
@@ -342,7 +342,7 @@ const ProductSpanish5000 = () => {
                   className="w-full mt-3 text-sm md:text-base py-4 h-auto min-h-[52px] whitespace-normal border-2 border-purple-500/40 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10"
                 >
                   <span className="flex items-center justify-center gap-2 font-bold">
-                    Or get Digital Only — $22
+                    Or get Digital Only — $30
                   </span>
                 </Button>
               </div>

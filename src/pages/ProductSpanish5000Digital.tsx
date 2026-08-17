@@ -351,88 +351,72 @@ const ProductSpanish5000Digital = () => {
         </div>
       </section>
 
-      {/* Benefits */}
-      <section className="py-10 md:py-14 bg-muted/30">
-        <div className="container px-4 md:px-6">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-4xl font-black">Why this PDF works</h2>
-            <p className="text-muted-foreground mt-2">Built to save you months of dictionary-hopping.</p>
+      {/* What's Included */}
+      <section className="py-10 md:py-16">
+        <div className="container px-4 md:px-6 max-w-5xl">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-black">Spanish Mastery System</h2>
+            <p className="text-lg md:text-xl text-muted-foreground mt-2 font-bold text-foreground">
+              The Complete Spanish Learning System — From A1 to C1
+            </p>
+            <p className="text-muted-foreground mt-4 max-w-3xl mx-auto">
+              Master Spanish with a structured, progressive system designed to help you build vocabulary, strengthen grammar, master essential verbs, and practice real Spanish step by step.
+            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {benefits.map(({ icon: Icon, title, description }) => (
-              <motion.div
-                key={title}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4 }}
-                className="p-5 rounded-xl bg-card border border-border"
-              >
-                <Icon className="w-8 h-8 text-primary mb-3" />
-                <h3 className="font-bold mb-1">{title}</h3>
-                <p className="text-sm text-muted-foreground">{description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Preview pages */}
-      <section className="py-10 md:py-14">
-        <div className="container px-4 md:px-6">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-4xl font-black">Take a peek inside</h2>
-            <p className="text-muted-foreground mt-2">Real sample pages from the PDF.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { src: previewSpanishIndex, alt: "5,000 Spanish Words PDF — Table of contents sample page (Spanish for English speakers)" },
-              { src: previewSpanishVocab, alt: "5,000 Spanish Words PDF — Vocabulary sample page with English pronunciation" },
-              { src: previewSpanishPhrases, alt: "5,000 Spanish Words PDF — Real-life phrases sample page with English pronunciation" },
-            ].map((p, i) => (
-              <img
-                key={i}
-                src={p.src}
-                alt={p.alt}
-                className="w-full h-auto rounded-xl border border-border shadow-md"
-                loading="lazy"
-                decoding="async"
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Bonuses */}
-      <section className="py-10 md:py-14 bg-gradient-to-b from-primary/5 to-transparent">
-        <div className="container px-4 md:px-6">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/15 text-accent text-xs font-black mb-3">
-              <Gift className="w-4 h-4" /> INCLUDED FREE
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {/* Features List */}
+            <div className="space-y-6">
+              <h3 className="text-xl font-bold flex items-center gap-2">
+                <Check className="w-5 h-5 text-primary" /> What’s Included
+              </h3>
+              <ul className="space-y-3">
+                {[
+                  "5,000 Spanish Words + Pronunciation",
+                  "Complete A1–C1 Grammar Guide — 327 Pages",
+                  "1,000 Essential Spanish Verbs",
+                  "500 Spanish Questions for Practice",
+                  "Practical Exercises",
+                  "Structured Study Plan",
+                  "Practice Materials",
+                  "Progressive A1 → C1 Learning Path"
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-base">
+                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3.5 h-3.5 text-primary" />
+                    </div>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <h2 className="text-2xl md:text-4xl font-black">3 exclusive bonuses (worth $50)</h2>
-            <p className="text-muted-foreground mt-2">Added to your download at no extra cost.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {bonuses.map(b => (
-              <div key={b.title} className="p-5 rounded-2xl bg-card border border-border">
-                <img src={b.image} alt={b.title} className="w-full h-40 object-cover rounded-lg mb-3" loading="lazy" />
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-bold text-sm">{b.title}</h3>
-                  <span className="text-xs font-black text-primary">Value {b.value}</span>
+
+            {/* Journey Section */}
+            <div className="p-6 md:p-8 rounded-3xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+              <h3 className="text-xl font-bold mb-4">Your Learning Journey</h3>
+              <p className="text-muted-foreground leading-relaxed mb-6">
+                Follow a clear path from beginner to advanced Spanish, combining vocabulary, grammar, verbs, questions, and exercises in one complete learning system.
+              </p>
+              
+              <div className="relative pt-6 border-t border-primary/10">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-black mb-3">
+                  <Zap className="w-4 h-4" /> 🚀 Phase 2 — Audio Edition
                 </div>
-                <p className="text-xs text-muted-foreground">{b.subtitle}</p>
-                <BonusPreviewDialog title={b.title} subtitle={b.subtitle}>
-                  <p className="text-sm">Sample content will be delivered inside your PDF.</p>
-                </BonusPreviewDialog>
+                <h4 className="font-bold text-base mb-2 text-foreground">Coming soon:</h4>
+                <p className="text-sm text-muted-foreground italic mb-4">
+                  An enhanced version with audio pronunciation to help you improve listening and speaking skills.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  The Audio Edition will include everything in the Spanish Mastery System plus audio resources for pronunciation practice.
+                </p>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* How it works */}
-      <section className="py-10 md:py-14">
+      <section className="py-10 md:py-14 bg-muted/30">
         <div className="container px-4 md:px-6 max-w-4xl">
           <div className="text-center mb-8">
             <h2 className="text-2xl md:text-4xl font-black">How it works</h2>
@@ -453,40 +437,14 @@ const ProductSpanish5000Digital = () => {
         </div>
       </section>
 
-      {/* Physical book cross-sell */}
-      <section className="py-8 md:py-10 bg-background">
-        <div className="container px-4 md:px-6 max-w-3xl">
-          <a
-            href="/products/5-000-spanish-words-with-english-pronunciation-physical"
-            className="block p-5 md:p-6 rounded-2xl border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5 hover:border-primary transition-all shadow-sm hover:shadow-md"
-          >
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-primary mb-1">
-                  Are you interested?
-                </p>
-                <h3 className="text-lg md:text-xl font-black text-foreground">
-                  Get the Physical Book edition
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Printed book + digital PDF included. Ships worldwide.
-                </p>
-              </div>
-              <ArrowRight className="w-6 h-6 text-primary shrink-0" />
-            </div>
-          </a>
-        </div>
-      </section>
-
       {/* Reviews */}
-      <section className="py-10 md:py-14 bg-muted/30">
+      <section className="py-10 md:py-14">
         <div className="container px-4 md:px-6">
           <Suspense fallback={<div className="h-40" />}>
             <LooxStyleReviews />
           </Suspense>
         </div>
       </section>
-
 
       {/* Final CTA */}
       <section className="py-14 md:py-20 bg-gradient-to-br from-primary/10 via-background to-accent/10">

@@ -415,8 +415,8 @@ export const StickyBuyBar = ({
             <div className="flex flex-col gap-1.5 w-full">
               <Button
                 type="button"
-                size="default"
-                className={`relative z-10 w-full h-12 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_4px_20px_rgba(16,185,129,0.5)] ${isVeryLongPrice ? 'text-[13px]' : isLongPrice ? 'text-sm' : 'text-base'} font-extrabold transition-all hover:scale-[1.02] active:scale-[0.98] touch-manipulation px-3 sm:px-4 ${pulse ? 'animate-pulse ring-4 ring-emerald-400/40' : ''} ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
+                size="sm"
+                className={`relative z-10 w-full h-10 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-md ${isVeryLongPrice ? 'text-[11px]' : isLongPrice ? 'text-[12px]' : 'text-sm'} font-extrabold transition-all hover:scale-[1.01] active:scale-[0.98] touch-manipulation px-3 ${pulse ? 'animate-pulse ring-2 ring-emerald-400/30' : ''} ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
                 onClick={handleBuy}
                 onMouseEnter={warmupCheckout}
                 onTouchStart={warmupCheckout}
@@ -425,13 +425,14 @@ export const StickyBuyBar = ({
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                    <Loader2 className="w-3 h-3 ml-1 animate-spin" />
                     Processing...
                   </>
                 ) : (
                   <>
+                    <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
                     <span className="min-w-0 truncate">{ctaText}</span>
-                    {disabled && <Clock className="w-4 h-4 ml-2" />}
+                    {disabled && <Clock className="w-3 h-3 ml-1.5" />}
                   </>
                 )}
               </Button>

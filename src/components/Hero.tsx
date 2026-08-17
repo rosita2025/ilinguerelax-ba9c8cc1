@@ -12,9 +12,8 @@ import appPreview2 from "@/assets/app-preview-2.png.asset.json";
 
 export const Hero = () => {
   return (
-    <section className="relative h-[85vh] md:h-screen flex items-start pt-0 overflow-hidden bg-background">
-      {/* Background Slider */}
-      <div className="absolute inset-0 w-full h-full">
+    <section className="relative w-full overflow-hidden bg-background">
+      <div className="w-full aspect-[9/19] md:aspect-video relative">
         <Swiper
           modules={[Autoplay, EffectFade, Pagination, Navigation]}
           effect={'fade'}
@@ -30,19 +29,19 @@ export const Hero = () => {
           loop={true}
           className="w-full h-full"
         >
-          <SwiperSlide key="slide-1" className="flex items-center justify-center bg-black/5 backdrop-blur-sm">
+          <SwiperSlide key="slide-1" className="bg-black/5 backdrop-blur-sm">
             <img
               src={`${appPreview1.url}?v=${new Date().getTime()}`}
               alt="iLingue Relax App Preview 1"
-              className="h-full w-full object-contain transition-transform duration-700"
+              className="w-full h-full object-cover transition-transform duration-700"
               loading="eager"
             />
           </SwiperSlide>
-          <SwiperSlide key="slide-2" className="flex items-center justify-center bg-black/5 backdrop-blur-sm">
+          <SwiperSlide key="slide-2" className="bg-black/5 backdrop-blur-sm">
             <img
               src={`${appPreview2.url}?v=${new Date().getTime()}`}
               alt="iLingue Relax App Preview 2"
-              className="h-full w-full object-contain transition-transform duration-700"
+              className="w-full h-full object-cover transition-transform duration-700"
               loading="lazy"
             />
           </SwiperSlide>

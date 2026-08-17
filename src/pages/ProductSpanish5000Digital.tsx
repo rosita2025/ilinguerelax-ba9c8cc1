@@ -385,9 +385,9 @@ const ProductSpanish5000Digital = () => {
                     variant="outline" 
                     size="sm" 
                     className="w-full border-primary/30 hover:bg-primary/5 text-primary font-bold"
-                    onClick={() => window.location.href = "/products/5-000-spanish-words-with-english-pronunciation"}
+                    onClick={() => window.location.href = "/products/5-000-spanish-words-with-english-pronunciation-bundle"}
                   >
-                    UPGRADE TO PHYSICAL · {formatPrice(44.00)}
+                    UPGRADE TO PHYSICAL · $44.00
                   </Button>
                 </div>
               </div>

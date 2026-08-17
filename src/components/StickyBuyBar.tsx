@@ -366,7 +366,7 @@ export const StickyBuyBar = ({
           </div>
           {/* Row: Reviews or Mini-Testimonials */}
           {testimonials && testimonials.length > 0 ? (
-            <div className="flex items-center justify-center gap-1.5 min-h-[16px]">
+            <div className="flex items-center justify-center gap-1.5 min-h-[24px]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentTestimonialIndex}

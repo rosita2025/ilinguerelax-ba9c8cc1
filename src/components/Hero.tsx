@@ -85,26 +85,50 @@ export const Hero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background Image - LCP candidate */}
-      <img
-        src={heroBg}
-        alt=""
-        width={1920}
-        height={1080}
-        loading="eager"
-        // @ts-ignore - fetchPriority is supported but types are missing
-        fetchPriority="high"
-        decoding="async"
-        className="absolute inset-0 w-full h-full object-cover object-center"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/85 to-black/95" />
+      {/* Background Slider */}
+      <div className="absolute inset-0 w-full h-full">
+        <Swiper
+          modules={[Autoplay, EffectFade, Pagination, Navigation]}
+          effect={'fade'}
+          autoplay={{
+            delay: 5000,
+            disableOnInteraction: false,
+          }}
+          pagination={{
+            clickable: true,
+            dynamicBullets: true,
+          }}
+          navigation={true}
+          loop={true}
+          className="w-full h-full"
+        >
+          <SwiperSlide>
+            <img
+              src={appPreview1.url}
+              alt="iLingue Relax App"
+              className="w-full h-full object-cover object-center"
+              loading="eager"
+            />
+          </SwiperSlide>
+          <SwiperSlide>
+            <img
+              src={appPreview2.url}
+              alt="2,000 Korean Words"
+              className="w-full h-full object-cover object-center"
+              loading="lazy"
+            />
+          </SwiperSlide>
+        </Swiper>
+      </div>
+      
+      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/90 pointer-events-none z-10" />
 
       {/* Floating Elements */}
-      <div className="absolute top-1/4 left-10 w-20 h-20 bg-accent/20 rounded-full blur-2xl animate-pulse" />
-      <div className="absolute bottom-1/4 right-10 w-32 h-32 bg-primary-foreground/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+      <div className="absolute top-1/4 left-10 w-20 h-20 bg-accent/20 rounded-full blur-2xl animate-pulse z-20" />
+      <div className="absolute bottom-1/4 right-10 w-32 h-32 bg-primary-foreground/10 rounded-full blur-3xl animate-pulse z-20" style={{ animationDelay: "1s" }} />
 
       {/* Content */}
-      <div className="relative container px-4 md:px-6 py-20 md:py-32">
+      <div className="relative container px-4 md:px-6 py-20 md:py-32 z-30">
         <div className="max-w-4xl mx-auto text-center">
           {/* Logo Badge */}
           <div className="inline-flex flex-col items-center gap-2 mb-8 animate-fade-in">

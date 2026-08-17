@@ -81,6 +81,14 @@ const countryToFlag = (cc: string): string => {
 };
 
 const ProductSpanish5000Digital = () => {
+  const shortTestimonials = [
+    "Best Spanish book I've found!",
+    "Finally understood Ser vs Estar.",
+    "Fast delivery & secure payment.",
+    "The pronunciation guide is a life saver!",
+    "Perfect for A1 to C1 levels.",
+    "Everything I needed in one PDF."
+  ];
   const [isRedirecting, setIsRedirecting] = useState(false);
   const lockRef = useRef(false);
   const { currency, countryCode, formatPrice } = useI18n();

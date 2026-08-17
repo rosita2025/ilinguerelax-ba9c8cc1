@@ -12,7 +12,7 @@ import appPreview2 from "@/assets/app-preview-2.png.asset.json";
 
 export const Hero = () => {
   return (
-    <section className="relative min-h-[70vh] md:min-h-screen flex items-start pt-20 md:pt-32 overflow-hidden bg-background">
+    <section className="relative min-h-[60vh] md:min-h-screen flex items-start pt-8 md:pt-12 overflow-hidden bg-background">
       {/* Background Slider */}
       <div className="absolute inset-0 w-full h-full">
         <Swiper

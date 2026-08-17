@@ -44,8 +44,8 @@ const ProductComparisonSpanish = () => {
     {
       title: "Digital Edition",
       subtitle: "5,000 Spanish Words",
-      price: tier.priceUsd || 22,
-      originalPrice: 35,
+      price: 30,
+      originalPrice: 43,
       description: "Perfect for studying on your phone, tablet or computer. Instant access to everything.",
       image: "/images/product-5000-spanish-digital.webp",
       url: "/products/5-000-spanish-words-with-english-pronunciation-digital",
@@ -57,14 +57,14 @@ const ProductComparisonSpanish = () => {
         "Instant PDF Download",
         "Lifetime Updates FREE"
       ],
-      cta: "GET DIGITAL — $22",
+      cta: "GET DIGITAL — $30",
       popular: false
     },
     {
       title: "Physical + Digital",
       subtitle: "The Master Bundle",
-      price: 34.99, // Physical always fixed at base USD if not overridden elsewhere
-      originalPrice: 54,
+      price: 44.00, // Physical updated to $44.00
+      originalPrice: 59,
       description: "The complete experience. A high-quality printed book for your shelf plus the digital version.",
       image: "/images/product-5000-spanish-physical.webp",
       url: "/products/5-000-spanish-words-with-english-pronunciation-physical",
@@ -76,7 +76,7 @@ const ProductComparisonSpanish = () => {
         "3 Exclusive Bonuses",
         "Best Value for money"
       ],
-      cta: "GET BUNDLE — $34.99",
+      cta: "GET BUNDLE — $44.00",
       popular: true
     }
   ];

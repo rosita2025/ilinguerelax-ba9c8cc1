@@ -561,25 +561,18 @@ const ProductSpanish5000Digital = () => {
                   subtitle={bonus.subtitle}
                   previewImage={bonus.previewImage}
                 >
-                  <div className="space-y-4">
-                    <h4 className="font-bold text-lg text-slate-900">{bonus.title} — Preview Content</h4>
-                    <p className="text-sm text-slate-600 italic">
-                      This bonus is specially designed to complement your Spanish Mastery System journey.
-                    </p>
-                    <div className="h-64 rounded-lg border-2 border-dashed border-slate-200 flex items-center justify-center bg-slate-50">
-                      <FileText className="w-12 h-12 text-slate-300" />
-                    </div>
-                    <ul className="space-y-2">
-                      <li className="flex items-center gap-2 text-xs text-slate-700">
-                        <Check className="w-3.5 h-3.5 text-emerald-500" /> Instant access after purchase
-                      </li>
-                      <li className="flex items-center gap-2 text-xs text-slate-700">
-                        <Check className="w-3.5 h-3.5 text-emerald-500" /> Lifetime free updates
-                      </li>
-                      <li className="flex items-center gap-2 text-xs text-slate-700">
-                        <Check className="w-3.5 h-3.5 text-emerald-500" /> Printable & mobile-friendly
-                      </li>
-                    </ul>
+                  <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-slate-100 shadow-sm">
+                    {bonus.previewImage ? (
+                      <img 
+                        src={bonus.previewImage} 
+                        alt={bonus.title} 
+                        className="w-full h-auto" 
+                      />
+                    ) : (
+                      <div className="h-64 flex items-center justify-center bg-slate-50">
+                        <FileText className="w-12 h-12 text-slate-300" />
+                      </div>
+                    )}
                   </div>
                 </BonusPreviewDialog>
               </motion.div>

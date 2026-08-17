@@ -420,30 +420,6 @@ const ProductSpanish5000Digital = () => {
           </div>
         </div>
       </section>
-                    ⚠️ Próximamente subirá el precio con la inclusión del Audio Edition.
-                  </p>
-                </div>
-                <div className="mt-6 pt-6 border-t border-primary/10">
-                  <h4 className="font-bold text-base mb-2 text-foreground flex items-center gap-2">
-                    <Package className="w-4 h-4 text-primary" /> Want the physical book?
-                  </h4>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Get the 250-page printed edition delivered to your door + the digital version for FREE.
-                  </p>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full border-primary/30 hover:bg-primary/5 text-primary font-bold"
-                    onClick={() => window.location.href = "/products/5-000-spanish-words-with-english-pronunciation-bundle"}
-                  >
-                    UPGRADE TO PHYSICAL · $44.00
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Look Inside */}
       <section className="py-12 md:py-20 bg-muted/30 overflow-hidden">

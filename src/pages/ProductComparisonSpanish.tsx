@@ -12,7 +12,33 @@ import { useAdminPricing } from "@/hooks/useAdminPricing";
 
 const ProductComparisonSpanish = () => {
   const navigate = useNavigate();
-  const { formatPrice } = useI18n();
+  const { formatPrice, countryCode } = useI18n();
+  const ADMIN_SKU = "5-000-spanish-words-with-english-pronunciation-digital";
+  const pricing = useAdminPricing(ADMIN_SKU);
+  const tier = useCountryTierRouting(ADMIN_SKU, {
+    fallbackPriceGlobalUsd: 22,
+    fallbackPriceLatamUsd: 19,
+    fallbackPricePen: 45,
+  });
+
+  const shortTestimonials = [
+    "Best Spanish book I've found!",
+    "Finally understood Ser vs Estar.",
+    "Fast delivery & secure payment.",
+    "The pronunciation guide is a life saver!",
+    "Perfect for A1 to C1 levels."
+  ];
+
+  const countryToFlag = (cc: string): string => {
+    if (!cc || cc.length !== 2) return "🌍";
+    const base = 0x1f1e6;
+    const A = "A".charCodeAt(0);
+    return String.fromCodePoint(
+      base + cc.toUpperCase().charCodeAt(0) - A,
+      base + cc.toUpperCase().charCodeAt(1) - A,
+    );
+  };
+  const flag = countryToFlag(countryCode);
 
   const products = [
     {

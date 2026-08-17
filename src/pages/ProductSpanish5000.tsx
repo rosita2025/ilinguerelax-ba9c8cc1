@@ -455,13 +455,20 @@ const ProductSpanish5000 = () => {
                 </div>
                 <div className="space-y-5 text-center md:text-left">
                   <h3 className="text-2xl md:text-3xl font-bold text-foreground">
-                    Digital Only — 5,000+ Words
+                    Spanish Mastery System — Digital Only
                   </h3>
                   <p className="text-muted-foreground leading-relaxed">
-                    Spanish with English pronunciation. Instant download, study on any device, includes <strong>3 FREE bonuses</strong>.
+                    Spanish with English pronunciation. Instant download, study on any device — <strong>everything included</strong>.
                   </p>
                   <ul className="space-y-3 text-left">
-                    {["Instant PDF download", "5,000+ Spanish words with English pronunciation", "3 exclusive bonuses included FREE", "No shipping — access in seconds", "Lifetime access on any device"].map(item => (
+                    {[
+                      "5,000 Words + Pronunciation (250 Pages) — Included",
+                      "A1–C1 Grammar Guide (250 Pages) — Included",
+                      "1,000 Essential Verbs + Pronunciation — Included",
+                      "500 Practice Questions + Pronunciation — Included",
+                      "Structured Study Plan & Exercises — Included",
+                      "Instant PDF download · Lifetime access on any device",
+                    ].map(item => (
                       <li key={item} className="flex items-start gap-2.5 text-sm text-foreground">
                         <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <span>{item}</span>
@@ -469,17 +476,18 @@ const ProductSpanish5000 = () => {
                     ))}
                   </ul>
                   <div className="flex items-baseline justify-center md:justify-start gap-3 pt-2 flex-wrap">
-                    <span className="text-4xl font-bold text-foreground">$22</span>
-                    <span className="text-lg text-muted-foreground line-through">$54.00</span>
-                    <span className="text-xs font-bold text-accent bg-accent/10 px-2 py-1 rounded-full">SAVE 59%</span>
+                    <span className="text-4xl font-bold text-foreground">$30</span>
+                    <span className="text-lg text-muted-foreground line-through">$97.00</span>
+                    <span className="text-xs font-bold text-accent bg-accent/10 px-2 py-1 rounded-full">SAVE 69%</span>
                   </div>
                   <Button asChild size="xl" variant="hero" className="w-full">
                     <a href="/products/5-000-spanish-words-with-english-pronunciation-digital">
                       <CreditCard className="w-5 h-5" />
-                      View Digital Version — $22
+                      View Digital Version — $30
                       <ArrowRight className="w-5 h-5" />
                     </a>
                   </Button>
+
                   <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground pt-1">
                     <span className="flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> Secure checkout</span>
                     <span className="flex items-center gap-1"><Download className="w-3.5 h-3.5" /> Instant access</span>

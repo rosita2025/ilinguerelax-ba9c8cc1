@@ -546,7 +546,7 @@ const ProductSpanish5000Digital = () => {
         rating={4.8}
         reviewCount={500}
         calmMode
-        dismissible
+
       />
       <ScrollToTop />
       <WhatsAppButton />

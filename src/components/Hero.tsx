@@ -2,7 +2,17 @@ import { ArrowRight, Play, Smile, Brain, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useI18n } from "@/i18n/I18nContext";
-import heroBg from "@/assets/hero-bg.jpg";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, EffectFade, Pagination, Navigation } from 'swiper/modules';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/effect-fade';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+
+import appPreview1 from "@/assets/app-preview-1.png.asset.json";
+import appPreview2 from "@/assets/app-preview-2.png.asset.json";
 
 export const Hero = () => {
   const { t, language } = useI18n();

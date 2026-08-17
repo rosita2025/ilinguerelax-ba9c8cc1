@@ -9,16 +9,20 @@ async function brevoGet(path: string) {
   if (!LOVABLE_API_KEY || !BREVO_API_KEY) {
     return { error: "Brevo not configured", status: 500 };
   }
-  const res = await fetch(`${GATEWAY_URL}${path}`, {
-    headers: {
-      "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-      "X-Connection-Api-Key": BREVO_API_KEY,
-      "Accept": "application/json",
-    },
-  });
-  const text = await res.text();
-  if (!res.ok) return { error: text, status: res.status };
-  try { return { data: JSON.parse(text) }; } catch { return { data: text }; }
+  try {
+    const res = await fetch(`${GATEWAY_URL}${path}`, {
+      headers: {
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "X-Connection-Api-Key": BREVO_API_KEY,
+        "Accept": "application/json",
+      },
+    });
+    const text = await res.text();
+    if (!res.ok) return { error: text, status: res.status };
+    try { return { data: JSON.parse(text) }; } catch { return { data: text }; }
+  } catch (e) {
+    return { error: (e as Error).message, status: 502 };
+  }
 }
 
 Deno.serve(async (req) => {
@@ -51,7 +55,6 @@ Deno.serve(async (req) => {
 
     // Extract plan info
     let emailsLeft: number | null = null;
-    let emailsPlanTotal: number | null = null;
     let planType: string | null = null;
     let planEndDate: string | null = null;
     if (accountRes.data && typeof accountRes.data === "object") {
@@ -99,3 +102,4 @@ Deno.serve(async (req) => {
     });
   }
 });
+

@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { BarChart3, Star, Search, ArrowRight, Globe, ShoppingBag, CreditCard, Wallet, Package, Mail, Activity, Users, ClipboardList, LineChart, GitCompare, ShieldCheck, Send, Shield, Radar, AlertTriangle, Banknote, MailCheck, Bot, ShieldAlert, Calendar } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
+import { BrevoStatusCard } from "@/components/admin/BrevoStatusCard";
+
 
 type Category = "Ventas" | "Productos" | "Marketing" | "Analítica" | "Seguridad";
 
@@ -72,6 +74,12 @@ const AdminHome = () => {
               Todas tus herramientas internas en un solo lugar. La sesión queda activa hasta que cierres el navegador o pulses "Salir".
             </p>
           </header>
+
+          <div className="grid gap-4 md:grid-cols-4">
+            <BrevoStatusCard />
+            {/* Add other quick stats cards here later */}
+          </div>
+
 
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-wrap gap-2">

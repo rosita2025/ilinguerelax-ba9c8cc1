@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { adminInvoke } from "@/lib/adminInvoke";
+import { useAdminKey } from "@/components/admin/AdminGate";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Send, RefreshCw, Mail } from "lucide-react";
+import { Send, RefreshCw, Mail, Activity, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
+
+
 
 interface DripConfigRow {
   step: number;
@@ -32,8 +37,10 @@ interface SendRow {
 const LANGS = ['es','en','fr','pt','de','it','nl','ja','ko','zh','ru','ar','hi','tr'];
 
 export default function AdminNewsletterDrip() {
+  const { adminKey } = useAdminKey();
   const [config, setConfig] = useState<DripConfigRow[]>([]);
   const [sends, setSends] = useState<SendRow[]>([]);
+  const [syncLogs, setSyncLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("youtumundial2017@gmail.com");
   const [name, setName] = useState("");
@@ -42,6 +49,7 @@ export default function AdminNewsletterDrip() {
   const [mode, setMode] = useState<"test" | "resend">("test");
   const [sending, setSending] = useState(false);
 
+
   const stepLabel = useMemo(() => {
     const s = config.find(c => c.template_key === stepKey);
     return s ? `Paso ${s.step} · Día ${s.day_offset}` : "";
@@ -49,15 +57,18 @@ export default function AdminNewsletterDrip() {
 
   async function loadAll() {
     setLoading(true);
-    const [{ data: cfg }, { data: rows }] = await Promise.all([
+    const [{ data: cfg }, { data: rows }, { data: logs }] = await Promise.all([
       supabase.from("newsletter_drip_config").select("*").order("step"),
       supabase.from("newsletter_drip_sends").select("*").order("created_at", { ascending: false }).limit(50),
+      supabase.from("brevo_sync_logs").select("*").order("created_at", { ascending: false }).limit(20)
     ]);
     setConfig((cfg as DripConfigRow[]) || []);
     setSends((rows as SendRow[]) || []);
+    setSyncLogs(logs || []);
     if (!stepKey && cfg && cfg.length) setStepKey((cfg[0] as any).template_key);
     setLoading(false);
   }
+
 
   useEffect(() => { loadAll(); /* eslint-disable-next-line */ }, []);
 
@@ -153,6 +164,61 @@ export default function AdminNewsletterDrip() {
           </p>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader className="py-3 flex flex-row items-center justify-between">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Activity className="w-4 h-4 text-emerald-500" /> 
+            Estado de Sincronización Brevo
+          </CardTitle>
+          <Badge variant="outline" className="text-[10px]">Últimos 20 eventos</Badge>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-[11px]">
+              <thead>
+                <tr className="border-b text-left text-muted-foreground font-medium">
+                  <th className="pb-2 pr-2">Fecha</th>
+                  <th className="pb-2 pr-2">Email</th>
+                  <th className="pb-2 pr-2">Evento</th>
+                  <th className="pb-2 pr-2 text-center">Status</th>
+                  <th className="pb-2 pr-2">Respuesta / Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                {syncLogs.map(log => (
+                  <tr key={log.id} className="border-b border-border/40 hover:bg-muted/30">
+                    <td className="py-1.5 pr-2 whitespace-nowrap text-muted-foreground font-mono">
+                      {new Date(log.created_at).toLocaleString('es-PE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                    <td className="py-1.5 pr-2 font-medium">{log.email}</td>
+                    <td className="py-1.5 pr-2">
+                      <Badge variant="outline" className="text-[9px] uppercase px-1 py-0 h-4 bg-muted/50">
+                        {log.event_type?.replace(/_/g, ' ')}
+                      </Badge>
+                    </td>
+                    <td className="py-1.5 pr-2 text-center">
+                      {log.status === 'success' ? (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 mx-auto" />
+                      ) : log.status === 'failed' ? (
+                        <AlertCircle className="w-3.5 h-3.5 text-rose-500 mx-auto" />
+                      ) : (
+                        <div className="w-2 h-2 rounded-full bg-amber-400 mx-auto" />
+                      )}
+                    </td>
+                    <td className="py-1.5 pr-2 text-muted-foreground truncate max-w-[200px]" title={log.error || log.response}>
+                      {log.error || log.response || '—'}
+                      {log.http_status && <span className="ml-1 opacity-50">({log.http_status})</span>}
+                    </td>
+                  </tr>
+                ))}
+                {!syncLogs.length && <tr><td colSpan={5} className="py-4 text-center text-muted-foreground italic">No hay logs recientes</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
 
       <Card>
         <CardHeader className="py-3"><CardTitle className="text-sm">Últimos 50 envíos del drip</CardTitle></CardHeader>

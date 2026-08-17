@@ -231,7 +231,7 @@ const ProductSpanish5000Digital = () => {
       </Helmet>
       <SEO
         title={pricing.name ?? "5,000 Spanish Words PDF · English Pronunciation"}
-        description={pricing.description ?? "Digital PDF with 5,000 essential Spanish words and English pronunciation. 3 free bonuses. Launch price $22 (was $35). Instant download."}
+        description={pricing.description ?? "Digital PDF with 5,000 essential Spanish words and English pronunciation. Instant download."}
         canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-digital"
         image={pricing.coverImageUrl ?? "https://ilinguerelax.com/product-spanish-5000.webp"}
         type="product"

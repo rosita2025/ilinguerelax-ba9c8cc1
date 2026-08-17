@@ -360,47 +360,6 @@ const ProductSpanish5000Digital = () => {
 
             {/* Right: Purchase Card (Fast Purchase focus) */}
             <div className="lg:sticky lg:top-24 space-y-6">
-              <div className="p-8 rounded-[2.5rem] bg-card border-4 border-primary/20 shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl -mr-16 -mt-16 rounded-full" />
-                
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-6">
-                    <div className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 text-[10px] font-black uppercase tracking-wider border border-emerald-500/20">
-                      Best Value Guarantee
-                    </div>
-                  </div>
-
-                  <h3 className="text-2xl font-black mb-2">Get the Digital PDF</h3>
-                  <p className="text-sm text-muted-foreground mb-8">
-                    Start learning in 60 seconds. Instant access sent to your email.
-                  </p>
-
-                  <div className="flex items-baseline gap-3 mb-8">
-                    <span className="text-5xl font-black text-foreground">{tier.priceLabel}</span>
-                    <span className="text-xl line-through text-muted-foreground opacity-50">{tier.originalLabel}</span>
-                  </div>
-
-                  <div className="space-y-3">
-                    <Button
-                      onClick={handleBuyNow}
-                      disabled={isRedirecting || !pricingReady}
-                      size="xl"
-                      className="w-full h-16 text-lg font-black rounded-2xl shadow-hero bg-primary hover:bg-primary/90"
-                    >
-                      <Zap className="w-5 h-5 mr-2 fill-current" />
-                      {isRedirecting ? "Connecting..." : "BUY NOW — INSTANT ACCESS"}
-                    </Button>
-                    
-                    <div className="flex flex-col items-center gap-2 pt-4">
-                      <div className="flex items-center gap-4 text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> 7-Day Refund</span>
-                        <span className="w-1 h-1 rounded-full bg-border" />
-                        <span className="flex items-center gap-1.5"><Lock className="w-3.5 h-3.5" /> Secure SSL</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
               {/* Physical Upgrade Shortened */}
               <div className="p-6 rounded-2xl border border-dashed border-primary/30 bg-primary/5 flex items-center justify-between gap-4">

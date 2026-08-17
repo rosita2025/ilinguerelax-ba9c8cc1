@@ -73,64 +73,6 @@ const benefits = [
   { icon: Brain, title: "No Dictionaries Needed", description: "Meanings, pronunciation, and examples all in one place." },
 ];
 
-const bonuses = [
-  {
-    title: "BONUS #1 · Spanish Exam Test",
-    subtitle: "Measure your progress with self-graded tests.",
-    image: bonus1Image,
-    previewImage: examPreviewAsset.url,
-    value: "$19",
-  },
-  {
-    title: "BONUS #2 · Daily Planner",
-    subtitle: "A printable planner to keep your study routine consistent.",
-    image: bonus2Image,
-    previewImage: plannerPreviewAsset.url,
-    value: "$14",
-  },
-  {
-    title: "BONUS #3 · 1,000 Essential Verbs",
-    subtitle: "A guide with the tricky Spanish sounds and how to master them.",
-    image: bonus3Image,
-    previewImage: verbsV2PreviewAsset.url,
-    value: "$17",
-  },
-];
-
-const BonusPreviewDialog = ({ title, subtitle, previewImage, children }: { title: string; subtitle: string; previewImage?: string; children?: React.ReactNode }) => (
-  <Dialog>
-    <DialogTrigger asChild>
-      <Button variant="outline" size="sm" className="mt-3 w-full gap-1.5">
-        <Eye className="w-4 h-4" /> See sample
-      </Button>
-    </DialogTrigger>
-    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-      <DialogHeader>
-        <DialogTitle>{title}</DialogTitle>
-        <p className="text-sm text-muted-foreground">{subtitle}</p>
-      </DialogHeader>
-      <div className="relative mx-auto w-full bg-white text-slate-900 rounded-lg shadow-lg overflow-hidden border border-border">
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-10 select-none">
-          <span className="text-5xl md:text-6xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap">
-            PREVIEW · ilinguerelax.com
-          </span>
-        </div>
-        <div className="relative p-6 md:p-8">
-          {previewImage ? (
-            <img 
-              src={previewImage} 
-              alt={title} 
-              className="w-full h-auto rounded-md shadow-sm border border-slate-100" 
-            />
-          ) : children}
-        </div>
-      </div>
-      <p className="text-xs text-center text-muted-foreground mt-2">
-        This is a 1-page sample. Full PDF delivered after purchase.
-      </p>
-    </DialogContent>
-  </Dialog>
-);
 
 const countryToFlag = (cc: string): string => {
   if (!cc || cc.length !== 2) return "🌍";

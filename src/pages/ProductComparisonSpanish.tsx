@@ -48,13 +48,12 @@ const ProductComparisonSpanish = () => {
       originalPrice: 43,
       description: "Perfect for studying on your phone, tablet or computer. Instant access to everything.",
       image: "/images/product-5000-spanish-digital.webp",
-      url: "/products/5-000-spanish-words-with-english-pronunciation-digital",
+      url: "/products/5-000-words-spanish-with-pronunciation-english-nwna",
       features: [
         "5,000 words with pronunciation",
-        "Complete A1-C1 Grammar Guide",
-        "1,000 Essential Verbs",
-        "500 Practice Questions",
+        "Essential A1-C1 Vocabulary",
         "Instant PDF Download",
+        "7-Day Refund Guarantee",
         "Lifetime Updates FREE"
       ],
       cta: "GET DIGITAL — $30",
@@ -63,7 +62,7 @@ const ProductComparisonSpanish = () => {
     {
       title: "Physical + Digital",
       subtitle: "The Master Bundle",
-      price: 44.00, // Physical updated to $44.00
+      price: 44.00,
       originalPrice: 59,
       description: "The complete experience. A high-quality printed book for your shelf plus the digital version.",
       image: "/images/product-5000-spanish-physical.webp",
@@ -73,7 +72,6 @@ const ProductComparisonSpanish = () => {
         "Premium Printed Book",
         "Digital PDF Version FREE",
         "Shipped to your door",
-        "3 Exclusive Bonuses",
         "Best Value for money"
       ],
       cta: "GET BUNDLE — $44.00",

@@ -482,7 +482,7 @@ const ProductSpanish5000Digital = () => {
       </section>
 
       {/* Reviews */}
-      <section className="py-10 md:py-14">
+      <section className="pt-6 pb-2 md:pt-8 md:pb-3">
         <div className="container px-4 md:px-6">
           <div className="mb-6 rounded-2xl border border-primary/20 bg-primary/5 p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-4 justify-between">
             <div>
@@ -506,9 +506,10 @@ const ProductSpanish5000Digital = () => {
         </div>
       </section>
 
-
-
       <Suspense fallback={<div className="h-40" />}>
+        <div className="[&>section]:py-8 md:[&>section]:py-10">
+
+
         <FAQ
           title="Frequently Asked Questions"
           subtitle="Everything about the digital PDF, learning materials, and delivery."
@@ -546,7 +547,9 @@ const ProductSpanish5000Digital = () => {
             },
           ]}
         />
+        </div>
       </Suspense>
+
 
       <Suspense fallback={<div className="h-20" />}>
         <Footer />

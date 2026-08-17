@@ -502,8 +502,29 @@ export const StickyBuyBar = ({
               <span className="text-muted-foreground">{lang === "en" ? "Secure Payment" : "Pago Seguro"}</span>
             </div>
 
-            {/* Reviews */}
-            {showReviews && (
+            {/* Reviews or Mini-Testimonials */}
+            {testimonials && testimonials.length > 0 ? (
+              <div className="flex items-center gap-3 text-sm h-6">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentTestimonialIndex}
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="flex items-center gap-2 font-bold text-emerald-600 italic bg-emerald-500/5 px-3 py-1 rounded-full border border-emerald-500/10"
+                  >
+                    <Quote className="w-3 h-3 shrink-0 fill-emerald-600/10" />
+                    <span>{testimonials[currentTestimonialIndex]}</span>
+                  </motion.div>
+                </AnimatePresence>
+                {showReviews && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground opacity-60">
+                    {renderStars()}
+                    <span>({reviewCount}+)</span>
+                  </div>
+                )}
+              </div>
+            ) : showReviews && (
               <div className="flex items-center gap-1.5 text-sm">
                 {renderStars()}
                 <span className="text-foreground font-medium">

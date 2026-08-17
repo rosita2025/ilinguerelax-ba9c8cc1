@@ -30,7 +30,11 @@ export const BrevoStatusCard = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchStatus = async () => {
-    if (!adminKey) return;
+    if (!adminKey) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const { data, error } = await adminInvoke<BrevoStatus>("brevo-account-stats", {

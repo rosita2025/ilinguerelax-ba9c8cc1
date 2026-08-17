@@ -39,7 +39,7 @@ import examPreviewAsset from "@/assets/previews/spanish-exam-preview.png.asset.j
 import grammarPreviewAsset from "@/assets/previews/spanish-grammar-preview.png.asset.json";
 import verbsPreviewAsset from "@/assets/previews/spanish-verbs-preview.png.asset.json";
 import questionsPreviewAsset from "@/assets/previews/spanish-questions-preview.png.asset.json";
-import verbsV2PreviewAsset from "@/assets/previews/spanish-verbs-v2-preview.png.asset.json";
+import verbsV2PreviewAsset from "@/assets/spanish-verbs-preview.png.asset.json";
 
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));

@@ -50,14 +50,14 @@ const ORIGINAL_PRICE = 35;
 const DISCOUNT_PCT = Math.round(((ORIGINAL_PRICE - PRICE) / ORIGINAL_PRICE) * 100);
 
 const features = [
-  "5,000+ essential Spanish words",
-  "English pronunciation included",
-  "Designed for English speakers",
-  "No dictionary needed",
-  "Stress-free step-by-step method",
-  "UK & USA phonetics included",
-  "Instant PDF download",
-  "Study on any device",
+  "5,000 Spanish Words + Pronunciation (250 Pages)",
+  "Complete A1–C1 Grammar Guide (250 Pages)",
+  "1,000 Essential Spanish Verbs",
+  "500 Spanish Questions for Practice",
+  "Practical Exercises & Study Plan",
+  "Escrito por humanos & Marca registrada",
+  "Instant PDF download · Pago Seguro",
+  "Progressive A1 → C1 Learning Path",
 ];
 
 const benefits = [
@@ -311,7 +311,7 @@ const ProductSpanish5000Digital = () => {
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
-                  One-time payment · Instant PDF download · Includes 3 free bonuses
+                  One-time payment · Instant PDF · Escrito humano · Pago seguro
                 </p>
                 <Button
                   onClick={handleBuyNow}
@@ -372,14 +372,14 @@ const ProductSpanish5000Digital = () => {
               </h3>
               <ul className="space-y-3">
                 {[
-                  "5,000 Spanish Words + Pronunciation",
-                  "Complete A1–C1 Grammar Guide — 327 Pages",
+                  "5,000 Spanish Words + Pronunciation 250 Pages",
+                  "Complete A1–C1 Grammar Guide — 250 Pages",
                   "1,000 Essential Spanish Verbs",
                   "500 Spanish Questions for Practice",
                   "Practical Exercises",
                   "Structured Study Plan",
                   "Practice Materials",
-                  "Progressive A1 → C1 Learning Path"
+                  "Progressive A1 → C1 — Learning Path"
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-base">
                     <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">

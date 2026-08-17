@@ -364,8 +364,23 @@ export const StickyBuyBar = ({
               </span>
             )}
           </div>
-          {/* Row: Reviews */}
-          {showReviews && (
+          {/* Row: Reviews or Mini-Testimonials */}
+          {testimonials && testimonials.length > 0 ? (
+            <div className="flex items-center justify-center gap-1.5 min-h-[16px]">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentTestimonialIndex}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 italic leading-tight"
+                >
+                  <Quote className="w-2.5 h-2.5 shrink-0 fill-emerald-600/10" />
+                  <span className="truncate">{testimonials[currentTestimonialIndex]}</span>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          ) : showReviews && (
             <div className="flex items-center gap-1.5 text-[11px]">
               {renderStars()}
               <span className="text-foreground font-bold tabular-nums">

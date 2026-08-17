@@ -190,6 +190,28 @@ const ProductComparisonSpanish = () => {
         </div>
       </section>
 
+      <StickyBuyBar
+        sku={ADMIN_SKU}
+        productName="Spanish Mastery System · Select Edition"
+        price={tier.priceLabel}
+        originalPrice={tier.originalLabel}
+        currencyCode={tier.currencyCode}
+        flag={flag}
+        usdValue={tier.priceUsd}
+        localUsdPrices={pricing.localUsdPrices}
+        onBuyClick={() => {
+          const el = document.getElementById('comparison-cards');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }}
+        ctaText="CHOOSE EDITION"
+        testimonials={shortTestimonials}
+        lang="en"
+        rating={4.8}
+        reviewCount={500}
+        calmMode
+        dismissible
+      />
+
       <Footer />
     </main>
   );

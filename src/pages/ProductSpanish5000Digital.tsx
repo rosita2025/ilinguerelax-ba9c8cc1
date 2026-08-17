@@ -31,9 +31,6 @@ import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
 import productDigitalImage from "@/assets/spanish-5000-digital-only.webp";
-import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";
-import bonus2Image from "@/assets/bonus-2-daily-planner.webp";
-import bonus3Image from "@/assets/bonus-3-pronunciation.webp";
 import previewSpanishVocab from "@/assets/preview-spanish-vocab.png";
 import previewSpanishPhrases from "@/assets/preview-spanish-phrases.webp";
 import previewSpanishIndex from "@/assets/preview-spanish-index.png";

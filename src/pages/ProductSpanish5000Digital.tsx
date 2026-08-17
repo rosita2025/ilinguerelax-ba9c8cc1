@@ -48,7 +48,7 @@ const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then
 
 const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/aFa5kC2OIchv2mA8m98IU0e";
 const PRICE = 30;
-const ORIGINAL_PRICE = 43;
+const ORIGINAL_PRICE = 97;
 const DISCOUNT_PCT = Math.round(((ORIGINAL_PRICE - PRICE) / ORIGINAL_PRICE) * 100);
 
 const features = [

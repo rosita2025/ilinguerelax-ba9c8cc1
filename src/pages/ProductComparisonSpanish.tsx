@@ -45,7 +45,7 @@ const ProductComparisonSpanish = () => {
       title: "Digital Edition",
       subtitle: "5,000 Spanish Words",
       price: 30,
-      originalPrice: 43,
+      originalPrice: 97,
       description: "Perfect for studying on your phone, tablet or computer. Instant access to everything.",
       image: "/images/product-5000-spanish-digital.webp",
       url: "/products/5-000-spanish-words-with-english-pronunciation-digital",

@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { adminInvoke } from "@/lib/adminInvoke";
+import { useAdminKey } from "./AdminGate";
 import { Mail, RefreshCw, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+
 
 interface BrevoStatus {
   account: {
@@ -22,19 +25,18 @@ interface BrevoStatus {
 }
 
 export const BrevoStatusCard = () => {
+  const { adminKey } = useAdminKey();
   const [status, setStatus] = useState<BrevoStatus | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchStatus = async () => {
+    if (!adminKey) return;
     setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const adminKey = localStorage.getItem("admin_review_key") || "";
-      
-      const { data, error } = await supabase.functions.invoke("brevo-account-stats", {
-        body: { adminKey, days: 7 },
-        headers: { "x-admin-csrf": "1" } // Bypass CSRF for initial fetch if adminInvoke not used
+      const { data, error } = await adminInvoke<BrevoStatus>("brevo-account-stats", {
+        body: { adminKey, days: 7 }
       });
+
 
 
       if (error) throw error;

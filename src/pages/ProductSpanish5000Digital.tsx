@@ -507,6 +507,8 @@ const ProductSpanish5000Digital = () => {
       </section>
 
       <Suspense fallback={<div className="h-40" />}>
+        <div className="[&>section]:py-8 md:[&>section]:py-10">
+
 
         <FAQ
           title="Frequently Asked Questions"

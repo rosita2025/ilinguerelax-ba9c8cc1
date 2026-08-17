@@ -12,7 +12,7 @@ import appPreview2 from "@/assets/app-preview-2.png.asset.json";
 
 export const Hero = () => {
   return (
-    <section className="relative min-h-[60vh] md:min-h-screen flex items-start pt-8 md:pt-12 overflow-hidden bg-background">
+    <section className="relative h-[85vh] md:h-screen flex items-start pt-0 overflow-hidden bg-background">
       {/* Background Slider */}
       <div className="absolute inset-0 w-full h-full">
         <Swiper
@@ -34,7 +34,7 @@ export const Hero = () => {
             <img
               src={appPreview1.url}
               alt="iLingue Relax App Preview 1"
-              className="max-h-[85vh] w-auto object-contain transition-transform duration-700"
+              className="h-full w-full object-contain transition-transform duration-700"
               loading="eager"
             />
           </SwiperSlide>
@@ -42,7 +42,7 @@ export const Hero = () => {
             <img
               src={appPreview2.url}
               alt="iLingue Relax App Preview 2"
-              className="max-h-[85vh] w-auto object-contain transition-transform duration-700"
+              className="h-full w-full object-contain transition-transform duration-700"
               loading="lazy"
             />
           </SwiperSlide>

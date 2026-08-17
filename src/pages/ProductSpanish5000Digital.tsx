@@ -7,7 +7,7 @@ import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import {
   Check, BookOpen, Sparkles, Brain, Download, Zap, Shield, ShoppingCart,
-  Star, Eye, Globe, Smartphone, FileText, CreditCard, Gift, ArrowRight,
+  Star, Eye, Globe, Smartphone, FileText, CreditCard, ArrowRight,
 } from "lucide-react";
 
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -31,9 +31,6 @@ import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
 import productDigitalImage from "@/assets/spanish-5000-digital-only.webp";
-import bonus1Image from "@/assets/bonus-1-spanish-exam.webp";
-import bonus2Image from "@/assets/bonus-2-daily-planner.webp";
-import bonus3Image from "@/assets/bonus-3-pronunciation.webp";
 import previewSpanishVocab from "@/assets/preview-spanish-vocab.png";
 import previewSpanishPhrases from "@/assets/preview-spanish-phrases.webp";
 import previewSpanishIndex from "@/assets/preview-spanish-index.png";
@@ -73,64 +70,6 @@ const benefits = [
   { icon: Brain, title: "No Dictionaries Needed", description: "Meanings, pronunciation, and examples all in one place." },
 ];
 
-const bonuses = [
-  {
-    title: "BONUS #1 · Spanish Exam Test",
-    subtitle: "Measure your progress with self-graded tests.",
-    image: bonus1Image,
-    previewImage: examPreviewAsset.url,
-    value: "$19",
-  },
-  {
-    title: "BONUS #2 · Daily Planner",
-    subtitle: "A printable planner to keep your study routine consistent.",
-    image: bonus2Image,
-    previewImage: plannerPreviewAsset.url,
-    value: "$14",
-  },
-  {
-    title: "BONUS #3 · 1,000 Essential Verbs",
-    subtitle: "A guide with the tricky Spanish sounds and how to master them.",
-    image: bonus3Image,
-    previewImage: verbsV2PreviewAsset.url,
-    value: "$17",
-  },
-];
-
-const BonusPreviewDialog = ({ title, subtitle, previewImage, children }: { title: string; subtitle: string; previewImage?: string; children?: React.ReactNode }) => (
-  <Dialog>
-    <DialogTrigger asChild>
-      <Button variant="outline" size="sm" className="mt-3 w-full gap-1.5">
-        <Eye className="w-4 h-4" /> See sample
-      </Button>
-    </DialogTrigger>
-    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-      <DialogHeader>
-        <DialogTitle>{title}</DialogTitle>
-        <p className="text-sm text-muted-foreground">{subtitle}</p>
-      </DialogHeader>
-      <div className="relative mx-auto w-full bg-white text-slate-900 rounded-lg shadow-lg overflow-hidden border border-border">
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-10 select-none">
-          <span className="text-5xl md:text-6xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap">
-            PREVIEW · ilinguerelax.com
-          </span>
-        </div>
-        <div className="relative p-6 md:p-8">
-          {previewImage ? (
-            <img 
-              src={previewImage} 
-              alt={title} 
-              className="w-full h-auto rounded-md shadow-sm border border-slate-100" 
-            />
-          ) : children}
-        </div>
-      </div>
-      <p className="text-xs text-center text-muted-foreground mt-2">
-        This is a 1-page sample. Full PDF delivered after purchase.
-      </p>
-    </DialogContent>
-  </Dialog>
-);
 
 const countryToFlag = (cc: string): string => {
   if (!cc || cc.length !== 2) return "🌍";
@@ -516,67 +455,6 @@ const ProductSpanish5000Digital = () => {
         </div>
       </section>
 
-      {/* Bonuses Section */}
-      <section className="py-12 md:py-20 bg-background relative overflow-hidden">
-        <div className="container px-4 md:px-6">
-          <div className="text-center mb-10 md:mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-black mb-4">
-              <Gift className="w-4 h-4" /> EVERYTHING INCLUDED
-            </div>
-            <h2 className="text-3xl md:text-5xl font-black mb-4">Added to your download at no extra cost</h2>
-            <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
-              We've included these specialized resources to accelerate your learning and keep you consistent every single day.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {bonuses.map((bonus, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="relative flex flex-col p-6 rounded-3xl border border-border bg-card shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="absolute -top-3 -right-3 px-3 py-1 rounded-full bg-emerald-500 text-white text-[10px] font-black shadow-lg z-10">
-                  VALUE {bonus.value}
-                </div>
-                <div className="relative aspect-video rounded-xl overflow-hidden mb-6 border border-border bg-muted">
-                  <img 
-                    src={bonus.image} 
-                    alt={bonus.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="font-bold text-xl mb-2 text-foreground">{bonus.title}</h3>
-                <p className="text-sm text-muted-foreground mb-6 flex-grow">
-                  {bonus.subtitle}
-                </p>
-                <BonusPreviewDialog 
-                  title={bonus.title} 
-                  subtitle={bonus.subtitle}
-                  previewImage={bonus.previewImage}
-                >
-                  <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-slate-100 shadow-sm">
-                    {bonus.previewImage ? (
-                      <img 
-                        src={bonus.previewImage} 
-                        alt={bonus.title} 
-                        className="w-full h-auto" 
-                      />
-                    ) : (
-                      <div className="h-64 flex items-center justify-center bg-slate-50">
-                        <FileText className="w-12 h-12 text-slate-300" />
-                      </div>
-                    )}
-                  </div>
-                </BonusPreviewDialog>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* How it works */}
       <section className="py-10 md:py-14 bg-muted/30">

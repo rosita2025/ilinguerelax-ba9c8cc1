@@ -445,29 +445,39 @@ const ProductSpanish5000Digital = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { 
-                img: examPreviewAsset.url, 
-                title: "Spanish Exam Test", 
-                desc: "Real tests to measure your vocabulary and grammar progress." 
+                img: previewSpanishVocab, 
+                title: "5,000 Spanish Words + Pronunciation (250 Pages)", 
+                desc: "Every word is written the way it actually sounds in English. No phonetic symbols to learn." 
               },
               { 
                 img: grammarPreviewAsset.url, 
-                title: "Grammar Master A1 to C1", 
+                title: "Complete A1–C1 Grammar Guide — 250 Pages", 
                 desc: "Clear explanations of Ser vs Estar and essential sentence structures." 
               },
               { 
                 img: verbsV2PreviewAsset.url, 
-                title: "1,000 Essential Verbs", 
+                title: "1,000 Essential Spanish Verbs + English Pronunciation", 
                 desc: "Comprehensive tables covering present, past, and future tenses with English pronunciation." 
               },
               { 
                 img: questionsPreviewAsset.url, 
-                title: "500 Spanish Questions", 
+                title: "500 Spanish Questions for Practice + English Pronunciation", 
                 desc: "Real-world conversational questions to build fluency and confidence." 
               },
               { 
+                img: previewSpanishPhrases, 
+                title: "Practical Exercises", 
+                desc: "Real-world examples and exercises to reinforce what you've learned and build confidence." 
+              },
+              { 
                 img: plannerPreviewAsset.url, 
-                title: "Daily Study Planner 6 months to 1 year", 
+                title: "Structured Study Plan", 
                 desc: "A step-by-step 4-step daily method to keep your routine consistent." 
+              },
+              { 
+                img: examPreviewAsset.url, 
+                title: "Practice Materials", 
+                desc: "Real tests to measure your vocabulary and grammar progress." 
               },
             ].map((item, i) => (
               <motion.div 

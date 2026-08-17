@@ -107,45 +107,45 @@ const ProductSpanishMastery = () => {
 
       <section className="pt-6 pb-12">
         <div className="container px-4">
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-[0.9fr,1.1fr] gap-8 items-center">
             <div className="relative">
               <img
                 src={productDigitalImage}
                 alt="Spanish Mastery System Bundle"
-                className="w-full h-auto rounded-3xl shadow-hero border-4 border-primary/10"
+                className="w-full h-auto rounded-2xl shadow-lg border border-primary/10"
               />
               <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/20 blur-3xl rounded-full" />
             </div>
 
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-widest border border-primary/20">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest border border-primary/20">
                   Full Bundle Access
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black leading-tight">
+                <h1 className="text-3xl md:text-4xl font-black leading-tight">
                   Spanish Mastery <span className="text-primary">System</span>
                 </h1>
-                <p className="text-lg text-muted-foreground font-medium">
-                  The definitive collection for English speakers. From zero to C1 with our structural method and 5,000 essential words.
+                <p className="text-base text-muted-foreground font-medium">
+                  The definitive collection for English speakers. Zero to C1 with our structural method.
                 </p>
               </div>
 
-              <div className="p-8 rounded-[2.5rem] border-4 border-primary/20 bg-card shadow-2xl relative overflow-hidden">
+              <div className="p-6 rounded-2xl border border-primary/20 bg-card shadow-lg relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-2xl -mr-16 -mt-16 rounded-full" />
                 
                 <div className="relative z-10">
-                  <div className="flex items-baseline gap-3 mb-6">
-                    <span className="text-5xl font-black">{tier.priceLabel}</span>
-                    <span className="text-xl line-through text-muted-foreground opacity-50">{tier.originalLabel}</span>
+                  <div className="flex items-baseline gap-2 mb-4">
+                    <span className="text-3xl font-black">{tier.priceLabel}</span>
+                    <span className="text-lg line-through text-muted-foreground opacity-50">{tier.originalLabel}</span>
                   </div>
 
                   <Button
                     onClick={handleBuyNow}
                     disabled={isRedirecting || !pricingReady}
-                    size="xl"
-                    className="w-full h-16 text-lg font-black rounded-2xl shadow-hero bg-primary hover:bg-primary/90"
+                    size="lg"
+                    className="w-full h-14 text-base font-black rounded-xl shadow-md bg-primary hover:bg-primary/90"
                   >
-                    <Zap className="w-5 h-5 mr-2 fill-current" />
+                    <Zap className="w-4 h-4 mr-2 fill-current" />
                     {isRedirecting ? "Connecting..." : "BUY MASTERY SYSTEM"}
                   </Button>
                   
@@ -182,14 +182,14 @@ const ProductSpanishMastery = () => {
         </div>
       </section>
 
-      <section className="py-20 bg-muted/30">
+      <section className="py-12 bg-muted/30">
         <div className="container px-4 text-center">
-          <h2 className="text-3xl md:text-5xl font-black mb-12">The Mastery Components</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto text-left">
-            <div className="p-8 rounded-3xl bg-card border border-border shadow-sm">
-              <BookOpen className="w-10 h-10 text-primary mb-6" />
-              <h3 className="text-xl font-black mb-4">Vocabulary Core</h3>
-              <p className="text-muted-foreground text-sm font-medium">5,000 essential words with English pronunciation to build your base fast.</p>
+          <h2 className="text-2xl md:text-3xl font-black mb-8">The Mastery Components</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto text-left">
+            <div className="p-6 rounded-2xl bg-card border border-border shadow-sm">
+              <BookOpen className="w-8 h-8 text-primary mb-4" />
+              <h3 className="text-lg font-black mb-2">Vocabulary Core</h3>
+              <p className="text-muted-foreground text-xs font-medium">5,000 essential words with English pronunciation to build your base fast.</p>
             </div>
             <div className="p-8 rounded-3xl bg-card border border-border shadow-sm">
               <Zap className="w-10 h-10 text-primary mb-6" />

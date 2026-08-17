@@ -324,20 +324,20 @@ export const StickyBuyBar = ({
   }
 
   return (
-    <div ref={barRef} className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-sm border-t-2 border-primary/20 shadow-[0_-8px_30px_rgba(0,0,0,0.25)]">
+    <div ref={barRef} className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-sm border-t border-primary/20 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
       {dismissible && (
         <button
           type="button"
           onClick={() => setDismissed(true)}
           aria-label={lang === "en" ? "Hide buy bar" : "Ocultar barra"}
-          className="absolute top-1 right-1 z-40 w-7 h-7 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground flex items-center justify-center"
+          className="absolute top-1 right-1 z-40 w-6 h-6 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground flex items-center justify-center"
         >
-          <X className="w-3.5 h-3.5" />
+          <X className="w-3 h-3" />
         </button>
       )}
-      <div className="container px-3 sm:px-4 py-2 lg:py-3">
+      <div className="container px-3 sm:px-4 py-1.5 lg:py-2">
         {/* Mobile & Tablet: Vertical Stack Layout */}
-        <div className="flex lg:hidden flex-col gap-1.5">
+        <div className="flex lg:hidden flex-col gap-1">
           {/* Product name (mobile) */}
           {productName && (
             <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">
@@ -345,17 +345,17 @@ export const StickyBuyBar = ({
             </p>
           )}
           {/* Row 1: Price */}
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex flex-col gap-0.5 min-w-0 flex-shrink">
-              <div className="flex items-baseline gap-1.5 flex-wrap">
-                <span className={`${isVeryLongPrice ? 'text-base' : isLongPrice ? 'text-lg' : 'text-xl'} sm:text-2xl font-black text-foreground tabular-nums leading-none whitespace-nowrap`}>{price}</span>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-0 min-w-0 flex-shrink">
+              <div className="flex items-baseline gap-1 flex-wrap">
+                <span className={`${isVeryLongPrice ? 'text-sm' : isLongPrice ? 'text-base' : 'text-lg'} sm:text-xl font-black text-foreground tabular-nums leading-tight whitespace-nowrap`}>{price}</span>
                 {originalPrice && (
-                  <span className="text-[11px] sm:text-xs text-muted-foreground line-through tabular-nums whitespace-nowrap opacity-70">{originalPrice}</span>
+                  <span className="text-[10px] text-muted-foreground line-through tabular-nums whitespace-nowrap opacity-60">{originalPrice}</span>
                 )}
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1">
                 {flagBadge}
-                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">{currencyCode}</span>
+                <span className="text-[9px] font-black uppercase tracking-widest px-1 py-0 rounded bg-primary/10 text-primary border border-primary/10">{currencyCode}</span>
               </div>
             </div>
             {savingsLabel && (
@@ -366,16 +366,16 @@ export const StickyBuyBar = ({
           </div>
           {/* Row: Reviews or Mini-Testimonials */}
           {testimonials && testimonials.length > 0 ? (
-            <div className="flex items-center justify-center gap-1.5 min-h-[24px]">
+            <div className="flex items-center justify-center gap-1 min-h-[20px]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentTestimonialIndex}
-                  initial={{ opacity: 0, y: 5 }}
+                  initial={{ opacity: 0, y: 3 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 italic leading-tight"
+                  exit={{ opacity: 0, y: -3 }}
+                  className="flex items-center gap-1 text-[9px] font-bold text-emerald-600 italic leading-tight"
                 >
-                  <Quote className="w-2.5 h-2.5 shrink-0 fill-emerald-600/10" />
+                  <Quote className="w-2 h-2 shrink-0 fill-emerald-600/10" />
                   <span className="truncate max-w-[200px]">{testimonials[currentTestimonialIndex]}</span>
                 </motion.div>
               </AnimatePresence>
@@ -415,8 +415,8 @@ export const StickyBuyBar = ({
             <div className="flex flex-col gap-1.5 w-full">
               <Button
                 type="button"
-                size="default"
-                className={`relative z-10 w-full h-12 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_4px_20px_rgba(16,185,129,0.5)] ${isVeryLongPrice ? 'text-[13px]' : isLongPrice ? 'text-sm' : 'text-base'} font-extrabold transition-all hover:scale-[1.02] active:scale-[0.98] touch-manipulation px-3 sm:px-4 ${pulse ? 'animate-pulse ring-4 ring-emerald-400/40' : ''} ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
+                size="sm"
+                className={`relative z-10 w-full h-10 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-md ${isVeryLongPrice ? 'text-[11px]' : isLongPrice ? 'text-[12px]' : 'text-sm'} font-extrabold transition-all hover:scale-[1.01] active:scale-[0.98] touch-manipulation px-3 ${pulse ? 'animate-pulse ring-2 ring-emerald-400/30' : ''} ${disabled ? 'bg-amber-500/50 cursor-not-allowed' : ''} ${ctaClassName || ''}`}
                 onClick={handleBuy}
                 onMouseEnter={warmupCheckout}
                 onTouchStart={warmupCheckout}
@@ -425,13 +425,14 @@ export const StickyBuyBar = ({
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                    <Loader2 className="w-3 h-3 ml-1 animate-spin" />
                     Processing...
                   </>
                 ) : (
                   <>
+                    <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
                     <span className="min-w-0 truncate">{ctaText}</span>
-                    {disabled && <Clock className="w-4 h-4 ml-2" />}
+                    {disabled && <Clock className="w-3 h-3 ml-1.5" />}
                   </>
                 )}
               </Button>

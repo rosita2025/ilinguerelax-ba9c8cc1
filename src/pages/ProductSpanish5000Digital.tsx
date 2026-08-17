@@ -443,6 +443,21 @@ const ProductSpanish5000Digital = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { 
+                img: previewSpanishIndex, 
+                title: "Structured A1-C1 Path", 
+                desc: "A clear roadmap showing you exactly what to study and in what order to reach fluency." 
+              },
+              { 
+                img: previewSpanishVocab, 
+                title: "Vocabulary with Pronunciation", 
+                desc: "Every word is written the way it actually sounds in English. No phonetic symbols to learn." 
+              },
+              { 
+                img: previewSpanishPhrases, 
+                title: "Practical Exercises", 
+                desc: "Real-world examples and exercises to reinforce what you've learned and build confidence." 
+              },
+              { 
                 img: examPreviewAsset.url, 
                 title: "Spanish Exam Test", 
                 desc: "Real tests to measure your vocabulary and grammar progress." 
@@ -456,6 +471,11 @@ const ProductSpanish5000Digital = () => {
                 img: verbsPreviewAsset.url, 
                 title: "Verb Tables", 
                 desc: "Comprehensive tables covering present, past, and future tenses." 
+              },
+              { 
+                img: plannerPreviewAsset.url, 
+                title: "Daily Study Planner", 
+                desc: "A step-by-step 4-step daily method to keep your routine consistent." 
               },
             ].map((item, i) => (
               <motion.div 

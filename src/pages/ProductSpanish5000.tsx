@@ -332,19 +332,6 @@ const ProductSpanish5000 = () => {
                     </div>
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="lg"
-                  onClick={() => {
-                    window.location.href = "/products/5-000-spanish-words-with-english-pronunciation";
-                  }}
-                  className="w-full mt-3 text-sm md:text-base py-4 h-auto min-h-[52px] whitespace-normal border-2 border-purple-500/40 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10"
-                >
-                  <span className="flex items-center justify-center gap-2 font-bold">
-                    Or get Digital Only — $30
-                  </span>
-                </Button>
               </div>
 
               {/* Recent buyer micro-testimonial — fights buyer hesitation */}
@@ -476,17 +463,18 @@ const ProductSpanish5000 = () => {
                     ))}
                   </ul>
                   <div className="flex items-baseline justify-center md:justify-start gap-3 pt-2 flex-wrap">
-                    <span className="text-4xl font-bold text-foreground">$30</span>
-                    <span className="text-lg text-muted-foreground line-through">$97.00</span>
-                    <span className="text-xs font-bold text-accent bg-accent/10 px-2 py-1 rounded-full">SAVE 69%</span>
+                    <span className="text-4xl font-bold text-foreground">$97</span>
+                    <span className="text-lg text-muted-foreground line-through">$215.00</span>
+                    <span className="text-xs font-bold text-accent bg-accent/10 px-2 py-1 rounded-full">SAVE 55%</span>
                   </div>
                   <Button asChild size="xl" variant="hero" className="w-full">
                     <a href="/products/5-000-spanish-words-with-english-pronunciation-digital">
                       <CreditCard className="w-5 h-5" />
-                      View Digital Version — $30
+                      View Digital Version — $97
                       <ArrowRight className="w-5 h-5" />
                     </a>
                   </Button>
+
 
                   <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground pt-1">
                     <span className="flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> Secure checkout</span>

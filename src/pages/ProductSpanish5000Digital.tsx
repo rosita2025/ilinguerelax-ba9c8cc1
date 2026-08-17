@@ -33,7 +33,6 @@ import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import productDigitalImage from "@/assets/spanish-5000-digital-only.webp";
 import previewSpanishVocab from "@/assets/preview-spanish-vocab.png";
 import previewSpanishPhrases from "@/assets/preview-spanish-phrases.webp";
-import previewSpanishIndex from "@/assets/preview-spanish-index.png";
 import { PinterestSave } from "@/components/PinterestSave";
 import plannerPreviewAsset from "@/assets/previews/spanish-daily-planner-preview.png.asset.json";
 import examPreviewAsset from "@/assets/previews/spanish-exam-preview.png.asset.json";

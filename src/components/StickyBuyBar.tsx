@@ -345,17 +345,17 @@ export const StickyBuyBar = ({
             </p>
           )}
           {/* Row 1: Price */}
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex flex-col gap-0.5 min-w-0 flex-shrink">
-              <div className="flex items-baseline gap-1.5 flex-wrap">
-                <span className={`${isVeryLongPrice ? 'text-base' : isLongPrice ? 'text-lg' : 'text-xl'} sm:text-2xl font-black text-foreground tabular-nums leading-none whitespace-nowrap`}>{price}</span>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-0 min-w-0 flex-shrink">
+              <div className="flex items-baseline gap-1 flex-wrap">
+                <span className={`${isVeryLongPrice ? 'text-sm' : isLongPrice ? 'text-base' : 'text-lg'} sm:text-xl font-black text-foreground tabular-nums leading-tight whitespace-nowrap`}>{price}</span>
                 {originalPrice && (
-                  <span className="text-[11px] sm:text-xs text-muted-foreground line-through tabular-nums whitespace-nowrap opacity-70">{originalPrice}</span>
+                  <span className="text-[10px] text-muted-foreground line-through tabular-nums whitespace-nowrap opacity-60">{originalPrice}</span>
                 )}
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1">
                 {flagBadge}
-                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">{currencyCode}</span>
+                <span className="text-[9px] font-black uppercase tracking-widest px-1 py-0 rounded bg-primary/10 text-primary border border-primary/10">{currencyCode}</span>
               </div>
             </div>
             {savingsLabel && (

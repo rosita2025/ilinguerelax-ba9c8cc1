@@ -481,8 +481,8 @@ const ProductSpanish5000Digital = () => {
       <section className="py-12 md:py-20 bg-background relative overflow-hidden">
         <div className="container px-4 md:px-6">
           <div className="text-center mb-10 md:mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-600 text-sm font-black mb-4">
-              <Gift className="w-4 h-4" /> 3 EXCLUSIVE BONUSES (WORTH $50)
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-black mb-4">
+              <Gift className="w-4 h-4" /> EVERYTHING INCLUDED
             </div>
             <h2 className="text-3xl md:text-5xl font-black mb-4">Added to your download at no extra cost</h2>
             <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
@@ -583,7 +583,9 @@ const ProductSpanish5000Digital = () => {
             Ready to speak Spanish with confidence?
           </h2>
           <p className="text-muted-foreground text-base md:text-lg mb-6">
-            5,000 essential Spanish words · English pronunciation · 3 free bonuses.
+            5,000 essential Spanish words · English pronunciation · The Complete System.
+            <br />
+            <span className="text-accent font-bold mt-2 inline-block">⚠️ Price will increase when Audio Edition is released.</span>
           </p>
           <div className="flex items-baseline justify-center gap-3 mb-4">
             <span className="text-5xl font-black">{tier.priceLabel}</span>
@@ -610,16 +612,16 @@ const ProductSpanish5000Digital = () => {
       <Suspense fallback={<div className="h-40" />}>
         <FAQ
           title="Frequently Asked Questions"
-          subtitle="Everything about the digital PDF, bonuses, and delivery."
+          subtitle="Everything about the digital PDF, learning materials, and delivery."
           items={[
             {
-              question: "How do I receive the PDF after purchase?",
-              answer: "As soon as your Stripe payment is confirmed, the 5,000 Words digital PDF and the 3 free bonuses are sent automatically to your email. If you don't see it, check your spam/promotions folder or write to hola@ilinguerelax.com.",
+              question: "How do I receive the product after purchase?",
+              answer: "As soon as your Stripe payment is confirmed, the Spanish Mastery System (PDF and all materials) is sent automatically to your email. If you don't see it, check your spam/promotions folder or write to hola@ilinguerelax.com.",
               icon: Download,
             },
             {
               question: "What's the difference between this and the physical book version?",
-              answer: "This is the DIGITAL-ONLY edition (PDF). No shipping, no waiting: instant download for $22. The physical book version is a separate product and includes the printed edition plus the digital PDF free.",
+              answer: "This is the DIGITAL-ONLY edition (PDF). No shipping, no waiting: instant download. The physical book version is a separate product and includes the printed edition plus the digital PDF free.",
               icon: FileText,
             },
             {

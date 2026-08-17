@@ -577,7 +577,7 @@ const ProductSpanish5000Digital = () => {
         buyUrl={useTiendaOnly ? undefined : (tier.hotmartUrl || HOTMART_SP5K_LATAM)}
         onBuyClick={handleBuyNow}
         ctaText={useTiendaOnly ? `GET IT NOW — ${tier.priceLabel}` : `BUY ON HOTMART — ${tier.priceLabel}`}
-
+        testimonials={shortTestimonials}
         lang="en"
         rating={4.8}
         reviewCount={500}

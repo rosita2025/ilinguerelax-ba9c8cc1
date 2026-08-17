@@ -415,6 +415,136 @@ const ProductSpanish5000Digital = () => {
         </div>
       </section>
 
+      {/* Look Inside */}
+      <section className="py-12 md:py-20 bg-muted/30 overflow-hidden">
+        <div className="container px-4 md:px-6">
+          <div className="text-center mb-10 md:mb-16">
+            <h2 className="text-3xl md:text-5xl font-black mb-4">Look Inside the Spanish Mastery System</h2>
+            <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto font-medium">
+              Take a closer look at the structured path, vocabulary pages, and practical exercises included in your digital bundle.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { 
+                img: previewSpanishIndex, 
+                title: "Structured A1-C1 Path", 
+                desc: "A clear roadmap showing you exactly what to study and in what order to reach fluency." 
+              },
+              { 
+                img: previewSpanishVocab, 
+                title: "Vocabulary with Pronunciation", 
+                desc: "Every word is written the way it actually sounds in English. No phonetic symbols to learn." 
+              },
+              { 
+                img: previewSpanishPhrases, 
+                title: "Practical Exercises", 
+                desc: "Real-world examples and exercises to reinforce what you've learned and build confidence." 
+              },
+            ].map((item, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="group relative"
+              >
+                <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-border bg-white shadow-lg transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                    <p className="text-white text-sm font-medium leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+                  <img 
+                    src={item.img} 
+                    alt={item.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute top-4 right-4 z-20">
+                    <div className="p-2 rounded-full bg-white/90 shadow-sm backdrop-blur-sm">
+                      <Eye className="w-5 h-5 text-primary" />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4 text-center md:text-left">
+                  <h3 className="font-bold text-lg text-foreground">{item.title}</h3>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Bonuses Section */}
+      <section className="py-12 md:py-20 bg-background relative overflow-hidden">
+        <div className="container px-4 md:px-6">
+          <div className="text-center mb-10 md:mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-600 text-sm font-black mb-4">
+              <Gift className="w-4 h-4" /> 3 EXCLUSIVE BONUSES (WORTH $50)
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black mb-4">Added to your download at no extra cost</h2>
+            <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
+              We've included these specialized resources to accelerate your learning and keep you consistent every single day.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {bonuses.map((bonus, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="relative flex flex-col p-6 rounded-3xl border border-border bg-card shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="absolute -top-3 -right-3 px-3 py-1 rounded-full bg-emerald-500 text-white text-[10px] font-black shadow-lg z-10">
+                  VALUE {bonus.value}
+                </div>
+                <div className="relative aspect-video rounded-xl overflow-hidden mb-6 border border-border bg-muted">
+                  <img 
+                    src={bonus.image} 
+                    alt={bonus.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="font-bold text-xl mb-2 text-foreground">{bonus.title}</h3>
+                <p className="text-sm text-muted-foreground mb-6 flex-grow">
+                  {bonus.subtitle}
+                </p>
+                <BonusPreviewDialog 
+                  title={bonus.title} 
+                  subtitle={bonus.subtitle}
+                >
+                  <div className="space-y-4">
+                    <h4 className="font-bold text-lg text-slate-900">{bonus.title} — Preview Content</h4>
+                    <p className="text-sm text-slate-600 italic">
+                      This bonus is specially designed to complement your Spanish Mastery System journey.
+                    </p>
+                    <div className="h-64 rounded-lg border-2 border-dashed border-slate-200 flex items-center justify-center bg-slate-50">
+                      <FileText className="w-12 h-12 text-slate-300" />
+                    </div>
+                    <ul className="space-y-2">
+                      <li className="flex items-center gap-2 text-xs text-slate-700">
+                        <Check className="w-3.5 h-3.5 text-emerald-500" /> Instant access after purchase
+                      </li>
+                      <li className="flex items-center gap-2 text-xs text-slate-700">
+                        <Check className="w-3.5 h-3.5 text-emerald-500" /> Lifetime free updates
+                      </li>
+                      <li className="flex items-center gap-2 text-xs text-slate-700">
+                        <Check className="w-3.5 h-3.5 text-emerald-500" /> Printable & mobile-friendly
+                      </li>
+                    </ul>
+                  </div>
+                </BonusPreviewDialog>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* How it works */}
       <section className="py-10 md:py-14 bg-muted/30">
         <div className="container px-4 md:px-6 max-w-4xl">

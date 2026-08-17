@@ -50,8 +50,9 @@ export const BrevoStatusCard = () => {
   };
 
   useEffect(() => {
-    fetchStatus();
-  }, []);
+    if (adminKey) fetchStatus();
+  }, [adminKey]);
+
 
   if (loading) {
     return (

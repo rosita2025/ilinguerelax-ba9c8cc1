@@ -525,7 +525,7 @@ const ProductSpanishGrammarPatterns = () => {
               <div className="bg-[#2a1f4d]/60 rounded-2xl border border-white/10 p-6 text-center">
                 <Shield className="w-8 h-8 text-[#f4d782] mx-auto mb-3" />
                 <p className="text-sm text-slate-300 mb-2">Guarantee</p>
-                <p className="text-3xl font-black text-white">30 days</p>
+                <p className="text-3xl font-black text-white">7 days</p>
                 <p className="text-xs text-slate-400 mt-2">Money-back promise</p>
               </div>
             </div>
@@ -556,9 +556,9 @@ const ProductSpanishGrammarPatterns = () => {
               <Shield className="w-7 h-7 text-[#1a1233]" />
             </div>
             <div>
-              <p className="text-base font-bold text-white">30-Day Money-Back Guarantee</p>
+              <p className="text-base font-bold text-white">7-Day Money-Back Guarantee</p>
               <p className="text-sm text-slate-200">
-                Try the book risk-free. If it's not for you, email us within 30 days for a full refund.
+                Try the book risk-free. If it's not for you, email us within 7 days for a full refund.
               </p>
             </div>
           </div>

@@ -53,9 +53,9 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
       },
       {
         icon: Package,
-        title: "Libros físicos — Amazon (hasta 30 días)",
+        title: "Libros físicos — Amazon (7 días)",
         content:
-          "Los libros físicos se venden y envían a través de Amazon, y su política de devolución permite reembolso hasta 30 días después de la entrega. Aplica en casos de libro dañado, extraviado, defectuoso o si no cumple con tus expectativas. La devolución y el reembolso son gestionados y garantizados directamente por Amazon bajo su propia responsabilidad.",
+          "Los libros físicos se venden y envían a través de Amazon, y su política de devolución permite reembolso hasta 7 días después de la entrega. Aplica en casos de libro dañado, extraviado, defectuoso o si no cumple con tus expectativas. La devolución y el reembolso son gestionados y garantizados directamente por Amazon bajo su propia responsabilidad.",
       },
       {
         icon: RefreshCw,
@@ -106,9 +106,9 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
       },
       {
         icon: Package,
-        title: "Physical books — Amazon (up to 30 days)",
+        title: "Physical books — Amazon (7 days)",
         content:
-          "Physical books are sold and shipped through Amazon, and their return policy allows refunds up to 30 days after delivery. This applies to damaged, lost, defective books, or if the item does not meet your expectations. Returns and refunds are handled and guaranteed directly by Amazon under their own responsibility.",
+          "Physical books are sold and shipped through Amazon, and their return policy allows refunds up to 7 days after delivery. This applies to damaged, lost, defective books, or if the item does not meet your expectations. Returns and refunds are handled and guaranteed directly by Amazon under their own responsibility.",
       },
       {
         icon: RefreshCw,
@@ -212,9 +212,9 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
       },
       {
         icon: Package,
-        title: "Livros físicos — Amazon (até 30 dias)",
+        title: "Livros físicos — Amazon (7 dias)",
         content:
-          "Os livros físicos são vendidos e enviados pela Amazon, e sua política de devolução permite reembolso em até 30 dias após a entrega. Aplica-se a livros danificados, extraviados, defeituosos ou que não atendam às suas expectativas. Devoluções e reembolsos são gerenciados e garantidos diretamente pela Amazon sob sua responsabilidade.",
+          "Os livros físicos são vendidos e enviados pela Amazon, e sua política de devolução permite reembolso em até 7 dias após a entrega. Aplica-se a livros danificados, extraviados, defeituosos ou que não atendam às suas expectativas. Devoluções e reembolsos são gerenciados e garantidos diretamente pela Amazon sob sua responsabilidade.",
       },
       {
         icon: RefreshCw,

@@ -1,40 +1,46 @@
-# Plan: Spanish Mastery System - Product Alignment and High-Conversion Improvements
+# Plan: Spanish Mastery System - Pricing Alignment & Page Optimization
 
-The user wants to align the products for the "Spanish Mastery System", ensure consistent pricing ($30 digital, $44 physical bundle), and improve the high-conversion elements (StickyBuyBar testimonials and layout) on the digital product page.
+The user wants to fix the pricing and layout for the Spanish Mastery System.
+Specifically:
+1.  **Product Alignment**:
+    *   `/products/5-000-spanish-words-with-english-pronunciation-digital` (Mastery System): **$97 USD** (Bundle of 1,000 verbs, structures, etc.).
+    *   `/products/5-000-words-spanish-with-pronunciation-english-nwna` (Digital Only): **$30 USD**.
+    *   `/products/5-000-spanish-words-with-english-pronunciation-physical` (Physical + Digital): **$44 USD**.
+2.  **Layout Fixes**:
+    *   `ProductSpanish5000Digital.tsx` is too long/scroll-heavy. Need to shorten/optimize.
+    *   `StickyBuyBar` testimonials are missing or not showing correctly.
 
 ## Proposed Changes
 
-### 1. `src/pages/ProductSpanish5000Digital.tsx` (Digital Only - $30)
-- Update product title to "Spanish Mastery System - Digital Only".
-- Ensure price is $30 USD (original $43).
-- Update the "Upgrade to Physical" section to point to the comparison page `/products/5-000-spanish-words-with-english-pronunciation`.
-- Standardize the 7-day refund policy (already mostly done, but verify).
-- Ensure high-conversion layout is clean.
+### 1. Route & Component Separation (`src/App.tsx`)
+- Ensure `/products/5-000-spanish-words-with-english-pronunciation-digital` points to the Mastery System page ($97).
+- Ensure `/products/5-000-words-spanish-with-pronunciation-english-nwna` points to the "Solo Digital" page ($30).
+- I will create a new component `src/pages/ProductSpanishMastery.tsx` for the $97 Mastery System to avoid confusion, or refactor existing ones.
 
-### 2. `src/pages/ProductSpanish5000.tsx` (Physical + Digital - $44)
-- Update pricing to $44.00 USD (original $59).
-- Ensure "Digital Only" button links to the comparison page `/products/5-000-spanish-words-with-english-pronunciation`.
-- Standardize the 7-day refund policy.
+### 2. Update `ProductSpanish5000Digital.tsx` (Targeting $30 version)
+- Shorten the page content as requested ("too long").
+- Consolidate sections into a more compact, high-conversion format.
+- Set price to $30 USD.
+- Ensure 7-day refund policy is clear.
 
-### 3. `src/pages/ProductComparisonSpanish.tsx` (Comparison Page)
-- Ensure Digital is $30 and Physical Bundle is $44.00.
-- Verify meta descriptions and titles.
+### 3. Update `ProductSpanish5000.tsx` (Physical version)
+- Set price to $44 USD.
+- Ensure "Digital Only" links to the $30 version (`/products/5-000-words-spanish-with-pronunciation-english-nwna`).
 
-### 4. `src/components/StickyBuyBar.tsx` (Sticky Bar)
-- Ensure `testimonials` are being rendered correctly in the mobile layout.
-- Adjust vertical spacing and font sizes for mobile to prevent "stuck" or overlapping elements.
-- Ensure 7-day guarantee is visible.
+### 4. Create/Update Mastery System Page ($97)
+- Target SKU: `5-000-spanish-words-with-english-pronunciation-digital`.
+- Price: $97 USD.
+- Content: Include "1,000 verbs", "structural", etc.
+
+### 5. `StickyBuyBar.tsx` Fixes
+- Ensure `testimonials` prop is passed correctly from product pages.
+- Verify mobile rendering of testimonials.
 
 ## Technical Details
-- Use `useI18n` for localized formatting.
-- Ensure `StickyBuyBar` receives the `shortTestimonials` array.
-- Update `products` array in `ProductComparisonSpanish.tsx`.
-- Update constants in `ProductSpanish5000Digital.tsx` and `ProductSpanish5000.tsx`.
+- Standardize SKUs and prices in `useCountryTierRouting` and `useAdminPricing` hooks where applicable.
+- Update `ProductComparisonSpanish.tsx` to reflect the 3-tier structure if needed.
 
-## Verification Plan
-- Check the 3 URLs in the preview:
-  1. `/products/5-000-spanish-words-with-english-pronunciation-digital`
-  2. `/products/5-000-words-spanish-with-pronunciation-english-nwna` (This seems to be another digital SKU, I should check if it needs syncing or redirection).
-  3. `/products/5-000-spanish-words-with-english-pronunciation-physical`
-- Verify the comparison page: `/products/5-000-spanish-words-with-english-pronunciation`.
-- Inspect the `StickyBuyBar` on mobile view to confirm testimonials rotate.
+## Verification
+- Verify each URL and its price.
+- Check StickyBuyBar on mobile preview.
+- Confirm 7-day guarantee everywhere.

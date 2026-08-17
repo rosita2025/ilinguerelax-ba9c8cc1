@@ -302,13 +302,6 @@ const ProductSpanish5000Digital = () => {
 
               <StockCounter />
 
-              <ul className="grid grid-cols-2 gap-x-4 gap-y-2 pt-2">
-                {features.map(f => (
-                  <li key={f} className="flex items-start gap-2 text-sm">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" /> {f}
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
         </div>

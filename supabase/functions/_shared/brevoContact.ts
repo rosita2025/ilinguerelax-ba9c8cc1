@@ -4,6 +4,7 @@
 //
 // Uses the Lovable connector gateway. Never call api.brevo.com directly.
 
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { logBrevoSync } from "./brevoLog.ts";
 import { inferProductCategory, CATEGORY_LABEL } from "./brevoCategory.ts";
 import { resolveBrevoAudiences } from "./brevoProductAudiences.ts";

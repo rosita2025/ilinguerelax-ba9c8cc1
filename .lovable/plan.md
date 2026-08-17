@@ -1,7 +1,7 @@
-# Plan: Compact Design Fix
+# Plan: Fix Oversized Layout
 
-I will immediately make the cards, headings, and images smaller and cleaner to fix the "too big" and "ugly" design.
+I will fix the "too big" cards and headings by making them compact and professional.
 
-1. **Shrink Cards**: Reduce padding and rounding on all product and comparison cards.
-2. **Compact Typography**: Lower heading sizes for a more professional look.
-3. **Slimmer Layout**: Reduce vertical gaps and image sizes.
+- **Shrink Comparison Cards**: Smaller padding, borders, and text.
+- **Slim Mastery Page**: Reduce the size of the purchase block and hero image.
+- **Fix Sticky Bar**: Make it thinner on mobile.

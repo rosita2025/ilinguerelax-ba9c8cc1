@@ -42,6 +42,8 @@ import plannerPreviewAsset from "@/assets/previews/spanish-daily-planner-preview
 import examPreviewAsset from "@/assets/previews/spanish-exam-preview.png.asset.json";
 import grammarPreviewAsset from "@/assets/previews/spanish-grammar-preview.png.asset.json";
 import verbsPreviewAsset from "@/assets/previews/spanish-verbs-preview.png.asset.json";
+import questionsPreviewAsset from "@/assets/previews/spanish-questions-preview.png.asset.json";
+import verbsV2PreviewAsset from "@/assets/previews/spanish-verbs-v2-preview.png.asset.json";
 
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
@@ -56,8 +58,8 @@ const DISCOUNT_PCT = Math.round(((ORIGINAL_PRICE - PRICE) / ORIGINAL_PRICE) * 10
 const features = [
   "5,000 Spanish Words + Pronunciation (250 Pages)",
   "Complete A1–C1 Grammar Guide (250 Pages)",
-  "1,000 Essential Spanish Verbs",
-  "500 Spanish Questions for Practice",
+  "1,000 Essential Spanish Verbs + English Pronunciation",
+  "500 Spanish Questions for Practice + English Pronunciation",
   "Practical Exercises & Study Plan",
   "Escrito por humanos & Marca registrada",
   "Instant PDF download · Pago Seguro",
@@ -87,10 +89,10 @@ const bonuses = [
     value: "$14",
   },
   {
-    title: "BONUS #3 · Pronunciation Guide",
+    title: "BONUS #3 · 1,000 Essential Verbs",
     subtitle: "A guide with the tricky Spanish sounds and how to master them.",
     image: bonus3Image,
-    previewImage: verbsPreviewAsset.url,
+    previewImage: verbsV2PreviewAsset.url,
     value: "$17",
   },
 ];
@@ -246,7 +248,7 @@ const ProductSpanish5000Digital = () => {
       </Helmet>
       <SEO
         title={pricing.name ?? "5,000 Spanish Words PDF · English Pronunciation"}
-        description={pricing.description ?? "Digital PDF with 5,000 essential Spanish words and English pronunciation. Instant download."}
+        description={pricing.description ?? "Digital PDF with 5,000 essential Latin American Spanish words and English pronunciation. Includes 1,000 verbs and 500 questions. Instant download."}
         canonicalUrl="https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-digital"
         image={pricing.coverImageUrl ?? "https://ilinguerelax.com/product-spanish-5000.webp"}
         type="product"
@@ -312,7 +314,7 @@ const ProductSpanish5000Digital = () => {
               </h1>
 
               <p className="text-base md:text-lg text-muted-foreground">
-                {pricing.description ?? (<>Digital-only PDF designed for English speakers. Every word written the way it{" "}
+                {pricing.description ?? (<>Digital-only PDF designed for English speakers learning Latin American Spanish. Every word written the way it{" "}
                 <em>actually sounds</em>. No dictionaries, no stress — start speaking Spanish today.</>)}
               </p>
 
@@ -372,7 +374,7 @@ const ProductSpanish5000Digital = () => {
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-black">Spanish Mastery System</h2>
             <p className="text-lg md:text-xl text-muted-foreground mt-2 font-bold text-foreground">
-              The Complete Spanish Learning System — From A1 to C1
+              The Complete Latin American Spanish Learning System — From A1 to C1
             </p>
             <p className="text-muted-foreground mt-4 max-w-3xl mx-auto">
               Master Spanish with a structured, progressive system designed to help you build vocabulary, strengthen grammar, master essential verbs, and practice real Spanish step by step.
@@ -389,8 +391,8 @@ const ProductSpanish5000Digital = () => {
                 {[
                   "5,000 Spanish Words + Pronunciation 250 Pages",
                   "Complete A1–C1 Grammar Guide — 250 Pages",
-                  "1,000 Essential Spanish Verbs",
-                  "500 Spanish Questions for Practice",
+                  "1,000 Essential Spanish Verbs + English Pronunciation",
+                  "500 Spanish Questions for Practice + English Pronunciation",
                   "Practical Exercises",
                   "Structured Study Plan",
                   "Practice Materials",
@@ -468,9 +470,14 @@ const ProductSpanish5000Digital = () => {
                 desc: "Clear explanations of Ser vs Estar and essential sentence structures." 
               },
               { 
-                img: verbsPreviewAsset.url, 
-                title: "Verb Tables", 
-                desc: "Comprehensive tables covering present, past, and future tenses." 
+                img: verbsV2PreviewAsset.url, 
+                title: "1,000 Essential Verbs", 
+                desc: "Comprehensive tables covering present, past, and future tenses with English pronunciation." 
+              },
+              { 
+                img: questionsPreviewAsset.url, 
+                title: "500 Spanish Questions", 
+                desc: "Real-world conversational questions to build fluency and confidence." 
               },
               { 
                 img: plannerPreviewAsset.url, 

@@ -514,6 +514,12 @@ const ProductSpanish5000Digital = () => {
           subtitle="Everything about the digital PDF, learning materials, and delivery."
           items={[
             {
+              question: "What exactly is included?",
+              answer: "You get the complete Spanish Mastery System: 5,000 Words + Pronunciation (250 Pages), A1–C1 Grammar Guide (250 Pages), 1,000 Essential Verbs + Pronunciation, 500 Practice Questions + Pronunciation, and a Structured Study Plan & Exercises.",
+              icon: FileText,
+            },
+            {
+
               question: "How do I receive the product after purchase?",
               answer: "As soon as your Stripe payment is confirmed, the Spanish Mastery System (PDF and all materials) is sent automatically to your email. If you don't see it, check your spam/promotions folder or write to hola@ilinguerelax.com.",
               icon: Download,

@@ -332,19 +332,6 @@ const ProductSpanish5000 = () => {
                     </div>
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="lg"
-                  onClick={() => {
-                    window.location.href = "/products/5-000-spanish-words-with-english-pronunciation";
-                  }}
-                  className="w-full mt-3 text-sm md:text-base py-4 h-auto min-h-[52px] whitespace-normal border-2 border-purple-500/40 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10"
-                >
-                  <span className="flex items-center justify-center gap-2 font-bold">
-                    Or get Digital Only — $30
-                  </span>
-                </Button>
               </div>
 
               {/* Recent buyer micro-testimonial — fights buyer hesitation */}

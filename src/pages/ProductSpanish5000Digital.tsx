@@ -7,7 +7,7 @@ import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import {
   Check, BookOpen, Sparkles, Brain, Download, Zap, Shield, ShoppingCart,
-  Star, Eye, Globe, Smartphone, FileText, CreditCard, ArrowRight, Package,
+  Star, Eye, Globe, Smartphone, FileText, CreditCard, ArrowRight, Package, Lock
 } from "lucide-react";
 
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -314,63 +314,112 @@ const ProductSpanish5000Digital = () => {
         </div>
       </section>
 
-      {/* What's Included */}
-      <section className="py-10 md:py-16">
-        <div className="container px-4 md:px-6 max-w-5xl">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-black">Spanish Mastery System</h2>
-            <p className="text-lg md:text-xl text-muted-foreground mt-2 font-bold text-foreground">
-              The Complete Latin American Spanish Learning System — From A1 to C1
-            </p>
-            <p className="text-muted-foreground mt-4 max-w-3xl mx-auto">
-              Master Spanish with a structured, progressive system designed to help you build vocabulary, strengthen grammar, master essential verbs, and practice real Spanish step by step.
-            </p>
-          </div>
+      {/* Content Section - High Conversion */}
+      <section className="py-12 md:py-20">
+        <div className="container px-4 md:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            {/* Left: Benefits & Features (Clean & Fast) */}
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-black mb-4">Spanish Mastery System</h2>
+                <p className="text-lg text-muted-foreground font-medium">
+                  The complete system for English speakers to master Latin American Spanish naturally.
+                </p>
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            {/* Features List */}
-            <div className="space-y-6">
-              <h3 className="text-xl font-bold flex items-center gap-2">
-                <Check className="w-5 h-5 text-primary" /> What’s Included
-              </h3>
-              <ul className="space-y-3">
-                {[
-                  "5,000 Spanish Words + Pronunciation (250 Pages) $43 now $30",
-                  "Complete A1–C1 Grammar Guide — 250 Pages $34 now $25",
-                  "1,000 Essential Spanish Verbs + English Pronunciation $27 now $20",
-                  "500 Spanish Questions for Practice + English Pronunciation $25 now $15",
-                  "Practical Exercises $20 now $10",
-                  "Structured Study Plan FREE",
-                  "Practice Materials FREE",
-                  "Progressive A1 → C1 — Learning Path"
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-base">
-                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-3.5 h-3.5 text-primary" />
-                    </div>
-                    <span>{item}</span>
-                  </li>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {benefits.map((benefit, i) => (
+                  <div key={i} className="p-4 rounded-xl border border-border bg-card/50 hover:bg-card transition-colors">
+                    <benefit.icon className="w-6 h-6 text-primary mb-3" />
+                    <h3 className="font-bold text-sm mb-1">{benefit.title}</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{benefit.description}</p>
+                  </div>
                 ))}
-              </ul>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-primary/5 border border-primary/10">
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <Check className="w-5 h-5 text-primary" /> What you get today:
+                </h3>
+                <ul className="space-y-3">
+                  {[
+                    "5,000 Words + Pronunciation (250 Pages)",
+                    "A1–C1 Grammar Guide (250 Pages)",
+                    "1,000 Essential Verbs + Pronunciation",
+                    "500 Practice Questions + Pronunciation",
+                    "Structured Study Plan & Exercises",
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3 text-sm font-semibold">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
-            {/* Journey Section */}
-            <div className="p-6 md:p-8 rounded-3xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
-              <h3 className="text-xl font-bold mb-4">Your Learning Journey</h3>
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                Follow a clear path from beginner to advanced Spanish, combining vocabulary, grammar, verbs, questions, and exercises in one complete learning system.
-              </p>
-              
-              <div className="relative pt-6 border-t border-primary/10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-black mb-3">
-                  <Zap className="w-4 h-4" /> 🚀 Updates & Audio
+            {/* Right: Purchase Card (Fast Purchase focus) */}
+            <div className="lg:sticky lg:top-24 space-y-6">
+              <div className="p-8 rounded-[2.5rem] bg-card border-4 border-primary/20 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl -mr-16 -mt-16 rounded-full" />
+                
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 text-[10px] font-black uppercase tracking-wider border border-emerald-500/20">
+                      Best Value Guarantee
+                    </div>
+                  </div>
+
+                  <h3 className="text-2xl font-black mb-2">Get the Digital PDF</h3>
+                  <p className="text-sm text-muted-foreground mb-8">
+                    Start learning in 60 seconds. Instant access sent to your email.
+                  </p>
+
+                  <div className="flex items-baseline gap-3 mb-8">
+                    <span className="text-5xl font-black text-foreground">{tier.priceLabel}</span>
+                    <span className="text-xl line-through text-muted-foreground opacity-50">{tier.originalLabel}</span>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Button
+                      onClick={handleBuyNow}
+                      disabled={isRedirecting || !pricingReady}
+                      size="xl"
+                      className="w-full h-16 text-lg font-black rounded-2xl shadow-hero bg-primary hover:bg-primary/90"
+                    >
+                      <Zap className="w-5 h-5 mr-2 fill-current" />
+                      {isRedirecting ? "Connecting..." : "BUY NOW — INSTANT ACCESS"}
+                    </Button>
+                    
+                    <div className="flex flex-col items-center gap-2 pt-4">
+                      <div className="flex items-center gap-4 text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                        <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> 7-Day Refund</span>
+                        <span className="w-1 h-1 rounded-full bg-border" />
+                        <span className="flex items-center gap-1.5"><Lock className="w-3.5 h-3.5" /> Secure SSL</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <h4 className="font-bold text-base mb-2 text-foreground">Free Updates & Future Audio:</h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Recibirás actualizaciones gratuitas del material directamente en tu correo de forma automática. 
-                </p>
-                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                  <p className="text-xs font-bold text-red-600">
+              </div>
+
+              {/* Physical Upgrade Shortened */}
+              <div className="p-6 rounded-2xl border border-dashed border-primary/30 bg-primary/5 flex items-center justify-between gap-4">
+                <div>
+                  <h4 className="font-bold text-sm">Want the printed version?</h4>
+                  <p className="text-xs text-muted-foreground">Get the book + PDF for $44.00</p>
+                </div>
+                <Button 
+                  variant="link" 
+                  className="text-primary font-bold text-sm h-auto p-0"
+                  onClick={() => window.location.href = "/products/5-000-spanish-words-with-english-pronunciation-bundle"}
+                >
+                  Upgrade <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
                     ⚠️ Próximamente subirá el precio con la inclusión del Audio Edition.
                   </p>
                 </div>

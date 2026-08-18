@@ -52,7 +52,7 @@ const CART_ITEM_BASE = {
 
 const Product500Preguntas = () => {
   const pricing = useAdminPricing(ADMIN_SKU);
-  const tier = useCountryTierRouting(ADMIN_SKU, { fallbackHotmartUrl: HOTMART_URL, originalMultiplier: 2.5 });
+  const tier = useCountryTierRouting(ADMIN_SKU, { fallbackHotmartUrl: HOTMART_URL, });
   const currentPrice = tier.priceUsd;
   const pricingReady = tier.loaded;
   const navigate = useNavigate();

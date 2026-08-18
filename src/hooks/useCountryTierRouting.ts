@@ -73,9 +73,9 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
   const basePriceLatam = pricing.priceLatamUsd ?? opts.fallbackPriceLatamUsd ?? basePriceGlobal;
   const basePriceTienda = pricing.priceTiendaUsd ?? opts.fallbackPriceTiendaUsd ?? basePriceLatam;
 
-  const baseCompareGlobal = pricing.compareAtPriceGlobalUsd ?? null;
-  const baseCompareLatam = pricing.compareAtPriceLatamUsd ?? null ?? baseCompareGlobal;
-  const baseCompareTienda = pricing.compareAtPriceTiendaUsd ?? null ?? baseCompareLatam;
+  const baseCompareGlobal = pricing.compareAtPriceGlobalUsd;
+  const baseCompareLatam = pricing.compareAtPriceLatamUsd ?? baseCompareGlobal;
+  const baseCompareTienda = pricing.compareAtPriceTiendaUsd ?? baseCompareLatam;
 
   // Precio USD asignado según la región del usuario
   const priceUsd = isTiendaUsd ? basePriceTienda : useHotmartLatam ? basePriceLatam : basePriceGlobal;

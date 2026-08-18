@@ -52,7 +52,7 @@ const features = [
 
 const Product1000Verbos = () => {
   const pricing = useAdminPricing(ADMIN_SKU_1000_VERBOS);
-  const tier = useCountryTierRouting(ADMIN_SKU_1000_VERBOS, { fallbackHotmartUrl: HOTMART_URL, originalMultiplier: 2.5 });
+  const tier = useCountryTierRouting(ADMIN_SKU_1000_VERBOS, { fallbackHotmartUrl: HOTMART_URL, });
   const currentPrice = tier.priceUsd;
   const pricingReady = tier.loaded;
   const navigate = useNavigate();

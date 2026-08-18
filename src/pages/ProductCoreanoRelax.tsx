@@ -293,7 +293,6 @@ const ProductCoreanoRelax = () => {
         flag={displayFlag}
         productName="Coreano · 1,000 Palabras Esenciales"
         ctaText={"Comprar ahora"}
-        buyUrl={TIENDA_CHECKOUT_PATH}
         onBuyClick={handleBuy}
         usdValue={priceUsd}
         rating={4.9}

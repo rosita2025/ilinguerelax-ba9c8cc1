@@ -94,10 +94,8 @@ const Product5000Book = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isLoading: cartLoading } = useCartStore();
-  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
-
   const handleAddToCart = async () => {
-    setPhysicalCheckoutOpen(true);
+    navigate("/checkouts/english_5000");
   };
 
   const pixelParams = useMemo(() => ({

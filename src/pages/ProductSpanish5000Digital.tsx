@@ -541,41 +541,60 @@ const ProductSpanish5000Digital = () => {
         </div>
       </section>
 
-      {/* Reviews */}
-      <section className="pt-6 pb-2 md:pt-8 md:pb-3">
-        <div className="container px-4 md:px-6">
-          <div className="mb-6 rounded-2xl border border-primary/20 bg-primary/5 p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-4 justify-between">
-            <div>
-              <p className="text-sm font-bold text-foreground">
-                These reviews are from readers of the printed book.
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Want the physical book and get the digital version free? This digital page does not include the printed book.
-              </p>
-            </div>
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-8 rounded-3xl bg-slate-900 text-white shadow-2xl relative overflow-hidden mb-12">
-              <div className="relative z-10 flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <Package className="w-5 h-5 text-emerald-400" />
-                  <span className="text-xs font-black uppercase tracking-widest text-emerald-400">Limited Upgrade</span>
-                </div>
-                <h3 className="text-2xl font-black mb-2">Want the Hardcover edition?</h3>
-                <p className="text-slate-400 text-sm max-w-md">
-                  Get the physical book shipped to your door and receive the full Digital Mastery Kit (PDF, MP3s, Flashcards) 100% FREE.
-                </p>
+      {/* Reviews Section */}
+      <section className="bg-slate-50 py-16 md:py-24" id="reviews">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12 border-b border-slate-200 pb-8">
+            <div className="max-w-xl">
+              <div className="flex items-center gap-1 mb-3">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-emerald-500 text-emerald-500" />
+                ))}
               </div>
-              <a
-                href="/products/5-000-spanish-words-with-english-pronunciation-physical"
-                className="relative z-10 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-8 py-4 text-sm font-black text-white shadow-xl hover:bg-emerald-500 transition-all hover:scale-105 active:scale-95"
-              >
-                Upgrade to Physical + Digital Free — $44 USD
-              </a>
-              {/* Decorative background element */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/10 blur-3xl -mr-32 -mt-32 rounded-full" />
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 leading-tight">
+                Trusted by 5,000+ Students Worldwide
+              </h2>
+              <p className="text-slate-600 mt-4 text-lg">
+                See why students are switching to our English-based pronunciation system.
+              </p>
             </div>
-            <Suspense fallback={<div className="h-40" />}>
-              <LooxStyleReviews />
-            </Suspense>
+            <div className="flex flex-col items-center md:items-end gap-4">
+              <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+                <div className="text-center border-r border-slate-100 pr-4">
+                  <div className="text-2xl font-black text-emerald-600">4.8</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Rating</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-black text-slate-900">100%</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Guaranteed</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-8 rounded-3xl bg-slate-900 text-white shadow-2xl relative overflow-hidden mb-12">
+            <div className="relative z-10 flex-1 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+                <Package className="w-5 h-5 text-emerald-400" />
+                <span className="text-xs font-black uppercase tracking-widest text-emerald-400">Limited Upgrade</span>
+              </div>
+              <h3 className="text-2xl font-black mb-2">Want the Hardcover edition?</h3>
+              <p className="text-slate-400 text-sm max-w-md mx-auto md:mx-0">
+                Get the physical book shipped to your door and receive the full Digital Mastery Kit (PDF, MP3s, Flashcards) 100% FREE.
+              </p>
+            </div>
+            <a
+              href="/products/5-000-spanish-words-with-english-pronunciation-physical"
+              className="relative z-10 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-8 py-4 text-sm font-black text-white shadow-xl hover:bg-emerald-500 transition-all hover:scale-105 active:scale-95"
+            >
+              Upgrade to Physical + Digital Free — $44 USD
+            </a>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/10 blur-3xl -mr-32 -mt-32 rounded-full" />
+          </div>
+
+          <Suspense fallback={<div className="h-40" />}>
+            <LooxStyleReviews />
+          </Suspense>
         </div>
       </section>
 

@@ -103,9 +103,9 @@ const ProductSpanish5000Digital = () => {
     tiendaPath: TIENDA_PATH_SP5K,
     fallbackHotmartUrl: HOTMART_SP5K_LATAM,
     fallbackPriceGlobalUsd: 97,
-    fallbackPriceLatamUsd: 67,
-    fallbackPriceTiendaUsd: 47,
-    fallbackPricePen: 45,
+    fallbackPriceLatamUsd: 97,
+    fallbackPriceTiendaUsd: 97,
+    fallbackPricePen: 365,
   });
   const currentPrice = tier.priceUsd;
   const pricingReady = tier.loaded;

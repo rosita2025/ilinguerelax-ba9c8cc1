@@ -723,8 +723,16 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       });
       return;
     }
-    const dlCurrency = DLOCAL_CURRENCY_BY_COUNTRY[ctry] ?? "USD";
-    const dlAmount = dlCurrency === "USD" ? totals.total : (local.currency === dlCurrency ? local.amount : totals.total);
+    const pricing = {
+      priceUsd: currentUsdRef,
+      currencyCode: countryCode,
+      priceLabel: localTotalLabel,
+      exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
+      finalPriceAmount: localTotalAmount,
+    };
+    const payload = getPaymentPayload(pricing, "dlocal", ctry);
+    const dlCurrency = payload.currency;
+    const dlAmount = Number(payload.amount);
     redirectingRef.current = true;
     setMpLoading(dlMethod);
     const dlOrderId = `ILR-DL-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`;

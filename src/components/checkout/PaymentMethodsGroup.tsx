@@ -28,9 +28,11 @@ import { usePurchaseTracking } from "@/hooks/usePurchaseTracking";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";
 import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
-import { mapDlocalStatus } from "@/lib/dlocalErrorMap";
+import { mapDlocalStatus } from "@/lib/localErrorMap";
 import { saveDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
 import { extractEdgeErrorMessage, looksTechnical } from "@/lib/edgeError";
+import { getPaymentPayload } from "@/lib/paymentGatewayRouter";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
 
 type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";

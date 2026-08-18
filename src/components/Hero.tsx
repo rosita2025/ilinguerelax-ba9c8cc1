@@ -12,44 +12,46 @@ import appPreview2 from "@/assets/app-preview-2.png.asset.json";
 
 export const Hero = () => {
   return (
-    <section className="relative w-full overflow-hidden bg-background">
-      <div className="w-full aspect-[9/19] md:aspect-video relative">
-        <Swiper
-          modules={[Autoplay, EffectFade, Pagination, Navigation]}
-          effect={'fade'}
-          autoplay={{
-            delay: 5000,
-            disableOnInteraction: false,
-          }}
-          pagination={{
-            clickable: true,
-            dynamicBullets: true,
-          }}
-          navigation={true}
-          loop={true}
-          className="w-full h-full"
-        >
-          <SwiperSlide key="slide-1" className="bg-black/5 backdrop-blur-sm">
-            <img
-              src={`${appPreview1.url}?v=${new Date().getTime()}`}
-              alt="iLingue Relax App Preview 1"
-              className="w-full h-full object-cover transition-transform duration-700"
-              loading="eager"
-            />
-          </SwiperSlide>
-          <SwiperSlide key="slide-2" className="bg-black/5 backdrop-blur-sm">
-            <img
-              src={`${appPreview2.url}?v=${new Date().getTime()}`}
-              alt="iLingue Relax App Preview 2"
-              className="w-full h-full object-cover transition-transform duration-700"
-              loading="lazy"
-            />
-          </SwiperSlide>
-        </Swiper>
+    <section className="relative w-full overflow-hidden bg-background py-4">
+      <div className="container mx-auto px-4 max-w-6xl">
+        <div className="relative w-full aspect-[9/16] md:aspect-video max-h-[75vh] md:max-h-[500px] overflow-hidden rounded-2xl bg-black/5">
+          <Swiper
+            modules={[Autoplay, EffectFade, Pagination, Navigation]}
+            effect={'fade'}
+            autoplay={{
+              delay: 5000,
+              disableOnInteraction: false,
+            }}
+            pagination={{
+              clickable: true,
+              dynamicBullets: true,
+            }}
+            navigation={true}
+            loop={true}
+            className="w-full h-full"
+          >
+            <SwiperSlide key="slide-1" className="flex items-center justify-center">
+              <img
+                src={`${appPreview1.url}?v=${new Date().getTime()}`}
+                alt="iLingue Relax App Preview 1"
+                className="w-full h-full object-contain mx-auto transition-transform duration-700"
+                loading="eager"
+              />
+            </SwiperSlide>
+            <SwiperSlide key="slide-2" className="flex items-center justify-center">
+              <img
+                src={`${appPreview2.url}?v=${new Date().getTime()}`}
+                alt="iLingue Relax App Preview 2"
+                className="w-full h-full object-contain mx-auto transition-transform duration-700"
+                loading="lazy"
+              />
+            </SwiperSlide>
+          </Swiper>
+        </div>
       </div>
 
       {/* Subtle bottom gradient to blend with next section */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none z-10" />
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent pointer-events-none z-10" />
     </section>
   );
 };

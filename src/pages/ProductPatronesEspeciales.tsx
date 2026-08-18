@@ -169,9 +169,6 @@ const ProductPatronesEspeciales = () => {
     });
   };
 
-
-
-
   const productReviews = [
     {
       author: "María G.",

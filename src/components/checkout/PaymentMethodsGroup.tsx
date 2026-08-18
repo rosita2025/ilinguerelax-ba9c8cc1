@@ -353,7 +353,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
   // Replicating exactly the logic from OrderSummary.tsx
   const localItemsSum = sumItemsLocal(
-    items.map((i) => ({ id: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
+    items.map((i) => ({ id: i.id, sku: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
     countryCode,
     overridesFor,
   );
@@ -648,6 +648,15 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         metadata: { phone: s.buyer.phone ?? "", processor: "mercadopago", paymentType },
       }, { onConflict: "email,source" }).then(() => {}, () => {});
 
+      const pricing = {
+        priceUsd: currentUsdRef,
+        currencyCode: local.currency,
+        priceLabel: localTotalLabel,
+        exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
+        finalPriceAmount: localTotalAmount,
+      };
+      const payload = getPaymentPayload(pricing, "mercadopago", countryCode);
+
       const { data, error } = await invokeWithRetry<{ init_point?: string }>("create-mercadopago-preference", {
         body: {
           orderId: `ILR-MP-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
@@ -663,8 +672,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           payerName: s.buyer.fullName.trim(),
           payerPhone: s.buyer.phone ?? undefined,
           expectedTotalUsd: Number(currentUsdRef.toFixed(2)),
-          currency: countryCode === "PE" ? "PEN" : local.currency,
-          amount: Number((countryCode === "PE" ? (penTotals?.total || localTotalAmount) : localTotalAmount).toFixed(2)),
+          currency: payload.currency,
+          amount: Number(payload.amount),
           returnUrl: `${window.location.origin}/checkouts/return`,
           successUrl: `${window.location.origin}/checkouts/success`,
           failureUrl: `${window.location.origin}/checkouts/failure`,
@@ -2153,7 +2162,19 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
                   <div className="rounded-lg bg-white/50 dark:bg-black/20 p-3 text-center border border-[#742282]/10">
                     <p className="text-xs text-[#742282]/70 dark:text-[#a356b1]/70 uppercase tracking-wider font-bold">{t.amountToPay}</p>
-                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted)}</p>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                      {(() => {
+                        const pricing = {
+                          priceUsd: currentUsdRef,
+                          currencyCode: local.currency,
+                          priceLabel: localTotalLabel,
+                          exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
+                          finalPriceAmount: localTotalAmount,
+                        };
+                        const payload = getPaymentPayload(pricing, "manual", countryCode);
+                        return formatCurrencyAmount(Number(payload.amount), "PEN");
+                      })()}
+                    </p>
                     <p className="text-[11px] text-neutral-500 mt-1">{t.sendEquivalentSoles}</p>
                   </div>
 
@@ -2235,7 +2256,19 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
                   <div className="rounded-lg bg-[#F0B90B]/10 p-3 text-center border border-[#F0B90B]/20">
                     <p className="text-xs text-[#b38a08] uppercase tracking-wider font-bold">{t.amountToPay}</p>
-                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">USD ${totalUsd}</p>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                      {(() => {
+                        const pricing = {
+                          priceUsd: currentUsdRef,
+                          currencyCode: local.currency,
+                          priceLabel: localTotalLabel,
+                          exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
+                          finalPriceAmount: localTotalAmount,
+                        };
+                        const payload = getPaymentPayload(pricing, "binance", countryCode);
+                        return `USD $${payload.amountUsdt || payload.amount}`;
+                      })()}
+                    </p>
                   </div>
 
                   <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-[#b38a08] dark:text-[#F0B90B]/80 italic text-left">

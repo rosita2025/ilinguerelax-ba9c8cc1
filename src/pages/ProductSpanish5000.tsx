@@ -185,7 +185,7 @@ const ProductSpanish5000 = () => {
   const stickyCtaText = "BUY NOW";
 
   // Physical book — Stripe checkout with international shipping.
-  const isPhysicalBundle = false;
+  const isPhysicalBundle = true;
   const dynamicCtaText = stickyCtaText;
   const stickyPriceLabel = campaign.price;
   const stickyOriginalLabel = campaign.originalPrice;

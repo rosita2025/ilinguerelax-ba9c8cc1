@@ -95,10 +95,6 @@ const ProductSpanish3000VerbsBook = () => {
   };
 
   const AMAZON_URL_3000 = "https://www.amazon.com/s?k=Spanish+Relax+3000+Verbs";
-  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
-  const handleAddToCart = async () => {
-    setPhysicalCheckoutOpen(true);
-  };
 
 
   const pixelParams = useMemo(

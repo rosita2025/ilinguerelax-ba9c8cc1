@@ -100,11 +100,6 @@ const Product5000Book = () => {
     setPhysicalCheckoutOpen(true);
   };
 
-  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
-  const handleAddToCart = async () => {
-    setPhysicalCheckoutOpen(true);
-  };
-
   const pixelParams = useMemo(() => ({
     content_name: "Inglés Relax - 5,000 Palabras Libro Físico + Digital",
     content_category: "Physical Book Bundle",

@@ -456,7 +456,7 @@ const Product5000Book = () => {
                 <p className="text-muted-foreground mb-6">
                   Pago único • Envío internacional • Incluye PDF digital
                 </p>
-              <Button variant="hero" size="xl" className="w-full" onClick={handleAddToShopifyCart} disabled={cartLoading}>
+              <Button variant="hero" size="xl" className="w-full" onClick={handleAddToCart} disabled={cartLoading}>
                 COMPRAR AHORA
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>

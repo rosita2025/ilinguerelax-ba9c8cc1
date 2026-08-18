@@ -342,7 +342,7 @@ const Product8000Book = () => {
                   <Button
                     size="lg"
                     className="w-full h-14 rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold text-base shadow-lg hover:shadow-xl transition-all"
-                    onClick={handleAddToShopifyCart}
+                    onClick={handleAddToCart}
                   >
                     <ShoppingCart className="w-5 h-5 mr-2" />
                     Comprar ahora — Envío internacional
@@ -585,7 +585,7 @@ const Product8000Book = () => {
                 <Button
                   size="lg"
                   className="w-full h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-base shadow-lg hover:shadow-xl transition-all"
-                  onClick={handleAddToShopifyCart}
+                  onClick={handleAddToCart}
                   disabled={cartLoading}
                 >
                   {cartLoading ? (
@@ -622,7 +622,7 @@ const Product8000Book = () => {
                 <Button
                   size="lg"
                   className="w-full h-14 rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold text-base shadow-lg hover:shadow-xl transition-all"
-                  onClick={handleAddToShopifyCart}
+                  onClick={handleAddToCart}
                 >
                   <span className="inline-flex items-center">
                     <ShoppingCart className="w-5 h-5 mr-2" />

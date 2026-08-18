@@ -355,33 +355,18 @@ const ProductPatronesEspeciales = () => {
                 </p>
               </motion.div>
 
-              {useTiendaOnly ? (
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    variant="hero"
-                    size="xl"
-                    className="w-full mb-4 text-lg py-6 shadow-2xl"
-                    onClick={handleBuy}
-                  >
-                    <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-                    Comprar ahora
-                    <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
-                  </Button>
-                </motion.div>
-              ) : (
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    variant="hero"
-                    size="xl"
-                    className="w-full mb-4 text-lg py-6 shadow-2xl"
-                    onClick={handleBuy}
-                  >
-                    <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-                    ¡QUIERO COMPRAR AHORA!
-                    <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
-                  </Button>
-                </motion.div>
-              )}
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  variant="hero"
+                  size="xl"
+                  className="w-full mb-4 text-lg py-6 shadow-2xl"
+                  onClick={handleBuy}
+                >
+                  <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
+                  Comprar ahora
+                  <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
+                </Button>
+              </motion.div>
 
               <Button
                 variant="outline"
@@ -747,8 +732,8 @@ const ProductPatronesEspeciales = () => {
         rating={pricingAdmin.rating != null ? pricingAdmin.rating : 4.9}
         reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}
         showReviews={true}
-        buyUrl={useTiendaOnly ? TIENDA_CHECKOUT_PATH : HOTMART_URL}
-        onBuyClick={useTiendaOnly ? handleBuy : undefined}
+        buyUrl={TIENDA_CHECKOUT_PATH}
+        onBuyClick={handleBuy}
         ctaText={"Comprar ahora"}
         localUsdPrices={pricingAdmin.localUsdPrices}
       />

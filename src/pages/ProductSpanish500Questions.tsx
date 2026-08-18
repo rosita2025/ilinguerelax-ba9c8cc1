@@ -42,22 +42,18 @@ const ProductSpanish500Questions = () => {
 
   const handleBuyNow = () => {
     if (!pricingReady) return;
-    if (useTiendaOnly) {
-      addItem({
-        id: "500-preguntas-spanish",
-        name: pricing.name ?? "500 Questions in Spanish (Digital PDF)",
-        price: currentPrice,
-        pricePen: pricePen ?? undefined,
-        regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
-        image: productImage,
-        description: "500 real Spanish questions with English pronunciation",
-        quantity: 1,
-      });
-      setDrawerOpen(false);
-      navigate(TIENDA_PATH);
-    } else if (tier.hotmartUrl) {
-      window.open(tier.hotmartUrl, "_blank", "noopener,noreferrer");
-    }
+    addItem({
+      id: "500-preguntas-spanish",
+      name: pricing.name ?? "500 Questions in Spanish (Digital PDF)",
+      price: currentPrice,
+      pricePen: pricePen ?? undefined,
+      regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
+      image: productImage,
+      description: "500 real Spanish questions with English pronunciation",
+      quantity: 1,
+    });
+    setDrawerOpen(false);
+    navigate(TIENDA_PATH);
   };
 
 
@@ -174,9 +170,9 @@ const ProductSpanish500Questions = () => {
         rating={4.8}
         reviewCount={0}
         showReviews={false}
-        buyUrl={useTiendaOnly ? TIENDA_PATH : (tier.hotmartUrl || "#")}
+        buyUrl={TIENDA_PATH}
         onBuyClick={handleBuyNow}
-        ctaText={useTiendaOnly ? `GET IT NOW — ${tier.priceLabel}` : `BUY ON HOTMART — ${tier.priceLabel}`}
+        ctaText={`GET IT NOW — ${tier.priceLabel}`}
         lang="en"
         calmMode
         dismissible

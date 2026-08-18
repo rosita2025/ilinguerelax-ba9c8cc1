@@ -1132,6 +1132,9 @@ const AdminProductEdit = () => {
                       ? product.price_usd 
                       : (product.price_usd_tienda ?? product.price_usd);
                   
+                  const isAsiaOrRest = !isLatam && !isAnglosphereOrEurope;
+                  const regionLabel = isLatam ? "LATAM" : isAnglosphereOrEurope ? "ANGLO / EU" : "ASIA / RESTO";
+                  
                   const regionalUsdOverride = product.local_usd_prices?.[code];
                   const currentUsdValue = regionalUsdOverride != null ? Number(regionalUsdOverride) : Number(baseUsdRef);
                   

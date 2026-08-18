@@ -232,34 +232,6 @@ const ProductSpanish5000 = () => {
     return Math.round(((original - current) / original) * 100);
   }, [digitalTier.priceUsd]);
 
-  const { formatPrice } = useI18n();
-  const ADMIN_SKU_DIGITAL = "5-000-spanish-words-with-english-pronunciation-digital";
-  const TIENDA_PATH_DIGITAL = "/checkouts/5000-spanish-words";
-  const HOTMART_DIGITAL_LATAM = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
-  
-  const digitalTier = useCountryTierRouting(ADMIN_SKU_DIGITAL, {
-    tiendaPath: TIENDA_PATH_DIGITAL,
-    fallbackHotmartUrl: HOTMART_DIGITAL_LATAM,
-    fallbackPriceGlobalUsd: 72.99,
-    fallbackPriceLatamUsd: 72.99,
-    fallbackPriceTiendaUsd: 72.99,
-    fallbackPricePen: 280,
-  });
-
-  const digitalPriceLabel = (digitalTier.isPeru && digitalTier.pricePen && Number(digitalTier.pricePen) > 0) 
-    ? `S/${Number(digitalTier.pricePen).toFixed(2)}` 
-    : digitalTier.priceLabel;
-    
-  const digitalOriginalLabel = digitalTier.isPeru && digitalTier.pricePen 
-    ? `S/${(Number(digitalTier.pricePen) * 2.5).toFixed(2)}` 
-    : digitalTier.originalLabel;
-
-  const digitalDiscountPct = useMemo(() => {
-    const current = digitalTier.priceUsd || 72.99;
-    const original = 97;
-    return Math.round(((original - current) / original) * 100);
-  }, [digitalTier.priceUsd]);
-
   return <main className="min-h-screen bg-background">
       <Helmet>
         <link rel="preload" as="image" href={productSpanish5000BundleImageAvif} type="image/avif" />

@@ -131,8 +131,12 @@ const BonusPreviewDialog = ({ triggerLabel = "See sample", title, subtitle, chil
 
 const ProductSpanish5000 = () => {
   // Libro físico: cobro siempre se realiza en USD para internal checkout.
-  const detected = useCampaignPrice(44.00, 59);
-  const campaign = { ...detected, currency: "USD" as const, symbol: "$", price: "$44.00", originalPrice: "$59.00" };
+  const campaign = {
+    price: "$44.00",
+    originalPrice: "$59.00",
+    currency: "USD" as const,
+    discountPercentage: 25
+  };
 
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({

@@ -59,14 +59,13 @@ const features = [
   "500 Spanish Questions for Practice + English Pronunciation",
   "Practical Exercises & Study Plan",
   "Digital PDF Version",
-  "Native Audio Modules (Coming Soon Bonus)",
-  "iLingue Relax App (Early Access Bonus)",
+  "FREE Bonus: Future Audio & iLingue Relax App Access (Coming Soon)",
   "Instant PDF download · Secure Payment",
   "Progressive A1 → C1 Learning Path",
 ];
 
 const benefits = [
-  { icon: Headphones, title: "Native Audio Modules", description: "Coming Soon: Native pronunciation MP3s included as a free launch bonus for early buyers." },
+  { icon: Headphones, title: "Future Audio & App Access", description: "FREE Bonus: Get the native pronunciation MP3s and iLingue Relax App access as soon as they launch." },
   { icon: Layers, title: "Digital Flashcards", description: "Ready-to-use decks for Anki/Quizlet to memorize the 5,000 words 3x faster." },
   { icon: Zap, title: "Learn Anywhere", description: "Study on your phone, tablet, or computer. Your Spanish vocabulary is always with you." },
   { icon: FilePlus, title: "Quick Conjugation Guide", description: "A high-impact miniguide for the most common 100 Spanish conversations." },
@@ -86,7 +85,7 @@ const countryToFlag = (cc: string): string => {
 const ProductSpanish5000Digital = () => {
   const shortTestimonials = [
     "\"Best Spanish kit I've bought\" — Sarah, USA",
-    "\"The pronunciation system is a game changer\" — Mark, UK",
+    "\"The pronunciation guide is a game changer\" — Sarah, USA",
     "\"Memorized 500 words in 1 week with flashcards\" — Julie, Canada",
     "\"The pronunciation makes it so easy\" — Tom, USA",
     "\"Perfect for reaching B2 level\" — Anna, Ireland",
@@ -394,8 +393,8 @@ const ProductSpanish5000Digital = () => {
                 </h3>
                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
                   {[
-                    "Native Audio Modules (Coming Soon)",
-                    "iLingue Relax App (Future Access)",
+                    "Future Audio MP3 Pack (FREE Bonus)",
+                    "iLingue Relax App (FREE Early Access)",
                     "Free Lifetime Updates",
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3 text-sm font-bold text-slate-900">
@@ -422,7 +421,7 @@ const ProductSpanish5000Digital = () => {
                     ))}
                   </div>
                   <p className="text-xl font-bold italic mb-6 leading-relaxed">
-                    "I've tried every app out there, but this is the first time I actually feel confident speaking. The English pronunciation system is pure genius!"
+                    "I've tried every app out there, but this is the first time I actually feel confident speaking. The English pronunciation system for the 5,000 words is pure genius!"
                   </p>
                   <div className="flex items-center gap-4 border-t border-white/20 pt-6">
                     <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-black text-xl">M</div>

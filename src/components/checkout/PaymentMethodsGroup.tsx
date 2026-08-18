@@ -2162,7 +2162,19 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
                   <div className="rounded-lg bg-white/50 dark:bg-black/20 p-3 text-center border border-[#742282]/10">
                     <p className="text-xs text-[#742282]/70 dark:text-[#a356b1]/70 uppercase tracking-wider font-bold">{t.amountToPay}</p>
-                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{penBadge ?? (local.loading ? `USD $${totalUsd}` : local.formatted)}</p>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                      {(() => {
+                        const pricing = {
+                          priceUsd: currentUsdRef,
+                          currencyCode: local.currency,
+                          priceLabel: localTotalLabel,
+                          exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
+                          finalPriceAmount: localTotalAmount,
+                        };
+                        const payload = getPaymentPayload(pricing, "manual", countryCode);
+                        return formatCurrencyAmount(Number(payload.amount), "PEN");
+                      })()}
+                    </p>
                     <p className="text-[11px] text-neutral-500 mt-1">{t.sendEquivalentSoles}</p>
                   </div>
 

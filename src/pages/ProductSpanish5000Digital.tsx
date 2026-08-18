@@ -346,13 +346,13 @@ const ProductSpanish5000Digital = () => {
       {/* Content Section - High Conversion */}
       <section className="py-12 md:py-20">
         <div className="container px-4 md:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,0.8fr] gap-12 items-start">
             {/* Left: Benefits & Features (Clean & Fast) */}
-            <div className="space-y-8">
+            <div className="space-y-10">
               <div>
-                <h2 className="text-3xl md:text-4xl font-black mb-4">Spanish Mastery System</h2>
-                <p className="text-lg text-muted-foreground font-medium">
-                  The complete system for English speakers to master Latin American Spanish naturally.
+                <h2 className="text-3xl md:text-5xl font-black mb-6 text-slate-900 leading-tight">Master Spanish Without the Struggle</h2>
+                <p className="text-xl text-slate-600 font-medium leading-relaxed">
+                  Most apps only teach you words. Our system gives you the <span className="text-emerald-600 font-black italic underline decoration-emerald-200">Tools</span>, the <span className="text-emerald-600 font-black italic underline decoration-emerald-200">Context</span>, and the <span className="text-emerald-600 font-black italic underline decoration-emerald-200">Native Sounds</span> to start speaking today.
                 </p>
               </div>
 
@@ -390,7 +390,43 @@ const ProductSpanish5000Digital = () => {
               </div>
             </div>
 
-          </div>
+            {/* Right: Featured Review Box (Conversion Booster) */}
+            <div className="lg:sticky lg:top-32 space-y-6">
+              <div className="p-8 rounded-3xl bg-emerald-600 text-white shadow-xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                  <Star className="w-24 h-24 fill-white" />
+                </div>
+                <div className="relative z-10">
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 fill-white text-white" />
+                    ))}
+                  </div>
+                  <p className="text-xl font-bold italic mb-6 leading-relaxed">
+                    "I've tried every app out there, but this is the first time I actually feel confident speaking. The English pronunciation system is pure genius!"
+                  </p>
+                  <div className="flex items-center gap-4 border-t border-white/20 pt-6">
+                    <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-black text-xl">M</div>
+                    <div>
+                      <div className="font-black">Michelle R.</div>
+                      <div className="text-sm text-white/70">Verified Student · USA</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-8 rounded-3xl bg-white border border-slate-100 shadow-sm">
+                <div className="text-center">
+                  <div className="text-4xl font-black text-slate-900 mb-2">5,000+</div>
+                  <div className="text-xs font-black uppercase tracking-widest text-slate-400">Happy Learners</div>
+                  <div className="mt-4 flex flex-wrap justify-center gap-2">
+                    {["🇺🇸", "🇬🇧", "🇨🇦", "🇦🇺", "🇮🇪"].map(f => (
+                      <span key={f} className="text-2xl grayscale hover:grayscale-0 cursor-default transition-all">{f}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
         </div>
       </section>
 

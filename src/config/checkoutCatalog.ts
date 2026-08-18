@@ -217,7 +217,25 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
 };
 
 
+// Alias de slugs legacy/cortos → SKU real registrado en /admin/products.
+// Evita el error "Producto no encontrado" cuando un botón o un enlace antiguo
+// usa un identificador que ya no existe en el catálogo.
+export const CHECKOUT_SLUG_ALIASES: Record<string, string> = {
+  spanish_5000_physical: "5-000-spanish-words-with-english-pronunciation-physical",
+  spanish_5000_digital: "5-000-spanish-words-with-english-pronunciation-digital",
+  spanish_grammar: "spanish-relax-structural-spanish-grammar-a1-c1-book-physical-n9ct",
+  english_5000: "5-000-palabras-libro-fisico",
+  english_8000: "8-000-palabras-libro-fisico",
+};
+
+export function resolveCheckoutSlug(slug: string | undefined): string {
+  const raw = String(slug ?? "").trim();
+  if (!raw) return raw;
+  return CHECKOUT_SLUG_ALIASES[raw] ?? CHECKOUT_SLUG_ALIASES[raw.toLowerCase()] ?? raw;
+}
+
 export function getCatalogItem(slug: string | undefined): CatalogItem | null {
   if (!slug) return null;
-  return CHECKOUT_CATALOG[slug] ?? null;
+  const resolved = resolveCheckoutSlug(slug);
+  return CHECKOUT_CATALOG[resolved] ?? CHECKOUT_CATALOG[slug] ?? null;
 }

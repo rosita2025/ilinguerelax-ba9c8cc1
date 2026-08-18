@@ -339,9 +339,7 @@ const ProductSpanish3000VerbsBook = () => {
                 ) : (
                   <ShoppingCart className="w-6 h-6 mr-2" />
                 )}
-                {shopifyVariantId
-                  ? `PRE-ORDER THE 3,000 VERBS BOOK — $${PREORDER_PRICE}`
-                  : "Loading pre-order..."}
+                {`PRE-ORDER THE 3,000 VERBS BOOK — $${PREORDER_PRICE}`}
               </Button>
               <p className="text-xs text-center text-slate-400 mb-5">
                 Add the Verb Mastery to my collection · Secure checkout · Ships June 2026

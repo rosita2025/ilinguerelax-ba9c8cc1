@@ -321,9 +321,7 @@ const ProductSpanishGrammarPatterns = () => {
                 ) : (
                   <ShoppingCart className="w-6 h-6 mr-2" />
                 )}
-                {shopifyVariantId
-                  ? `ADD TO CART — $${PRICE}.00`
-                  : "Loading..."}
+                {`ADD TO CART — $${PRICE}.00`}
               </Button>
               <p className="text-xs text-center text-slate-300 mb-5">
                 Secure checkout · Free shipping over ${FREE_SHIPPING_THRESHOLD} · Ships worldwide

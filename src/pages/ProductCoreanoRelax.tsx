@@ -52,7 +52,7 @@ const TIENDA_CHECKOUT_PATH = "/checkouts/coreano-100-mapas";
 const ADMIN_SKU = "100-mapas-mentales-para-aprender-coreano-hangul-c1";
 
 const features = [
-  "Más de 100 mapas mentales organizados por temas",
+  "1,000 palabras esenciales del coreano",
   "Introducción completa al Hangul (alfabeto coreano) paso a paso",
   "Vocabulario práctico del día a día",
   "Verbos esenciales y estructuras básicas explicadas visualmente",
@@ -158,7 +158,7 @@ const ProductCoreanoRelax = () => {
       <SEO
         title={pricing.name ?? "1,000 Palabras Esenciales para Aprender Coreano · iLingue Relax"}
         description={pricing.description ?? "Domina el vocabulario coreano con 1,000 palabras esenciales, Hangul y pronunciación adaptada para hispanohablantes. PDF descargable."}
-        canonicalUrl="https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1"
+        canonicalUrl="https://ilinguerelax.com/products/1-000-palabras-esenciales-para-aprender-coreano"
         image={pricing.coverImageUrl ?? `https://ilinguerelax.com${coverAsset.url}`}
         type="product"
         price="12"

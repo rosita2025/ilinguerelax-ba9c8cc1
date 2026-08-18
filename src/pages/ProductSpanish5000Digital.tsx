@@ -83,12 +83,12 @@ const countryToFlag = (cc: string): string => {
 
 const ProductSpanish5000Digital = () => {
   const shortTestimonials = [
-    "\"Best Spanish PDF I've bought\" — Sarah, USA",
-    "\"Finally understood Ser vs Estar\" — Mark, UK",
-    "\"Instant download, no waiting\" — Julie, Canada",
-    "\"The pronunciation makes it easy\" — Tom, USA",
-    "\"Perfect from A1 to C1\" — Anna, Ireland",
-    "\"Everything in one single PDF\" — David, Australia"
+    "\"Best Spanish kit I've bought\" — Sarah, USA",
+    "\"The audio modules are a game changer\" — Mark, UK",
+    "\"Memorized 500 words in 1 week with flashcards\" — Julie, Canada",
+    "\"The pronunciation makes it so easy\" — Tom, USA",
+    "\"Perfect for reaching B2 level\" — Anna, Ireland",
+    "\"Everything I needed in one kit\" — David, Australia"
   ];
 
   const [isRedirecting, setIsRedirecting] = useState(false);

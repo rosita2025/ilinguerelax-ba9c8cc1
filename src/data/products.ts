@@ -187,7 +187,7 @@ export const products: Product[] = [
     description: "Digital-only PDF designed for English speakers learning Latin American Spanish. With English Pronunciation.",
     rating: 4.8,
     reviews: 500,
-    price: 34.99,
+    price: 72.99,
     originalPrice: 97.00,
     discount: 64,
     badge: "📥 Digital",

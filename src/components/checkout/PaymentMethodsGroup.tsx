@@ -662,8 +662,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           payerEmail: s.buyer.email.trim(),
           payerName: s.buyer.fullName.trim(),
           payerPhone: s.buyer.phone ?? undefined,
-          // Mercado Pago aplica el tipo de cambio local automáticamente (USD → moneda del comprador).
-          expectedTotalUsd: Number(totals.total.toFixed(2)),
+          expectedTotalUsd: Number(currentUsdRef.toFixed(2)),
+          currency: countryCode === "PE" ? "PEN" : local.currency,
+          amount: Number((countryCode === "PE" ? (penTotals?.total || localTotalAmount) : localTotalAmount).toFixed(2)),
           returnUrl: `${window.location.origin}/checkouts/return`,
           successUrl: `${window.location.origin}/checkouts/success`,
           failureUrl: `${window.location.origin}/checkouts/failure`,

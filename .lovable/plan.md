@@ -1,31 +1,29 @@
-# Plan: Unify Spanish Mastery System Pricing to $97 USD
+# Plan - Unified Pricing Fix for Spanish Mastery System
 
-The user wants to ensure the "Spanish Mastery System - Digital Only" product (5,000 Spanish words) is consistently priced at **$97 USD** (original price **$215 USD**) across all pages. Currently, while the main digital page is updated, other references (like the cross-sell on the physical book page) might still show outdated prices.
+The user wants to update the price of the "Spanish Mastery System - Digital Only" product. Based on the request "del precio actualzar seimpre admin/products/:sku", it seems the user is frustrated that the price set in the admin/database is not consistently reflected everywhere, or they want a specific price to be "always" updated. 
 
-## Technical Details
+The previous messages indicate a flip-flop between $97 and $34.99. The most recent command was to set it to $34.99. However, the database currently shows `price_usd` as **$78.99**, while `price_usd_latam` and `price_usd_tienda` are **$34.99**. 
 
-- **Affected Files:**
-    - `src/pages/ProductSpanish5000.tsx`: Update the digital version cross-sell price from hardcoded values to $97/$215.
-    - `src/pages/ProductSpanish5000Digital.tsx`: Verify all price labels and fallbacks are $97/$215.
-    - `src/config/checkoutCatalog.ts`: Verify `5000-spanish-words` entry.
-- **Database:** Ensure `public.digital_products` for SKU `5-000-spanish-words-with-english-pronunciation-digital` has `price_usd`, `price_usd_latam`, and `price_usd_tienda` all set to **97**.
+I will unify all price tiers to **$34.99** in the database and ensure the frontend (catalog and landing page fallbacks) matches this value.
 
 ## Proposed Changes
 
-### 1. Unified Price Updating in Frontend
-- Update `src/pages/ProductSpanish5000.tsx` (Physical Book Page):
-    - Change the "View Digital Version" button/label to show **$97**.
-    - Change the original price reference to **$215.00**.
-- Update `src/pages/ProductSpanish5000Digital.tsx` (Digital Page):
-    - Ensure `PRICE` constant is `97`.
-    - Ensure `ORIGINAL_PRICE` constant is `215`.
-    - Ensure `fallbackPriceGlobalUsd`, `fallbackPriceLatamUsd`, and `fallbackPriceTiendaUsd` are all `97`.
+### Database
+- Update `public.digital_products` for SKU `5-000-spanish-words-with-english-pronunciation-digital`:
+    - Set `price_usd` = 34.99
+    - Set `price_usd_latam` = 34.99
+    - Set `price_usd_tienda` = 34.99
 
-### 2. Database Sync
-- Execute a SQL migration to enforce the $97 price for the digital SKU in the database to prevent overrides.
+### Frontend
+- **`src/config/checkoutCatalog.ts`**:
+    - Ensure `5000-spanish-words` has `price: 34.99` and `regionPrices: { latam: 34.99, global: 34.99, tienda: 34.99 }`.
+- **`src/pages/ProductSpanish5000Digital.tsx`**:
+    - Ensure `PRICE` constant is `34.99`.
+    - Ensure `fallbackPriceGlobalUsd`, `fallbackPriceLatamUsd`, and `fallbackPriceTiendaUsd` in `useCountryTierRouting` are all `34.99`.
+- **`src/pages/ProductSpanish5000.tsx`**:
+    - Update any hardcoded price references in the digital cross-sell section to `34.99`.
 
----
-**Verification Plan:**
-- Check the physical product page (`/products/5-000-spanish-words-with-english-pronunciation-physical`) and confirm the digital cross-sell shows $97.
-- Check the digital product page (`/products/5-000-spanish-words-with-english-pronunciation-digital`) and confirm the price is $97.
-- Verify checkout for both regions (USA/LatAm) defaults to $97.
+## Technical Details
+- Use `supabase--migration` for the database update.
+- Use `code--line_replace` for frontend file updates.
+- Verify the changes with `supabase--read_query`.

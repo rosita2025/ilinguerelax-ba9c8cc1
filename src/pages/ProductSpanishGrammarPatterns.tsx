@@ -72,10 +72,6 @@ const ProductSpanishGrammarPatterns = () => {
   };
 
   const AMAZON_URL_GRAMMAR = "https://www.amazon.com/s?k=Spanish+Relax+Grammar+Patterns";
-  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
-  const handleAddToCart = async () => {
-    setPhysicalCheckoutOpen(true);
-  };
 
 
   const pixelParams = useMemo(

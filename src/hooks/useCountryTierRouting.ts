@@ -92,7 +92,7 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
           : originalPriceBase,
         displayCurrency,
         null,
-        pricing.localUsdPrices
+        pricing.localUsdPrices || pricing.localPrices
       );
 
   const hasFallback = (opts.fallbackPriceGlobalUsd ?? 0) > 0;

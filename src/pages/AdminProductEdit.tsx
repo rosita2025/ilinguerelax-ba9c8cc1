@@ -37,6 +37,10 @@ interface Product {
   price_usd_latam: number | null;
   price_usd_tienda: number | null;
   price_pen: number | null;
+  compare_at_price_usd: number | null;
+  compare_at_price_usd_latam: number | null;
+  compare_at_price_usd_tienda: number | null;
+  compare_at_price_pen: number | null;
   drive_url: string | null;
   access_key: string | null;
   cover_image_url: string | null;
@@ -58,6 +62,7 @@ interface Product {
   sku_aliases: string[];
   local_prices: Record<string, number>;
   local_usd_prices: Record<string, number>;
+  local_compare_at_prices: Record<string, number>;
   is_physical: boolean;
   gallery_metadata: Record<string, any>;
   rating?: number | null;
@@ -81,7 +86,9 @@ const LANGS = [
 
 const EMPTY: Product = {
   sku: "", name: "", description: "", learner_language: "es", target_language: "en",
-  price_usd: 0, price_usd_latam: null, price_usd_tienda: null, price_pen: null, drive_url: "", access_key: "", cover_image_url: "",
+  price_usd: 0, price_usd_latam: null, price_usd_tienda: null, price_pen: null,
+  compare_at_price_usd: null, compare_at_price_usd_latam: null, compare_at_price_usd_tienda: null, compare_at_price_pen: null,
+  drive_url: "", access_key: "", cover_image_url: "",
   gallery_images: [],
   is_upsell: false, active: false, sort_order: 0,
   bonus_name: "", bonus_drive_url: "", bonus_access_key: "",
@@ -96,6 +103,7 @@ const EMPTY: Product = {
   sku_aliases: [],
   local_prices: {},
   local_usd_prices: {},
+  local_compare_at_prices: {},
   is_physical: false,
   gallery_metadata: {},
   rating: 4.8,
@@ -406,6 +414,7 @@ const AdminProductEdit = () => {
             // Normalize and round local and regional USD prices before saving
             const normalizedLocalPrices: Record<string, number> = {};
             const normalizedLocalUsdPrices: Record<string, number> = {};
+            const normalizedLocalCompareAtPrices: Record<string, number> = {};
             
             if (product.local_prices) {
               Object.entries(product.local_prices).forEach(([code, amount]) => {
@@ -427,10 +436,22 @@ const AdminProductEdit = () => {
               });
             }
 
+            if (product.local_compare_at_prices) {
+              Object.entries(product.local_compare_at_prices).forEach(([code, amount]) => {
+                const numAmount = Number(amount);
+                if (!isNaN(numAmount) && numAmount > 0) {
+                  const config = currencyConfig[code as Currency];
+                  const decimals = config?.decimals ?? 2;
+                  normalizedLocalCompareAtPrices[code] = Math.round(numAmount * Math.pow(10, decimals)) / Math.pow(10, decimals);
+                }
+              });
+            }
+
             return {
               ...cleanProduct,
               local_prices: normalizedLocalPrices,
               local_usd_prices: normalizedLocalUsdPrices,
+              local_compare_at_prices: normalizedLocalCompareAtPrices,
               gallery_images: Array.isArray(product.gallery_images) ? product.gallery_images : [],
               gallery_metadata: product.gallery_metadata || {},
               upsells,

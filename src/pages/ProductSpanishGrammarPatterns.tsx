@@ -590,7 +590,11 @@ const ProductSpanishGrammarPatterns = () => {
         ctaText={`ADD TO CART — $${PRICE}.00`}
         sku="SPANISH-GRAMMAR-PATTERNS"
         onBuyClick={handleAddToCart}
-    </main>
+        isLoading={cartLoading}
+        disabled={false}
+        isPhysical={true}
+        goesToInternalCheckout={true}
+      />
   );
 };
 

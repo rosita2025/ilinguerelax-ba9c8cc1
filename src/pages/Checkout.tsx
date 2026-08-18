@@ -214,7 +214,7 @@ export default function Checkout() {
     // product (price, image, upsells, with or without upsell) with zero manual
     // wiring per SKU.
     const derivedFromPath = staticItem?.productPath?.replace(/^\/products\//, "") || null;
-    const adminSku = staticItem?.adminSku ?? derivedFromPath ?? slug;
+    const adminSku = staticItem?.adminSku ?? derivedFromPath ?? resolveCheckoutSlug(slug);
 
 
     const load = async () => {

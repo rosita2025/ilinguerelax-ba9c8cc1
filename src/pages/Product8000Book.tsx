@@ -302,7 +302,7 @@ const Product8000Book = () => {
                     ) : (
                       <ShoppingCart className="w-5 h-5 mr-2" />
                     )}
-                    Agregar al carrito
+                    COMPRAR AHORA
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </div>

@@ -68,6 +68,7 @@ const ProductSpanishGrammarPatterns = () => {
   const { addItem, isLoading: cartLoading } = useCartStore();
   const navigate = useNavigate();
 
+
   const handleAddToCart = async () => {
     navigate("/checkouts/spanish_grammar");
   };

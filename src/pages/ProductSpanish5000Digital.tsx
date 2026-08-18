@@ -369,22 +369,39 @@ const ProductSpanish5000Digital = () => {
               </div>
 
               <div className="p-8 rounded-3xl bg-emerald-50 border border-emerald-100">
-                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                  <Check className="w-5 h-5 text-emerald-600" /> What's included in your Interactive Kit:
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-900">
+                  <Check className="w-5 h-5 text-emerald-600" /> Included Today (Instant Download):
                 </h3>
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 mb-8">
                   {[
                     "5,000 Words + Pronunciation (250 Pages)",
                     "A1–C1 Grammar Guide (250 Pages)",
                     "1,000 Essential Verbs + Pronunciation",
                     "500 Practice Questions + Pronunciation",
-                    "Native Audio Modules (MP3 Pack)",
                     "Interactive Flashcards (Anki/Quizlet)",
                     "Top 100 Conversations Miniguide",
                     "7-Day Money-Back Guarantee",
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3 text-sm font-semibold text-slate-700">
                       <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-900">
+                  <Sparkles className="w-5 h-5 text-amber-500" /> Launch Bonuses (Early Access):
+                </h3>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                  {[
+                    "Native Audio Modules (Coming Soon)",
+                    "iLingue Relax App (Future Access)",
+                    "Free Lifetime Updates",
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3 text-sm font-bold text-slate-900">
+                      <div className="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                        <Star className="w-3 h-3 text-amber-600 fill-amber-600" />
+                      </div>
                       {item}
                     </li>
                   ))}

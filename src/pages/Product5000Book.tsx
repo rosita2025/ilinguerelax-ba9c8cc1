@@ -119,7 +119,7 @@ const Product5000Book = () => {
   }, []);
 
   const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
-  const handleAddToShopifyCart = async () => {
+  const handleAddToCart = async () => {
     setPhysicalCheckoutOpen(true);
   };
 

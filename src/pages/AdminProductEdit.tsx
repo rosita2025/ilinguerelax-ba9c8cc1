@@ -959,9 +959,26 @@ const AdminProductEdit = () => {
           <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between border-b pb-2">
               <h2 className="font-semibold text-lg flex items-center gap-2">💰 Configuración de Precios Globales</h2>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-6">
                 <div className="text-right">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Base USD (Ancla)</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Precio Normal (USD)</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-muted-foreground/60">$</span>
+                    <Input
+                      type="number" step="0.01"
+                      className="w-24 h-8 text-sm font-bold border-dashed opacity-70"
+                      value={product.price_usd_tienda || ""}
+                      onChange={(e) => {
+                        const val = e.target.value === "" ? null : Number(e.target.value);
+                        update("price_usd_tienda", val);
+                      }}
+                      placeholder="97.00"
+                    />
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Base Oferta USD (Ancla)</Label>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-primary">$</span>
                     <Input
@@ -1011,7 +1028,7 @@ const AdminProductEdit = () => {
             <div className="space-y-3">
               <div>
                 <p className="text-[11px] text-muted-foreground bg-primary/5 p-2 rounded border border-primary/10">
-                  💡 Fija el monto <b>exacto</b> por moneda. El sistema detecta el país por IP y usa este valor manual. Si se deja vacío, se usa la conversión automática desde el <b>Precio Base USD</b> (Ref: Tasa actual). El usuario prefiere precios bajos en LATAM y altos en USA/EUR.
+                  💡 Fija el monto <b>exacto</b> por moneda. El sistema detecta el país por IP y usa este valor manual. Si se deja vacío, se usa la conversión automática desde el <b>Precio Base Oferta USD</b> (Ref: Tasa actual). El <b>Precio Normal</b> se usa para mostrar el monto tachado (antes).
                 </p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">

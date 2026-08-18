@@ -427,7 +427,8 @@ const ProductSpanish5000Digital = () => {
                 </div>
               </div>
             </div>
-        </div>
+            </div>
+          </div>
       </section>
 
       {/* Look Inside */}

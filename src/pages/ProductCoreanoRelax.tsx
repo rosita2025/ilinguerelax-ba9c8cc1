@@ -168,7 +168,7 @@ const ProductCoreanoRelax = () => {
       />
       <Navbar />
 
-      <section className="pt-4 pb-6 md:pt-8 md:pb-10">
+      <section className="pt-4 pb-0">
         {!pricing.active && (
           <div className="container px-4 md:px-6 mb-6">
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3 text-amber-800">
@@ -179,91 +179,22 @@ const ProductCoreanoRelax = () => {
             </div>
           </div>
         )}
-        <div className="container px-4 md:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="relative">
-              <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
-              <div className="relative">
-                <img
-                  src={coverAsset.url}
-                  alt="Coreano Relax - 100 Mapas Mentales para Aprender Coreano (Hangul a C1)"
-                  className="w-full h-auto rounded-2xl shadow-hero"
-                  onContextMenu={(e) => e.preventDefault()}
-                />
-                <PinterestSave 
-                  overlay 
-                  media={coverAsset.url}
-                  url="https://ilinguerelax.com/products/coreano-relax-100-mapas-mentales-vocabulario-visual-con-pronunciacion"
-                  description="Aprende coreano con 100 mapas mentales visuales y pronunciación fácil."
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold border border-amber-500/20">
-                  <Sparkles className="w-4 h-4" />
-                  <span>🇰🇷 NUEVO LANZAMIENTO</span>
-                </motion.div>
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20">
-                  <Brain className="w-4 h-4" /> +100 Mapas Mentales
-                </span>
-              </div>
-
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 text-balance leading-tight">
-                {pricing.name ?? (<>🇰🇷 Coreano Sin Complicaciones · <span className="text-gradient">+100 Mapas Mentales</span></>)}
-              </h1>
-
-              <p className="text-sm sm:text-base md:text-lg text-muted-foreground mb-6 text-pretty">
-                {pricing.description ?? (<>Aprende coreano de forma visual y entretenida con <strong>k-dramas</strong>, <strong>K-pop</strong> y cultura coreana. Sin reglas aburridas.</>)}
-              </p>
-
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 rounded-2xl p-5 border border-amber-500/20 mb-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-amber-600" />
-                  <span className="text-amber-600 font-semibold text-xs uppercase">Precio de Lanzamiento</span>
-                </div>
-                <div className="flex items-baseline gap-3 mb-2 flex-wrap">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">{displayPrice}</span>
-                  <span className="text-2xl text-muted-foreground line-through">$54</span>
-                  <motion.span animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold shadow-lg">
-                    {isPeru ? "-72%" : useHotmartLatam ? "-81%" : "-72%"}
-                  </motion.span>
-                </div>
-                <p className="text-sm font-semibold text-foreground mb-1">
-                  {displayFlag} Precio para {isPeru ? "Perú" : useHotmartLatam ? "Latinoamérica" : "tu país"} · <span className="text-primary">{currencyLabel}</span>
-                </p>
-                <p className="text-xs text-muted-foreground">💳 Pago único · Acceso de por vida · Sin impuestos incluidos</p>
-              </motion.div>
-
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="mb-6">
-                <div className={useTiendaOnly ? "grid grid-cols-1 gap-3" : "grid grid-cols-1 sm:grid-cols-2 gap-3"}>
-                  <Button onClick={handleBuyStore} size="lg" className="w-full text-base py-6 gradient-hero text-primary-foreground font-bold shadow-hero hover:scale-[1.02] transition-transform">
-                    <Store className="w-5 h-5 mr-2" />
-                    Tienda iLingue · {displayPrice}
-                  </Button>
-                  {useHotmartLatam && (
-                    <Button onClick={handleBuyHotmart} variant="outline" size="lg" className="w-full text-base py-6 border-2 border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white font-bold">
-                      <ShoppingCart className="w-5 h-5 mr-2" />
-                      Hotmart · ${priceLatamUsd.toFixed(2)}
-                    </Button>
-                  )}
-                </div>
-                <p className="text-center text-xs text-muted-foreground mt-2">🔒 Pago seguro · Entrega automática · Elige tu método</p>
-                
-                <div className="mt-6 mb-6 flex items-center justify-between bg-white/50 p-3 rounded-xl border border-amber-500/20">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Pagos:</span>
-                  <PaymentLogos />
-                </div>
-              </motion.div>
-
-            </div>
-          </div>
-        </div>
+        
+        <CoreanoHeroRedesign 
+          price={displayPrice} 
+          onBuy={handleBuy} 
+        />
       </section>
 
+      <CoreanoBonuses />
+      <CoreanoUpdates />
+      <CoreanoFeaturesGrid />
+      <CoreanoHowItWorks />
+      <CoreanoCategories />
+      <CoreanoForWho />
+
       {/* Vista previa - Slider de mapas mentales */}
-      <section className="py-10 md:py-14 bg-gradient-to-b from-background to-primary/5">
+      <section className="py-16 md:py-24 bg-gradient-to-b from-background to-primary/5">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-8">

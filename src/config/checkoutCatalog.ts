@@ -97,9 +97,9 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "5000-spanish-words": {
     id: "5000-spanish-words",
     name: "Spanish Mastery System - 5,000 Spanish Words (Digital PDF)",
-    price: 34.99,
+    price: 72.99,
     originalPrice: 97,
-    regionPrices: { latam: 34.99, global: 34.99, tienda: 34.99 },
+    regionPrices: { latam: 72.99, global: 72.99, tienda: 72.99 },
     image: "/images/product-5000-spanish.webp",
     description: "5,000 vocabulary words in Spanish with English pronunciation",
     productPath: "/products/5-000-spanish-words-with-english-pronunciation-digital",

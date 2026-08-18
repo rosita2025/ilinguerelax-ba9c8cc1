@@ -59,12 +59,14 @@ const features = [
   "500 Spanish Questions for Practice + English Pronunciation",
   "Practical Exercises & Study Plan",
   "Digital PDF Version",
+  "Native Audio Modules (Coming Soon Bonus)",
+  "iLingue Relax App (Early Access Bonus)",
   "Instant PDF download · Secure Payment",
   "Progressive A1 → C1 Learning Path",
 ];
 
 const benefits = [
-  { icon: Headphones, title: "Native Audio Modules", description: "Learn how words actually sound with native pronunciation MP3s included in your kit." },
+  { icon: Headphones, title: "Native Audio Modules", description: "Coming Soon: Native pronunciation MP3s included as a free launch bonus for early buyers." },
   { icon: Layers, title: "Digital Flashcards", description: "Ready-to-use decks for Anki/Quizlet to memorize the 5,000 words 3x faster." },
   { icon: Zap, title: "Learn Anywhere", description: "Study on your phone, tablet, or computer. Your Spanish vocabulary is always with you." },
   { icon: FilePlus, title: "Quick Conjugation Guide", description: "A high-impact miniguide for the most common 100 Spanish conversations." },
@@ -84,7 +86,7 @@ const countryToFlag = (cc: string): string => {
 const ProductSpanish5000Digital = () => {
   const shortTestimonials = [
     "\"Best Spanish kit I've bought\" — Sarah, USA",
-    "\"The audio modules are a game changer\" — Mark, UK",
+    "\"The pronunciation system is a game changer\" — Mark, UK",
     "\"Memorized 500 words in 1 week with flashcards\" — Julie, Canada",
     "\"The pronunciation makes it so easy\" — Tom, USA",
     "\"Perfect for reaching B2 level\" — Anna, Ireland",
@@ -367,22 +369,39 @@ const ProductSpanish5000Digital = () => {
               </div>
 
               <div className="p-8 rounded-3xl bg-emerald-50 border border-emerald-100">
-                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                  <Check className="w-5 h-5 text-emerald-600" /> What's included in your Interactive Kit:
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-900">
+                  <Check className="w-5 h-5 text-emerald-600" /> Included Today (Instant Download):
                 </h3>
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 mb-8">
                   {[
                     "5,000 Words + Pronunciation (250 Pages)",
                     "A1–C1 Grammar Guide (250 Pages)",
                     "1,000 Essential Verbs + Pronunciation",
                     "500 Practice Questions + Pronunciation",
-                    "Native Audio Modules (MP3 Pack)",
                     "Interactive Flashcards (Anki/Quizlet)",
                     "Top 100 Conversations Miniguide",
                     "7-Day Money-Back Guarantee",
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3 text-sm font-semibold text-slate-700">
                       <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-900">
+                  <Sparkles className="w-5 h-5 text-amber-500" /> Launch Bonuses (Early Access):
+                </h3>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                  {[
+                    "Native Audio Modules (Coming Soon)",
+                    "iLingue Relax App (Future Access)",
+                    "Free Lifetime Updates",
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3 text-sm font-bold text-slate-900">
+                      <div className="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                        <Star className="w-3 h-3 text-amber-600 fill-amber-600" />
+                      </div>
                       {item}
                     </li>
                   ))}
@@ -606,12 +625,17 @@ const ProductSpanish5000Digital = () => {
           items={[
             {
               question: "What exactly is included in the Mastery System?",
-              answer: "You get a complete interactive kit: The 5,000 Words & Pronunciation Guide (250 Pages), A1–C1 Grammar Manual (250 Pages), 1,000 Essential Verbs, 500 Conversational Questions, Native Audio MP3 Pack, Digital Flashcards for Anki/Quizlet, and the Top 100 Conversations Miniguide.",
+              answer: "You get a complete interactive kit: The 5,000 Words & Pronunciation Guide (250 Pages), A1–C1 Grammar Manual (250 Pages), 1,000 Essential Verbs, 500 Conversational Questions, and Digital Flashcards for Anki/Quizlet. PLUS: You get Early Access to the Native Audio MP3 Pack and the future iLingue Relax App as a launch bonus.",
               icon: FileText,
             },
             {
+              question: "When will I receive the Audio Modules and App access?",
+              answer: "The Audio Pack and App are currently in final development. By purchasing today, you lock in 'Early Access'. You will receive the instant PDF and Flashcard materials immediately, and the bonuses will be sent to your email automatically as soon as they launch, with no extra cost.",
+              icon: Zap,
+            },
+            {
               question: "How do I receive the kit after purchase?",
-              answer: "Instantly. As soon as your payment is confirmed, you'll get a download link for all PDF, MP3, and flashcard materials sent directly to your email. No shipping wait time.",
+              answer: "Instantly. As soon as your payment is confirmed, you'll get a download link for all PDF and flashcard materials sent directly to your email. Bonuses will follow via the same email upon release.",
               icon: Download,
             },
             {

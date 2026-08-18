@@ -986,7 +986,6 @@ const AdminProductEdit = () => {
               <h2 className="font-semibold text-lg flex items-center gap-2">💰 Configuración de Precios Regionales</h2>
               <div className="flex flex-wrap items-center gap-6">
                 <div className="text-right">
-                <div className="text-right">
                   <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">BASE USD - LATAM</Label>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-primary">$</span>

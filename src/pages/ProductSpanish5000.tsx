@@ -159,7 +159,7 @@ const ProductSpanish5000 = () => {
   useScrollTimeTracking("product_spanish_5000");
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [isCreatingDigitalCheckout, setIsCreatingDigitalCheckout] = useState(false);
-  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
+  
   const navigate = useNavigate();
   const checkoutLockRef = useRef(false);
 

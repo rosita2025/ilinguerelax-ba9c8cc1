@@ -598,8 +598,6 @@ const Product5000 = () => {
               <p className="text-center text-sm text-muted-foreground mb-6">
                 {isPeru
                   ? "👆 Pago local en soles (Yape, Plin, tarjetas, transferencia)"
-                  : useHotmartLatam
-                  ? "👆 Pago en tu moneda local vía Hotmart"
                   : "👆 Pago seguro en USD (tarjetas internacionales)"}
               </p>
 

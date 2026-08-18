@@ -96,6 +96,7 @@ interface ProductIn {
   store_excluded_countries?: string[] | null;
   hotmart_excluded_countries?: string[] | null;
   local_prices?: Record<string, number> | null;
+  local_compare_at_prices?: Record<string, number> | null;
   upsells?: UpsellIn[];
   gallery_metadata?: Record<string, any> | null;
   rating?: number | null;

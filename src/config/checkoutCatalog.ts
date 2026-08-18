@@ -109,7 +109,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     pricePen: 28.90,
     regionPrices: { latam: 9, global: 12, tienda: 5 },
     image: "/images/product-coreano-100-mapas.webp",
-    description: "Domina el vocabulario coreano con 1,000 palabras esenciales, Hangul y pronunciación fácil.",
+    description: "1,000 palabras esenciales para aprender coreano con Hangul, pronunciación y español.",
     productPath: "/products/100-mapas-mentales-para-aprender-coreano-hangul-c1",
     adminSku: "100-mapas-mentales-para-aprender-coreano-hangul-c1",
     upsells: [

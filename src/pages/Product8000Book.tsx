@@ -98,36 +98,14 @@ const benefits = [
 
 const Product8000Book = () => {
   const [currentImage, setCurrentImage] = useState(0);
-  const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
-  const [shopifyProduct, setShopifyProduct] = useState<any>(null);
-  const { addItem, isLoading: cartLoading } = useCartStore();
-
-  // Fetch Shopify product variant for the physical book
-  useEffect(() => {
-    const loadProduct = async () => {
-      try {
-        const products = await fetchShopifyProducts(10, "LIBRO FISICO 8,000");
-        const book = products.find(p => 
-          p.node.title.toLowerCase().includes("libro fisico") && 
-          (p.node.title.toLowerCase().includes("8000") || p.node.title.toLowerCase().includes("8,000"))
-        );
-        if (book) {
-          setShopifyProduct(book);
-          const variant = book.node.variants.edges[0]?.node;
-          if (variant) setShopifyVariantId(variant.id);
-        }
-      } catch (err) {
-        console.error("Failed to load Shopify product:", err);
-      }
-    };
-    loadProduct();
-  }, []);
-
-  const AMAZON_URL_8000 = "https://www.amazon.com/s?k=Ingl%C3%A9s+Relax+8000+Palabras";
+  const { isLoading: cartLoading } = useCartStore();
   const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
+
   const handleAddToCart = async () => {
     setPhysicalCheckoutOpen(true);
   };
+
+  const AMAZON_URL_8000 = "https://www.amazon.com/s?k=Ingl%C3%A9s+Relax+8000+Palabras";
 
 
 

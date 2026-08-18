@@ -48,55 +48,55 @@ export function PhysicalBookCheckout({ open, onOpenChange, book, title }: Physic
           <div className="w-full md:w-80 bg-muted/30 p-6 border-b md:border-b-0 md:border-r flex flex-col">
             <div className="space-y-6 flex-1">
               <div className="space-y-2">
-                <h3 className="font-bold text-lg flex items-center gap-2">
-                  <Truck className="w-5 h-5 text-primary" />
+                <h3 className="font-bold text-lg flex items-center gap-2 text-slate-900">
+                  <Truck className="w-5 h-5 text-emerald-600" />
                   Envío Internacional
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   Recibe tu libro físico en la puerta de tu casa.
                 </p>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div className="flex gap-3">
-                  <Globe className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                  <Globe className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-semibold">Países disponibles</p>
-                    <p className="text-xs text-muted-foreground">
-                      🇺🇸 USA · 🇨🇦 Canadá · 🇬🇧 UK · 🇦🇺 Australia · 🇳🇿 Nueva Zelanda · 🇲🇽 México · 🇪🇸 España · 🇦🇷 Argentina · 🇨🇱 Chile · 🇨🇴 Colombia · 🇵🇪 Perú
+                    <p className="text-sm font-bold text-slate-800">Países disponibles</p>
+                    <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
+                      US · CA · UK · AU · NZ · MX · ES · AR · CL · CO · PE
                     </p>
                   </div>
                 </div>
 
                 <div className="flex gap-3">
-                  <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                  <MapPin className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-semibold">Costo de envío</p>
-                    <p className="text-xs text-muted-foreground">
-                      Tarifa plana: <span className="font-bold">$8 USD</span>
+                    <p className="text-sm font-bold text-slate-800">Costo de envío</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      Tarifa plana: <span className="font-bold text-slate-900">$8 USD</span>
                     </p>
-                    <p className="text-[10px] text-emerald-600 font-medium leading-tight mt-1">
-                      🎁 GRATIS en pedidos mayores a $50
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-semibold">Pago Seguro</p>
-                    <p className="text-xs text-muted-foreground">
-                      Tus datos y dirección están protegidos por Stripe.
+                    <p className="text-[10px] text-emerald-600 font-black uppercase tracking-wider mt-1.5 inline-block bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
+                      🎁 GRATIS {'>'} $50
                     </p>
                   </div>
                 </div>
 
                 <div className="flex gap-3">
-                  <Gift className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                  <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-semibold text-emerald-700">Digital GRATIS</p>
-                    <p className="text-xs text-muted-foreground">
-                      Acceso inmediato al PDF tras la compra.
+                    <p className="text-sm font-bold text-slate-800">Pago Seguro</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      Protegido por SSL y Stripe.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <Gift className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-bold text-amber-600">Digital GRATIS</p>
+                    <p className="text-[11px] text-muted-foreground leading-tight">
+                      Acceso al PDF tras la compra.
                     </p>
                   </div>
                 </div>
@@ -104,28 +104,28 @@ export function PhysicalBookCheckout({ open, onOpenChange, book, title }: Physic
             </div>
 
             {/* Order Summary Table */}
-            <div className="mt-8 pt-6 border-t border-muted/60 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Resumen del pedido</h4>
+            <div className="mt-8 pt-6 border-t border-muted-foreground/10 space-y-3">
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Resumen del pedido</h4>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Libro físico</span>
-                  <span className="font-medium">{book === "english_8000" ? "$34.99" : book === "spanish_5000" ? "$34.99" : book === "spanish_3000_verbs" ? "$17.00" : book === "spanish_grammar_patterns" ? "$45.00" : "$24.00"}</span>
+                  <span className="text-muted-foreground font-medium">Libro físico</span>
+                  <span className="font-black text-slate-900">{book === "english_8000" ? "$34.99" : book === "spanish_5000" ? "$34.99" : book === "spanish_3000_verbs" ? "$17.00" : book === "spanish_grammar_patterns" ? "$45.00" : "$24.00"}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Digital (PDF)</span>
-                  <span className="text-emerald-600 font-bold">GRATIS</span>
+                  <span className="text-muted-foreground font-medium">Digital (PDF)</span>
+                  <span className="text-emerald-600 font-black uppercase tracking-tighter text-xs">GRATIS</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Envío</span>
-                  <span className="font-medium">$8.00</span>
+                  <span className="text-muted-foreground font-medium">Envío</span>
+                  <span className="font-black text-slate-900">$8.00</span>
                 </div>
-                <div className="pt-2 border-t flex justify-between font-bold text-base">
+                <div className="pt-2 border-t border-slate-900/5 flex justify-between font-black text-lg text-slate-900">
                   <span>Total</span>
                   <span>{book === "english_8000" ? "$42.99" : book === "spanish_5000" ? "$42.99" : book === "spanish_3000_verbs" ? "$25.00" : book === "spanish_grammar_patterns" ? "$53.00" : "$32.00"}</span>
                 </div>
               </div>
-              <p className="text-[10px] text-muted-foreground italic mt-2">
-                * El tiempo de entrega estimado es de 7 a 15 días hábiles después del despacho.
+              <p className="text-[9px] text-muted-foreground italic mt-3 leading-tight opacity-70">
+                * Despacho internacional vía Amazon Logistics.
               </p>
             </div>
           </div>

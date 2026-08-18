@@ -214,6 +214,7 @@ export const StickyBuyBar = ({
     // duplicate the event.
     const goesToInternalCheckout = (() => {
       if (onBuyClick) return true; // internal handlers always land on our checkout store
+      if (isPhysical) return true; // physical products on this site use internal checkout
       if (!buyUrl) return false;
       try {
         const url = new URL(buyUrl, window.location.origin);

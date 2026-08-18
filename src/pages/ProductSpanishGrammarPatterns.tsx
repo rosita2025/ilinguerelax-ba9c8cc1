@@ -65,39 +65,13 @@ const ProductSpanishGrammarPatterns = () => {
   const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
   const [shopifyProduct, setShopifyProduct] = useState<any>(null);
   const { addItem, isLoading: cartLoading } = useCartStore();
-
-  useEffect(() => {
-    const loadProduct = async () => {
-      try {
-        const products = await fetchShopifyProducts(20, "Structural Grammar Manual");
-        // Prefer the physical book (avoid the DIGITAL variant at $15)
-        const book =
-          products.find((p: any) => {
-            const t = p.node.title.toLowerCase();
-            return t.includes("structural grammar manual") && t.includes("physical");
-          }) ||
-          products.find((p: any) => p.node.handle === "spanish-relax-grammar-patterns-a1-c1-mastery-physical-book-pre-order") ||
-          products.find((p: any) => {
-            const t = p.node.title.toLowerCase();
-            return t.includes("physical") && !t.includes("digital");
-          });
-        if (book) {
-          setShopifyProduct(book);
-          const variant = book.node.variants.edges[0]?.node;
-          if (variant) setShopifyVariantId(variant.id);
-        }
-      } catch (err) {
-        console.error("Failed to load Shopify product:", err);
-      }
-    };
-    loadProduct();
-  }, []);
-
-  const AMAZON_URL_GRAMMAR = "https://www.amazon.com/s?k=Spanish+Relax+Grammar+Patterns";
   const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
+
   const handleAddToCart = async () => {
     setPhysicalCheckoutOpen(true);
   };
+
+  const AMAZON_URL_GRAMMAR = "https://www.amazon.com/s?k=Spanish+Relax+Grammar+Patterns";
 
 
   const pixelParams = useMemo(

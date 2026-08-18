@@ -137,8 +137,8 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
   const t = translations[language];
 
-  const formatPriceWithCurrency = (priceInUSD: number): string => {
-    return formatPrice(priceInUSD, currency);
+  const formatPriceWithCurrency = (priceInUSD: number, overrides?: any, localUsdPrices?: any): string => {
+    return formatPrice(priceInUSD, currency, overrides, localUsdPrices);
   };
 
   const value: I18nContextType = {

@@ -5,7 +5,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
+
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";

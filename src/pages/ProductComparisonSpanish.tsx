@@ -16,8 +16,8 @@ const ProductComparisonSpanish = () => {
   const ADMIN_SKU = "5-000-spanish-words-with-english-pronunciation-digital";
   const pricing = useAdminPricing(ADMIN_SKU);
   const tier = useCountryTierRouting(ADMIN_SKU, {
-    fallbackPriceGlobalUsd: 22,
-    fallbackPriceLatamUsd: 19,
+    fallbackPriceGlobalUsd: 97,
+    fallbackPriceLatamUsd: 67,
     fallbackPricePen: 45,
   });
 
@@ -44,8 +44,8 @@ const ProductComparisonSpanish = () => {
     {
       title: "Digital Edition",
       subtitle: "5,000 Spanish Words",
-      price: 30,
-      originalPrice: 97,
+      price: 97,
+      originalPrice: 215,
       description: "Perfect for studying on your phone, tablet or computer. Instant access to everything.",
       image: "/images/product-5000-spanish-digital.webp",
       url: "/products/5-000-spanish-words-with-english-pronunciation-digital",
@@ -57,7 +57,7 @@ const ProductComparisonSpanish = () => {
         "Instant PDF Download",
         "Lifetime Updates FREE"
       ],
-      cta: "GET DIGITAL — $30",
+      cta: "GET DIGITAL — $97",
       popular: false
     },
     {
@@ -85,7 +85,7 @@ const ProductComparisonSpanish = () => {
     <main className="min-h-screen bg-background">
       <SEO 
         title="Spanish 5,000 Words · Choose Your Edition"
-        description="Choose between the Digital PDF edition ($30) or the Physical Book + Digital Bundle ($44.00). Master 5,000 Spanish words with English pronunciation."
+        description="Choose between the Digital PDF edition ($97) or the Physical Book + Digital Bundle ($44.00). Master 5,000 Spanish words with English pronunciation."
       />
       <Navbar />
       

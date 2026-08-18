@@ -1,12 +1,11 @@
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useRegionTier } from "@/hooks/useRegionTier";
-import { detectCurrency, formatPrice, formatCurrencyAmount, exchangeRates, type Currency } from "@/i18n";
+import { detectCurrency, formatCurrencyAmount, exchangeRates, type Currency } from "@/i18n";
 import { useLocalOverrides } from "@/lib/livePrices";
 
 /**
  * Países que compran vía Hotmart LATAM (USD). El resto del mundo (incl. Perú y
- * VE/CU/NI) se envía a la tienda interna. Perú paga en soles, VE/CU/NI en USD
- * tienda ($7 por defecto), Global en USD Global ($15 por defecto).
+ * VE/CU/NI) se envía a la tienda interna.
  */
 export const LATAM_HOTMART_COUNTRIES = new Set([
   "AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV",
@@ -23,127 +22,119 @@ export interface CountryTierRouting {
   useHotmartLatam: boolean;
   /** true cuando NO se usa Hotmart (Perú, VE/CU/NI, Global). */
   useTiendaOnly: boolean;
-  /** Precio USD a mostrar/cobrar según el tier. */
+  /** Precio USD base a mostrar según el tier (Global, Latam o Tienda). */
   priceUsd: number;
   compareAtPriceUsd: number | null;
+  /** Montos finales convertidos y formateados */
+  priceLabel: string;
+  originalLabel: string | null;
+  currencyCode: string;
+  isOnSale: boolean;
+  discountPercentage: number;
+  /** Propiedades heredadas del admin para componentes descendientes */
+  hotmartUrl: string | null;
   priceGlobalUsd: number;
   priceLatamUsd: number;
   priceTiendaUsd: number;
   pricePen: number | null;
   compareAtPricePen: number | null;
-  hotmartUrl: string | null;
-  /** Label listo para renderizar en hero y sticky bar. */
-  priceLabel: string;
-  currencyCode: string;
-  originalLabel: string | null;
-  isOnSale: boolean;
-  discountPercentage: number;
-  /** Regional USD overrides for specific currencies. */
   localUsdPrices: Record<string, number> | null;
   localCompareAtPrices: Record<string, number> | null;
 }
 
 interface Options {
-  /** Ruta interna al checkout de este producto (informativa, opcional). */
   tiendaPath?: string;
-  /** URL Hotmart de fallback si el admin no la tiene cargada. */
   fallbackHotmartUrl?: string;
-  /** Multiplicador para el precio "antes" tachado (default 2.5x). */
-  originalMultiplier?: number;
   fallbackPriceGlobalUsd?: number;
   fallbackPriceLatamUsd?: number;
   fallbackPriceTiendaUsd?: number;
   fallbackPricePen?: number;
 }
 
+/**
+ * Lógica Única y Genérica para procesar precios globales.
+ * Refactorización 100% dinámica basada en ISO sin condicionales por país.
+ */
 export function useCountryTierRouting(adminSku: string, opts: Options = {}): CountryTierRouting {
   const pricing = useAdminPricing(adminSku);
   const region = useRegionTier();
-  // Montos exactos por moneda fijados en /admin/productos/:sku. Se aplican aquí
-  // para que cualquier página que use este hook muestre el MISMO importe que
-  // la ficha de producto y el checkout.
-  const overrides = useLocalOverrides(adminSku) as Partial<Record<Currency, number>> | null;
-  const country = (region.country || "").toUpperCase();
-  const isPeru = country === "PE";
-  const isTiendaUsd = TIENDA_USD_COUNTRIES.has(country);
-  const useHotmartLatam = LATAM_HOTMART_COUNTRIES.has(country);
+  const manualOverrides = useLocalOverrides(adminSku) as Partial<Record<Currency, number>> | null;
+  
+  const countryCode = (region.country || "US").toUpperCase();
+  const currency = detectCurrency(countryCode);
+  const rate = exchangeRates[currency] || 1;
+
+  // 1. Determinar el Tier de Precios USD
+  const useHotmartLatam = LATAM_HOTMART_COUNTRIES.has(countryCode);
+  const isTiendaUsd = TIENDA_USD_COUNTRIES.has(countryCode);
   const useTiendaOnly = !useHotmartLatam;
 
-  const priceGlobalUsd = pricing.priceGlobalUsd ?? opts.fallbackPriceGlobalUsd ?? 0;
-  const priceLatamUsd = pricing.priceLatamUsd ?? opts.fallbackPriceLatamUsd ?? priceGlobalUsd;
-  const priceTiendaUsd = pricing.priceTiendaUsd ?? opts.fallbackPriceTiendaUsd ?? priceLatamUsd;
-  const pricePen = pricing.pricePen ?? opts.fallbackPricePen ?? null;
+  const basePriceGlobal = pricing.priceGlobalUsd ?? opts.fallbackPriceGlobalUsd ?? 0;
+  const basePriceLatam = pricing.priceLatamUsd ?? opts.fallbackPriceLatamUsd ?? basePriceGlobal;
+  const basePriceTienda = pricing.priceTiendaUsd ?? opts.fallbackPriceTiendaUsd ?? basePriceLatam;
 
-  const priceUsd = isTiendaUsd
-    ? priceTiendaUsd
-    : useHotmartLatam
-      ? priceLatamUsd
-      : priceGlobalUsd;
+  const baseCompareGlobal = pricing.compareAtPriceGlobalUsd ?? null;
+  const baseCompareLatam = pricing.compareAtPriceLatamUsd ?? null ?? baseCompareGlobal;
+  const baseCompareTienda = pricing.compareAtPriceTiendaUsd ?? null ?? baseCompareLatam;
 
-  const compareAtPriceUsd = isTiendaUsd
-    ? pricing.compareAtPriceTiendaUsd
-    : useHotmartLatam
-      ? pricing.compareAtPriceLatamUsd
-      : pricing.compareAtPriceGlobalUsd;
+  // Precio USD asignado según la región del usuario
+  const priceUsd = isTiendaUsd ? basePriceTienda : useHotmartLatam ? basePriceLatam : basePriceGlobal;
+  const compareAtPriceUsd = isTiendaUsd ? baseCompareTienda : useHotmartLatam ? baseCompareLatam : baseCompareGlobal;
 
-  const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
+  // 2. Calcular Precios Finales (Moneda Local)
+  // Prioridad: Manual por Moneda (PEN, COP, etc) > (Manual USD Regional * Rate) > (Base Global * Rate)
+  
+  // Precio "Ahora"
+  const manualFixed = manualOverrides?.[currency];
+  const regionalUsdOverride = pricing.localUsdPrices?.[currency];
+  
+  const finalPriceAmount = typeof manualFixed === "number" && manualFixed > 0
+    ? manualFixed
+    : typeof regionalUsdOverride === "number" && regionalUsdOverride > 0
+      ? regionalUsdOverride * rate
+      : priceUsd * rate;
 
-  // Precios finales (ahora)
-  const finalPrice = isPeru && pricePen
-    ? pricePen
-    : overrides?.[displayCurrency as Currency] ?? priceUsd;
+  // Precio "Antes" (Tachado)
+  const manualCompareFixed = pricing.localCompareAtPrices?.[currency];
+  
+  const finalCompareAmount = typeof manualCompareFixed === "number" && manualCompareFixed > 0
+    ? manualCompareFixed
+    : compareAtPriceUsd && compareAtPriceUsd > 0
+      ? compareAtPriceUsd * rate
+      : null;
 
-  // Precios tachados (antes)
-  const manualCompareAt = pricing.localCompareAtPrices?.[displayCurrency];
-  let finalCompareAt: number | null = null;
-
-  if (isPeru && pricing.compareAtPricePen) {
-    finalCompareAt = pricing.compareAtPricePen;
-  } else if (manualCompareAt) {
-    finalCompareAt = manualCompareAt;
-  } else if (compareAtPriceUsd && compareAtPriceUsd > 0) {
-    // Si hay oferta en USD, convertirla a local usando la misma tasa que el precio de venta
-    const rate = exchangeRates[displayCurrency as Currency] ?? 1;
-    finalCompareAt = compareAtPriceUsd * rate;
-  }
-
-  // Si el precio tachado es menor o igual al actual, lo ignoramos
-  const isOnSale = !!(finalCompareAt && finalCompareAt > finalPrice);
+  // 3. Flags y Etiquetas
+  const isOnSale = !!(finalCompareAmount && finalCompareAmount > finalPriceAmount);
   const discountPercentage = isOnSale 
-    ? Math.round(((finalCompareAt! - finalPrice) / finalCompareAt!) * 100) 
+    ? Math.round(((finalCompareAmount! - finalPriceAmount) / finalCompareAmount!) * 100) 
     : 0;
 
-  const priceLabel = isPeru && pricePen
-    ? formatCurrencyAmount(pricePen, "PEN")
-    : formatPrice(priceUsd, displayCurrency, overrides ?? undefined, pricing.localUsdPrices);
-
-  const originalLabel = isOnSale
-    ? formatCurrencyAmount(finalCompareAt!, displayCurrency as Currency)
-    : null;
+  const priceLabel = formatCurrencyAmount(finalPriceAmount, currency);
+  const originalLabel = isOnSale ? formatCurrencyAmount(finalCompareAmount!, currency) : null;
 
   const hasFallback = (opts.fallbackPriceGlobalUsd ?? 0) > 0;
-  const loaded = (pricing.loaded || hasFallback) && (isPeru ? (pricePen ?? 0) > 0 : priceUsd > 0);
+  const loaded = (pricing.loaded || hasFallback) && finalPriceAmount > 0;
 
   return {
     loaded,
-    country,
-    isPeru,
+    country: countryCode,
+    isPeru: countryCode === "PE",
     isTiendaUsd,
     useHotmartLatam,
     useTiendaOnly,
     priceUsd,
     compareAtPriceUsd,
-    priceGlobalUsd,
-    priceLatamUsd,
-    priceTiendaUsd,
-    pricePen,
-    compareAtPricePen: pricing.compareAtPricePen,
-    hotmartUrl: pricing.hotmartUrl || opts.fallbackHotmartUrl || null,
     priceLabel,
-    currencyCode: displayCurrency,
     originalLabel,
+    currencyCode: currency,
     isOnSale,
     discountPercentage,
+    hotmartUrl: pricing.hotmartUrl || opts.fallbackHotmartUrl || null,
+    priceGlobalUsd: basePriceGlobal,
+    priceLatamUsd: basePriceLatam,
+    priceTiendaUsd: basePriceTienda,
+    pricePen: pricing.pricePen,
+    compareAtPricePen: pricing.compareAtPricePen,
     localUsdPrices: pricing.localUsdPrices,
     localCompareAtPrices: pricing.localCompareAtPrices,
   };

@@ -47,10 +47,8 @@ const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })
 const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then(m => ({ default: m.LooxStyleReviews })));
 
 
+// Fallbacks (referenciales, el hook useCountryTierRouting manda)
 const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/aFa5kC2OIchv2mA8m98IU0e";
-const PRICE = 34.99;
-const ORIGINAL_PRICE = 97;
-const DISCOUNT_PCT = 64;
 
 const features = [
   "5,000 Spanish Words + Pronunciation (250 Pages)",
@@ -110,8 +108,8 @@ const ProductSpanish5000Digital = () => {
   const currentPrice = tier.priceUsd;
   const pricingReady = tier.loaded;
   const { useTiendaOnly, useHotmartLatam, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen } = tier;
-  const localizedPrice = (tier.isPeru && pricePen && Number(pricePen) > 0) ? `S/${Number(pricePen).toFixed(2)}` : tier.priceLabel;
-  const localizedOriginal = tier.isPeru && pricePen ? `S/${(Number(pricePen) * 2.5).toFixed(2)}` : tier.originalLabel;
+  const localizedPrice = tier.priceLabel;
+  const localizedOriginal = tier.originalLabel;
   const flag = countryToFlag(countryCode);
 
   const pixelParams = useMemo(() => ({
@@ -202,7 +200,7 @@ const ProductSpanish5000Digital = () => {
         image={pricing.coverImageUrl ?? "https://ilinguerelax.com/product-spanish-5000.webp"}
         type="product"
         price={String(currentPrice)}
-        originalPrice={String(ORIGINAL_PRICE)}
+        originalPrice={tier.compareAtPriceUsd ? String(tier.compareAtPriceUsd) : undefined}
         rating="4.8"
         reviewCount="500"
         sku="SPANISH-5000-DIGITAL"
@@ -244,9 +242,11 @@ const ProductSpanish5000Digital = () => {
                 <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black shadow-lg">
                   <Download className="w-3.5 h-3.5" /> DIGITAL PDF — INSTANT ACCESS
                 </div>
-                <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500 text-white text-xs font-black shadow-lg">
-                  -{DISCOUNT_PCT}%
-                </div>
+                {tier.isOnSale && (
+                  <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500 text-white text-xs font-black shadow-lg">
+                    -{tier.discountPercentage}%
+                  </div>
+                )}
               </div>
             </div>
 
@@ -280,10 +280,14 @@ const ProductSpanish5000Digital = () => {
               <div className="p-5 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
                 <div className="flex items-end gap-3 flex-wrap">
                   <span className="text-4xl md:text-5xl font-black text-foreground">{tier.priceLabel}</span>
-                  <span className="text-xl text-muted-foreground line-through mb-1 opacity-70">{tier.originalLabel}</span>
-                  <span className="px-2 py-1 rounded-md bg-red-500 text-white text-xs font-black shadow-sm">
-                    SAVE {DISCOUNT_PCT}%
-                  </span>
+                  {tier.isOnSale && (
+                    <>
+                      <span className="text-xl text-muted-foreground line-through mb-1 opacity-70">{tier.originalLabel}</span>
+                      <span className="px-2 py-1 rounded-md bg-red-500 text-white text-xs font-black shadow-sm">
+                        SAVE {tier.discountPercentage}%
+                      </span>
+                    </>
+                  )}
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
                   One-time payment · Instant Access · Secure Checkout

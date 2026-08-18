@@ -218,19 +218,9 @@ const ProductSpanish5000 = () => {
     fallbackPricePen: 280,
   });
 
-  const digitalPriceLabel = (digitalTier.isPeru && digitalTier.pricePen && Number(digitalTier.pricePen) > 0) 
-    ? `S/${Number(digitalTier.pricePen).toFixed(2)}` 
-    : formatPrice(digitalTier.priceUsd || 72.99, null, digitalPricing.localUsdPrices);
-    
-  const digitalOriginalLabel = digitalTier.isPeru && digitalTier.pricePen 
-    ? `S/${(Number(digitalTier.pricePen) * 2.5).toFixed(2)}` 
-    : formatPrice(97, null, digitalPricing.localUsdPrices);
-
-  const digitalDiscountPct = useMemo(() => {
-    const current = digitalTier.priceUsd || 72.99;
-    const original = 97;
-    return Math.round(((original - current) / original) * 100);
-  }, [digitalTier.priceUsd]);
+  const digitalPriceLabel = digitalTier.priceLabel;
+  const digitalOriginalLabel = digitalTier.originalLabel;
+  const digitalDiscountPct = digitalTier.discountPercentage;
 
   return <main className="min-h-screen bg-background">
       <Helmet>

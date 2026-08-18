@@ -1028,6 +1028,20 @@ const AdminProductEdit = () => {
                     />
                   </div>
                 </div>
+
+                <div className="text-right">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">PEN Antes (Tachado)</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-muted-foreground/40">S/</span>
+                    <Input
+                      type="number" step="0.1"
+                      className="w-20 h-8 text-xs border-dashed opacity-60"
+                      value={product.compare_at_price_pen ?? ""}
+                      onChange={(e) => update("compare_at_price_pen", e.target.value === "" ? null : Number(e.target.value))}
+                      placeholder="149.00"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 

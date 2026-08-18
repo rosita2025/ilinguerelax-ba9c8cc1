@@ -2,6 +2,7 @@ import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { detectCurrency, formatCurrencyAmount, exchangeRates, type Currency } from "@/i18n";
 import { useLocalOverrides } from "@/lib/livePrices";
+import { REGIONS } from "@/lib/countryRegions";
 
 /**
  * Países que compran vía Hotmart LATAM (USD). El resto del mundo (incl. Perú y

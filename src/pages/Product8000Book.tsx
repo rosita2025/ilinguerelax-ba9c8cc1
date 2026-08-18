@@ -294,7 +294,7 @@ const Product8000Book = () => {
                   <Button
                     size="lg"
                     className="w-full h-14 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base shadow-lg hover:shadow-xl transition-all"
-                    onClick={handleAddToShopifyCart}
+                    onClick={handleAddToCart}
                     disabled={cartLoading}
                   >
                     {cartLoading ? (
@@ -703,7 +703,7 @@ const Product8000Book = () => {
         originalPrice="$45"
         productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés - Libro físico"
         ctaText="Comprar ahora"
-        onBuyClick={handleAddToShopifyCart}
+        onBuyClick={handleAddToCart}
         isLoading={cartLoading}
         showReviews={true}
         rating={4.89}

@@ -306,7 +306,7 @@ const Product5000Book = () => {
                 variant="hero"
                 size="xl"
                 className="w-full mb-3 text-lg py-6"
-                onClick={handleAddToShopifyCart}
+                onClick={handleAddToCart}
                 disabled={cartLoading}
               >
                 {cartLoading ? (
@@ -511,7 +511,7 @@ const Product5000Book = () => {
         productName="5,000 Palabras - Libro Físico"
         price="$24.00"
         ctaText="Comprar ahora"
-        onBuyClick={handleAddToShopifyCart}
+        onBuyClick={handleAddToCart}
         isLoading={cartLoading}
         showReviews={false}
         isPhysical={true}

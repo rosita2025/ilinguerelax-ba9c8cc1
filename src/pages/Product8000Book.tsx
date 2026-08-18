@@ -676,7 +676,7 @@ const Product8000Book = () => {
       />
 
       {/* Sticky Buy Bar */}
-      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="english_8000" title="8,000 Essential Words - Physical Book" />
+      
       <StickyBuyBar
         price="$34.99"
         originalPrice="$49.99"

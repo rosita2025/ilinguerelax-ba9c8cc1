@@ -5,7 +5,7 @@ import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Truck, ShieldCheck, Globe, Gift } from "lucide-react";
 
-export type PhysicalBookKey = "english_5000" | "english_8000" | "spanish_5000";
+export type PhysicalBookKey = "english_5000" | "english_8000" | "spanish_5000" | "spanish_3000_verbs" | "spanish_grammar_patterns";
 
 interface PhysicalBookCheckoutProps {
   open: boolean;
@@ -109,7 +109,7 @@ export function PhysicalBookCheckout({ open, onOpenChange, book, title }: Physic
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Libro físico</span>
-                  <span className="font-medium">{book === "english_8000" ? "$34.99" : book === "spanish_5000" ? "$34.99" : "$24.00"}</span>
+                  <span className="font-medium">{book === "english_8000" ? "$34.99" : book === "spanish_5000" ? "$34.99" : book === "spanish_3000_verbs" ? "$17.00" : book === "spanish_grammar_patterns" ? "$45.00" : "$24.00"}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Digital (PDF)</span>
@@ -121,7 +121,7 @@ export function PhysicalBookCheckout({ open, onOpenChange, book, title }: Physic
                 </div>
                 <div className="pt-2 border-t flex justify-between font-bold text-base">
                   <span>Total</span>
-                  <span>{book === "english_8000" ? "$42.99" : book === "spanish_5000" ? "$42.99" : "$32.00"}</span>
+                  <span>{book === "english_8000" ? "$42.99" : book === "spanish_5000" ? "$42.99" : book === "spanish_3000_verbs" ? "$25.00" : book === "spanish_grammar_patterns" ? "$53.00" : "$32.00"}</span>
                 </div>
               </div>
               <p className="text-[10px] text-muted-foreground italic mt-2">

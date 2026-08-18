@@ -13,13 +13,15 @@ const BOOKS = {
   english_5000: { priceId: "book_english_5000_onetime", name: "Inglés Relax 5,000 Palabras — Libro Físico" },
   english_8000: { priceId: "book_english_8000_onetime", name: "Inglés Relax 8,000 Palabras — Libro Físico" },
   spanish_5000: { priceId: "book_spanish_5000_onetime", name: "Spanish Relax 5,000 Words — Physical Book" },
+  spanish_3000_verbs: { priceId: "book_spanish_3000_verbs_onetime", name: "Spanish Relax 3,000 Verbs — Physical Book" },
+  spanish_grammar_patterns: { priceId: "book_spanish_grammar_patterns_onetime", name: "Spanish Relax Grammar Patterns — Physical Book" },
 } as const;
 
 // Envíos internacionales habilitados
 const SHIPPING_COUNTRIES = ["US", "CA", "GB", "AU", "NZ", "MX", "AR", "CL", "CO", "PE", "ES"] as const;
 
 const BodySchema = z.object({
-  book: z.enum(["english_5000", "english_8000", "spanish_5000"]),
+  book: z.enum(["english_5000", "english_8000", "spanish_5000", "spanish_3000_verbs", "spanish_grammar_patterns"]),
   quantity: z.number().int().min(1).max(10).default(1),
   email: z.string().email().max(255).optional(),
   environment: z.enum(["sandbox", "live"]),
@@ -103,7 +105,7 @@ Deno.serve(async (req) => {
         book, 
         product_name: config.name,
         digital_bundle: "true",
-        digital_sku: book === "english_5000" ? "5000" : book === "english_8000" ? "8000" : "spanish-5000-digital"
+        digital_sku: book === "english_5000" ? "5000" : book === "english_8000" ? "8000" : book === "spanish_3000_verbs" ? "spanish-3000-verbs" : book === "spanish_grammar_patterns" ? "spanish-grammar-patterns" : "spanish-5000-digital"
       },
     });
 

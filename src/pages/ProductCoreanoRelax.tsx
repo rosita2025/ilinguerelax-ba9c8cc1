@@ -121,7 +121,7 @@ const ProductCoreanoRelax = () => {
       regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
       pricePen: pricePen ?? undefined,
       image: "/images/product-coreano-100-mapas.webp",
-      description: "1,000 palabras esenciales + 100 mapas mentales para aprender coreano (Hangul, pronunciación y español)",
+      description: "1,000 palabras esenciales para aprender coreano (Hangul, pronunciación y español)",
       quantity: 1,
     });
     sonnerToast.success("Producto agregado al carrito");
@@ -156,8 +156,8 @@ const ProductCoreanoRelax = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title={pricing.name ?? "1,000 Palabras Esenciales + 100 Mapas Mentales para Aprender Coreano · iLingue Relax"}
-        description={pricing.description ?? "Domina el vocabulario coreano con 1,000 palabras esenciales, 100 mapas mentales y pronunciación adaptada para hispanohablantes. PDF descargable."}
+        title={pricing.name ?? "1,000 Palabras Esenciales para Aprender Coreano · iLingue Relax"}
+        description={pricing.description ?? "Domina el vocabulario coreano con 1,000 palabras esenciales, Hangul y pronunciación adaptada para hispanohablantes. PDF descargable."}
         canonicalUrl="https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1"
         image={pricing.coverImageUrl ?? `https://ilinguerelax.com${coverAsset.url}`}
         type="product"
@@ -281,7 +281,7 @@ const ProductCoreanoRelax = () => {
         originalPrice={"$39"}
         currencyCode={currencyLabel}
         flag={displayFlag}
-        productName="Coreano · 1,000 Palabras + 100 Mapas"
+        productName="Coreano · 1,000 Palabras Esenciales"
         ctaText={"Comprar ahora"}
         buyUrl={TIENDA_CHECKOUT_PATH}
         onBuyClick={handleBuy}

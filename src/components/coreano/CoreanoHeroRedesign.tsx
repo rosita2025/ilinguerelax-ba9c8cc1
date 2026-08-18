@@ -93,7 +93,7 @@ export const CoreanoHeroRedesign = ({ price, onBuy }: CoreanoHeroRedesignProps) 
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
                 {[
                   "1,000 palabras esenciales",
-                  "Incluye +100 Mapas Mentales",
+                  "Coreano desde Cero",
                   "Hangul + español",
                   "Pronunciación adaptada",
                   "Organizado por categorías",

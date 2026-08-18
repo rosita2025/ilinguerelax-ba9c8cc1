@@ -154,9 +154,7 @@ const VistaPreviaCoreano = () => {
                       onContextMenu={(e) => e.preventDefault()}
                     />
                     <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-0">
-                      <span className="text-2xl md:text-4xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap select-none">
-                        ilinguerelax.com
-                      </span>
+                      {/* Watermark removed as requested */}
                     </div>
                   </div>
                   <figcaption className="p-3 text-sm font-semibold text-foreground text-center">

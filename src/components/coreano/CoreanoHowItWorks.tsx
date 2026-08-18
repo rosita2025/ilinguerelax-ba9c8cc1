@@ -62,7 +62,7 @@ export const CoreanoHowItWorks = () => {
             >
               {/* PDF Header Mockup */}
               <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100 dark:border-slate-700">
-                <span className="text-xs font-black text-primary tracking-widest uppercase">Página 14 · Saludos</span>
+                <span className="text-xs font-black text-primary tracking-widest uppercase">Página 14 · Listado de Palabras</span>
                 <div className="flex gap-1">
                   {[1, 2, 3].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full bg-slate-200" />)}
                 </div>

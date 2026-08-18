@@ -207,7 +207,6 @@ const ProductCoreanoRelax = () => {
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 Listado de palabras esenciales con Hangul, pronunciación en español y vocabulario práctico.
               </p>
-
             </div>
 
             <Carousel

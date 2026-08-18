@@ -483,15 +483,18 @@ const Product5000Book = () => {
       />
 
       <Footer />
-      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="english_5000" title="5,000 Palabras — Libro Físico · Pago seguro" />
+      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="english_5000" title="5,000 Essential Words - Physical Book" />
       <StickyBuyBar
-        productName="5,000 Palabras - Libro Físico"
+        productName="5,000 Words - Physical Book"
         price="$24.00"
+        originalPrice="$31.99"
         ctaText="Comprar ahora"
         onBuyClick={handleAddToCart}
         isLoading={cartLoading}
         showReviews={false}
         isPhysical={true}
+        goesToInternalCheckout={true}
+        sku="ILINGUE-5000-BOOK"
       />
       <SalesNotification />
       <ScrollToTop />

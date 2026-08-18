@@ -673,9 +673,9 @@ const ProductSpanish5000Digital = () => {
 
       <StickyBuyBar
         sku={ADMIN_SKU_SP5K}
-        productName="Spanish Mastery System — DIGITAL PDF"
+        productName={pricing.name ?? "Spanish Mastery System — DIGITAL PDF"}
         price={tier.priceLabel}
-        originalPrice={tier.originalLabel}
+        originalPrice={tier.isOnSale ? (tier.originalLabel || undefined) : undefined}
         currencyCode={tier.currencyCode}
         flag={flag}
         usdValue={currentPrice}
@@ -685,10 +685,9 @@ const ProductSpanish5000Digital = () => {
         ctaText={useTiendaOnly ? `GET IT NOW — ${tier.priceLabel}` : `BUY ON HOTMART — ${tier.priceLabel}`}
         testimonials={shortTestimonials}
         lang="en"
-        rating={4.8}
-        reviewCount={500}
+        rating={pricing.rating ?? 4.8}
+        reviewCount={pricing.reviewCount ?? 500}
         calmMode
-
       />
       <ScrollToTop />
       <WhatsAppButton />

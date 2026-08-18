@@ -582,21 +582,15 @@ const Product5000 = () => {
                   size="xl"
                   className="w-full mb-4 text-lg py-6 shadow-2xl relative overflow-hidden group"
                 >
-                  <a
-                    href={buyUrl}
-                    target={useTiendaOnly ? "_self" : "_blank"}
-                    rel={useTiendaOnly ? undefined : "noopener noreferrer"}
-                    onClick={handleBuyClick}
+                  <button
+                    className="flex items-center justify-center w-full h-full"
+                    onClick={handleBuy}
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                     <ShoppingCart className="w-6 h-6 mr-2" />
-                    {isPeru
-                      ? "COMPRAR EN TIENDA (PERÚ)"
-                      : useHotmartLatam
-                      ? "COMPRAR EN HOTMART"
-                      : "COMPRAR AHORA"}
+                    COMPRAR AHORA
                     <ArrowRight className="w-6 h-6 ml-2" />
-                  </a>
+                  </button>
                 </Button>
               </motion.div>
 

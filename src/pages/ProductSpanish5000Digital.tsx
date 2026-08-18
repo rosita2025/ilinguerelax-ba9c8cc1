@@ -82,7 +82,7 @@ const countryToFlag = (cc: string): string => {
 };
 
 const ProductSpanish5000Digital = () => {
-  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
+  
   const shortTestimonials = [
     "\"Best Spanish kit I've bought\" — Sarah, USA",
     "\"The pronunciation guide is a game changer\" — Sarah, USA",

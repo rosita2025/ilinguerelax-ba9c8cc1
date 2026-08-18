@@ -114,6 +114,7 @@ export const CoreanoHeroRedesign = ({ price, onBuy }: CoreanoHeroRedesignProps) 
                 <div className="flex items-center gap-2">
                   <span className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white">{price}</span>
                   <span className="text-lg text-slate-400 line-through font-bold">$39</span>
+
                 </div>
                 <p className="text-emerald-600 font-bold text-sm">¡Ahorra 70% hoy!</p>
               </div>

@@ -109,9 +109,20 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
     pricePen: 28.90,
     regionPrices: { latam: 9, global: 12, tienda: 5 },
     image: "/images/product-coreano-100-mapas.webp",
-    description: "1,000 palabras esenciales + 100 mapas mentales para aprender coreano (Hangul, pronunciación y español)",
+    description: "Domina el vocabulario coreano con 1,000 palabras esenciales, Hangul y pronunciación fácil.",
     productPath: "/products/100-mapas-mentales-para-aprender-coreano-hangul-c1",
     adminSku: "100-mapas-mentales-para-aprender-coreano-hangul-c1",
+    upsells: [
+      {
+        id: "upsell-coreano-100-mapas",
+        name: "+100 Mapas Mentales de Coreano (PDF)",
+        price: 5,
+        originalPrice: 15,
+        image: "/images/product-coreano-100-mapas.webp",
+        description: "Visualiza y memoriza más rápido con mapas temáticos",
+        badge: "Recomendado",
+      },
+    ],
   },
   "500-preguntas": {
     id: "500-preguntas-ingles",

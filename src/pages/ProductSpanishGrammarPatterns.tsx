@@ -66,10 +66,10 @@ const ProductSpanishGrammarPatterns = () => {
   const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
   const [shopifyProduct, setShopifyProduct] = useState<any>(null);
   const { addItem, isLoading: cartLoading } = useCartStore();
-  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleAddToCart = async () => {
-    setPhysicalCheckoutOpen(true);
+    navigate("/checkouts/spanish_grammar");
   };
 
   const AMAZON_URL_GRAMMAR = "https://www.amazon.com/s?k=Spanish+Relax+Grammar+Patterns";

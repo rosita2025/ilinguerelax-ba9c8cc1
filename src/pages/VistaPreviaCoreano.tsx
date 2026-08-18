@@ -30,9 +30,9 @@ const VistaPreviaCoreano = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Vista Previa · Coreano Sin Complicaciones · +100 Mapas Mentales | iLingue Relax®"
-        description="Mira páginas reales del ebook Coreano Sin Complicaciones con +100 mapas mentales visuales. Hangul, pronunciación en español, vocabulario y frases de k-dramas y K-pop."
-        canonicalUrl="https://ilinguerelax.com/vista-previa/coreano-100-mapas-mentales"
+        title="Vista Previa · Coreano Sin Complicaciones · 1,000 Palabras Esenciales | iLingue Relax®"
+        description="Mira páginas reales del ebook Coreano Sin Complicaciones con 1,000 palabras esenciales. Hangul, pronunciación en español, vocabulario y frases por categorías."
+        canonicalUrl="https://ilinguerelax.com/vista-previa/coreano-1000-palabras"
         image={`https://ilinguerelax.com${coverAsset.url}`}
       />
       <Navbar />
@@ -45,10 +45,10 @@ const VistaPreviaCoreano = () => {
                 <Eye className="w-4 h-4" /> Vista previa exclusiva · 🇰🇷
               </div>
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3 text-balance leading-tight">
-                Coreano Sin Complicaciones · <span className="text-gradient">+100 Mapas Mentales</span>
+                Coreano Sin Complicaciones · <span className="text-gradient">1,000 Palabras Esenciales</span>
               </h1>
               <p className="text-muted-foreground max-w-2xl mx-auto text-pretty">
-                Páginas reales del PDF con Hangul, pronunciación para hispanohablantes y vocabulario práctico. Marca de agua incluida.
+                Páginas reales del PDF con Hangul, pronunciación para hispanohablantes y vocabulario práctico.
               </p>
             </div>
 
@@ -73,7 +73,7 @@ const VistaPreviaCoreano = () => {
                 <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
                 <img
                   src={coverAsset.url}
-                  alt="Portada Coreano Sin Complicaciones +100 Mapas Mentales"
+                  alt="Portada Coreano Sin Complicaciones 1,000 Palabras Esenciales"
                   className="relative w-full h-auto rounded-2xl shadow-hero"
                   onContextMenu={(e) => e.preventDefault()}
                 />
@@ -152,7 +152,7 @@ const VistaPreviaCoreano = () => {
                       className="absolute inset-0 w-full h-full object-contain"
                       onContextMenu={(e) => e.preventDefault()}
                     />
-                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-0">
                       <span className="text-2xl md:text-4xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap select-none">
                         ilinguerelax.com
                       </span>
@@ -230,7 +230,7 @@ const VistaPreviaCoreano = () => {
             </div>
 
             <p className="text-center text-xs text-muted-foreground mt-6">
-              Vistas previas con marca de agua. El PDF completo se entrega tras la compra.
+              Vistas previas optimizadas. El PDF completo se entrega tras la compra.
             </p>
           </div>
         </div>

@@ -31,7 +31,7 @@ export const CoreanoHeroRedesign = ({ price, onBuy }: CoreanoHeroRedesignProps) 
               {/* Main Cover */}
               <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 transform lg:-rotate-2 hover:rotate-0 transition-transform duration-500">
                 <img
-                  src={coverAsset.url}
+                  src="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/1-000-palabras-esenciales-para-aprender-coreano/1784178628839-09lsq.webp"
                   alt="Aprende Coreano con 1,000 Palabras Esenciales"
                   className="w-full h-auto"
                 />

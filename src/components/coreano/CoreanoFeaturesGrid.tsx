@@ -35,8 +35,8 @@ export const CoreanoFeaturesGrid = () => {
     },
     {
       icon: <Gift className="w-6 h-6" />,
-      title: "BONOS",
-      description: "100 expresiones + ejercicios de escritura en Hangul.",
+      title: "EXTRAS",
+      description: "Ejercicios de escritura en Hangul y frases clave de k-dramas.",
       color: "bg-pink-500"
     }
   ];

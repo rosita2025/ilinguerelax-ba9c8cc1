@@ -28,9 +28,11 @@ import { usePurchaseTracking } from "@/hooks/usePurchaseTracking";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";
 import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
-import { mapDlocalStatus } from "@/lib/localErrorMap";
+import { mapDlocalStatus } from "@/lib/dlocalErrorMap";
 import { saveDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
 import { extractEdgeErrorMessage, looksTechnical } from "@/lib/edgeError";
+import { getPaymentPayload } from "@/lib/paymentGatewayRouter";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { getPaymentPayload } from "@/lib/paymentGatewayRouter";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 

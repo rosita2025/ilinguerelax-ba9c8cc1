@@ -37,6 +37,10 @@ interface Product {
   price_usd_latam: number | null;
   price_usd_tienda: number | null;
   price_pen: number | null;
+  compare_at_price_usd: number | null;
+  compare_at_price_usd_latam: number | null;
+  compare_at_price_usd_tienda: number | null;
+  compare_at_price_pen: number | null;
   drive_url: string | null;
   access_key: string | null;
   cover_image_url: string | null;
@@ -58,6 +62,7 @@ interface Product {
   sku_aliases: string[];
   local_prices: Record<string, number>;
   local_usd_prices: Record<string, number>;
+  local_compare_at_prices: Record<string, number>;
   is_physical: boolean;
   gallery_metadata: Record<string, any>;
   rating?: number | null;
@@ -81,7 +86,9 @@ const LANGS = [
 
 const EMPTY: Product = {
   sku: "", name: "", description: "", learner_language: "es", target_language: "en",
-  price_usd: 0, price_usd_latam: null, price_usd_tienda: null, price_pen: null, drive_url: "", access_key: "", cover_image_url: "",
+  price_usd: 0, price_usd_latam: null, price_usd_tienda: null, price_pen: null,
+  compare_at_price_usd: null, compare_at_price_usd_latam: null, compare_at_price_usd_tienda: null, compare_at_price_pen: null,
+  drive_url: "", access_key: "", cover_image_url: "",
   gallery_images: [],
   is_upsell: false, active: false, sort_order: 0,
   bonus_name: "", bonus_drive_url: "", bonus_access_key: "",
@@ -96,6 +103,7 @@ const EMPTY: Product = {
   sku_aliases: [],
   local_prices: {},
   local_usd_prices: {},
+  local_compare_at_prices: {},
   is_physical: false,
   gallery_metadata: {},
   rating: 4.8,
@@ -406,6 +414,7 @@ const AdminProductEdit = () => {
             // Normalize and round local and regional USD prices before saving
             const normalizedLocalPrices: Record<string, number> = {};
             const normalizedLocalUsdPrices: Record<string, number> = {};
+            const normalizedLocalCompareAtPrices: Record<string, number> = {};
             
             if (product.local_prices) {
               Object.entries(product.local_prices).forEach(([code, amount]) => {
@@ -427,10 +436,22 @@ const AdminProductEdit = () => {
               });
             }
 
+            if (product.local_compare_at_prices) {
+              Object.entries(product.local_compare_at_prices).forEach(([code, amount]) => {
+                const numAmount = Number(amount);
+                if (!isNaN(numAmount) && numAmount > 0) {
+                  const config = currencyConfig[code as Currency];
+                  const decimals = config?.decimals ?? 2;
+                  normalizedLocalCompareAtPrices[code] = Math.round(numAmount * Math.pow(10, decimals)) / Math.pow(10, decimals);
+                }
+              });
+            }
+
             return {
               ...cleanProduct,
               local_prices: normalizedLocalPrices,
               local_usd_prices: normalizedLocalUsdPrices,
+              local_compare_at_prices: normalizedLocalCompareAtPrices,
               gallery_images: Array.isArray(product.gallery_images) ? product.gallery_images : [],
               gallery_metadata: product.gallery_metadata || {},
               upsells,
@@ -959,7 +980,7 @@ const AdminProductEdit = () => {
           <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between border-b pb-2">
               <h2 className="font-semibold text-lg flex items-center gap-2">💰 Configuración de Precios Globales</h2>
-              <div className="flex items-center gap-6">
+              <div className="flex flex-wrap items-center gap-6">
                 <div className="text-right">
                   <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Precio Normal (USD)</Label>
                   <div className="flex items-center gap-2">
@@ -967,10 +988,10 @@ const AdminProductEdit = () => {
                     <Input
                       type="number" step="0.01"
                       className="w-24 h-8 text-sm font-bold border-dashed opacity-70"
-                      value={product.price_usd_tienda || ""}
+                      value={product.compare_at_price_usd || ""}
                       onChange={(e) => {
                         const val = e.target.value === "" ? null : Number(e.target.value);
-                        update("price_usd_tienda", val);
+                        update("compare_at_price_usd", val);
                       }}
                       placeholder="97.00"
                     />
@@ -990,6 +1011,34 @@ const AdminProductEdit = () => {
                         update("price_usd", val);
                       }}
                       placeholder="15.00"
+                    />
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">PEN (Perú)</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-muted-foreground/60">S/</span>
+                    <Input
+                      type="number" step="0.1"
+                      className="w-20 h-8 text-xs"
+                      value={product.price_pen ?? ""}
+                      onChange={(e) => update("price_pen", e.target.value === "" ? null : Number(e.target.value))}
+                      placeholder="59.90"
+                    />
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">PEN Antes (Tachado)</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-muted-foreground/40">S/</span>
+                    <Input
+                      type="number" step="0.1"
+                      className="w-20 h-8 text-xs border-dashed opacity-60"
+                      value={product.compare_at_price_pen ?? ""}
+                      onChange={(e) => update("compare_at_price_pen", e.target.value === "" ? null : Number(e.target.value))}
+                      placeholder="149.00"
                     />
                   </div>
                 </div>
@@ -1107,56 +1156,88 @@ const AdminProductEdit = () => {
                           </button>
                         )}
                       </div>
-                      <div className="relative">
-                        <Input
-                          type="text" 
-                          inputMode="decimal"
-                          className={cn(
-                            "h-9 text-xs pr-8",
-                            product.local_prices?.[code] ? "border-primary bg-primary/5 font-semibold" : "border-dashed opacity-70"
+                      <div className="space-y-1.5">
+                        <div className="relative">
+                          <Label className="text-[8px] absolute -top-2 left-1 bg-background px-0.5 text-primary font-bold z-10">AHORA</Label>
+                          <Input
+                            type="text" 
+                            inputMode="decimal"
+                            className={cn(
+                              "h-9 text-xs pr-8",
+                              product.local_prices?.[code] ? "border-primary bg-primary/5 font-semibold" : "border-dashed opacity-70"
+                            )}
+                            value={product.local_prices?.[code] ?? ""}
+                            onChange={(e) => {
+                              const rawValue = e.target.value.replace(/,/g, ".");
+                              const next = { ...(product.local_prices || {}) };
+                              
+                              if (rawValue === "" || isNaN(Number(rawValue)) || Number(rawValue) < 0) {
+                                delete next[code];
+                              } else {
+                                const amount = Number(rawValue);
+                                const config = currencyConfig[code as Currency];
+                                const decimals = config?.decimals ?? 2;
+                                next[code] = Math.round(amount * Math.pow(10, decimals)) / Math.pow(10, decimals);
+                              }
+                              update("local_prices", next);
+                            }}
+                            placeholder={regionPrice ? `ej: ${regionPrice}` : "auto"}
+                          />
+                          {product.local_prices?.[code] && (
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="text-[10px]">Precio fijo manual (Muestra: {formatCurrencyAmount(product.local_prices[code], code as Currency)})</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
                           )}
-                          value={product.local_prices?.[code] ?? ""}
-                          onChange={(e) => {
-                            const rawValue = e.target.value.replace(/,/g, ".");
-                            const next = { ...(product.local_prices || {}) };
-                            
-                            if (rawValue === "" || isNaN(Number(rawValue)) || Number(rawValue) < 0) {
-                              delete next[code];
-                            } else {
-                              const amount = Number(rawValue);
-                              const config = currencyConfig[code as Currency];
-                              const decimals = config?.decimals ?? 2;
-                              next[code] = Math.round(amount * Math.pow(10, decimals)) / Math.pow(10, decimals);
-                            }
-                            update("local_prices", next);
-                          }}
-                          placeholder={regionPrice ? `ej: ${regionPrice}` : "auto"}
-                        />
-                        {product.local_prices?.[code] && (
-                          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                            <span className="text-[9px] text-muted-foreground font-mono">
-                              {formatCurrencyAmount(product.local_prices[code], code as Currency)}
-                            </span>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p className="text-[10px]">Precio fijo manual (Muestra: {formatCurrencyAmount(product.local_prices[code], code as Currency)})</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </div>
-                        )}
+                        </div>
+
+                        <div className="relative">
+                          <Label className="text-[8px] absolute -top-2 left-1 bg-background px-0.5 text-muted-foreground font-bold z-10 uppercase">Antes (Tachado)</Label>
+                          <Input
+                            type="text" 
+                            inputMode="decimal"
+                            className={cn(
+                              "h-7 text-[10px] pr-2 border-dashed",
+                              product.local_compare_at_prices?.[code] ? "border-muted-foreground/50 bg-muted/20 line-through" : "opacity-50"
+                            )}
+                            value={product.local_compare_at_prices?.[code] ?? ""}
+                            onChange={(e) => {
+                              const rawValue = e.target.value.replace(/,/g, ".");
+                              const next = { ...(product.local_compare_at_prices || {}) };
+                              
+                              if (rawValue === "" || isNaN(Number(rawValue)) || Number(rawValue) < 0) {
+                                delete next[code];
+                              } else {
+                                const amount = Number(rawValue);
+                                const config = currencyConfig[code as Currency];
+                                const decimals = config?.decimals ?? 2;
+                                next[code] = Math.round(amount * Math.pow(10, decimals)) / Math.pow(10, decimals);
+                              }
+                              update("local_compare_at_prices", next);
+                            }}
+                            placeholder="---"
+                          />
+                        </div>
                       </div>
+
                       <div className="flex flex-col gap-0.5 mt-1 px-0.5">
                         <div className="flex items-center justify-between">
-                          <p className="text-[9px] text-muted-foreground font-medium">
-                            {product.local_prices?.[code] 
-                              ? "✓ Manual" 
-                              : "Auto"}
-                          </p>
+                          <div className="flex items-center gap-1">
+                            <p className="text-[9px] text-muted-foreground font-medium">
+                              {product.local_prices?.[code] ? "✓ Manual" : "Auto"}
+                            </p>
+                            {product.local_compare_at_prices?.[code] && (
+                              <span className="text-[8px] bg-amber-100 text-amber-700 px-1 rounded font-bold">OFERTA</span>
+                            )}
+                          </div>
                           <p className="text-[9px] text-muted-foreground/70 italic">
                             Ref: ${currentUsdValue.toFixed(2)} USD
                           </p>

@@ -5,8 +5,18 @@
     <link>https://ilinguerelax.com/products</link>
     <description>Libros digitales y físicos de iLingue Relax: vocabulario, pronunciación y fonética para aprender idiomas sin estrés.</description>
     <language>es</language>
-    <lastBuildDate>Tue, 18 Aug 2026 19:54:49 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 18 Aug 2026 20:10:53 GMT</lastBuildDate>
     <atom:link href="https://ilinguerelax.com/rss-productos.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés</title>
+      <link>https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</link>
+      <guid isPermaLink="true">https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</guid>
+      <pubDate>Tue, 18 Aug 2026 20:10:53 GMT</pubDate>
+      <description>Método visual para dominar la pronunciación del inglés desde cero.</description>
+      <enclosure url="https://ilinguerelax.com/images/product-patrones-especiales.webp" type="image/jpeg" length="0" />
+      <media:content url="https://ilinguerelax.com/images/product-patrones-especiales.webp" medium="image" />
+      <media:thumbnail url="https://ilinguerelax.com/images/product-patrones-especiales.webp" />
+    </item>
     <item>
       <title>Spanish Mastery System - Digital Only</title>
       <link>https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-digital</link>
@@ -46,16 +56,6 @@
       <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp" type="image/jpeg" length="0" />
       <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp" medium="image" />
       <media:thumbnail url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp" />
-    </item>
-    <item>
-      <title>Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés</title>
-      <link>https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</link>
-      <guid isPermaLink="true">https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</guid>
-      <pubDate>Sun, 16 Aug 2026 22:58:01 GMT</pubDate>
-      <description>Método visual para dominar la pronunciación del inglés desde cero.</description>
-      <enclosure url="https://ilinguerelax.com/images/product-patrones-especiales.webp" type="image/jpeg" length="0" />
-      <media:content url="https://ilinguerelax.com/images/product-patrones-especiales.webp" medium="image" />
-      <media:thumbnail url="https://ilinguerelax.com/images/product-patrones-especiales.webp" />
     </item>
     <item>
       <title>1,000 palabras ingles más utilizadas en Ingeniería Civil</title>

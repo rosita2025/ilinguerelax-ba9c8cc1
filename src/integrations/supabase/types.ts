@@ -858,6 +858,10 @@ export type Database = {
           bonus_name: string | null
           bonus_titles: Json | null
           bonuses: Json
+          compare_at_price_pen: number | null
+          compare_at_price_usd: number | null
+          compare_at_price_usd_latam: number | null
+          compare_at_price_usd_tienda: number | null
           cover_image_url: string | null
           created_at: string
           description: string | null
@@ -873,6 +877,7 @@ export type Database = {
           is_physical: boolean
           is_upsell: boolean
           learner_language: string
+          local_compare_at_prices: Json | null
           local_prices: Json
           local_usd_prices: Json | null
           mp_preference_template: Json | null
@@ -901,6 +906,10 @@ export type Database = {
           bonus_name?: string | null
           bonus_titles?: Json | null
           bonuses?: Json
+          compare_at_price_pen?: number | null
+          compare_at_price_usd?: number | null
+          compare_at_price_usd_latam?: number | null
+          compare_at_price_usd_tienda?: number | null
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
@@ -916,6 +925,7 @@ export type Database = {
           is_physical?: boolean
           is_upsell?: boolean
           learner_language?: string
+          local_compare_at_prices?: Json | null
           local_prices?: Json
           local_usd_prices?: Json | null
           mp_preference_template?: Json | null
@@ -944,6 +954,10 @@ export type Database = {
           bonus_name?: string | null
           bonus_titles?: Json | null
           bonuses?: Json
+          compare_at_price_pen?: number | null
+          compare_at_price_usd?: number | null
+          compare_at_price_usd_latam?: number | null
+          compare_at_price_usd_tienda?: number | null
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
@@ -959,6 +973,7 @@ export type Database = {
           is_physical?: boolean
           is_upsell?: boolean
           learner_language?: string
+          local_compare_at_prices?: Json | null
           local_prices?: Json
           local_usd_prices?: Json | null
           mp_preference_template?: Json | null

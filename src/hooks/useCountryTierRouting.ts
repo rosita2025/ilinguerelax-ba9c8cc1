@@ -25,17 +25,22 @@ export interface CountryTierRouting {
   useTiendaOnly: boolean;
   /** Precio USD a mostrar/cobrar según el tier. */
   priceUsd: number;
+  compareAtPriceUsd: number | null;
   priceGlobalUsd: number;
   priceLatamUsd: number;
   priceTiendaUsd: number;
   pricePen: number | null;
+  compareAtPricePen: number | null;
   hotmartUrl: string | null;
   /** Label listo para renderizar en hero y sticky bar. */
   priceLabel: string;
   currencyCode: string;
-  originalLabel: string;
+  originalLabel: string | null;
+  isOnSale: boolean;
+  discountPercentage: number;
   /** Regional USD overrides for specific currencies. */
   localUsdPrices: Record<string, number> | null;
+  localCompareAtPrices: Record<string, number> | null;
 }
 
 interface Options {
@@ -75,25 +80,49 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
       ? priceLatamUsd
       : priceGlobalUsd;
 
-  const mult = opts.originalMultiplier ?? 2.5;
+  const compareAtPriceUsd = isTiendaUsd
+    ? pricing.compareAtPriceTiendaUsd
+    : useHotmartLatam
+      ? pricing.compareAtPriceLatamUsd
+      : pricing.compareAtPriceGlobalUsd;
+
   const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
   const isSpanishDigital = adminSku === "5-000-spanish-words-with-english-pronunciation-digital";
+
+  // Precios finales (ahora)
+  const finalPrice = isPeru && pricePen
+    ? pricePen
+    : overrides?.[displayCurrency as Currency] ?? priceUsd;
+
+  // Precios tachados (antes)
+  const manualCompareAt = pricing.localCompareAtPrices?.[displayCurrency];
+  let finalCompareAt: number | null = null;
+
+  if (isPeru && pricing.compareAtPricePen) {
+    finalCompareAt = pricing.compareAtPricePen;
+  } else if (manualCompareAt) {
+    finalCompareAt = manualCompareAt;
+  } else if (compareAtPriceUsd && compareAtPriceUsd > 0) {
+    // Si hay oferta en USD, convertirla a local
+    const rate = exchangeRates[displayCurrency as Currency] ?? 1;
+    finalCompareAt = compareAtPriceUsd * rate;
+  } else if (isSpanishDigital) {
+    finalCompareAt = 97; // Legacy fallback for this SKU
+  }
+
+  // Si el precio tachado es menor o igual al actual, lo ignoramos
+  const isOnSale = !!(finalCompareAt && finalCompareAt > finalPrice);
+  const discountPercentage = isOnSale 
+    ? Math.round(((finalCompareAt! - finalPrice) / finalCompareAt!) * 100) 
+    : 0;
 
   const priceLabel = isPeru && pricePen
     ? formatCurrencyAmount(pricePen, "PEN")
     : formatPrice(priceUsd, displayCurrency, overrides ?? undefined, pricing.localUsdPrices);
 
-  const originalPriceBase = isSpanishDigital ? 97 : (pricing.priceTiendaUsd || priceUsd * mult);
-  const originalLabel = isPeru && pricePen
-    ? formatCurrencyAmount(pricePen * mult, "PEN")
-    : formatPrice(
-        (overrides?.[displayCurrency] ?? 0) > 0
-          ? (overrides![displayCurrency] as number) * mult
-          : originalPriceBase,
-        displayCurrency,
-        null,
-        pricing.localUsdPrices
-      );
+  const originalLabel = isOnSale
+    ? formatCurrencyAmount(finalCompareAt!, displayCurrency as Currency)
+    : null;
 
   const hasFallback = (opts.fallbackPriceGlobalUsd ?? 0) > 0;
   const loaded = (pricing.loaded || hasFallback) && (isPeru ? (pricePen ?? 0) > 0 : priceUsd > 0);
@@ -106,14 +135,19 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
     useHotmartLatam,
     useTiendaOnly,
     priceUsd,
+    compareAtPriceUsd,
     priceGlobalUsd,
     priceLatamUsd,
     priceTiendaUsd,
     pricePen,
+    compareAtPricePen: pricing.compareAtPricePen,
     hotmartUrl: pricing.hotmartUrl || opts.fallbackHotmartUrl || null,
     priceLabel,
     currencyCode: displayCurrency,
     originalLabel,
+    isOnSale,
+    discountPercentage,
     localUsdPrices: pricing.localUsdPrices,
+    localCompareAtPrices: pricing.localCompareAtPrices,
   };
 }

@@ -93,30 +93,12 @@ const MEDIA_SLIDES = [
 const Product5000Book = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
-  const [shopifyProduct, setShopifyProduct] = useState<any>(null);
-  const { addItem, isLoading: cartLoading } = useCartStore();
+  const { isLoading: cartLoading } = useCartStore();
+  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
 
-  // Fetch Shopify product variant for the physical book
-  useEffect(() => {
-    const loadProduct = async () => {
-      try {
-        const products = await fetchShopifyProducts(10, "LIBRO FISICO 5,000");
-        const book = products.find(p => 
-          p.node.title.toLowerCase().includes("libro fisico") && 
-          (p.node.title.toLowerCase().includes("5000") || p.node.title.toLowerCase().includes("5,000"))
-        );
-        if (book) {
-          setShopifyProduct(book);
-          const variant = book.node.variants.edges[0]?.node;
-          if (variant) setShopifyVariantId(variant.id);
-        }
-      } catch (err) {
-        console.error("Failed to load Shopify product:", err);
-      }
-    };
-    loadProduct();
-  }, []);
+  const handleAddToCart = async () => {
+    setPhysicalCheckoutOpen(true);
+  };
 
   const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
   const handleAddToCart = async () => {

@@ -87,29 +87,12 @@ const ProductSpanish3000VerbsBook = () => {
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
-  const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
-  const [shopifyProduct, setShopifyProduct] = useState<any>(null);
-  const { addItem, isLoading: cartLoading } = useCartStore();
+  const { isLoading: cartLoading } = useCartStore();
+  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
 
-  useEffect(() => {
-    const loadProduct = async () => {
-      try {
-        const products = await fetchShopifyProducts(20, "Spanish Relax 3,000 Verbs Pre-Order");
-        const book = products.find((p: any) => {
-          const t = p.node.title.toLowerCase();
-          return t.includes("spanish") && t.includes("3,000") && t.includes("verb");
-        }) || products.find((p: any) => p.node.handle === "spanish-relax-3000-verbs-mastery-pre-order");
-        if (book) {
-          setShopifyProduct(book);
-          const variant = book.node.variants.edges[0]?.node;
-          if (variant) setShopifyVariantId(variant.id);
-        }
-      } catch (err) {
-        console.error("Failed to load Shopify pre-order product:", err);
-      }
-    };
-    loadProduct();
-  }, []);
+  const handleAddToCart = async () => {
+    setPhysicalCheckoutOpen(true);
+  };
 
   const AMAZON_URL_3000 = "https://www.amazon.com/s?k=Spanish+Relax+3000+Verbs";
   const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);

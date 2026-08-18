@@ -318,6 +318,24 @@ const ProductSpanish5000Digital = () => {
                 </div>
               </div>
 
+              {/* Added Trust Icons */}
+              <div className="grid grid-cols-2 gap-4 mt-6">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <Shield className="w-5 h-5 text-emerald-600" />
+                  <div>
+                    <div className="text-[10px] font-black uppercase text-slate-400">Secure</div>
+                    <div className="text-xs font-bold text-slate-700">AES-256 SSL</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <Globe className="w-5 h-5 text-emerald-600" />
+                  <div>
+                    <div className="text-[10px] font-black uppercase text-slate-400">Delivery</div>
+                    <div className="text-xs font-bold text-slate-700">Instant Email</div>
+                  </div>
+                </div>
+              </div>
+
               <StockCounter />
 
             </div>
@@ -462,21 +480,24 @@ const ProductSpanish5000Digital = () => {
 
 
       {/* How it works */}
-      <section className="py-10 md:py-14 bg-muted/30">
-        <div className="container px-4 md:px-6 max-w-4xl">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-4xl font-black">How it works</h2>
+      <section className="py-16 md:py-24 bg-slate-50 border-y border-slate-100">
+        <div className="container px-4 md:px-6 max-w-5xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 leading-tight">Your Path to Fluency</h2>
+            <p className="text-slate-600 mt-4 text-lg">Three simple steps to start speaking Spanish like a native.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: CreditCard, title: "1. Secure checkout", text: "Pay with card via Stripe. Takes less than a minute." },
-              { icon: Download, title: "2. Instant PDF", text: "Download link delivered to your email right after payment." },
-              { icon: Smartphone, title: "3. Learn anywhere", text: "Open the PDF on any device and start learning at your own pace." },
+              { icon: CreditCard, title: "1. Secure Access", text: "Choose your payment method. Encrypted and 100% secure via Stripe." },
+              { icon: Download, title: "2. Instant Delivery", text: "Your complete interactive kit is sent to your email the second you finish." },
+              { icon: Smartphone, title: "3. Interactive Learning", text: "Use our PDF, MP3s, and Flashcards on any device, anywhere." },
             ].map(({ icon: Icon, title, text }) => (
-              <div key={title} className="p-5 rounded-xl bg-card border border-border text-center">
-                <Icon className="w-8 h-8 text-primary mx-auto mb-3" />
-                <h3 className="font-bold mb-1">{title}</h3>
-                <p className="text-sm text-muted-foreground">{text}</p>
+              <div key={title} className="p-8 rounded-3xl bg-white border border-slate-100 shadow-sm text-center group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center mx-auto mb-6 group-hover:bg-emerald-600 transition-colors">
+                  <Icon className="w-8 h-8 text-emerald-600 group-hover:text-white transition-colors" />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-slate-900">{title}</h3>
+                <p className="text-slate-600 leading-relaxed">{text}</p>
               </div>
             ))}
           </div>

@@ -91,6 +91,7 @@ const ProductSpanish3000VerbsBook = () => {
   const { isLoading: cartLoading } = useCartStore();
   const navigate = useNavigate();
 
+
   const handleAddToCart = async () => {
     navigate("/checkouts/spanish_3000_verbs");
   };

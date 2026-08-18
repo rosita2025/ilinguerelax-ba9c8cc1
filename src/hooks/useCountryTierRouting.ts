@@ -87,7 +87,6 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
       : pricing.compareAtPriceGlobalUsd;
 
   const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
-  const isSpanishDigital = adminSku === "5-000-spanish-words-with-english-pronunciation-digital";
 
   // Precios finales (ahora)
   const finalPrice = isPeru && pricePen
@@ -103,11 +102,9 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
   } else if (manualCompareAt) {
     finalCompareAt = manualCompareAt;
   } else if (compareAtPriceUsd && compareAtPriceUsd > 0) {
-    // Si hay oferta en USD, convertirla a local
+    // Si hay oferta en USD, convertirla a local usando la misma tasa que el precio de venta
     const rate = exchangeRates[displayCurrency as Currency] ?? 1;
     finalCompareAt = compareAtPriceUsd * rate;
-  } else if (isSpanishDigital) {
-    finalCompareAt = 97; // Legacy fallback for this SKU
   }
 
   // Si el precio tachado es menor o igual al actual, lo ignoramos

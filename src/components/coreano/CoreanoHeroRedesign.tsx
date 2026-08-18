@@ -32,7 +32,7 @@ export const CoreanoHeroRedesign = ({ price, onBuy }: CoreanoHeroRedesignProps) 
               <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 transform lg:-rotate-2 hover:rotate-0 transition-transform duration-500">
                 <img
                   src={coverAsset.url}
-                  alt="Aprende Coreano con 2,000 Palabras Esenciales"
+                  alt="Aprende Coreano con 1,000 Palabras Esenciales"
                   className="w-full h-auto"
                 />
               </div>

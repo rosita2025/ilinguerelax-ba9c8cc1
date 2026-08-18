@@ -1123,9 +1123,17 @@ const AdminProductEdit = () => {
                   { code: "KES", flag: "🇰🇪", label: "Kenia", region: "Africa" },
                   { code: "MAD", flag: "🇲🇦", label: "Marruecos", region: "Africa" },
                 ].map(({ code, flag, label, region }) => {
-                  const baseUsdRef = Number(product.price_usd) || 0;
+                  const isLatam = REGIONS.latam.codes.includes(code) || region === "LATAM";
+                  const isAnglosphereOrEurope = REGIONS.english_speaking.codes.includes(code) || REGIONS.europe.codes.includes(code) || region === "Anglosphere/Europe";
+                  
+                  const baseUsdRef = isLatam 
+                    ? (product.price_usd_latam ?? product.price_usd)
+                    : isAnglosphereOrEurope 
+                      ? product.price_usd 
+                      : (product.price_usd_tienda ?? product.price_usd);
+                  
                   const regionalUsdOverride = product.local_usd_prices?.[code];
-                  const currentUsdValue = regionalUsdOverride != null ? Number(regionalUsdOverride) : baseUsdRef;
+                  const currentUsdValue = regionalUsdOverride != null ? Number(regionalUsdOverride) : Number(baseUsdRef);
                   
                   const regionPrice = (() => {
                     if (currentUsdValue <= 0) return null;

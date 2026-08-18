@@ -58,7 +58,6 @@ const ProductCoreano100Mapas = () => {
   const pricing = useAdminPricing(ADMIN_SKU);
   const tier = useCountryTierRouting(ADMIN_SKU, {
     tiendaPath: TIENDA_CHECKOUT_PATH,
-    fallbackHotmartUrl: HOTMART_URL_LATAM,
   });
   const {
     isPeru,

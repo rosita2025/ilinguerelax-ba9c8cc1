@@ -92,7 +92,6 @@ const ProductPatronesEspeciales = () => {
   const pricingAdmin = useAdminPricing(ADMIN_SKU);
   const tier = useCountryTierRouting(ADMIN_SKU, {
     tiendaPath: TIENDA_CHECKOUT_PATH,
-    fallbackHotmartUrl: HOTMART_URL_LATAM,
   });
 
   const { isPeru, useHotmartLatam, useTiendaOnly, priceUsd: PRICE_USD, priceGlobalUsd: GLOBAL_USD, priceLatamUsd: LATAM_USD, priceTiendaUsd: TIENDA_USD, pricePen, country } = tier;
@@ -101,7 +100,7 @@ const ProductPatronesEspeciales = () => {
   const priceLabel = tier.priceLabel;
   const originalLabel = tier.originalLabel;
 
-  const HOTMART_URL = tier.hotmartUrl || HOTMART_URL_LATAM;
+  
   const hasLongPriceLabel = priceLabel.length > 9;
   
   const pixelParams = useMemo(() => ({

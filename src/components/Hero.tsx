@@ -14,7 +14,7 @@ export const Hero = () => {
   return (
     <section className="relative w-full overflow-hidden bg-background py-4 sm:py-6 md:py-8">
       <div className="container mx-auto px-0 sm:px-4 max-w-6xl">
-        <div className="relative w-full overflow-hidden sm:rounded-2xl bg-black/5">
+        <div className="relative w-full overflow-hidden sm:rounded-2xl bg-black/5 hero-swiper-container">
           <Swiper
             modules={[Autoplay, EffectFade, Pagination, Navigation]}
             effect={'fade'}
@@ -31,21 +31,21 @@ export const Hero = () => {
             className="w-full h-full"
           >
             <SwiperSlide key="slide-1" className="flex items-center justify-center bg-black/5">
-              <div className="w-full relative overflow-hidden">
+              <div className="w-full relative overflow-hidden flex items-center justify-center">
                 <img
                   src={`${appPreview1.url}?v=${new Date().getTime()}`}
                   alt="iLingue Relax App Preview 1"
-                  className="w-full h-auto max-h-[500px] md:max-h-[600px] object-cover sm:object-contain mx-auto transition-opacity duration-700"
+                  className="w-full h-auto max-h-[500px] md:max-h-[600px] object-cover sm:object-contain transition-opacity duration-700 block"
                   loading="eager"
                 />
               </div>
             </SwiperSlide>
             <SwiperSlide key="slide-2" className="flex items-center justify-center bg-black/5">
-              <div className="w-full relative overflow-hidden">
+              <div className="w-full relative overflow-hidden flex items-center justify-center">
                 <img
                   src={`${appPreview2.url}?v=${new Date().getTime()}`}
                   alt="iLingue Relax App Preview 2"
-                  className="w-full h-auto max-h-[500px] md:max-h-[600px] object-cover sm:object-contain mx-auto transition-opacity duration-700"
+                  className="w-full h-auto max-h-[500px] md:max-h-[600px] object-cover sm:object-contain transition-opacity duration-700 block"
                   loading="lazy"
                 />
               </div>
@@ -53,6 +53,41 @@ export const Hero = () => {
           </Swiper>
         </div>
       </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .hero-swiper-container .swiper-button-next,
+        .hero-swiper-container .swiper-button-prev {
+          background: rgba(255, 255, 255, 0.2);
+          backdrop-filter: blur(4px);
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          color: white;
+          transition: all 0.3s ease;
+        }
+        .hero-swiper-container .swiper-button-next:after,
+        .hero-swiper-container .swiper-button-prev:after {
+          font-size: 14px;
+          font-weight: bold;
+        }
+        .hero-swiper-container .swiper-button-next { right: 8px; }
+        .hero-swiper-container .swiper-button-prev { left: 8px; }
+        .hero-swiper-container .swiper-button-next:hover,
+        .hero-swiper-container .swiper-button-prev:hover {
+          background: rgba(255, 255, 255, 0.4);
+        }
+        @media (min-width: 640px) {
+          .hero-swiper-container .swiper-button-next,
+          .hero-swiper-container .swiper-button-prev {
+            width: 44px;
+            height: 44px;
+          }
+          .hero-swiper-container .swiper-button-next:after,
+          .hero-swiper-container .swiper-button-prev:after {
+            font-size: 18px;
+          }
+        }
+      `}} />
 
       {/* Subtle bottom gradient to blend with next section */}
       <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent pointer-events-none z-10" />

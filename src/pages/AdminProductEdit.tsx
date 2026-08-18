@@ -488,7 +488,11 @@ const AdminProductEdit = () => {
       } catch { /* ignore */ }
       publishCatalogUpdate(product.sku, version);
       localStorage.removeItem(draftKey);
-      toast({ title: "✅ Guardado correctamente" });
+      
+      // Disparar evento global de actualización para invalidar cachés y refrescar UI pública
+      window.dispatchEvent(new Event('pricing_updated'));
+      
+      toast({ title: "✅ Guardado correctamente", description: "La tienda se ha actualizado en tiempo real." });
       navigate("/admin/productos");
     } catch (e: any) {
       // Si la función nos devolvió un 409 (Conflict) con datos estructurados para drive_url
@@ -979,27 +983,27 @@ const AdminProductEdit = () => {
 
           <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between border-b pb-2">
-              <h2 className="font-semibold text-lg flex items-center gap-2">💰 Configuración de Precios Globales</h2>
+              <h2 className="font-semibold text-lg flex items-center gap-2">💰 Configuración de Precios Regionales</h2>
               <div className="flex flex-wrap items-center gap-6">
                 <div className="text-right">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Precio Normal (USD)</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Base USD - LATAM</Label>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-muted-foreground/60">$</span>
+                    <span className="text-sm font-bold text-primary">$</span>
                     <Input
                       type="number" step="0.01"
-                      className="w-24 h-8 text-sm font-bold border-dashed opacity-70"
-                      value={product.compare_at_price_usd || ""}
+                      className="w-24 h-8 text-sm font-bold border-primary/30"
+                      value={product.price_usd_latam ?? ""}
                       onChange={(e) => {
                         const val = e.target.value === "" ? null : Number(e.target.value);
-                        update("compare_at_price_usd", val);
+                        update("price_usd_latam", val);
                       }}
-                      placeholder="97.00"
+                      placeholder="50.00"
                     />
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Base Oferta USD (Ancla)</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Base USD - Anglosphere / EU</Label>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-primary">$</span>
                     <Input
@@ -1010,40 +1014,43 @@ const AdminProductEdit = () => {
                         const val = e.target.value === "" ? 0 : Number(e.target.value);
                         update("price_usd", val);
                       }}
-                      placeholder="15.00"
+                      placeholder="72.00"
                     />
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">PEN (Perú)</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Base USD - Resto del Mundo</Label>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-muted-foreground/60">S/</span>
+                    <span className="text-sm font-bold text-primary">$</span>
                     <Input
-                      type="number" step="0.1"
-                      className="w-20 h-8 text-xs"
-                      value={product.price_pen ?? ""}
-                      onChange={(e) => update("price_pen", e.target.value === "" ? null : Number(e.target.value))}
-                      placeholder="59.90"
-                    />
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">PEN Antes (Tachado)</Label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-muted-foreground/40">S/</span>
-                    <Input
-                      type="number" step="0.1"
-                      className="w-20 h-8 text-xs border-dashed opacity-60"
-                      value={product.compare_at_price_pen ?? ""}
-                      onChange={(e) => update("compare_at_price_pen", e.target.value === "" ? null : Number(e.target.value))}
-                      placeholder="149.00"
+                      type="number" step="0.01"
+                      className="w-24 h-8 text-sm font-bold border-primary/30"
+                      value={product.price_usd_tienda ?? ""}
+                      onChange={(e) => {
+                        const val = e.target.value === "" ? null : Number(e.target.value);
+                        update("price_usd_tienda", val);
+                      }}
+                      placeholder="68.00"
                     />
                   </div>
                 </div>
               </div>
             </div>
+
+            <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg flex items-start gap-3">
+              <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="text-xs text-amber-800 space-y-1">
+                <p className="font-bold">Estructura Simplificada:</p>
+                <ul className="list-disc ml-4 space-y-0.5">
+                  <li><b>LATAM:</b> Usa el precio base LATAM ($ {product.price_usd_latam || product.price_usd}).</li>
+                  <li><b>Angloparlantes/Europa:</b> Usa el precio base Global ($ {product.price_usd}).</li>
+                  <li><b>Resto del Mundo:</b> Usa el precio Resto del Mundo ($ {product.price_usd_tienda || product.price_usd}).</li>
+                  <li>Los precios tachados se controlan ahora de forma manual por moneda en las tarjetas de abajo para mayor precisión.</li>
+                </ul>
+              </div>
+            </div>
+
 
             <div className="grid md:grid-cols-2 gap-4 bg-muted/20 p-3 rounded-lg border border-dashed">
               <div className="space-y-1">
@@ -1116,9 +1123,17 @@ const AdminProductEdit = () => {
                   { code: "KES", flag: "🇰🇪", label: "Kenia", region: "Africa" },
                   { code: "MAD", flag: "🇲🇦", label: "Marruecos", region: "Africa" },
                 ].map(({ code, flag, label, region }) => {
-                  const baseUsdRef = Number(product.price_usd) || 0;
+                  const isLatam = REGIONS.latam.codes.includes(code) || region === "LATAM";
+                  const isAnglosphereOrEurope = REGIONS.english_speaking.codes.includes(code) || REGIONS.europe.codes.includes(code) || region === "Anglosphere/Europe";
+                  
+                  const baseUsdRef = isLatam 
+                    ? (product.price_usd_latam ?? product.price_usd)
+                    : isAnglosphereOrEurope 
+                      ? product.price_usd 
+                      : (product.price_usd_tienda ?? product.price_usd);
+                  
                   const regionalUsdOverride = product.local_usd_prices?.[code];
-                  const currentUsdValue = regionalUsdOverride != null ? Number(regionalUsdOverride) : baseUsdRef;
+                  const currentUsdValue = regionalUsdOverride != null ? Number(regionalUsdOverride) : Number(baseUsdRef);
                   
                   const regionPrice = (() => {
                     if (currentUsdValue <= 0) return null;
@@ -1244,7 +1259,7 @@ const AdminProductEdit = () => {
                         </div>
                         
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="text-[8px] uppercase font-bold text-muted-foreground/60 shrink-0">USD Region:</span>
+                          <span className="text-[8px] uppercase font-bold text-muted-foreground/60 shrink-0">USD Ref:</span>
                           <Input
                             type="text"
                             inputMode="decimal"
@@ -1263,7 +1278,7 @@ const AdminProductEdit = () => {
                               }
                               update("local_usd_prices", next);
                             }}
-                            placeholder={baseUsdRef.toString()}
+                            placeholder={baseUsdRef.toFixed(2)}
                           />
                         </div>
                         {exchangeRates[code as Currency] && (

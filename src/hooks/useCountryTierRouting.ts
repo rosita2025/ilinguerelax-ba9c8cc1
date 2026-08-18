@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { detectCurrency, formatCurrencyAmount, exchangeRates, type Currency } from "@/i18n";
 import { useLocalOverrides } from "@/lib/livePrices";
+import { REGIONS } from "@/lib/countryRegions";
 
 /**
  * Países que compran vía Hotmart LATAM (USD). El resto del mundo (incl. Perú y
@@ -63,48 +65,54 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
   const pricing = useAdminPricing(adminSku);
   const region = useRegionTier();
   const manualOverrides = useLocalOverrides(adminSku) as Partial<Record<Currency, number>> | null;
+  const [refreshTick, setRefreshTick] = useState(0);
+
+  // Escuchar actualizaciones globales para refrescar precios sin F5
+  useEffect(() => {
+    const handleUpdate = () => setRefreshTick(v => v + 1);
+    window.addEventListener('pricing_updated', handleUpdate);
+    return () => window.removeEventListener('pricing_updated', handleUpdate);
+  }, []);
+
   
   const countryCode = (region.country || "US").toUpperCase();
   const currency = detectCurrency(countryCode);
   const rate = exchangeRates[currency] || 1;
 
-  // 1. Determinar el Tier de Precios USD
-  const useHotmartLatam = LATAM_HOTMART_COUNTRIES.has(countryCode);
+  // 1. Determinar el Tier de Región
+  const isLatam = REGIONS.latam.codes.includes(countryCode);
+  const isAnglosphereOrEurope = REGIONS.english_speaking.codes.includes(countryCode) || REGIONS.europe.codes.includes(countryCode);
   const isTiendaUsd = TIENDA_USD_COUNTRIES.has(countryCode);
-  const useTiendaOnly = !useHotmartLatam;
 
+  // Mapeo según la solicitud:
+  // LATAM -> price_usd_latam
+  // Angloparlantes / USA / Europa -> price_usd (Global)
+  // Resto del Mundo / Asia / África -> price_usd_tienda
   const basePriceGlobal = pricing.priceGlobalUsd ?? opts.fallbackPriceGlobalUsd ?? 0;
   const basePriceLatam = pricing.priceLatamUsd ?? opts.fallbackPriceLatamUsd ?? basePriceGlobal;
-  const basePriceTienda = pricing.priceTiendaUsd ?? opts.fallbackPriceTiendaUsd ?? basePriceLatam;
-
-  const baseCompareGlobal = pricing.compareAtPriceGlobalUsd;
-  const baseCompareLatam = pricing.compareAtPriceLatamUsd ?? baseCompareGlobal;
-  const baseCompareTienda = pricing.compareAtPriceTiendaUsd ?? baseCompareLatam;
+  const basePriceRestOfWorld = pricing.priceTiendaUsd ?? opts.fallbackPriceTiendaUsd ?? basePriceGlobal;
 
   // Precio USD asignado según la región del usuario
-  const priceUsd = isTiendaUsd ? basePriceTienda : useHotmartLatam ? basePriceLatam : basePriceGlobal;
-  const compareAtPriceUsd = isTiendaUsd ? baseCompareTienda : useHotmartLatam ? baseCompareLatam : baseCompareGlobal;
+  const regionUsdPrice = isLatam ? basePriceLatam : isAnglosphereOrEurope ? basePriceGlobal : basePriceRestOfWorld;
 
   // 2. Calcular Precios Finales (Moneda Local)
-  // Prioridad: Manual por Moneda (PEN, COP, etc) > (Manual USD Regional * Rate) > (Base Global * Rate)
+  // Prioridad: Manual por Moneda (local_prices) > (Base USD de Región * Rate)
   
   // Precio "Ahora"
   const manualFixed = manualOverrides?.[currency];
-  const regionalUsdOverride = pricing.localUsdPrices?.[currency];
-  
   const finalPriceAmount = typeof manualFixed === "number" && manualFixed > 0
     ? manualFixed
-    : typeof regionalUsdOverride === "number" && regionalUsdOverride > 0
-      ? regionalUsdOverride * rate
-      : priceUsd * rate;
+    : regionUsdPrice * rate;
 
   // Precio "Antes" (Tachado)
+  // Prioridad: local_compare_at_prices > (Global compare USD * Rate)
   const manualCompareFixed = pricing.localCompareAtPrices?.[currency];
+  const globalCompareUsd = pricing.compareAtPriceGlobalUsd;
   
   const finalCompareAmount = typeof manualCompareFixed === "number" && manualCompareFixed > 0
     ? manualCompareFixed
-    : compareAtPriceUsd && compareAtPriceUsd > 0
-      ? compareAtPriceUsd * rate
+    : globalCompareUsd && globalCompareUsd > 0
+      ? globalCompareUsd * rate
       : null;
 
   // 3. Flags y Etiquetas
@@ -124,10 +132,10 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
     country: countryCode,
     isPeru: countryCode === "PE",
     isTiendaUsd,
-    useHotmartLatam,
-    useTiendaOnly,
-    priceUsd,
-    compareAtPriceUsd,
+    useHotmartLatam: LATAM_HOTMART_COUNTRIES.has(countryCode),
+    useTiendaOnly: !LATAM_HOTMART_COUNTRIES.has(countryCode),
+    priceUsd: regionUsdPrice,
+    compareAtPriceUsd: globalCompareUsd,
     priceLabel,
     originalLabel,
     currencyCode: currency,
@@ -138,7 +146,7 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
     hotmartUrl: pricing.hotmartUrl || opts.fallbackHotmartUrl || null,
     priceGlobalUsd: basePriceGlobal,
     priceLatamUsd: basePriceLatam,
-    priceTiendaUsd: basePriceTienda,
+    priceTiendaUsd: basePriceRestOfWorld,
     pricePen: pricing.pricePen,
     compareAtPricePen: pricing.compareAtPricePen,
     localUsdPrices: pricing.localUsdPrices,

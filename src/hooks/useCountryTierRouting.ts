@@ -31,6 +31,10 @@ export interface CountryTierRouting {
   currencyCode: string;
   isOnSale: boolean;
   discountPercentage: number;
+  /** Monto numérico final en moneda local para procesamiento de pagos. */
+  finalPriceAmount: number;
+  /** Tasa de cambio utilizada para este país. */
+  exchangeRate: number;
   /** Propiedades heredadas del admin para componentes descendientes */
   hotmartUrl: string | null;
   priceGlobalUsd: number;
@@ -129,6 +133,8 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
     currencyCode: currency,
     isOnSale,
     discountPercentage,
+    finalPriceAmount,
+    exchangeRate: rate,
     hotmartUrl: pricing.hotmartUrl || opts.fallbackHotmartUrl || null,
     priceGlobalUsd: basePriceGlobal,
     priceLatamUsd: basePriceLatam,

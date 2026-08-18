@@ -79,14 +79,16 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
   const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
   const priceLabel = isPeru && pricePen
     ? formatCurrencyAmount(pricePen, "PEN")
-    : formatPrice(priceUsd, displayCurrency, overrides ?? undefined);
+    : formatPrice(priceUsd, displayCurrency, overrides ?? undefined, pricing.localUsdPrices);
   const originalLabel = isPeru && pricePen
     ? formatCurrencyAmount(pricePen * mult, "PEN")
-    : formatCurrencyAmount(
+    : formatPrice(
         (overrides?.[displayCurrency] ?? 0) > 0
           ? (overrides![displayCurrency] as number) * mult
-          : priceUsd * mult * (exchangeRates[displayCurrency] ?? 1),
+          : priceUsd * mult,
         displayCurrency,
+        null,
+        pricing.localUsdPrices
       );
 
   const hasFallback = (opts.fallbackPriceGlobalUsd ?? 0) > 0;

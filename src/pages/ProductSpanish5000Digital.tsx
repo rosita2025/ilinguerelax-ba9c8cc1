@@ -692,7 +692,7 @@ const ProductSpanish5000Digital = () => {
         calmMode
       />
       <ScrollToTop />
-      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="spanish_5000" title="Spanish Mastery System - Physical Book" />
+      
       <WhatsAppButton />
       <SalesNotification />
     </main>

@@ -20,7 +20,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
+
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { LiveViewers } from "@/components/LiveViewers";
 import SalesNotification from "@/components/SalesNotification";

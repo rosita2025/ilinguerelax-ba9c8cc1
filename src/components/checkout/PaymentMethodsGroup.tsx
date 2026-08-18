@@ -515,7 +515,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       const fetchSecret = async (retryForRestricted = false) => {
         const pricing = {
           priceUsd: currentUsdRef,
-          currencyCode: countryCode,
+          currencyCode: local.currency,
           priceLabel: localTotalLabel,
           exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
           finalPriceAmount: localTotalAmount,
@@ -726,7 +726,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
     }
     const pricing = {
       priceUsd: currentUsdRef,
-      currencyCode: countryCode,
+      currencyCode: local.currency,
       priceLabel: localTotalLabel,
       exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
       finalPriceAmount: localTotalAmount,

@@ -1028,7 +1028,7 @@ const AdminProductEdit = () => {
             <div className="space-y-3">
               <div>
                 <p className="text-[11px] text-muted-foreground bg-primary/5 p-2 rounded border border-primary/10">
-                  💡 Fija el monto <b>exacto</b> por moneda. El sistema detecta el país por IP y usa este valor manual. Si se deja vacío, se usa la conversión automática desde el <b>Precio Base USD</b> (Ref: Tasa actual). El usuario prefiere precios bajos en LATAM y altos en USA/EUR.
+                  💡 Fija el monto <b>exacto</b> por moneda. El sistema detecta el país por IP y usa este valor manual. Si se deja vacío, se usa la conversión automática desde el <b>Precio Base Oferta USD</b> (Ref: Tasa actual). El <b>Precio Normal</b> se usa para mostrar el monto tachado (antes).
                 </p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">

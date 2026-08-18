@@ -240,14 +240,12 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                   )}
                 </div>
                 <div className="text-sm font-semibold shrink-0 text-right">
-                  {penMode && item.pricePen != null
-                    ? formatPen(item.pricePen)
-                    : showLocalRef
-                      ? (() => {
-                          const { local_prices, local_usd_prices } = overridesFor(item.id);
-                          return formatLocalAmount(itemPrice(item, region.tier), region.country, local_prices, local_usd_prices).formatted;
-                        })()
-                      : formatCurrencyAmount(itemPrice(item, region.tier), "USD")}
+                  {showLocalRef
+                    ? (() => {
+                        const { local_prices, local_usd_prices } = overridesFor(item.id);
+                        return formatLocalAmount(itemPrice(item, region.tier), region.country, local_prices, local_usd_prices).formatted;
+                      })()
+                    : formatCurrencyAmount(itemPrice(item, region.tier), "USD")}
                 </div>
               </div>
 

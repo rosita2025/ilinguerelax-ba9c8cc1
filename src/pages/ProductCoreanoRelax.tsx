@@ -259,86 +259,11 @@ const ProductCoreanoRelax = () => {
         </div>
       </section>
 
-      <section className="py-8 md:py-10">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-foreground mb-3 text-balance leading-tight">
-              Aprende coreano con <span className="text-gradient">mapas mentales</span>
-            </h2>
-            <p className="text-sm sm:text-base text-muted-foreground text-center mb-10 text-pretty">Método visual, claro y progresivo · k-dramas y K-pop.</p>
-            <div className="bg-card rounded-3xl border border-border shadow-card p-8 mb-12">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {features.map((feature) => (
-                  <div key={feature} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-4 h-4 text-primary-foreground" />
-                    </div>
-                    <span className="text-foreground">{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      <section className="py-8 md:py-10">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold mb-3 border border-amber-500/20">
-                <Sparkles className="w-4 h-4" /> Incluye 2 Bonos GRATIS
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                Bonos exclusivos <span className="text-gradient">incluidos</span> en tu compra
-              </h3>
-              <p className="text-muted-foreground">Llévate dos recursos adicionales sin costo extra para acelerar tu aprendizaje.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-amber-500/5 p-6 shadow-card">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-bold mb-3">
-                  <Sparkles className="w-3.5 h-3.5" /> Bono 1
-                </div>
-                <h4 className="text-xl font-bold text-foreground mb-2">
-                  📖 Guía Completa del Alfabeto Hangul
-                </h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Aprende a leer y escribir Hangul desde cero con explicaciones claras de cada vocal y consonante, trazos paso a paso y ejemplos de pronunciación para hispanohablantes.
-                </p>
-                <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-                  <Check className="w-4 h-4" /> Incluido GRATIS
-                </div>
-              </div>
-
-              <div className="rounded-2xl border-2 border-amber-500/30 bg-gradient-to-br from-amber-500/5 to-primary/5 p-6 shadow-card">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 text-amber-600 text-xs font-bold mb-3">
-                  <Sparkles className="w-3.5 h-3.5" /> Bono 2
-                </div>
-                <h4 className="text-xl font-bold text-foreground mb-2">
-                  💬 100 Expresiones Coreanas Esenciales
-                </h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Las frases más usadas en el día a día, k-dramas y K-pop, con Hangul, pronunciación hispana y traducción al español para que hables con naturalidad desde el primer día.
-                </p>
-                <div className="flex items-center gap-2 text-sm font-semibold text-amber-600">
-                  <Check className="w-4 h-4" /> Incluido GRATIS
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      
-      <ResenasWhatsAppCoreano />
-      
       <FAQ
         items={[
-          { question: t.productFaq.specialTitle, answer: t.productFaq.specialAnswer, icon: Sparkles },
-          { question: t.productFaq.receiveTitle, answer: t.productFaq.receiveAnswer, icon: Download },
-          { question: t.productFaq.secureTitle, answer: t.productFaq.secureAnswer, icon: Shield },
+          { question: "Aclarar el Estado de los Audios y la App:", answer: "Los módulos de audio nativo y el acceso a la App iLingue Relax son beneficios adicionales que se encuentran actualmente en desarrollo. Los compradores actuales recibirán acceso anticipado y actualizaciones gratuitas sin costo extra tan pronto como se lancen.", icon: Sparkles },
+          { question: "¿Cómo recibo el material?", answer: "La entrega es inmediata. Tras completar tu compra, recibirás un correo electrónico con el enlace de descarga del PDF de las 2,000 palabras y los bonos incluidos.", icon: Download },
+          { question: "¿Es seguro mi pago?", answer: "Totalmente. Utilizamos pasarelas de pago cifradas y seguras (PayPal, Stripe, dLocal) para garantizar la protección de tus datos bancarios.", icon: Shield },
           { question: "¿En qué formato se entrega?", answer: "PDF descargable, optimizado para leer desde celular, tablet o computadora. Puedes imprimirlo si lo deseas.", icon: Globe },
         ]}
         title="Preguntas Frecuentes"
@@ -351,10 +276,10 @@ const ProductCoreanoRelax = () => {
       {/* Sticky Buy Bar — 4-tier routing (Perú/VE-CU-NI/Global → Tienda · LATAM → Hotmart) */}
       <StickyBuyBar
         price={displayPrice}
-        originalPrice={tier.originalLabel}
+        originalPrice={"$39"}
         currencyCode={currencyLabel}
         flag={displayFlag}
-        productName="Coreano · +100 Mapas Mentales"
+        productName="Coreano · 2,000 Palabras Esenciales"
         ctaText={"Comprar ahora"}
         buyUrl={TIENDA_CHECKOUT_PATH}
         onBuyClick={handleBuy}

@@ -1159,7 +1159,7 @@ const AdminProductEdit = () => {
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex flex-col">
                           <Label className="text-xs">{flag} {code}</Label>
-                          <span className="text-[9px] text-muted-foreground leading-tight">{region} · {label}</span>
+                          <span className="text-[9px] text-muted-foreground leading-tight">{regionLabel} · {label}</span>
                         </div>
                         {regionPrice && !product.local_prices?.[code] && (
                           <button 

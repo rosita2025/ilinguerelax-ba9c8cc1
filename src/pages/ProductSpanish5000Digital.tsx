@@ -50,7 +50,7 @@ const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then
 const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/aFa5kC2OIchv2mA8m98IU0e";
 const PRICE = 34.99;
 const ORIGINAL_PRICE = 97;
-const DISCOUNT_PCT = Math.round(((ORIGINAL_PRICE - PRICE) / ORIGINAL_PRICE) * 100);
+const DISCOUNT_PCT = 64;
 
 const features = [
   "5,000 Spanish Words + Pronunciation (250 Pages)",

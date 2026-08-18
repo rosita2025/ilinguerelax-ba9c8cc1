@@ -589,18 +589,7 @@ const ProductSpanishGrammarPatterns = () => {
         reviewCount={1500}
         ctaText={`ADD TO CART — $${PRICE}.00`}
         sku="SPANISH-GRAMMAR-PATTERNS"
-        onBuyClick={() => setPhysicalCheckoutOpen(true)}
-        isLoading={cartLoading}
-        disabled={false}
-        isPhysical={true}
-        goesToInternalCheckout={true}
-      />
-      <PhysicalBookCheckout 
-        open={physicalCheckoutOpen} 
-        onOpenChange={setPhysicalCheckoutOpen} 
-        book="spanish_grammar_patterns" 
-        title="Spanish Grammar Patterns - Physical Book" 
-      />
+        onBuyClick={handleAddToCart}
     </main>
   );
 };

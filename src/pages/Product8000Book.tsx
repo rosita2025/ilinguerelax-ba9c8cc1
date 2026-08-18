@@ -103,7 +103,7 @@ const Product8000Book = () => {
   const navigate = useNavigate();
 
   const handleAddToCart = async () => {
-    navigate("/checkouts/english_8000");
+    navigate("/checkouts/8-000-palabras-libro-fisico");
   };
 
   const AMAZON_URL_8000 = "https://www.amazon.com/s?k=Ingl%C3%A9s+Relax+8000+Palabras";

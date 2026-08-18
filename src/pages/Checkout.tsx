@@ -22,7 +22,7 @@ import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
-import { getCatalogItem, CHECKOUT_CATALOG, type CatalogItem } from "@/config/checkoutCatalog";
+import { getCatalogItem, resolveCheckoutSlug, CHECKOUT_CATALOG, type CatalogItem } from "@/config/checkoutCatalog";
 import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
@@ -214,7 +214,7 @@ export default function Checkout() {
     // product (price, image, upsells, with or without upsell) with zero manual
     // wiring per SKU.
     const derivedFromPath = staticItem?.productPath?.replace(/^\/products\//, "") || null;
-    const adminSku = staticItem?.adminSku ?? derivedFromPath ?? slug;
+    const adminSku = staticItem?.adminSku ?? derivedFromPath ?? resolveCheckoutSlug(slug);
 
 
     const load = async () => {

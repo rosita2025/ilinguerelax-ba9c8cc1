@@ -358,15 +358,15 @@ const ProductSpanish5000Digital = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {benefits.map((benefit, i) => (
-                  <div key={i} className="p-4 rounded-xl border border-border bg-card/50 hover:bg-card transition-colors">
-                    <benefit.icon className="w-6 h-6 text-primary mb-3" />
-                    <h3 className="font-bold text-sm mb-1">{benefit.title}</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{benefit.description}</p>
+                  <div key={i} className="p-4 rounded-xl border border-slate-100 bg-white hover:border-emerald-200 transition-all duration-300 shadow-sm">
+                    <benefit.icon className="w-6 h-6 text-emerald-600 mb-3" />
+                    <h3 className="font-bold text-sm mb-1 text-slate-900">{benefit.title}</h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">{benefit.description}</p>
                   </div>
                 ))}
               </div>
 
-              <div className="p-6 rounded-2xl bg-primary/5 border border-primary/10">
+              <div className="p-8 rounded-3xl bg-emerald-50 border border-emerald-100">
                 <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                   <Check className="w-5 h-5 text-emerald-600" /> What's included in your Interactive Kit:
                 </h3>

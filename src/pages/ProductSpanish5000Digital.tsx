@@ -421,7 +421,7 @@ const ProductSpanish5000Digital = () => {
                     ))}
                   </div>
                   <p className="text-xl font-bold italic mb-6 leading-relaxed">
-                    "I've tried every app out there, but this is the first time I actually feel confident speaking. The English pronunciation system is pure genius!"
+                    "I've tried every app out there, but this is the first time I actually feel confident speaking. The English pronunciation system for the 5,000 words is pure genius!"
                   </p>
                   <div className="flex items-center gap-4 border-t border-white/20 pt-6">
                     <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-black text-xl">M</div>

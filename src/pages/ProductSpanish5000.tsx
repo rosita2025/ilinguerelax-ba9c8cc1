@@ -9,6 +9,9 @@ import { toast } from "sonner";
 import { useAbTest } from "@/hooks/useAbTest";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
+import { useI18n } from "@/i18n/I18nContext";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
 import { CountdownTimer } from "@/components/CountdownTimer";
@@ -199,6 +202,35 @@ const ProductSpanish5000 = () => {
   const handleViewDigital = () => {
     navigate("/products/5-000-spanish-words-with-english-pronunciation-digital");
   };
+
+  const { formatPrice, currency } = useI18n();
+  const ADMIN_SKU_DIGITAL = "5-000-spanish-words-with-english-pronunciation-digital";
+  const TIENDA_PATH_DIGITAL = "/checkouts/5000-spanish-words";
+  const HOTMART_DIGITAL_LATAM = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
+  
+  const digitalPricing = useAdminPricing(ADMIN_SKU_DIGITAL);
+  const digitalTier = useCountryTierRouting(ADMIN_SKU_DIGITAL, {
+    tiendaPath: TIENDA_PATH_DIGITAL,
+    fallbackHotmartUrl: HOTMART_DIGITAL_LATAM,
+    fallbackPriceGlobalUsd: 72.99,
+    fallbackPriceLatamUsd: 72.99,
+    fallbackPriceTiendaUsd: 72.99,
+    fallbackPricePen: 280,
+  });
+
+  const digitalPriceLabel = (digitalTier.isPeru && digitalTier.pricePen && Number(digitalTier.pricePen) > 0) 
+    ? `S/${Number(digitalTier.pricePen).toFixed(2)}` 
+    : formatPrice(digitalTier.priceUsd || 72.99, null, digitalPricing.localUsdPrices);
+    
+  const digitalOriginalLabel = digitalTier.isPeru && digitalTier.pricePen 
+    ? `S/${(Number(digitalTier.pricePen) * 2.5).toFixed(2)}` 
+    : formatPrice(97, null, digitalPricing.localUsdPrices);
+
+  const digitalDiscountPct = useMemo(() => {
+    const current = digitalTier.priceUsd || 72.99;
+    const original = 97;
+    return Math.round(((original - current) / original) * 100);
+  }, [digitalTier.priceUsd]);
 
   return <main className="min-h-screen bg-background">
       <Helmet>
@@ -471,14 +503,14 @@ const ProductSpanish5000 = () => {
                     ))}
                   </ul>
                   <div className="flex items-baseline justify-center md:justify-start gap-3 pt-2 flex-wrap">
-                    <span className="text-4xl font-bold text-foreground">$34.99</span>
-                    <span className="text-lg text-muted-foreground line-through">$97.00</span>
-                    <span className="text-xs font-bold text-accent bg-accent/10 px-2 py-1 rounded-full">SAVE 55%</span>
+                    <span className="text-4xl font-bold text-foreground">{digitalPriceLabel}</span>
+                    <span className="text-lg text-muted-foreground line-through">{digitalOriginalLabel}</span>
+                    <span className="text-xs font-bold text-accent bg-accent/10 px-2 py-1 rounded-full">SAVE {digitalDiscountPct}%</span>
                   </div>
                   <Button asChild size="xl" variant="hero" className="w-full">
                     <a href="/products/5-000-spanish-words-with-english-pronunciation-digital">
                       <CreditCard className="w-5 h-5" />
-                      View Digital Version — $34.99
+                      View Digital Version — {digitalPriceLabel}
                       <ArrowRight className="w-5 h-5" />
                     </a>
                   </Button>

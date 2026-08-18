@@ -5,7 +5,7 @@ import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Truck, ShieldCheck, Globe, Gift } from "lucide-react";
 
-export type PhysicalBookKey = "english_5000" | "english_8000" | "spanish_5000";
+export type PhysicalBookKey = "english_5000" | "english_8000" | "spanish_5000" | "spanish_3000_verbs" | "spanish_grammar_patterns";
 
 interface PhysicalBookCheckoutProps {
   open: boolean;

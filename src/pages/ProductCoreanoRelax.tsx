@@ -156,13 +156,13 @@ const ProductCoreanoRelax = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title={pricing.name ?? "Aprender Coreano PDF · +100 Mapas Mentales"}
-        description={pricing.description ?? "Aprende coreano desde cero con +100 mapas mentales visuales, alfabeto hangul y vocabulario K-pop y K-dramas. PDF descargable, nivel A1–A2."}
+        title={pricing.name ?? "2,000 Palabras Esenciales para Aprender Coreano · iLingue Relax"}
+        description={pricing.description ?? "Domina el vocabulario coreano con 2,000 palabras esenciales, Hangul y pronunciación adaptada para hispanohablantes. PDF descargable."}
         canonicalUrl="https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1"
         image={pricing.coverImageUrl ?? `https://ilinguerelax.com${coverAsset.url}`}
         type="product"
-        price="10"
-        originalPrice="54"
+        price="12"
+        originalPrice="39"
         sku="ILINGUE-COREANO-100MM"
         keywords="aprender coreano desde cero, coreano para hispanohablantes, mapas mentales coreano, alfabeto hangul pdf, curso de coreano pdf, vocabulario coreano, coreano kpop, coreano kdramas, libro para aprender coreano, coreano A1 A2, ebook coreano"
       />

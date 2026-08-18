@@ -48,8 +48,8 @@ const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then
 
 
 const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/aFa5kC2OIchv2mA8m98IU0e";
-const PRICE = 97;
-const ORIGINAL_PRICE = 215;
+const PRICE = 34.99;
+const ORIGINAL_PRICE = 97;
 const DISCOUNT_PCT = Math.round(((ORIGINAL_PRICE - PRICE) / ORIGINAL_PRICE) * 100);
 
 const features = [
@@ -102,16 +102,16 @@ const ProductSpanish5000Digital = () => {
   const tier = useCountryTierRouting(ADMIN_SKU_SP5K, {
     tiendaPath: TIENDA_PATH_SP5K,
     fallbackHotmartUrl: HOTMART_SP5K_LATAM,
-    fallbackPriceGlobalUsd: 97,
-    fallbackPriceLatamUsd: 97,
-    fallbackPriceTiendaUsd: 97,
-    fallbackPricePen: 365,
+    fallbackPriceGlobalUsd: 34.99,
+    fallbackPriceLatamUsd: 34.99,
+    fallbackPriceTiendaUsd: 34.99,
+    fallbackPricePen: 135,
   });
   const currentPrice = tier.priceUsd;
   const pricingReady = tier.loaded;
   const { useTiendaOnly, useHotmartLatam, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen } = tier;
   const localizedPrice = (tier.isPeru && pricePen && Number(pricePen) > 0) ? `S/${Number(pricePen).toFixed(2)}` : formatPrice(currentPrice);
-  const localizedOriginal = formatPrice(215);
+  const localizedOriginal = formatPrice(97);
   const flag = countryToFlag(countryCode);
 
   const pixelParams = useMemo(() => ({

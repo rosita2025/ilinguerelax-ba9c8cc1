@@ -3,16 +3,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 
 export interface AdminPricing {
-  /** USD price for Tier-1 / global regions. `null` until the DB responds. */
-  priceGlobalUsd: number | null;
   /** USD price for LATAM regions. `null` until the DB responds. */
   priceLatamUsd: number | null;
-  /** USD price for the internal store tier (VE/CU/NI). `null` when not configured. */
+  /** USD price for Anglosphere / USA / Europe regions. `null` until the DB responds. */
+  priceGlobalUsd: number | null;
+  /** USD price for Rest of World (Asia / Africa / etc) tier. `null` when not configured. */
   priceTiendaUsd: number | null;
-  /** Native PEN price for Peru buyers. `null` when not configured. */
+  /** Native PEN price for Peru buyers. DEPRECATED - use local_prices['PEN'] */
   pricePen: number | null;
 
-  // Compare at prices (strikethrough)
+  // Compare at prices (strikethrough) - DEPRECATED for manual regional control
   compareAtPriceGlobalUsd: number | null;
   compareAtPriceLatamUsd: number | null;
   compareAtPriceTiendaUsd: number | null;

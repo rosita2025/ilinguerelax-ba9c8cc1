@@ -73,6 +73,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   );
   const localSubtotalAmount = localItemsSum.amount;
   const localTotalAmount = (localSubtotalAmount * (1 - (couponPercent || 0) / 100)) + shipping;
+  const currentUsdRef = localItemsSum.usdReference;
   const localTotalLabel = showLocalRef ? formatLocalDirect(localTotalAmount, region.country || "") : formatCurrencyAmount(grandTotal, "USD");
   const breakdown = useCurrencyBreakdown(total, null, items[0]?.localUsdPrices);
 

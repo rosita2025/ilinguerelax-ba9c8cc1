@@ -63,7 +63,7 @@ export function PhysicalBookCheckout({ open, onOpenChange, book, title }: Physic
                   <div>
                     <p className="text-sm font-semibold">Países disponibles</p>
                     <p className="text-xs text-muted-foreground">
-                      🇺🇸 USA · 🇨🇦 Canadá · 🇬🇧 UK · 🇦🇺 Australia · 🇳🇿 Nueva Zelanda
+                      🇺🇸 USA · 🇨🇦 Canadá · 🇬🇧 UK · 🇦🇺 Australia · 🇳🇿 Nueva Zelanda · 🇲🇽 México · 🇪🇸 España · 🇦🇷 Argentina · 🇨🇱 Chile · 🇨🇴 Colombia · 🇵🇪 Perú
                     </p>
                   </div>
                 </div>

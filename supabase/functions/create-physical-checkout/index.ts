@@ -16,7 +16,7 @@ const BOOKS = {
 } as const;
 
 // Envíos internacionales habilitados
-const SHIPPING_COUNTRIES = ["US", "CA", "GB", "AU", "NZ"] as const;
+const SHIPPING_COUNTRIES = ["US", "CA", "GB", "AU", "NZ", "MX", "AR", "CL", "CO", "PE", "ES"] as const;
 
 const BodySchema = z.object({
   book: z.enum(["english_5000", "english_8000", "spanish_5000"]),

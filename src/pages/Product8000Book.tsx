@@ -125,7 +125,7 @@ const Product8000Book = () => {
 
   const AMAZON_URL_8000 = "https://www.amazon.com/s?k=Ingl%C3%A9s+Relax+8000+Palabras";
   const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
-  const handleAddToShopifyCart = async () => {
+  const handleAddToCart = async () => {
     setPhysicalCheckoutOpen(true);
   };
 

@@ -483,7 +483,7 @@ const Product5000Book = () => {
       />
 
       <Footer />
-      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="english_5000" title="5,000 Essential Words - Physical Book" />
+      
       <StickyBuyBar
         productName="5,000 Words - Physical Book"
         price="$24.00"

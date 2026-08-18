@@ -652,8 +652,7 @@ const ProductSpanish3000VerbsBook = () => {
       <PhysicalBookCheckout 
         open={physicalCheckoutOpen} 
         onOpenChange={setPhysicalCheckoutOpen} 
-        book="spanish_5000" 
-
+        book="spanish_3000_verbs" 
         title="3,000 Spanish Verbs — Secure checkout" 
       />
     </main>

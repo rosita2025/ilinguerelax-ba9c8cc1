@@ -95,7 +95,7 @@ const ProductCoreanoRelax = () => {
 
   const trackInitiate = () =>
     trackHotmartEvent("InitiateCheckout", {
-      content_name: "Coreano Sin Complicaciones - 100 Mapas Mentales",
+      content_name: "Coreano Sin Complicaciones - 1,000 Palabras Esenciales",
       content_category: "Digital Book",
       content_ids: ["product-coreano-100-mapas"],
       content_type: "product",
@@ -140,7 +140,7 @@ const ProductCoreanoRelax = () => {
     setIsLoading(true);
     try {
       const { error } = await supabase.functions.invoke("send-store-notification", {
-        body: { email, storeName: "Coreano Relax - 100 Mapas Mentales", productType: "korean" },
+        body: { email, storeName: "Coreano Relax - 1,000 Palabras Esenciales", productType: "korean" },
       });
       if (error) throw error;
       setIsSubscribed(true);

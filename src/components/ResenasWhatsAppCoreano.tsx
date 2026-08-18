@@ -141,7 +141,7 @@ export const ResenasWhatsAppCoreano = () => {
           </div>
 
           <p className="text-center text-xs text-muted-foreground mt-4 max-w-xl mx-auto">
-            Por privacidad, ocultamos nombres y números de las compradoras. Capturas con marca de agua <strong>iLingue Relax®</strong>.
+            Por privacidad, ocultamos nombres y números de las compradoras. Capturas reales con marca de agua <strong>iLingue Relax®</strong>.
           </p>
         </div>
       </div>

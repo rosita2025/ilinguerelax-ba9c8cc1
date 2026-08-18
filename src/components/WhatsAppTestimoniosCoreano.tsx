@@ -25,7 +25,7 @@ export const WhatsAppTestimoniosCoreano = () => {
               Compradores reales de <span className="text-gradient">todo el mundo</span> 🌎
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto text-pretty">
-              Conversaciones auténticas con compradores del ebook <strong>+100 Mapas Mentales de Coreano</strong>. Datos personales protegidos por privacidad.
+              Conversaciones auténticas con compradores del ebook <strong>1,000 Palabras Esenciales de Coreano</strong>. Datos personales protegidos por privacidad.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 mt-4 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-1"><ShieldCheck className="w-4 h-4 text-primary" /> Nombres y números protegidos</span>

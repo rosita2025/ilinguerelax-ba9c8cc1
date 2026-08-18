@@ -25,8 +25,8 @@ const LANG_NAME: Record<string, string> = {
 const FALLBACK: LaunchProduct[] = [
   {
     sku: "100-mapas-mentales-para-aprender-coreano-hangul-c1",
-    name: "Aprende coreano con +100 Mapas Mentales",
-    description: "Método visual y natural conectado con k-dramas, K-pop y cultura coreana. Desde cero (A1) hasta nivel avanzado.",
+    name: "Aprende coreano con 1,000 Palabras Esenciales",
+    description: "Método visual y natural con Hangul y pronunciación adaptada. Desde cero (A1) hasta nivel intermedio.",
     cover_image_url: coverAsset.url,
     target_language: "ko",
   },

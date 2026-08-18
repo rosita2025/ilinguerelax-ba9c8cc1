@@ -81,10 +81,6 @@ export const CoreanoHowItWorks = () => {
                 ))}
               </div>
 
-              {/* Watermark */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] select-none rotate-12">
-                <span className="text-6xl font-black text-slate-900 uppercase tracking-tighter">ILINGUE RELAX</span>
-              </div>
             </motion.div>
           </div>
         </div>

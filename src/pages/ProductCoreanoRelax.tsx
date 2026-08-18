@@ -205,8 +205,9 @@ const ProductCoreanoRelax = () => {
                 Mira dentro del <span className="text-gradient">ebook</span>
               </h3>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Ejemplos reales de mapas mentales con Hangul, pronunciación en español y vocabulario práctico. Marca de agua incluida.
+                Ejemplos reales de mapas mentales con Hangul, pronunciación en español y vocabulario práctico.
               </p>
+
             </div>
 
             <Carousel

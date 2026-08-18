@@ -259,6 +259,8 @@ const ProductCoreanoRelax = () => {
         </div>
       </section>
 
+      <ResenasWhatsAppCoreano />
+
       <FAQ
         items={[
           { question: "Aclarar el Estado de los Audios y la App:", answer: "Los módulos de audio nativo y el acceso a la App iLingue Relax son beneficios adicionales que se encuentran actualmente en desarrollo. Los compradores actuales recibirán acceso anticipado y actualizaciones gratuitas sin costo extra tan pronto como se lancen.", icon: Sparkles },

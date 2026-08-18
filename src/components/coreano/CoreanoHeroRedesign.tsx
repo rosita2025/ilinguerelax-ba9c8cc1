@@ -71,12 +71,17 @@ export const CoreanoHeroRedesign = ({ price, onBuy }: CoreanoHeroRedesignProps) 
             transition={{ duration: 0.6, delay: 0.2 }}
             className="order-1 lg:order-2"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-bold mb-6 border border-primary/20">
-              <span className="text-base">🇰🇷</span> COREANO PARA HISPANOHABLANTES
+            <div className="flex flex-wrap items-center gap-2 mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20">
+                <span className="text-base">🇰🇷</span> COREANO PARA HISPANOHABLANTES
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold border border-amber-500/20">
+                <Sparkles className="w-4 h-4" /> NUEVO LANZAMIENTO
+              </div>
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-6 leading-[1.1] text-balance">
-              Aprende las <span className="text-primary">2,000 palabras</span> esenciales del coreano 🇰🇷
+              Aprende las <span className="text-primary">1,000 palabras</span> esenciales del coreano 🇰🇷
             </h1>
 
             <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-8 font-medium">

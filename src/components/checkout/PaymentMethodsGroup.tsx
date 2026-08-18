@@ -2256,7 +2256,19 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
                   <div className="rounded-lg bg-[#F0B90B]/10 p-3 text-center border border-[#F0B90B]/20">
                     <p className="text-xs text-[#b38a08] uppercase tracking-wider font-bold">{t.amountToPay}</p>
-                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">USD ${totalUsd}</p>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                      {(() => {
+                        const pricing = {
+                          priceUsd: currentUsdRef,
+                          currencyCode: local.currency,
+                          priceLabel: localTotalLabel,
+                          exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
+                          finalPriceAmount: localTotalAmount,
+                        };
+                        const payload = getPaymentPayload(pricing, "binance", countryCode);
+                        return `USD $${payload.amountUsdt || payload.amount}`;
+                      })()}
+                    </p>
                   </div>
 
                   <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-[#b38a08] dark:text-[#F0B90B]/80 italic text-left">

@@ -600,5 +600,3 @@ const ProductSpanishGrammarPatterns = () => {
 };
 
 export default ProductSpanishGrammarPatterns;
-
-export default ProductSpanishGrammarPatterns;

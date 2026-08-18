@@ -288,7 +288,7 @@ const ProductSpanishGrammarPatterns = () => {
               <Button
                 size="xl"
                 className="w-full mb-2 text-lg py-6 bg-gradient-to-r from-[#d4af37] to-[#f4d782] hover:from-[#f4d782] hover:to-[#d4af37] text-[#1a1233] font-black border-0 shadow-lg shadow-[#d4af37]/30"
-                onClick={() => setPhysicalCheckoutOpen(true)}
+                onClick={handleAddToCart}
                 disabled={false}
               >
                 {cartLoading ? (

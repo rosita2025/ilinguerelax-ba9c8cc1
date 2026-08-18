@@ -1,4 +1,4 @@
-import { Check, Star, ShieldCheck, Zap, Download, Lock } from "lucide-react";
+import { Check, Star, ShieldCheck, Zap, Download, Lock, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";
@@ -32,7 +32,7 @@ export const CoreanoHeroRedesign = ({ price, onBuy }: CoreanoHeroRedesignProps) 
               <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 transform lg:-rotate-2 hover:rotate-0 transition-transform duration-500">
                 <img
                   src={coverAsset.url}
-                  alt="Aprende Coreano con 2,000 Palabras Esenciales"
+                  alt="Aprende Coreano con 1,000 Palabras Esenciales"
                   className="w-full h-auto"
                 />
               </div>
@@ -71,12 +71,17 @@ export const CoreanoHeroRedesign = ({ price, onBuy }: CoreanoHeroRedesignProps) 
             transition={{ duration: 0.6, delay: 0.2 }}
             className="order-1 lg:order-2"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-bold mb-6 border border-primary/20">
-              <span className="text-base">🇰🇷</span> COREANO PARA HISPANOHABLANTES
+            <div className="flex flex-wrap items-center gap-2 mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20">
+                <span className="text-base">🇰🇷</span> COREANO PARA HISPANOHABLANTES
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold border border-amber-500/20">
+                <Sparkles className="w-4 h-4" /> NUEVO LANZAMIENTO
+              </div>
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-6 leading-[1.1] text-balance">
-              Aprende las <span className="text-primary">2,000 palabras</span> esenciales del coreano 🇰🇷
+              Aprende las <span className="text-primary">1,000 palabras</span> esenciales del coreano 🇰🇷
             </h1>
 
             <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-8 font-medium">
@@ -87,10 +92,12 @@ export const CoreanoHeroRedesign = ({ price, onBuy }: CoreanoHeroRedesignProps) 
               <p className="text-slate-700 dark:text-slate-300 font-semibold mb-4 text-sm uppercase tracking-wider">Una guía práctica para estudiar a tu propio ritmo:</p>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
                 {[
-                  "2,000 palabras esenciales",
+                  "1,000 palabras esenciales",
+                  "Incluye +100 Mapas Mentales",
                   "Hangul + español",
                   "Pronunciación adaptada",
-                  "Organizado por categorías"
+                  "Organizado por categorías",
+                  "Actualización GRATIS a 2,000 palabras"
                 ].map((benefit) => (
                   <li key={benefit} className="flex items-center gap-3 text-slate-700 dark:text-slate-200 font-bold">
                     <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">

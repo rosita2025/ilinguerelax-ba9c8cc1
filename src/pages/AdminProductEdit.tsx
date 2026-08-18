@@ -488,7 +488,11 @@ const AdminProductEdit = () => {
       } catch { /* ignore */ }
       publishCatalogUpdate(product.sku, version);
       localStorage.removeItem(draftKey);
-      toast({ title: "✅ Guardado correctamente" });
+      
+      // Disparar evento global de actualización para invalidar cachés y refrescar UI pública
+      window.dispatchEvent(new Event('pricing_updated'));
+      
+      toast({ title: "✅ Guardado correctamente", description: "La tienda se ha actualizado en tiempo real." });
       navigate("/admin/productos");
     } catch (e: any) {
       // Si la función nos devolvió un 409 (Conflict) con datos estructurados para drive_url

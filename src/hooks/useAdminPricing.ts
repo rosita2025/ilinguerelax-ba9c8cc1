@@ -11,6 +11,13 @@ export interface AdminPricing {
   priceTiendaUsd: number | null;
   /** Native PEN price for Peru buyers. `null` when not configured. */
   pricePen: number | null;
+
+  // Compare at prices (strikethrough)
+  compareAtPriceGlobalUsd: number | null;
+  compareAtPriceLatamUsd: number | null;
+  compareAtPriceTiendaUsd: number | null;
+  compareAtPricePen: number | null;
+
   /** Product display name from admin. `null` until loaded. */
   name: string | null;
   /** Product description from admin. `null` until loaded. */
@@ -33,6 +40,8 @@ export interface AdminPricing {
   reviewCount: number | null;
   /** Regional USD overrides for specific currencies. */
   localUsdPrices: Record<string, number> | null;
+  /** Regional comparison prices overrides for specific currencies. */
+  localCompareAtPrices: Record<string, number> | null;
 }
 
 const INITIAL: AdminPricing = {

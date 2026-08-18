@@ -67,7 +67,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const showLocalRef = !localTotal.loading; // Remove !penMode restriction to ensure USD ref always shows
   // Local totals honoring per-sku overrides from /admin/products/:sku
   const localItemsSum = sumItemsLocal(
-    items.map((i) => ({ id: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
+    items.map((i) => ({ id: i.id, sku: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
     region.country || "",
     overridesFor,
   );

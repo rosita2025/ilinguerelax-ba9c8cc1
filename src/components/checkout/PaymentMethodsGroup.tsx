@@ -353,7 +353,7 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
 
   // Replicating exactly the logic from OrderSummary.tsx
   const localItemsSum = sumItemsLocal(
-    items.map((i) => ({ id: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
+    items.map((i) => ({ id: i.id, sku: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
     countryCode,
     overridesFor,
   );

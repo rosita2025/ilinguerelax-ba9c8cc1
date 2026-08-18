@@ -648,6 +648,15 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
         metadata: { phone: s.buyer.phone ?? "", processor: "mercadopago", paymentType },
       }, { onConflict: "email,source" }).then(() => {}, () => {});
 
+      const pricing = {
+        priceUsd: currentUsdRef,
+        currencyCode: local.currency,
+        priceLabel: localTotalLabel,
+        exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
+        finalPriceAmount: localTotalAmount,
+      };
+      const payload = getPaymentPayload(pricing, "mercadopago", countryCode);
+
       const { data, error } = await invokeWithRetry<{ init_point?: string }>("create-mercadopago-preference", {
         body: {
           orderId: `ILR-MP-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
@@ -663,8 +672,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           payerName: s.buyer.fullName.trim(),
           payerPhone: s.buyer.phone ?? undefined,
           expectedTotalUsd: Number(currentUsdRef.toFixed(2)),
-          currency: countryCode === "PE" ? "PEN" : local.currency,
-          amount: Number((countryCode === "PE" ? (penTotals?.total || localTotalAmount) : localTotalAmount).toFixed(2)),
+          currency: payload.currency,
+          amount: Number(payload.amount),
           returnUrl: `${window.location.origin}/checkouts/return`,
           successUrl: `${window.location.origin}/checkouts/success`,
           failureUrl: `${window.location.origin}/checkouts/failure`,

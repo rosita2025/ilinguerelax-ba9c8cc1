@@ -64,6 +64,15 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
   const pricing = useAdminPricing(adminSku);
   const region = useRegionTier();
   const manualOverrides = useLocalOverrides(adminSku) as Partial<Record<Currency, number>> | null;
+  const [refreshTick, setRefreshTick] = useState(0);
+
+  // Escuchar actualizaciones globales para refrescar precios sin F5
+  useEffect(() => {
+    const handleUpdate = () => setRefreshTick(v => v + 1);
+    window.addEventListener('pricing_updated', handleUpdate);
+    return () => window.removeEventListener('pricing_updated', handleUpdate);
+  }, []);
+
   
   const countryCode = (region.country || "US").toUpperCase();
   const currency = detectCurrency(countryCode);

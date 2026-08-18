@@ -346,18 +346,21 @@ const ProductSpanish5000Digital = () => {
 
               <div className="p-6 rounded-2xl bg-primary/5 border border-primary/10">
                 <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                  <Check className="w-5 h-5 text-primary" /> What you get today:
+                  <Check className="w-5 h-5 text-emerald-600" /> What's included in your Interactive Kit:
                 </h3>
-                <ul className="space-y-3">
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
                   {[
                     "5,000 Words + Pronunciation (250 Pages)",
                     "A1–C1 Grammar Guide (250 Pages)",
                     "1,000 Essential Verbs + Pronunciation",
                     "500 Practice Questions + Pronunciation",
-                    "Structured Study Plan & Exercises",
+                    "Native Audio Modules (MP3 Pack)",
+                    "Interactive Flashcards (Anki/Quizlet)",
+                    "Top 100 Conversations Miniguide",
+                    "7-Day Money-Back Guarantee",
                   ].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-sm font-semibold">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    <li key={i} className="flex items-center gap-3 text-sm font-semibold text-slate-700">
+                      <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                       {item}
                     </li>
                   ))}

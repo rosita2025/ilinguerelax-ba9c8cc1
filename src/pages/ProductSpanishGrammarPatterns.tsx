@@ -613,7 +613,7 @@ const ProductSpanishGrammarPatterns = () => {
         rating={4.9}
         reviewCount={1500}
         ctaText={`ADD TO CART — $${PRICE}.00`}
-        onBuyClick={handleAddToCart}
+        onBuyClick={() => setPhysicalCheckoutOpen(true)}
         isLoading={cartLoading}
         disabled={false}
         isPhysical={true}

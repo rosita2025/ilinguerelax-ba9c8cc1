@@ -43,6 +43,7 @@ interface StickyBuyBarProps {
   localUsdPrices?: Record<string, number> | null;
   /** Short high-conversion testimonials to rotate. */
   testimonials?: string[];
+  goesToInternalCheckout?: boolean;
 }
 
 export const StickyBuyBar = ({
@@ -74,6 +75,7 @@ export const StickyBuyBar = ({
   usdValue,
   localUsdPrices,
   testimonials,
+  goesToInternalCheckout: forceInternal = false,
 }: StickyBuyBarProps & { sku?: string }) => {
   const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
 
@@ -213,6 +215,7 @@ export const StickyBuyBar = ({
     // 24959578143733255 embedded in its checkout and firing here would
     // duplicate the event.
     const goesToInternalCheckout = (() => {
+      if (forceInternal) return true;
       if (onBuyClick) return true; // internal handlers always land on our checkout store
       if (isPhysical) return true; // physical products on this site use internal checkout
       if (!buyUrl) return false;

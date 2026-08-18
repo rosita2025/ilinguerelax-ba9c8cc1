@@ -100,10 +100,10 @@ const benefits = [
 const Product8000Book = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const { isLoading: cartLoading } = useCartStore();
-  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleAddToCart = async () => {
-    setPhysicalCheckoutOpen(true);
+    navigate("/checkouts/english_8000");
   };
 
   const AMAZON_URL_8000 = "https://www.amazon.com/s?k=Ingl%C3%A9s+Relax+8000+Palabras";

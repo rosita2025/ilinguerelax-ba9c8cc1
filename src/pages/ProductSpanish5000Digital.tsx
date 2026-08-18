@@ -48,8 +48,8 @@ const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then
 
 
 const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/aFa5kC2OIchv2mA8m98IU0e";
-const PRICE = 30;
-const ORIGINAL_PRICE = 97;
+const PRICE = 97;
+const ORIGINAL_PRICE = 215;
 const DISCOUNT_PCT = Math.round(((ORIGINAL_PRICE - PRICE) / ORIGINAL_PRICE) * 100);
 
 const features = [
@@ -102,9 +102,9 @@ const ProductSpanish5000Digital = () => {
   const tier = useCountryTierRouting(ADMIN_SKU_SP5K, {
     tiendaPath: TIENDA_PATH_SP5K,
     fallbackHotmartUrl: HOTMART_SP5K_LATAM,
-    fallbackPriceGlobalUsd: 30,
-    fallbackPriceLatamUsd: 19,
-    fallbackPriceTiendaUsd: 10,
+    fallbackPriceGlobalUsd: 97,
+    fallbackPriceLatamUsd: 67,
+    fallbackPriceTiendaUsd: 47,
     fallbackPricePen: 45,
   });
   const currentPrice = tier.priceUsd;
@@ -115,7 +115,7 @@ const ProductSpanish5000Digital = () => {
   const flag = countryToFlag(countryCode);
 
   const pixelParams = useMemo(() => ({
-    content_name: "Spanish Relax - 5,000 Words (Digital)",
+    content_name: "Spanish Mastery System - Digital Only",
     content_category: "Digital Book",
     content_ids: ["product-spanish-5000-digital"],
     content_type: "product",
@@ -125,7 +125,7 @@ const ProductSpanish5000Digital = () => {
   useHotmartPixel(pixelParams);
   useTrackProductView({
     productId: "product-spanish-5000-digital",
-    productName: "Spanish Relax - 5,000 Words (Digital)",
+    productName: "Spanish Mastery System - Digital Only",
     price: currentPrice,
     currency: "USD",
     category: "Digital Book",
@@ -137,7 +137,7 @@ const ProductSpanish5000Digital = () => {
 
   const buildCartItem = () => ({
     id: "5000-spanish-words",
-    name: "5,000 Spanish Words with English Pronunciation (Digital PDF)",
+    name: "Spanish Mastery System - 5,000 Spanish Words (Digital PDF)",
     price: currentPrice,
     pricePen: pricePen ?? undefined,
     regionPrices: { 
@@ -160,7 +160,7 @@ const ProductSpanish5000Digital = () => {
       // Fire Meta Pixel only for our own /checkouts page. Hotmart embeds the
       // same pixel id, so firing here for Hotmart routes would double-count.
       trackHotmartEvent("InitiateCheckout", {
-        content_name: "Spanish Relax - 5,000 Words (Digital)",
+        content_name: "Spanish Mastery System - Digital Only",
         content_category: "Digital Book",
         content_ids: ["product-spanish-5000-digital"],
         content_type: "product",
@@ -265,7 +265,7 @@ const ProductSpanish5000Digital = () => {
               <PurchaseCounter />
 
               <h1 className="text-3xl md:text-5xl font-black leading-tight text-slate-900">
-                {pricing.name ?? (<>Learn Spanish: 5,000 Essential Words —{" "}
+                {pricing.name ?? (<>Spanish Mastery System: 5,000 Essential Words —{" "}
                   <span className="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
                     with English Pronunciation
                   </span></>)}

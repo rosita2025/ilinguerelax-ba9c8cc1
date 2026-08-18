@@ -1,10 +1,11 @@
 import { useMemo, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useMetaPixelViewContent, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { ProductReviews } from "@/components/ProductReviews";
 import { Navbar } from "@/components/Navbar";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
+
 import { useCartStore } from "@/stores/cartStore";
 import { fetchShopifyProducts } from "@/lib/shopify";
 import { CountdownTimer } from "@/components/CountdownTimer";
@@ -99,10 +100,10 @@ const benefits = [
 const Product8000Book = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const { isLoading: cartLoading } = useCartStore();
-  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleAddToCart = async () => {
-    setPhysicalCheckoutOpen(true);
+    navigate("/checkouts/english_8000");
   };
 
   const AMAZON_URL_8000 = "https://www.amazon.com/s?k=Ingl%C3%A9s+Relax+8000+Palabras";
@@ -675,7 +676,7 @@ const Product8000Book = () => {
       />
 
       {/* Sticky Buy Bar */}
-      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="english_8000" title="8,000 Essential Words - Physical Book" />
+      
       <StickyBuyBar
         price="$34.99"
         originalPrice="$49.99"

@@ -1,10 +1,11 @@
 import { useMemo, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
+
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -88,10 +89,11 @@ const ProductSpanish3000VerbsBook = () => {
   const [submitting, setSubmitting] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
   const { isLoading: cartLoading } = useCartStore();
-  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
+  const navigate = useNavigate();
+
 
   const handleAddToCart = async () => {
-    setPhysicalCheckoutOpen(true);
+    navigate("/checkouts/spanish_3000_verbs");
   };
 
   const AMAZON_URL_3000 = "https://www.amazon.com/s?k=Spanish+Relax+3000+Verbs";
@@ -626,12 +628,6 @@ const ProductSpanish3000VerbsBook = () => {
         disabled={false}
         isPhysical={true}
         goesToInternalCheckout={true}
-      />
-      <PhysicalBookCheckout 
-        open={physicalCheckoutOpen} 
-        onOpenChange={setPhysicalCheckoutOpen} 
-        book="spanish_3000_verbs" 
-        title="3,000 Spanish Verbs - Physical Book" 
       />
     </main>
   );

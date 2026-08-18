@@ -1,10 +1,11 @@
 import { useMemo, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
+
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -65,10 +66,11 @@ const ProductSpanishGrammarPatterns = () => {
   const [shopifyVariantId, setShopifyVariantId] = useState<string | null>(null);
   const [shopifyProduct, setShopifyProduct] = useState<any>(null);
   const { addItem, isLoading: cartLoading } = useCartStore();
-  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
+  const navigate = useNavigate();
+
 
   const handleAddToCart = async () => {
-    setPhysicalCheckoutOpen(true);
+    navigate("/checkouts/spanish_grammar");
   };
 
   const AMAZON_URL_GRAMMAR = "https://www.amazon.com/s?k=Spanish+Relax+Grammar+Patterns";
@@ -287,7 +289,7 @@ const ProductSpanishGrammarPatterns = () => {
               <Button
                 size="xl"
                 className="w-full mb-2 text-lg py-6 bg-gradient-to-r from-[#d4af37] to-[#f4d782] hover:from-[#f4d782] hover:to-[#d4af37] text-[#1a1233] font-black border-0 shadow-lg shadow-[#d4af37]/30"
-                onClick={() => setPhysicalCheckoutOpen(true)}
+                onClick={handleAddToCart}
                 disabled={false}
               >
                 {cartLoading ? (
@@ -588,17 +590,11 @@ const ProductSpanishGrammarPatterns = () => {
         reviewCount={1500}
         ctaText={`ADD TO CART — $${PRICE}.00`}
         sku="SPANISH-GRAMMAR-PATTERNS"
-        onBuyClick={() => setPhysicalCheckoutOpen(true)}
+        onBuyClick={handleAddToCart}
         isLoading={cartLoading}
         disabled={false}
         isPhysical={true}
         goesToInternalCheckout={true}
-      />
-      <PhysicalBookCheckout 
-        open={physicalCheckoutOpen} 
-        onOpenChange={setPhysicalCheckoutOpen} 
-        book="spanish_grammar_patterns" 
-        title="Spanish Grammar Patterns - Physical Book" 
       />
     </main>
   );

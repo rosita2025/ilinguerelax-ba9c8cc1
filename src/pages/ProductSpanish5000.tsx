@@ -13,7 +13,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
+
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { LiveViewers } from "@/components/LiveViewers";
 import SalesNotification from "@/components/SalesNotification";
@@ -159,7 +159,7 @@ const ProductSpanish5000 = () => {
   useScrollTimeTracking("product_spanish_5000");
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [isCreatingDigitalCheckout, setIsCreatingDigitalCheckout] = useState(false);
-  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
+  
   const navigate = useNavigate();
   const checkoutLockRef = useRef(false);
 
@@ -195,7 +195,7 @@ const ProductSpanish5000 = () => {
   };
 
   const handleBuyNow = async () => {
-    setPhysicalCheckoutOpen(true);
+    navigate("/checkouts/spanish_5000_physical");
   };
 
   const handleViewDigital = () => {
@@ -814,7 +814,7 @@ const ProductSpanish5000 = () => {
       </Suspense>
 
       {/* Sticky Buy Bar */}
-      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="spanish_5000" title="Spanish Mastery System - Physical Book" />
+      
       <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName="Book Physical & Digital — FREE Bonuses" onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={true} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible isLoading={isCreatingDigitalCheckout} disabled={isCreatingDigitalCheckout} sku="SPANISH-5000-PHYSICAL" goesToInternalCheckout={true} />
 
       {/* Spacer for sticky bar */}

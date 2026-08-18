@@ -510,41 +510,38 @@ const ProductSpanish5000Digital = () => {
 
       <Suspense fallback={<div className="h-40" />}>
         <div className="[&>section]:py-8 md:[&>section]:py-10">
-
-
         <FAQ
           title="Frequently Asked Questions"
-          subtitle="Everything about the digital PDF, learning materials, and delivery."
+          subtitle="Everything about the digital Mastery System, learning materials, and delivery."
           items={[
             {
-              question: "What exactly is included?",
-              answer: "You get the complete Spanish Mastery System: 5,000 Words + Pronunciation (250 Pages), A1–C1 Grammar Guide (250 Pages), 1,000 Essential Verbs + Pronunciation, 500 Practice Questions + Pronunciation, and a Structured Study Plan & Exercises.",
+              question: "What exactly is included in the Mastery System?",
+              answer: "You get a complete interactive kit: The 5,000 Words & Pronunciation Guide (250 Pages), A1–C1 Grammar Manual (250 Pages), 1,000 Essential Verbs, 500 Conversational Questions, Native Audio MP3 Pack, Digital Flashcards for Anki/Quizlet, and the Top 100 Conversations Miniguide.",
               icon: FileText,
             },
             {
-
-              question: "How do I receive the product after purchase?",
-              answer: "As soon as your Stripe payment is confirmed, the Spanish Mastery System (PDF and all materials) is sent automatically to your email. If you don't see it, check your spam/promotions folder or write to hola@ilinguerelax.com.",
+              question: "How do I receive the kit after purchase?",
+              answer: "Instantly. As soon as your payment is confirmed, you'll get a download link for all PDF, MP3, and flashcard materials sent directly to your email. No shipping wait time.",
               icon: Download,
             },
             {
-              question: "What's the difference between this and the physical book version?",
-              answer: "This is the DIGITAL-ONLY edition (PDF). No shipping, no waiting: instant download. The physical book version is a separate product and includes the printed edition plus the digital PDF free.",
-              icon: FileText,
-            },
-            {
-              question: "Can I read it on my phone, tablet or computer?",
-              answer: "Yes. It's a standard PDF that opens on any device — iPhone, Android, iPad, Mac, PC. Read it offline anytime.",
+              question: "Can I use the flashcards on my phone?",
+              answer: "Absolutely. We provide the decks formatted for Anki and Quizlet, which have free mobile apps. You can study your 5,000 words while commuting or waiting in line.",
               icon: Smartphone,
             },
             {
+              question: "Is the audio from native speakers?",
+              answer: "Yes. All audio modules feature native Latin American Spanish speakers so you learn the correct accent and rhythm from day one.",
+              icon: Headphones,
+            },
+            {
               question: "Is the pronunciation in English or Spanish?",
-              answer: "Every Spanish word is written with English pronunciation so you can read it the way it actually sounds — no phonetic symbols to learn.",
+              answer: "Every Spanish word is written with a unique English-based pronunciation system so you can read it correctly even if you've never spoken Spanish before.",
               icon: Globe,
             },
             {
-              question: "Do you offer a refund?",
-              answer: "Yes. 7-day money-back guarantee, no questions asked. Just email hola@ilinguerelax.com.",
+              question: "Do you offer a guarantee?",
+              answer: "Yes. We offer a 7-day, no-questions-asked money-back guarantee. If you don't feel you're learning faster, just email us for a full refund.",
               icon: Shield,
             },
           ]}

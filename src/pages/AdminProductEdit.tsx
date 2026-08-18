@@ -986,7 +986,8 @@ const AdminProductEdit = () => {
               <h2 className="font-semibold text-lg flex items-center gap-2">💰 Configuración de Precios Regionales</h2>
               <div className="flex flex-wrap items-center gap-6">
                 <div className="text-right">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Base USD - LATAM</Label>
+                <div className="text-right">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">BASE USD - LATAM</Label>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-primary">$</span>
                     <Input
@@ -997,13 +998,13 @@ const AdminProductEdit = () => {
                         const val = e.target.value === "" ? null : Number(e.target.value);
                         update("price_usd_latam", val);
                       }}
-                      placeholder="50.00"
+                      placeholder="45.00"
                     />
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Base USD - Anglosphere / EU</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">BASE USD - ANGLOSPHERE / EU</Label>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-primary">$</span>
                     <Input
@@ -1014,13 +1015,13 @@ const AdminProductEdit = () => {
                         const val = e.target.value === "" ? 0 : Number(e.target.value);
                         update("price_usd", val);
                       }}
-                      placeholder="72.00"
+                      placeholder="72.99"
                     />
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Base USD - Resto del Mundo</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">BASE USD - ASIA Y RESTO DEL MUNDO</Label>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-primary">$</span>
                     <Input

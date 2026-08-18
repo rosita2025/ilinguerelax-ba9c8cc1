@@ -82,12 +82,13 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
   // 1. Determinar el Tier de Región
   const isLatam = REGIONS.latam.codes.includes(countryCode);
   const isAnglosphereOrEurope = REGIONS.english_speaking.codes.includes(countryCode) || REGIONS.europe.codes.includes(countryCode);
+  const isAsiaOrRest = !isLatam && !isAnglosphereOrEurope;
   const isTiendaUsd = TIENDA_USD_COUNTRIES.has(countryCode);
 
   // Mapeo según la solicitud:
-  // LATAM -> price_usd_latam
-  // Angloparlantes / USA / Europa -> price_usd (Global)
-  // Resto del Mundo / Asia / África -> price_usd_tienda
+  // LATAM -> price_usd_latam ($45)
+  // Angloparlantes / USA / Europa -> price_usd ($72.99)
+  // Resto del Mundo / Asia / África -> price_usd_tienda ($68)
   const basePriceGlobal = pricing.priceGlobalUsd ?? opts.fallbackPriceGlobalUsd ?? 0;
   const basePriceLatam = pricing.priceLatamUsd ?? opts.fallbackPriceLatamUsd ?? basePriceGlobal;
   const basePriceRestOfWorld = pricing.priceTiendaUsd ?? opts.fallbackPriceTiendaUsd ?? basePriceGlobal;

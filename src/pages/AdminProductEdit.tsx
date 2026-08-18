@@ -986,7 +986,7 @@ const AdminProductEdit = () => {
               <h2 className="font-semibold text-lg flex items-center gap-2">💰 Configuración de Precios Regionales</h2>
               <div className="flex flex-wrap items-center gap-6">
                 <div className="text-right">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Base USD - LATAM</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">BASE USD - LATAM</Label>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-primary">$</span>
                     <Input
@@ -997,13 +997,13 @@ const AdminProductEdit = () => {
                         const val = e.target.value === "" ? null : Number(e.target.value);
                         update("price_usd_latam", val);
                       }}
-                      placeholder="50.00"
+                      placeholder="45.00"
                     />
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Base USD - Anglosphere / EU</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">BASE USD - ANGLOSPHERE / EU</Label>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-primary">$</span>
                     <Input
@@ -1014,13 +1014,13 @@ const AdminProductEdit = () => {
                         const val = e.target.value === "" ? 0 : Number(e.target.value);
                         update("price_usd", val);
                       }}
-                      placeholder="72.00"
+                      placeholder="72.99"
                     />
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Base USD - Resto del Mundo</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">BASE USD - ASIA Y RESTO DEL MUNDO</Label>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-primary">$</span>
                     <Input
@@ -1041,11 +1041,12 @@ const AdminProductEdit = () => {
             <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg flex items-start gap-3">
               <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
               <div className="text-xs text-amber-800 space-y-1">
-                <p className="font-bold">Estructura Simplificada:</p>
+                <p className="font-bold">Estructura de 3 Tiers:</p>
                 <ul className="list-disc ml-4 space-y-0.5">
-                  <li><b>LATAM:</b> Usa el precio base LATAM ($ {product.price_usd_latam || product.price_usd}).</li>
-                  <li><b>Angloparlantes/Europa:</b> Usa el precio base Global ($ {product.price_usd}).</li>
-                  <li><b>Resto del Mundo:</b> Usa el precio Resto del Mundo ($ {product.price_usd_tienda || product.price_usd}).</li>
+                  <li><b>LATAM:</b> Basado en BASE USD - LATAM ($ {product.price_usd_latam || product.price_usd}).</li>
+                  <li><b>ANGLO / EU:</b> Basado en BASE USD - ANGLOSPHERE / EU ($ {product.price_usd}).</li>
+                  <li><b>ASIA / RESTO:</b> Basado en BASE USD - ASIA Y RESTO DEL MUNDO ($ {product.price_usd_tienda || product.price_usd}).</li>
+
                   <li>Los precios tachados se controlan ahora de forma manual por moneda en las tarjetas de abajo para mayor precisión.</li>
                 </ul>
               </div>
@@ -1132,6 +1133,9 @@ const AdminProductEdit = () => {
                       ? product.price_usd 
                       : (product.price_usd_tienda ?? product.price_usd);
                   
+                  const isAsiaOrRest = !isLatam && !isAnglosphereOrEurope;
+                  const regionLabel = isLatam ? "LATAM" : isAnglosphereOrEurope ? "ANGLO / EU" : "ASIA / RESTO";
+                  
                   const regionalUsdOverride = product.local_usd_prices?.[code];
                   const currentUsdValue = regionalUsdOverride != null ? Number(regionalUsdOverride) : Number(baseUsdRef);
                   
@@ -1156,7 +1160,7 @@ const AdminProductEdit = () => {
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex flex-col">
                           <Label className="text-xs">{flag} {code}</Label>
-                          <span className="text-[9px] text-muted-foreground leading-tight">{region} · {label}</span>
+                          <span className="text-[9px] text-muted-foreground leading-tight">{regionLabel} · {label}</span>
                         </div>
                         {regionPrice && !product.local_prices?.[code] && (
                           <button 
@@ -1254,12 +1258,12 @@ const AdminProductEdit = () => {
                             )}
                           </div>
                           <p className="text-[9px] text-muted-foreground/70 italic">
-                            Ref: ${currentUsdValue.toFixed(2)} USD
+                            Ref: USD {currentUsdValue.toFixed(2)}
                           </p>
                         </div>
                         
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="text-[8px] uppercase font-bold text-muted-foreground/60 shrink-0">USD Ref:</span>
+                          <span className="text-[8px] uppercase font-bold text-muted-foreground/60 shrink-0">USD REF:</span>
                           <Input
                             type="text"
                             inputMode="decimal"

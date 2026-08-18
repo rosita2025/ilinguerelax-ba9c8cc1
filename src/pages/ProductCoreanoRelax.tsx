@@ -163,6 +163,7 @@ const ProductCoreanoRelax = () => {
         type="product"
         price="12"
         originalPrice="39"
+
         sku="ILINGUE-COREANO-100MM"
         keywords="aprender coreano desde cero, coreano para hispanohablantes, mapas mentales coreano, alfabeto hangul pdf, curso de coreano pdf, vocabulario coreano, coreano kpop, coreano kdramas, libro para aprender coreano, coreano A1 A2, ebook coreano"
       />

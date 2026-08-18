@@ -173,13 +173,11 @@ const Product8000 = () => {
       currency: "USD",
       num_items: 1
     });
-    if (typeof window !== "undefined") window.location.assign(TIENDA_PATH_8000);
+    navigate(TIENDA_PATH_8000);
   };
 
   const handleAddToCart = async () => {
-    if (typeof window !== "undefined") {
-      window.location.assign(TIENDA_PATH_8000);
-    }
+    navigate(TIENDA_PATH_8000);
   };
 
 

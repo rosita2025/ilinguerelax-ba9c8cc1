@@ -158,7 +158,7 @@ const ProductCoreanoRelax = () => {
       <SEO
         title={pricing.name ?? "1,000 Palabras Esenciales para Aprender Coreano · iLingue Relax"}
         description={pricing.description ?? "Domina el vocabulario coreano con 1,000 palabras esenciales, Hangul y pronunciación adaptada para hispanohablantes. PDF descargable."}
-        canonicalUrl="https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1"
+        canonicalUrl="https://ilinguerelax.com/products/1-000-palabras-esenciales-para-aprender-coreano"
         image={pricing.coverImageUrl ?? `https://ilinguerelax.com${coverAsset.url}`}
         type="product"
         price="12"

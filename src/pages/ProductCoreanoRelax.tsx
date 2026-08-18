@@ -39,6 +39,13 @@ import { WhatsAppTestimoniosCoreano } from "@/components/WhatsAppTestimoniosCore
 import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { PinterestSave } from "@/components/PinterestSave";
+import { CoreanoHeroRedesign } from "@/components/coreano/CoreanoHeroRedesign";
+import { CoreanoBonuses } from "@/components/coreano/CoreanoBonuses";
+import { CoreanoFeaturesGrid } from "@/components/coreano/CoreanoFeaturesGrid";
+import { CoreanoUpdates } from "@/components/coreano/CoreanoUpdates";
+import { CoreanoHowItWorks } from "@/components/coreano/CoreanoHowItWorks";
+import { CoreanoCategories } from "@/components/coreano/CoreanoCategories";
+import { CoreanoForWho } from "@/components/coreano/CoreanoForWho";
 
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
 const TIENDA_CHECKOUT_PATH = "/checkouts/coreano-100-mapas";
@@ -109,12 +116,12 @@ const ProductCoreanoRelax = () => {
     trackInitiate();
     addItem({
       id: "coreano-100-mapas",
-      name: "Coreano Sin Complicaciones · +100 Mapas Mentales (PDF)",
+      name: "Coreano Sin Complicaciones · 2,000 Palabras Esenciales (PDF)",
       price: priceUsd,
       regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
       pricePen: pricePen ?? undefined,
       image: "/images/product-coreano-100-mapas.webp",
-      description: "100 mapas mentales para aprender coreano desde cero (Hangul → C1)",
+      description: "2,000 palabras esenciales para aprender coreano (Hangul, pronunciación y español)",
       quantity: 1,
     });
     sonnerToast.success("Producto agregado al carrito");
@@ -149,19 +156,19 @@ const ProductCoreanoRelax = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title={pricing.name ?? "Aprender Coreano PDF · +100 Mapas Mentales"}
-        description={pricing.description ?? "Aprende coreano desde cero con +100 mapas mentales visuales, alfabeto hangul y vocabulario K-pop y K-dramas. PDF descargable, nivel A1–A2."}
+        title={pricing.name ?? "2,000 Palabras Esenciales para Aprender Coreano · iLingue Relax"}
+        description={pricing.description ?? "Domina el vocabulario coreano con 2,000 palabras esenciales, Hangul y pronunciación adaptada para hispanohablantes. PDF descargable."}
         canonicalUrl="https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1"
         image={pricing.coverImageUrl ?? `https://ilinguerelax.com${coverAsset.url}`}
         type="product"
-        price="10"
-        originalPrice="54"
+        price="12"
+        originalPrice="39"
         sku="ILINGUE-COREANO-100MM"
         keywords="aprender coreano desde cero, coreano para hispanohablantes, mapas mentales coreano, alfabeto hangul pdf, curso de coreano pdf, vocabulario coreano, coreano kpop, coreano kdramas, libro para aprender coreano, coreano A1 A2, ebook coreano"
       />
       <Navbar />
 
-      <section className="pt-4 pb-6 md:pt-8 md:pb-10">
+      <section className="pt-4 pb-0">
         {!pricing.active && (
           <div className="container px-4 md:px-6 mb-6">
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3 text-amber-800">
@@ -172,91 +179,22 @@ const ProductCoreanoRelax = () => {
             </div>
           </div>
         )}
-        <div className="container px-4 md:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="relative">
-              <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
-              <div className="relative">
-                <img
-                  src={coverAsset.url}
-                  alt="Coreano Relax - 100 Mapas Mentales para Aprender Coreano (Hangul a C1)"
-                  className="w-full h-auto rounded-2xl shadow-hero"
-                  onContextMenu={(e) => e.preventDefault()}
-                />
-                <PinterestSave 
-                  overlay 
-                  media={coverAsset.url}
-                  url="https://ilinguerelax.com/products/coreano-relax-100-mapas-mentales-vocabulario-visual-con-pronunciacion"
-                  description="Aprende coreano con 100 mapas mentales visuales y pronunciación fácil."
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold border border-amber-500/20">
-                  <Sparkles className="w-4 h-4" />
-                  <span>🇰🇷 NUEVO LANZAMIENTO</span>
-                </motion.div>
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20">
-                  <Brain className="w-4 h-4" /> +100 Mapas Mentales
-                </span>
-              </div>
-
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 text-balance leading-tight">
-                {pricing.name ?? (<>🇰🇷 Coreano Sin Complicaciones · <span className="text-gradient">+100 Mapas Mentales</span></>)}
-              </h1>
-
-              <p className="text-sm sm:text-base md:text-lg text-muted-foreground mb-6 text-pretty">
-                {pricing.description ?? (<>Aprende coreano de forma visual y entretenida con <strong>k-dramas</strong>, <strong>K-pop</strong> y cultura coreana. Sin reglas aburridas.</>)}
-              </p>
-
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 rounded-2xl p-5 border border-amber-500/20 mb-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-amber-600" />
-                  <span className="text-amber-600 font-semibold text-xs uppercase">Precio de Lanzamiento</span>
-                </div>
-                <div className="flex items-baseline gap-3 mb-2 flex-wrap">
-                  <span className="text-5xl md:text-6xl font-black text-foreground">{displayPrice}</span>
-                  <span className="text-2xl text-muted-foreground line-through">$54</span>
-                  <motion.span animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold shadow-lg">
-                    {isPeru ? "-72%" : useHotmartLatam ? "-81%" : "-72%"}
-                  </motion.span>
-                </div>
-                <p className="text-sm font-semibold text-foreground mb-1">
-                  {displayFlag} Precio para {isPeru ? "Perú" : useHotmartLatam ? "Latinoamérica" : "tu país"} · <span className="text-primary">{currencyLabel}</span>
-                </p>
-                <p className="text-xs text-muted-foreground">💳 Pago único · Acceso de por vida · Sin impuestos incluidos</p>
-              </motion.div>
-
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="mb-6">
-                <div className={useTiendaOnly ? "grid grid-cols-1 gap-3" : "grid grid-cols-1 sm:grid-cols-2 gap-3"}>
-                  <Button onClick={handleBuyStore} size="lg" className="w-full text-base py-6 gradient-hero text-primary-foreground font-bold shadow-hero hover:scale-[1.02] transition-transform">
-                    <Store className="w-5 h-5 mr-2" />
-                    Tienda iLingue · {displayPrice}
-                  </Button>
-                  {useHotmartLatam && (
-                    <Button onClick={handleBuyHotmart} variant="outline" size="lg" className="w-full text-base py-6 border-2 border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white font-bold">
-                      <ShoppingCart className="w-5 h-5 mr-2" />
-                      Hotmart · ${priceLatamUsd.toFixed(2)}
-                    </Button>
-                  )}
-                </div>
-                <p className="text-center text-xs text-muted-foreground mt-2">🔒 Pago seguro · Entrega automática · Elige tu método</p>
-                
-                <div className="mt-6 mb-6 flex items-center justify-between bg-white/50 p-3 rounded-xl border border-amber-500/20">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Pagos:</span>
-                  <PaymentLogos />
-                </div>
-              </motion.div>
-
-            </div>
-          </div>
-        </div>
+        
+        <CoreanoHeroRedesign 
+          price={displayPrice} 
+          onBuy={handleBuy} 
+        />
       </section>
 
+      <CoreanoBonuses />
+      <CoreanoUpdates />
+      <CoreanoFeaturesGrid />
+      <CoreanoHowItWorks />
+      <CoreanoCategories />
+      <CoreanoForWho />
+
       {/* Vista previa - Slider de mapas mentales */}
-      <section className="py-10 md:py-14 bg-gradient-to-b from-background to-primary/5">
+      <section className="py-16 md:py-24 bg-gradient-to-b from-background to-primary/5">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-8">
@@ -321,86 +259,13 @@ const ProductCoreanoRelax = () => {
         </div>
       </section>
 
-      <section className="py-8 md:py-10">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-foreground mb-3 text-balance leading-tight">
-              Aprende coreano con <span className="text-gradient">mapas mentales</span>
-            </h2>
-            <p className="text-sm sm:text-base text-muted-foreground text-center mb-10 text-pretty">Método visual, claro y progresivo · k-dramas y K-pop.</p>
-            <div className="bg-card rounded-3xl border border-border shadow-card p-8 mb-12">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {features.map((feature) => (
-                  <div key={feature} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-4 h-4 text-primary-foreground" />
-                    </div>
-                    <span className="text-foreground">{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      <section className="py-8 md:py-10">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold mb-3 border border-amber-500/20">
-                <Sparkles className="w-4 h-4" /> Incluye 2 Bonos GRATIS
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                Bonos exclusivos <span className="text-gradient">incluidos</span> en tu compra
-              </h3>
-              <p className="text-muted-foreground">Llévate dos recursos adicionales sin costo extra para acelerar tu aprendizaje.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-amber-500/5 p-6 shadow-card">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-bold mb-3">
-                  <Sparkles className="w-3.5 h-3.5" /> Bono 1
-                </div>
-                <h4 className="text-xl font-bold text-foreground mb-2">
-                  📖 Guía Completa del Alfabeto Hangul
-                </h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Aprende a leer y escribir Hangul desde cero con explicaciones claras de cada vocal y consonante, trazos paso a paso y ejemplos de pronunciación para hispanohablantes.
-                </p>
-                <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-                  <Check className="w-4 h-4" /> Incluido GRATIS
-                </div>
-              </div>
-
-              <div className="rounded-2xl border-2 border-amber-500/30 bg-gradient-to-br from-amber-500/5 to-primary/5 p-6 shadow-card">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 text-amber-600 text-xs font-bold mb-3">
-                  <Sparkles className="w-3.5 h-3.5" /> Bono 2
-                </div>
-                <h4 className="text-xl font-bold text-foreground mb-2">
-                  💬 100 Expresiones Coreanas Esenciales
-                </h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Las frases más usadas en el día a día, k-dramas y K-pop, con Hangul, pronunciación hispana y traducción al español para que hables con naturalidad desde el primer día.
-                </p>
-                <div className="flex items-center gap-2 text-sm font-semibold text-amber-600">
-                  <Check className="w-4 h-4" /> Incluido GRATIS
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      
       <ResenasWhatsAppCoreano />
-      
+
       <FAQ
         items={[
-          { question: t.productFaq.specialTitle, answer: t.productFaq.specialAnswer, icon: Sparkles },
-          { question: t.productFaq.receiveTitle, answer: t.productFaq.receiveAnswer, icon: Download },
-          { question: t.productFaq.secureTitle, answer: t.productFaq.secureAnswer, icon: Shield },
+          { question: "Aclarar el Estado de los Audios y la App:", answer: "Los módulos de audio nativo y el acceso a la App iLingue Relax son beneficios adicionales que se encuentran actualmente en desarrollo. Los compradores actuales recibirán acceso anticipado y actualizaciones gratuitas sin costo extra tan pronto como se lancen.", icon: Sparkles },
+          { question: "¿Cómo recibo el material?", answer: "La entrega es inmediata. Tras completar tu compra, recibirás un correo electrónico con el enlace de descarga del PDF de las 2,000 palabras y los bonos incluidos.", icon: Download },
+          { question: "¿Es seguro mi pago?", answer: "Totalmente. Utilizamos pasarelas de pago cifradas y seguras (PayPal, Stripe, dLocal) para garantizar la protección de tus datos bancarios.", icon: Shield },
           { question: "¿En qué formato se entrega?", answer: "PDF descargable, optimizado para leer desde celular, tablet o computadora. Puedes imprimirlo si lo deseas.", icon: Globe },
         ]}
         title="Preguntas Frecuentes"
@@ -413,10 +278,10 @@ const ProductCoreanoRelax = () => {
       {/* Sticky Buy Bar — 4-tier routing (Perú/VE-CU-NI/Global → Tienda · LATAM → Hotmart) */}
       <StickyBuyBar
         price={displayPrice}
-        originalPrice={tier.originalLabel}
+        originalPrice={"$39"}
         currencyCode={currencyLabel}
         flag={displayFlag}
-        productName="Coreano · +100 Mapas Mentales"
+        productName="Coreano · 2,000 Palabras Esenciales"
         ctaText={"Comprar ahora"}
         buyUrl={TIENDA_CHECKOUT_PATH}
         onBuyClick={handleBuy}

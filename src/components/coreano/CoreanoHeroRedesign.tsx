@@ -92,10 +92,12 @@ export const CoreanoHeroRedesign = ({ price, onBuy }: CoreanoHeroRedesignProps) 
               <p className="text-slate-700 dark:text-slate-300 font-semibold mb-4 text-sm uppercase tracking-wider">Una guía práctica para estudiar a tu propio ritmo:</p>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
                 {[
-                  "2,000 palabras esenciales",
+                  "1,000 palabras esenciales",
+                  "Incluye +100 Mapas Mentales",
                   "Hangul + español",
                   "Pronunciación adaptada",
-                  "Organizado por categorías"
+                  "Organizado por categorías",
+                  "Actualización GRATIS a 2,000 palabras"
                 ].map((benefit) => (
                   <li key={benefit} className="flex items-center gap-3 text-slate-700 dark:text-slate-200 font-bold">
                     <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">

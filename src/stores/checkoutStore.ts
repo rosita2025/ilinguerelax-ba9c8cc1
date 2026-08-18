@@ -133,6 +133,8 @@ const FIXED_TOTAL_COUPONS: Record<string, number> = {
   DLTEST1: 1,
   FIXED1: 1,
   PRUEBA1: 1,
+  PRUEBA1USD: 1,
+  TEST1USD: 1,
 };
 
 

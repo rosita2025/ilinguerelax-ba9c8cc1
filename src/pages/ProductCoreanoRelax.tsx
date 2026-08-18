@@ -48,8 +48,8 @@ import { CoreanoCategories } from "@/components/coreano/CoreanoCategories";
 import { CoreanoForWho } from "@/components/coreano/CoreanoForWho";
 
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
-const TIENDA_CHECKOUT_PATH = "/checkouts/coreano-100-mapas";
-const ADMIN_SKU = "100-mapas-mentales-para-aprender-coreano-hangul-c1";
+const TIENDA_CHECKOUT_PATH = "/checkouts/1000-palabras-coreano";
+const ADMIN_SKU = "1-000-palabras-esenciales-para-aprender-coreano";
 
 const features = [
   "1,000 palabras esenciales del coreano",
@@ -97,7 +97,7 @@ const ProductCoreanoRelax = () => {
     trackHotmartEvent("InitiateCheckout", {
       content_name: "Coreano Sin Complicaciones - 1,000 Palabras Esenciales",
       content_category: "Digital Book",
-      content_ids: ["product-coreano-100-mapas"],
+      content_ids: ["product-coreano-1000-palabras"],
       content_type: "product",
       value: priceUsd,
       currency: "USD",
@@ -115,12 +115,12 @@ const ProductCoreanoRelax = () => {
     if (!pricingReady) return;
     trackInitiate();
     addItem({
-      id: "coreano-100-mapas",
+      id: "coreano-1000-palabras",
       name: "Coreano Sin Complicaciones · 1,000 Palabras Esenciales (PDF)",
       price: priceUsd,
       regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
       pricePen: pricePen ?? undefined,
-      image: "/images/product-coreano-100-mapas.webp",
+      image: "https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/1-000-palabras-esenciales-para-aprender-coreano/1784178628839-09lsq.webp",
       description: "1,000 palabras esenciales para aprender coreano (Hangul, pronunciación y español)",
       quantity: 1,
     });
@@ -233,7 +233,7 @@ const ProductCoreanoRelax = () => {
                       <div className="aspect-[3/4] overflow-hidden bg-muted">
                         <img
                           src={item.src}
-                          alt={`Vista previa mapa mental coreano - ${item.caption}`}
+                          alt={`Vista previa vocabulario coreano - ${item.caption}`}
                           loading="lazy"
                           className="w-full h-full object-cover"
                         />
@@ -251,7 +251,7 @@ const ProductCoreanoRelax = () => {
 
             <div className="text-center mt-6">
               <a
-                href="/vista-previa/coreano-100-mapas-mentales"
+                href="/vista-previa/coreano-1000-palabras"
                 className="inline-flex items-center gap-2 text-primary font-semibold hover:underline"
               >
                 <Eye className="w-4 h-4" /> Ver vista previa completa

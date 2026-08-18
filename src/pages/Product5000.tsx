@@ -193,8 +193,8 @@ const Product5000 = () => {
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   
-  const { isPeru, useHotmartLatam, useTiendaOnly, priceUsd: priceUSD, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen, country } = tier;
-  const isLatam = useHotmartLatam;
+  const { isPeru, priceUsd: priceUSD, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen, country } = tier;
+  const isLatam = false; // Internal checkout for everyone
   const pricing5000Ready = tier.loaded;
   const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
   // Fuente única: los labels del hook (respetan los montos exactos por moneda

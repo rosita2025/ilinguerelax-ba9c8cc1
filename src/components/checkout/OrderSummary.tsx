@@ -73,6 +73,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   );
   const localSubtotalAmount = localItemsSum.amount;
   const localTotalAmount = (localSubtotalAmount * (1 - (couponPercent || 0) / 100)) + shipping;
+  const currentUsdRef = localItemsSum.usdReference;
   const localTotalLabel = showLocalRef ? formatLocalDirect(localTotalAmount, region.country || "") : formatCurrencyAmount(grandTotal, "USD");
   const breakdown = useCurrencyBreakdown(total, null, items[0]?.localUsdPrices);
 
@@ -131,7 +132,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             </span>
             {showLocalRef && (
               <span className="text-[10px] font-normal text-muted-foreground leading-none">
-                  ≈ USD ${localItemsSum.usdReference.toFixed(2)}
+                  ≈ USD ${currentUsdRef.toFixed(2)}
 
               </span>
             )}
@@ -330,7 +331,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
               <div className="text-xl">{penMode ? formatPen(penTotals!.total) : showLocalRef ? localTotalLabel : formatCurrencyAmount(grandTotal, "USD")}</div>
               {showLocalRef && (
                 <div className="text-[11px] text-muted-foreground font-normal mt-0.5">
-                  ≈ USD ${localItemsSum.usdReference.toFixed(2)}
+                  ≈ USD ${currentUsdRef.toFixed(2)}
                 </div>
               )}
               

@@ -31,6 +31,8 @@ import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
 import { mapDlocalStatus } from "@/lib/dlocalErrorMap";
 import { saveDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
 import { extractEdgeErrorMessage, looksTechnical } from "@/lib/edgeError";
+import { getPaymentPayload } from "@/lib/paymentGatewayRouter";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
 
 type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
@@ -511,6 +513,20 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       const initiallyRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(country);
 
       const fetchSecret = async (retryForRestricted = false) => {
+        const pricing = {
+          priceUsd: currentUsdRef,
+          currencyCode: local.currency,
+          priceLabel: localTotalLabel,
+          exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
+          finalPriceAmount: localTotalAmount,
+        };
+
+        const payload = getPaymentPayload(
+          pricing,
+          selected === "stripe_ach" ? "stripe" : selected === "stripe_cashapp" ? "stripe" : selected === "stripe_klarna" ? "stripe" : "stripe",
+          country
+        );
+
         const { data, error } = await invokeWithRetry<{ clientSecret?: string }>("create-checkout-prueba", {
           body: {
             environment: getStripeEnvironment(),
@@ -518,7 +534,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
               id: i.id, name: i.name, price: itemPrice(i, region.tier),
               quantity: i.quantity, image: toAbsUrl(i.image), description: i.description,
             })),
-            currency: "usd",
+            currency: payload.currency,
+            amount: payload.amount,
             stripePaymentMethod: selected === "stripe_ach" ? "us_bank_account" : selected === "stripe_cashapp" ? "cashapp" : selected === "stripe_klarna" ? "klarna" : "card",
             couponPercent: s.couponPercent,
             couponCode: s.coupon ?? undefined,
@@ -529,7 +546,6 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
               country,
             },
             returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
-            // In the edge function we'll use this to skip adaptive pricing if we are retrying
             isRestrictedRetry: retryForRestricted || initiallyRestricted,
           },
         }, { attempts: 3, baseDelayMs: 500 });
@@ -646,8 +662,9 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
           payerEmail: s.buyer.email.trim(),
           payerName: s.buyer.fullName.trim(),
           payerPhone: s.buyer.phone ?? undefined,
-          // Mercado Pago aplica el tipo de cambio local automáticamente (USD → moneda del comprador).
-          expectedTotalUsd: Number(totals.total.toFixed(2)),
+          expectedTotalUsd: Number(currentUsdRef.toFixed(2)),
+          currency: countryCode === "PE" ? "PEN" : local.currency,
+          amount: Number((countryCode === "PE" ? (penTotals?.total || localTotalAmount) : localTotalAmount).toFixed(2)),
           returnUrl: `${window.location.origin}/checkouts/return`,
           successUrl: `${window.location.origin}/checkouts/success`,
           failureUrl: `${window.location.origin}/checkouts/failure`,
@@ -707,8 +724,16 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       });
       return;
     }
-    const dlCurrency = DLOCAL_CURRENCY_BY_COUNTRY[ctry] ?? "USD";
-    const dlAmount = dlCurrency === "USD" ? totals.total : (local.currency === dlCurrency ? local.amount : totals.total);
+    const pricing = {
+      priceUsd: currentUsdRef,
+      currencyCode: local.currency,
+      priceLabel: localTotalLabel,
+      exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
+      finalPriceAmount: localTotalAmount,
+    };
+    const payload = getPaymentPayload(pricing, "dlocal", ctry);
+    const dlCurrency = payload.currency;
+    const dlAmount = Number(payload.amount);
     redirectingRef.current = true;
     setMpLoading(dlMethod);
     const dlOrderId = `ILR-DL-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
@@ -2320,14 +2345,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   </p>
                 </div>
                 <PayPalButtons
-                  amountUsd={Number(totalUsd)}
-                  localCurrency={local.currency}
-                  localAmount={local.amount}
+                  amountUsd={currentUsdRef}
+                  localCurrency={countryCode === "PE" ? "PEN" : local.currency}
+                  localAmount={countryCode === "PE" ? (penTotals?.total || localTotalAmount) : localTotalAmount}
                   description={items.map((i) => i.name).join(" + ").slice(0, 120) || "iLingue Relax"}
                   buyerEmail={buyer.email.trim() || undefined}
                   buyerName={buyer.fullName.trim() || undefined}
                   buyerPhone={buyer.phone || undefined}
-                  buyerCountry={(region.country || "").toUpperCase() || undefined}
+                  buyerCountry={countryCode || undefined}
                   skus={items.map((i) => i.id)}
                   couponCode={coupon ?? undefined}
                   items={items.map(i => ({ id: i.id, quantity: i.quantity || 1, price: itemPrice(i, region.tier) }))}

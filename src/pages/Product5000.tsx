@@ -909,7 +909,6 @@ const Product5000 = () => {
         reviewCount={800}
         showReviews={true}
         ctaText={"Comprar ahora"}
-        buyUrl={TIENDA_CHECKOUT_5000}
         onBuyClick={handleBuy}
       />
 

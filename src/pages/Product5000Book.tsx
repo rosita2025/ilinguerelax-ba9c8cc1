@@ -93,6 +93,7 @@ const MEDIA_SLIDES = [
 
 const Product5000Book = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isLoading: cartLoading } = useCartStore();
   const handleAddToCart = async () => {

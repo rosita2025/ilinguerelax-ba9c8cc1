@@ -52,7 +52,7 @@ const TIENDA_CHECKOUT_PATH = "/checkouts/coreano-100-mapas";
 const ADMIN_SKU = "100-mapas-mentales-para-aprender-coreano-hangul-c1";
 
 const features = [
-  "Más de 100 mapas mentales organizados por temas",
+  "1,000 palabras esenciales del coreano",
   "Introducción completa al Hangul (alfabeto coreano) paso a paso",
   "Vocabulario práctico del día a día",
   "Verbos esenciales y estructuras básicas explicadas visualmente",

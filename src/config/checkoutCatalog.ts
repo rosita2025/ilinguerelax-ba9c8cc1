@@ -19,6 +19,8 @@ export interface CatalogItem extends Omit<PruebaItem, "quantity"> {
   productPath?: string;
   /** SKU real en admin/products (digital_products.sku) cuando difiere del slug del checkout. */
   adminSku?: string;
+  /** Precio original (tachado) para mostrar el ahorro. */
+  originalPrice?: number;
 }
 
 

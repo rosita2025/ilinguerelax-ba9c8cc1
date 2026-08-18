@@ -2336,14 +2336,14 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
                   </p>
                 </div>
                 <PayPalButtons
-                  amountUsd={Number(totalUsd)}
-                  localCurrency={local.currency}
-                  localAmount={local.amount}
+                  amountUsd={currentUsdRef}
+                  localCurrency={countryCode === "PE" ? "PEN" : local.currency}
+                  localAmount={countryCode === "PE" ? (penTotals?.total || localTotalAmount) : localTotalAmount}
                   description={items.map((i) => i.name).join(" + ").slice(0, 120) || "iLingue Relax"}
                   buyerEmail={buyer.email.trim() || undefined}
                   buyerName={buyer.fullName.trim() || undefined}
                   buyerPhone={buyer.phone || undefined}
-                  buyerCountry={(region.country || "").toUpperCase() || undefined}
+                  buyerCountry={countryCode || undefined}
                   skus={items.map((i) => i.id)}
                   couponCode={coupon ?? undefined}
                   items={items.map(i => ({ id: i.id, quantity: i.quantity || 1, price: itemPrice(i, region.tier) }))}

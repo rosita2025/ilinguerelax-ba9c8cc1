@@ -119,7 +119,7 @@ const Product5000Book = () => {
   }, []);
 
   const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
-  const handleAddToShopifyCart = async () => {
+  const handleAddToCart = async () => {
     setPhysicalCheckoutOpen(true);
   };
 
@@ -306,7 +306,7 @@ const Product5000Book = () => {
                 variant="hero"
                 size="xl"
                 className="w-full mb-3 text-lg py-6"
-                onClick={handleAddToShopifyCart}
+                onClick={handleAddToCart}
                 disabled={cartLoading}
               >
                 {cartLoading ? (
@@ -456,7 +456,7 @@ const Product5000Book = () => {
                 <p className="text-muted-foreground mb-6">
                   Pago único • Envío internacional • Incluye PDF digital
                 </p>
-              <Button variant="hero" size="xl" className="w-full" onClick={handleAddToShopifyCart} disabled={cartLoading}>
+              <Button variant="hero" size="xl" className="w-full" onClick={handleAddToCart} disabled={cartLoading}>
                 COMPRAR AHORA
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
@@ -511,7 +511,7 @@ const Product5000Book = () => {
         productName="5,000 Palabras - Libro Físico"
         price="$24.00"
         ctaText="Comprar ahora"
-        onBuyClick={handleAddToShopifyCart}
+        onBuyClick={handleAddToCart}
         isLoading={cartLoading}
         showReviews={false}
         isPhysical={true}

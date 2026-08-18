@@ -729,7 +729,6 @@ const ProductPatronesEspeciales = () => {
         rating={pricingAdmin.rating != null ? pricingAdmin.rating : 4.9}
         reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}
         showReviews={true}
-        buyUrl={TIENDA_CHECKOUT_PATH}
         onBuyClick={handleBuy}
         ctaText={"Comprar ahora"}
         localUsdPrices={pricingAdmin.localUsdPrices}

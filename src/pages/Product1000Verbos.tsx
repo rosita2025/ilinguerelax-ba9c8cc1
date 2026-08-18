@@ -335,8 +335,6 @@ const Product1000Verbos = () => {
         showReviews={true}
         currencyCode={tier.currencyCode}
         flag={tier.isPeru ? "🇵🇪" : undefined}
-        buyUrl={"/checkouts/1000-verbos"}
-        ctaText={"Comprar ahora"}
         onBuyClick={handleBuy}
         usdValue={currentPrice}
         localUsdPrices={tier.localUsdPrices}

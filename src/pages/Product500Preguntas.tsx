@@ -299,8 +299,6 @@ const Product500Preguntas = () => {
         showReviews={true}
         currencyCode={tier.currencyCode}
         flag={tier.isPeru ? "🇵🇪" : undefined}
-        buyUrl={CHECKOUT_PATH}
-        ctaText={"Comprar ahora"}
         onBuyClick={handleBuy}
         usdValue={currentPrice}
       />

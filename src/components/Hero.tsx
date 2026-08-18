@@ -12,12 +12,13 @@ import appPreview2 from "@/assets/app-preview-2.png.asset.json";
 
 export const Hero = () => {
   return (
-    <section className="relative w-full overflow-hidden bg-background py-4 sm:py-6 md:py-8 lg:py-12">
+    <section className="relative w-full bg-background py-4 sm:py-6 md:py-8 lg:py-12">
       <div className="container mx-auto px-0 sm:px-4 lg:max-w-4xl">
-        <div className="relative w-full overflow-hidden sm:rounded-2xl bg-black/5 hero-swiper-container lg:shadow-hero">
+        <div className="relative w-full sm:rounded-2xl bg-black/5 hero-swiper-container lg:shadow-hero">
           <Swiper
             modules={[Autoplay, EffectFade, Pagination, Navigation]}
             effect={'fade'}
+            autoHeight={true}
             autoplay={{
               delay: 5000,
               disableOnInteraction: false,
@@ -28,24 +29,24 @@ export const Hero = () => {
             }}
             navigation={true}
             loop={true}
-            className="w-full h-full"
+            className="w-full"
           >
             <SwiperSlide key="slide-1" className="flex items-center justify-center bg-black/5">
-              <div className="w-full h-full relative overflow-hidden flex items-center justify-center">
+              <div className="w-full relative flex items-center justify-center">
                 <img
                   src={`${appPreview1.url}?v=${new Date().getTime()}`}
                   alt="iLingue Relax App Preview 1"
-                  className="w-full h-auto max-h-[500px] md:max-h-[600px] lg:max-h-[550px] object-cover sm:object-contain lg:object-cover transition-opacity duration-700 block mx-auto"
+                  className="w-full h-auto object-contain block mx-auto rounded-2xl"
                   loading="eager"
                 />
               </div>
             </SwiperSlide>
             <SwiperSlide key="slide-2" className="flex items-center justify-center bg-black/5">
-              <div className="w-full h-full relative overflow-hidden flex items-center justify-center">
+              <div className="w-full relative flex items-center justify-center">
                 <img
                   src={`${appPreview2.url}?v=${new Date().getTime()}`}
                   alt="iLingue Relax App Preview 2"
-                  className="w-full h-auto max-h-[500px] md:max-h-[600px] lg:max-h-[550px] object-cover sm:object-contain lg:object-cover transition-opacity duration-700 block mx-auto"
+                  className="w-full h-auto object-contain block mx-auto rounded-2xl"
                   loading="lazy"
                 />
               </div>

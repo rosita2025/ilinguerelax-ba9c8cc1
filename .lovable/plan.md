@@ -1,41 +1,42 @@
 ---
-name: plan-price-unification-v2
-description: Fix persistent regional pricing bug by hardcoding the $34.99 price and $97 original price for the Spanish Digital SKU across all tiers and hooks.
+name: plan-price-unification-hard-fix
+description: Force the Spanish Digital product price to $34.99 and original price to $97 globally by hardcoding values in hooks and frontend components to bypass any stale database state.
 type: feature
 ---
-# Plan - Spanish Digital Price Unification Fix
+# Plan - Final Spanish Digital Price Unification
 
-The Spanish Digital product ($34.99) is incorrectly showing a converted price from a legacy value (likely $78.99 or $97) in some regions, resulting in "334,56 kr" instead of the expected ~$37 USD equivalent. I will hardcode the fallback prices in the routing hooks and ensure the catalog and data files are byte-perfect to override any stale database state.
+The Spanish Digital product ($34.99) is showing incorrect converted prices in some regions (e.g., Sweden) because the routing logic is likely pulling legacy values from the database or failing to pass the unified overrides through the currency formatter. I will implement a "hard fix" that ensures these prices are correctly displayed globally.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> This will force the price to **$34.99 USD** (Global/LATAM) and **S/135 PEN** (Peru) regardless of database state, ensuring immediate consistency while Supabase Cloud syncs.
+> This plan forces the price to **$34.99 USD** and the original price to **$97 USD** for the Spanish Digital SKU globally. This will override any values currently in the database to ensure immediate consistency.
 
-- Do you want to keep the "Original Price" at **$97 USD** for all regions? (Currently planned as $97).
+- Is **$34.99 USD** the final intended price for all global regions (Sweden, USA, etc.)?
 
 ## Proposed Changes
 
-### Database (Supabase)
-- Enforce the **$34.99** price for the Spanish Digital SKU across all regional columns in a single migration.
-- Set `price_usd`, `price_usd_latam`, and `price_usd_tienda` to **34.99**.
-- Set `price_pen` to **135.00**.
+### Frontend Logic & Hooks
 
-### Frontend Logic
 #### `src/hooks/useCountryTierRouting.ts`
-- Fix the `originalLabel` generation to correctly use the base price when no override is present.
+- Modify the `originalLabel` generation logic. Currently, it might be using a default multiplier (2.5x) on a legacy base price.
+- I will ensure that if the SKU is the Spanish Digital one, it explicitly uses **$97** as the base for the `originalLabel` regardless of other calculations.
 
 #### `src/pages/ProductSpanish5000Digital.tsx`
-- Ensure all `fallbackPrice` props in `useCountryTierRouting` are set to **34.99**.
-- Verify `localizedOriginal` is set to `formatPrice(97)`.
+- The `useCountryTierRouting` call already has `fallbackPriceGlobalUsd: 34.99`, but I will ensure the `localizedOriginal` is also explicitly derived from **97**.
+- Verify that the `addItem` payload in `handleBuyNow` and `handleAddToCart` passes the unified $34.99 price to the cart.
 
 #### `src/config/checkoutCatalog.ts`
-- Verify the SKU `5-000-spanish-words-with-english-pronunciation-digital` has `price: 34.99` and `originalPrice: 97`.
+- Ensure the SKU `5-000-spanish-words-with-english-pronunciation-digital` entry has `price: 34.99` and `originalPrice: 97` for all regions in the `regionPrices` object.
 
 #### `src/data/products.ts`
-- Ensure the static data matches the **$34.99** / **$97** values.
+- Update the static `spanish-5000-digital` entry to have `price: 34.99` and `originalPrice: 97.00`.
+
+### Database Enforcements
+- Run a final Supabase migration to set `price_usd`, `price_usd_latam`, and `price_usd_tienda` to **34.99** and `price_pen` to **135.00** for the SKU `5-000-spanish-words-with-english-pronunciation-digital`.
 
 ## Technical Details
-- Table: `public.digital_products`
-- SKU: `5-000-spanish-words-with-english-pronunciation-digital`
-- Migration to be applied via `supabase--migration`.
+- Product SKU: `5-000-spanish-words-with-english-pronunciation-digital`
+- Target Price: **$34.99 USD**
+- Target Original Price: **$97.00 USD**
+- I will use `supabase--migration` for the database update.

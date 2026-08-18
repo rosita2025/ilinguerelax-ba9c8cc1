@@ -31,7 +31,7 @@ const resenas = [
     contacto: "Estudiante Verificada",
     telefono: "+52 55 **** 9012",
     pais: "México 🇲🇽",
-    resumen: "Muy recomendado. Los mapas mentales facilitan mucho el aprendizaje de este idioma tan complejo."
+    resumen: "Muy recomendado. La guía visual facilita mucho el aprendizaje de este idioma tan complejo."
   }
 ];
 

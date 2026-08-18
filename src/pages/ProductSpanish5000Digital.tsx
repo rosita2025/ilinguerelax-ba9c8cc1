@@ -201,9 +201,9 @@ const ProductSpanish5000Digital = () => {
         type="product"
         price={String(currentPrice)}
         originalPrice={tier.compareAtPriceUsd ? String(tier.compareAtPriceUsd) : undefined}
-        rating="4.8"
-        reviewCount="500"
-        sku="SPANISH-5000-DIGITAL"
+        rating={String(pricing.rating ?? 4.8)}
+        reviewCount={String(pricing.reviewCount ?? 500)}
+        sku={ADMIN_SKU_SP5K}
         keywords="5000 Spanish words pdf, learn Spanish vocabulary, Spanish for English speakers, Spanish pronunciation guide, best Spanish ebook, Spanish A1 to C1, Spanish Relax digital, Spanish vocabulary book pdf, download Spanish book, Spanish for beginners"
       />
       <Navbar />
@@ -257,7 +257,7 @@ const ProductSpanish5000Digital = () => {
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-emerald-500 text-emerald-500" />
                   ))}
-                  <span className="ml-2 text-sm font-bold text-slate-700">4.8/5 (500+ student reviews)</span>
+                  <span className="ml-2 text-sm font-bold text-slate-700">{pricing.rating ?? 4.8}/5 ({pricing.reviewCount ?? 500}+ student reviews)</span>
                 </div>
               </div>
               

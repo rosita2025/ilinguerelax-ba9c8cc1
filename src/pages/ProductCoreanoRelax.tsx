@@ -263,13 +263,29 @@ const ProductCoreanoRelax = () => {
 
       <FAQ
         items={[
-          { question: "Aclarar el Estado de los Audios y la App:", answer: "Los módulos de audio nativo y el acceso a la App iLingue Relax son beneficios adicionales que se encuentran actualmente en desarrollo. Los compradores actuales recibirán acceso anticipado y actualizaciones gratuitas sin costo extra tan pronto como se lancen.", icon: Sparkles },
-          { question: "¿Cómo recibo el material?", answer: "La entrega es inmediata. Tras completar tu compra, recibirás un correo electrónico con el enlace de descarga del PDF de las 2,000 palabras y los bonos incluidos.", icon: Download },
-          { question: "¿Es seguro mi pago?", answer: "Totalmente. Utilizamos pasarelas de pago cifradas y seguras (PayPal, Stripe, dLocal) para garantizar la protección de tus datos bancarios.", icon: Shield },
-          { question: "¿En qué formato se entrega?", answer: "PDF descargable, optimizado para leer desde celular, tablet o computadora. Puedes imprimirlo si lo deseas.", icon: Globe },
+          { 
+            question: "¿Cuándo recibiré mi acceso?", 
+            answer: "La entrega es inmediata. Tras completar tu pago, recibirás automáticamente un correo electrónico con el enlace de descarga de las 1,000 palabras esenciales y todos tus bonos.", 
+            icon: Download 
+          },
+          { 
+            question: "¿Cómo funciona la actualización a 2,000 palabras?", 
+            answer: "Al comprar hoy la versión de 1,000 palabras, quedas registrado para recibir la expansión a 2,000 palabras de forma totalmente GRATUITA. Te enviaremos la nueva versión a tu correo en cuanto sea lanzada sin que tengas que pagar nada extra.", 
+            icon: Sparkles 
+          },
+          { 
+            question: "¿Cuál es la política de reembolso?", 
+            answer: "Confiamos plenamente en nuestro método. Si por alguna razón sientes que el material no es para ti, cuentas con una garantía de satisfacción de 7 días para solicitar la devolución total de tu dinero.", 
+            icon: Shield 
+          },
+          { 
+            question: "¿Qué formato tiene el material?", 
+            answer: "Es un PDF digital de alta calidad, optimizado para ser visualizado en cualquier dispositivo (celular, tablet o computadora) y listo para imprimir si lo prefieres.", 
+            icon: Globe 
+          },
         ]}
         title="Preguntas Frecuentes"
-        subtitle="Resolvemos tus dudas sobre Coreano Sin Complicaciones"
+        subtitle="Todo lo que necesitas saber sobre Coreano Sin Complicaciones"
       />
       <Footer />
       <WhatsAppButton url="https://wa.link/ghi4rw" label="¿Dudas?" />

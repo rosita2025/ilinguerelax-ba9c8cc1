@@ -7,8 +7,9 @@ import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import {
   Check, BookOpen, Sparkles, Brain, Download, Zap, Shield, ShoppingCart,
-  Star, Eye, Globe, Smartphone, FileText, CreditCard, ArrowRight, Package, Lock
+  Star, Eye, Globe, Smartphone, FileText, CreditCard, ArrowRight, Package, Lock, Headphones, Layers, FilePlus
 } from "lucide-react";
+import { GuaranteeSeal } from "@/components/SpanishMasteryBadges";
 
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { useTrackProductView, useScrollTimeTracking } from "@/hooks/useGoogleAnalytics";
@@ -57,16 +58,16 @@ const features = [
   "1,000 Essential Spanish Verbs + English Pronunciation",
   "500 Spanish Questions for Practice + English Pronunciation",
   "Practical Exercises & Study Plan",
-  "Escrito por humanos & Marca registrada",
-  "Instant PDF download · Pago Seguro",
+  "Digital PDF Version",
+  "Instant PDF download · Secure Payment",
   "Progressive A1 → C1 Learning Path",
 ];
 
 const benefits = [
-  { icon: Download, title: "Instant Download", description: "Get immediate access to your PDF right after purchase. Start learning Spanish in minutes." },
+  { icon: Headphones, title: "Native Audio Modules", description: "Learn how words actually sound with native pronunciation MP3s included in your kit." },
+  { icon: Layers, title: "Digital Flashcards", description: "Ready-to-use decks for Anki/Quizlet to memorize the 5,000 words 3x faster." },
   { icon: Zap, title: "Learn Anywhere", description: "Study on your phone, tablet, or computer. Your Spanish vocabulary is always with you." },
-  { icon: Sparkles, title: "Stress-Free Method", description: "Learn at your own pace with a relaxed method that respects your process." },
-  { icon: Brain, title: "No Dictionaries Needed", description: "Meanings, pronunciation, and examples all in one place." },
+  { icon: FilePlus, title: "Quick Conjugation Guide", description: "A high-impact miniguide for the most common 100 Spanish conversations." },
 ];
 
 
@@ -250,12 +251,21 @@ const ProductSpanish5000Digital = () => {
 
             {/* Copy */}
             <div className="space-y-5">
+              <div className="flex flex-col sm:flex-row items-center gap-4 mb-2">
+                <div className="flex items-center gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-emerald-500 text-emerald-500" />
+                  ))}
+                  <span className="ml-2 text-sm font-bold text-slate-700">4.8/5 (500+ student reviews)</span>
+                </div>
+              </div>
+              
               <LiveViewers minViewers={18} maxViewers={54} lang="en" />
               <PurchaseCounter />
 
-              <h1 className="text-3xl md:text-5xl font-black leading-tight">
-                {pricing.name ?? (<>Learn 5,000 Spanish Words —{" "}
-                  <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <h1 className="text-3xl md:text-5xl font-black leading-tight text-slate-900">
+                {pricing.name ?? (<>Learn Spanish: 5,000 Essential Words —{" "}
+                  <span className="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
                     with English Pronunciation
                   </span></>)}
               </h1>
@@ -275,17 +285,20 @@ const ProductSpanish5000Digital = () => {
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
-                  One-time payment · Instant PDF · Escrito humano · Pago seguro
+                  One-time payment · Instant Access · Secure Checkout
                 </p>
-                <Button
-                  onClick={handleBuyNow}
-                  disabled={isRedirecting || !pricingReady}
-                  size="lg"
-                  className="mt-4 w-full h-14 text-base font-black shadow-hero"
-                >
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  {isRedirecting ? "Redirecting to secure checkout…" : `GET IT NOW — ${tier.priceLabel}`}
-                </Button>
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-[1fr,auto] gap-4 items-center">
+                  <Button
+                    onClick={handleBuyNow}
+                    disabled={isRedirecting || !pricingReady}
+                    size="lg"
+                    className="w-full h-14 text-base font-black shadow-hero bg-emerald-600 hover:bg-emerald-700 text-white"
+                  >
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    {isRedirecting ? "Redirecting to secure checkout…" : `GET THE FULL KIT — ${tier.priceLabel}`}
+                  </Button>
+                  <GuaranteeSeal />
+                </div>
 
                 <Button
                   onClick={handleAddToCart}

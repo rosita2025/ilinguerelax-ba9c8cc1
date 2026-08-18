@@ -28,15 +28,12 @@ import { detectCurrency, formatPrice, formatCurrencyAmount, exchangeRates, type 
 import { useLocalOverrides } from "@/lib/livePrices";
 import { useI18n } from "@/i18n/I18nContext";
 
-const HOTMART_URL_LATAM = "https://pay.hotmart.com/Q105880946X?checkoutMode=10&bid=1783106038717";
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
 // ÚNICA regla final para Patrones:
 // Perú → tienda interna PEN. VE/CU/NI → tienda interna USD. Global → tienda interna USD.
 // Solo LATAM permitido (sin PE/VE/CU/NI) usa Hotmart LATAM.
 const TIENDA_USD_COUNTRIES = new Set(["VE", "CU", "NI"]);
-const LATAM_HOTMART_COUNTRIES = new Set([
-  "AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "PA", "PY", "PR", "UY",
-]);
+
 
 const productImage = "/images/product-patrones-especiales.webp";
 

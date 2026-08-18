@@ -814,7 +814,7 @@ const ProductSpanish5000 = () => {
       </Suspense>
 
       {/* Sticky Buy Bar */}
-      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="spanish_5000" title="Spanish Mastery System - Physical Book" />
+      
       <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName="Book Physical & Digital — FREE Bonuses" onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={true} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible isLoading={isCreatingDigitalCheckout} disabled={isCreatingDigitalCheckout} sku="SPANISH-5000-PHYSICAL" goesToInternalCheckout={true} />
 
       {/* Spacer for sticky bar */}

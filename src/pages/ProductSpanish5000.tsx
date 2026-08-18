@@ -195,7 +195,7 @@ const ProductSpanish5000 = () => {
   };
 
   const handleBuyNow = async () => {
-    setPhysicalCheckoutOpen(true);
+    navigate("/checkouts/spanish_5000_physical");
   };
 
   const handleViewDigital = () => {

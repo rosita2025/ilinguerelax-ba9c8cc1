@@ -116,12 +116,12 @@ const ProductCoreanoRelax = () => {
     trackInitiate();
     addItem({
       id: "coreano-100-mapas",
-      name: "Coreano Sin Complicaciones · +100 Mapas Mentales (PDF)",
+      name: "Coreano Sin Complicaciones · 2,000 Palabras Esenciales (PDF)",
       price: priceUsd,
       regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
       pricePen: pricePen ?? undefined,
       image: "/images/product-coreano-100-mapas.webp",
-      description: "100 mapas mentales para aprender coreano desde cero (Hangul → C1)",
+      description: "2,000 palabras esenciales para aprender coreano (Hangul, pronunciación y español)",
       quantity: 1,
     });
     sonnerToast.success("Producto agregado al carrito");

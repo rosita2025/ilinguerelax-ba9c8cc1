@@ -145,7 +145,6 @@ const Product8000 = () => {
   const isLoading = useCartStore((s) => s.isLoading);
   const tier = useCountryTierRouting(ADMIN_SKU_8000, {
     tiendaPath: TIENDA_PATH_8000,
-    fallbackHotmartUrl: HOTMART_8000_LATAM,
   });
   const { useTiendaOnly, priceUsd } = tier;
 
@@ -165,23 +164,16 @@ const Product8000 = () => {
 
   // Handle Buy Now — 4-tier routing (Perú/VE-CU-NI/Global → tienda interna · LATAM → Hotmart)
   const handleBuyNow = () => {
-    if (useTiendaOnly) {
-      // Fire Meta Pixel only when navigating to our own /checkouts page.
-      // Hotmart embeds the same pixel id, so firing here for Hotmart routes
-      // would double-count InitiateCheckout.
-      trackHotmartEvent("InitiateCheckout", {
-        content_name: "Inglés Relax - 8,000 Palabras Digital",
-        content_category: "Digital Book",
-        content_ids: ["product-8000"],
-        content_type: "product",
-        value: priceUsd || 20,
-        currency: "USD",
-        num_items: 1
-      });
-      if (typeof window !== "undefined") window.location.assign(TIENDA_PATH_8000);
-      return;
-    }
-    window.open(tier.hotmartUrl || HOTMART_8000_LATAM, "_blank", "noopener,noreferrer");
+    trackHotmartEvent("InitiateCheckout", {
+      content_name: "Inglés Relax - 8,000 Palabras Digital",
+      content_category: "Digital Book",
+      content_ids: ["product-8000"],
+      content_type: "product",
+      value: priceUsd || 20,
+      currency: "USD",
+      num_items: 1
+    });
+    if (typeof window !== "undefined") window.location.assign(TIENDA_PATH_8000);
   };
 
   const handleAddToCart = async () => {
@@ -316,7 +308,7 @@ const Product8000 = () => {
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button variant="hero" size="xl" className="w-full text-lg py-6 shadow-2xl" onClick={handleBuyNow}>
                     <CreditCard className="w-6 h-6 mr-2" />
-                    {useTiendaOnly ? "¡COMPRAR AHORA EN TIENDA!" : "¡COMPRAR AHORA EN HOTMART!"}
+                    ¡COMPRAR AHORA!
                     <ArrowRight className="w-6 h-6 ml-2" />
                   </Button>
                 </motion.div>
@@ -339,7 +331,7 @@ const Product8000 = () => {
               </div>
 
               <p className="text-center text-sm text-muted-foreground mb-6 mt-4">
-                👆 Compra directo en Hotmart o agrega al carrito con otros productos
+                👆 Haz clic para asegurar tu copia al precio de oferta
               </p>
 
               {/* Trust Badges */}

@@ -75,7 +75,6 @@ const ProductCoreanoRelax = () => {
   const pricing = useAdminPricing(ADMIN_SKU);
   const tier = useCountryTierRouting(ADMIN_SKU, {
     tiendaPath: TIENDA_CHECKOUT_PATH,
-    fallbackHotmartUrl: HOTMART_URL_LATAM,
   });
   const {
     isPeru,
@@ -103,12 +102,6 @@ const ProductCoreanoRelax = () => {
       num_items: 1,
     });
 
-  const handleBuyHotmart = () => {
-    if (!pricingReady) return;
-    // Skip Meta Pixel: Hotmart embeds the same pixel id at its checkout,
-    // firing here would double-count InitiateCheckout.
-    window.open(tier.hotmartUrl || HOTMART_URL_LATAM, "_blank", "noopener,noreferrer");
-  };
 
   const handleBuyStore = () => {
     if (!pricingReady) return;

@@ -44,22 +44,18 @@ const ProductSpanish1000Verbs = () => {
 
   const handleBuyNow = () => {
     if (!pricingReady) return;
-    if (useTiendaOnly) {
-      addItem({
-        id: "1000-verbos-spanish",
-        name: pricing.name ?? "1,000 Verbs in Spanish (Digital PDF)",
-        price: currentPrice,
-        pricePen: pricePen ?? undefined,
-        regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
-        image: productImage,
-        description: "1,000 Spanish verbs conjugated in past, present & future",
-        quantity: 1,
-      });
-      setDrawerOpen(false);
-      navigate(TIENDA_PATH);
-    } else if (tier.hotmartUrl) {
-      window.open(tier.hotmartUrl, "_blank", "noopener,noreferrer");
-    }
+    addItem({
+      id: "1000-verbos-spanish",
+      name: pricing.name ?? "1,000 Verbs in Spanish (Digital PDF)",
+      price: currentPrice,
+      pricePen: pricePen ?? undefined,
+      regionPrices: { latam: priceLatamUsd, global: priceGlobalUsd, tienda: priceTiendaUsd },
+      image: productImage,
+      description: "1,000 Spanish verbs conjugated in past, present & future",
+      quantity: 1,
+    });
+    setDrawerOpen(false);
+    navigate(TIENDA_PATH);
   };
 
 
@@ -179,9 +175,9 @@ const ProductSpanish1000Verbs = () => {
         rating={4.8}
         reviewCount={0}
         showReviews={false}
-        buyUrl={useTiendaOnly ? TIENDA_PATH : (tier.hotmartUrl || "#")}
+        buyUrl={TIENDA_PATH}
         onBuyClick={handleBuyNow}
-        ctaText={useTiendaOnly ? `GET IT NOW — ${tier.priceLabel}` : `BUY ON HOTMART — ${tier.priceLabel}`}
+        ctaText={`GET IT NOW — ${tier.priceLabel}`}
         lang="en"
         calmMode
         dismissible

@@ -130,14 +130,9 @@ const BonusPreviewDialog = ({ triggerLabel = "See sample", title, subtitle, chil
 );
 
 const ProductSpanish5000 = () => {
-  // Libro físico: envíos solo a USA, Canadá, Reino Unido, Australia y Nueva Zelanda.
-  // Mostramos la moneda local de esos países (USD, CAD, GBP, AUD, NZD); cualquier
-  // otro país ve el precio en USD. El cobro siempre se realiza en USD.
-  const SHIPPING_CURRENCIES = ["USD", "CAD", "GBP", "AUD", "NZD"];
+  // Libro físico: cobro siempre se realiza en USD para internal checkout.
   const detected = useCampaignPrice(44.00, 59);
-  const campaign = SHIPPING_CURRENCIES.includes(detected.currency)
-    ? detected
-    : { ...detected, currency: "USD" as const, symbol: "$", price: "$44.00", originalPrice: "$59.00" };
+  const campaign = { ...detected, currency: "USD" as const, symbol: "$", price: "$44.00", originalPrice: "$59.00" };
 
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({
@@ -206,12 +201,10 @@ const ProductSpanish5000 = () => {
   const { formatPrice, currency } = useI18n();
   const ADMIN_SKU_DIGITAL = "5-000-spanish-words-with-english-pronunciation-digital";
   const TIENDA_PATH_DIGITAL = "/checkouts/5000-spanish-words";
-  const HOTMART_DIGITAL_LATAM = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
   
   const digitalPricing = useAdminPricing(ADMIN_SKU_DIGITAL);
   const digitalTier = useCountryTierRouting(ADMIN_SKU_DIGITAL, {
     tiendaPath: TIENDA_PATH_DIGITAL,
-    fallbackHotmartUrl: HOTMART_DIGITAL_LATAM,
     fallbackPriceGlobalUsd: 72.99,
     fallbackPriceLatamUsd: 72.99,
     fallbackPriceTiendaUsd: 72.99,

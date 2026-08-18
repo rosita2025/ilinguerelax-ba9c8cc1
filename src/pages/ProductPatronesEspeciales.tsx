@@ -92,7 +92,6 @@ const ProductPatronesEspeciales = () => {
   const pricingAdmin = useAdminPricing(ADMIN_SKU);
   const tier = useCountryTierRouting(ADMIN_SKU, {
     tiendaPath: TIENDA_CHECKOUT_PATH,
-    fallbackHotmartUrl: HOTMART_URL_LATAM,
   });
 
   const { isPeru, useHotmartLatam, useTiendaOnly, priceUsd: PRICE_USD, priceGlobalUsd: GLOBAL_USD, priceLatamUsd: LATAM_USD, priceTiendaUsd: TIENDA_USD, pricePen, country } = tier;
@@ -101,7 +100,7 @@ const ProductPatronesEspeciales = () => {
   const priceLabel = tier.priceLabel;
   const originalLabel = tier.originalLabel;
 
-  const HOTMART_URL = tier.hotmartUrl || HOTMART_URL_LATAM;
+  
   const hasLongPriceLabel = priceLabel.length > 9;
   
   const pixelParams = useMemo(() => ({
@@ -168,9 +167,6 @@ const ProductPatronesEspeciales = () => {
       },
     });
   };
-
-
-
 
   const productReviews = [
     {
@@ -358,33 +354,18 @@ const ProductPatronesEspeciales = () => {
                 </p>
               </motion.div>
 
-              {useTiendaOnly ? (
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    variant="hero"
-                    size="xl"
-                    className="w-full mb-4 text-lg py-6 shadow-2xl"
-                    onClick={handleBuy}
-                  >
-                    <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-                    Comprar ahora
-                    <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
-                  </Button>
-                </motion.div>
-              ) : (
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    variant="hero"
-                    size="xl"
-                    className="w-full mb-4 text-lg py-6 shadow-2xl"
-                    onClick={handleBuy}
-                  >
-                    <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-                    ¡QUIERO COMPRAR AHORA!
-                    <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
-                  </Button>
-                </motion.div>
-              )}
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  variant="hero"
+                  size="xl"
+                  className="w-full mb-4 text-lg py-6 shadow-2xl"
+                  onClick={handleBuy}
+                >
+                  <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
+                  Comprar ahora
+                  <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
+                </Button>
+              </motion.div>
 
               <Button
                 variant="outline"
@@ -750,8 +731,8 @@ const ProductPatronesEspeciales = () => {
         rating={pricingAdmin.rating != null ? pricingAdmin.rating : 4.9}
         reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}
         showReviews={true}
-        buyUrl={useTiendaOnly ? TIENDA_CHECKOUT_PATH : HOTMART_URL}
-        onBuyClick={useTiendaOnly ? handleBuy : undefined}
+        buyUrl={TIENDA_CHECKOUT_PATH}
+        onBuyClick={handleBuy}
         ctaText={"Comprar ahora"}
         localUsdPrices={pricingAdmin.localUsdPrices}
       />

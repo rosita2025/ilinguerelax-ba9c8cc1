@@ -25,11 +25,10 @@ import mapaSaludos from "@/assets/coreano-mapa-01-saludos.webp.asset.json";
 import mapaVocales from "@/assets/coreano-mapa-02-vocales.webp.asset.json";
 import mapaCuerpo from "@/assets/coreano-mapa-16-cuerpo.webp.asset.json";
 import mapaProfesiones from "@/assets/coreano-mapa-19-profesiones.webp.asset.json";
-import mapaVocales2 from "@/assets/Mapa-mental-2.webp.asset.json";
-import mapaConsonantes from "@/assets/Mapa-mental-3.webp.asset.json";
-import mapaPaises from "@/assets/Mapa-mental-5.webp.asset.json";
-import mapaTransporte from "@/assets/Mapa-mental-20.webp.asset.json";
-import mapaRestaurantes from "@/assets/Mapa-mental-47.webp.asset.json";
+import mapaFamilia from "@/assets/coreano-mapa-09-familia.webp.asset.json";
+import mapaRopa from "@/assets/coreano-mapa-15-ropa.webp.asset.json";
+import mapaEscuela from "@/assets/coreano-mapa-18-escuela.webp.asset.json";
+import mapaObjetos from "@/assets/coreano-mapa-objetos-casa.webp.asset.json";
 import bonoHangul from "@/assets/Bono-1-hangul.webp.asset.json";
 import demoPdfAsset from "@/assets/demo-gratis-coreano.pdf.asset.json";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -220,13 +219,13 @@ const ProductCoreanoRelax = () => {
                 {[
                   { src: mapaSaludos.url, caption: "Saludos y presentaciones" },
                   { src: mapaVocales.url, caption: "Alfabeto Hangul · Vocales" },
-                  { src: mapaConsonantes.url, caption: "Alfabeto Hangul · Consonantes" },
-                  { src: mapaPaises.url, caption: "Países y nacionalidades" },
+                  { src: mapaFamilia.url, caption: "La familia" },
+                  { src: mapaRopa.url, caption: "Ropa y vestimenta" },
                   { src: mapaCuerpo.url, caption: "El cuerpo humano" },
-                  { src: mapaTransporte.url, caption: "Transporte y direcciones" },
+                  { src: mapaEscuela.url, caption: "Escuela y objetos" },
                   { src: mapaProfesiones.url, caption: "Profesiones" },
-                  { src: mapaRestaurantes.url, caption: "Restaurantes y pedidos" },
-                  { src: bonoHangul.url, caption: "Bono · Práctica de escritura" },
+                  { src: mapaObjetos.url, caption: "Objetos de la casa" },
+                  { src: bonoHangul.url, caption: "Bono · Guía de escritura" },
                 ].map((item, i) => (
                   <CarouselItem key={i} className="pl-4 md:basis-1/2 lg:basis-1/3">
                     <div className="rounded-2xl overflow-hidden border-2 border-primary/20 bg-card shadow-card">

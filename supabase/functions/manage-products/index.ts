@@ -96,6 +96,7 @@ interface ProductIn {
   store_excluded_countries?: string[] | null;
   hotmart_excluded_countries?: string[] | null;
   local_prices?: Record<string, number> | null;
+  local_compare_at_prices?: Record<string, number> | null;
   upsells?: UpsellIn[];
   gallery_metadata?: Record<string, any> | null;
   rating?: number | null;
@@ -269,6 +270,23 @@ Deno.serve(async (req) => {
             const n = typeof v === "string" ? Number(v) : (v as number);
             if (typeof n === "number" && isFinite(n) && n > 0) {
               // Strict rounding by currency decimals to avoid DB storage bloat or frontend mismatches
+              const decimals = [
+                "COP", "ARS", "CLP", "PYG", "CRC", "JPY", "KRW", "INR", "UGX"
+              ].includes(cur) ? 0 : 2;
+              out[cur] = Math.round(n * Math.pow(10, decimals)) / Math.pow(10, decimals);
+            }
+          }
+          return out;
+        })(),
+        local_compare_at_prices: (() => {
+          const raw = (p as unknown as { local_compare_at_prices?: unknown }).local_compare_at_prices;
+          if (!raw || typeof raw !== "object") return {};
+          const out: Record<string, number> = {};
+          for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+            const cur = k.toUpperCase();
+            if (!/^[A-Z]{3}$/.test(cur)) continue;
+            const n = typeof v === "string" ? Number(v) : (v as number);
+            if (typeof n === "number" && isFinite(n) && n > 0) {
               const decimals = [
                 "COP", "ARS", "CLP", "PYG", "CRC", "JPY", "KRW", "INR", "UGX"
               ].includes(cur) ? 0 : 2;

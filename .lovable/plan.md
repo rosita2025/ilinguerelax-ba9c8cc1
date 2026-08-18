@@ -1,28 +1,27 @@
-# Plan - Unify Spanish Digital Price to $34.99
+# Plan - Final Unification of Spanish Digital Price
 
-The user wants the price for the **Spanish Mastery System - Digital Only** (5,000 Spanish words) to be consistently **$34.99 USD** (originally **$97 USD**) globally. The database currently shows $75 for global users, while LATAM and store prices are already $34.99.
-
-## User Review Required
-
-> [!IMPORTANT]
-> I will unify the price to **$34.99 USD** for all regions (Global, LATAM, and Tienda) to ensure consistency across all pages and the checkout.
-
-- **Current Global Price:** $75.00
-- **Target Global Price:** $34.99
-- **Current LATAM/Tienda Price:** $34.99 (already correct)
+The user is reporting that the price update for the **Spanish Mastery System - Digital Only** (5,000 Spanish words) is not reflecting correctly, despite previous attempts. I will perform a comprehensive synchronization across the database and all frontend files to ensure the price is **$34.99 USD** (Global, LATAM, and Tienda) and the original price is **$97.00 USD**.
 
 ## Proposed Changes
 
-### Database
-- Update the `digital_products` table for SKU `5-000-spanish-words-with-english-pronunciation-digital`.
-- Set `price_usd`, `price_usd_latam`, and `price_usd_tienda` all to **34.99**.
-- Set `price_pen` to **135.00** (PEN conversion).
+### 1. Database Update
+- Execute a Supabase migration to enforce the price for SKU `5-000-spanish-words-with-english-pronunciation-digital`:
+  - `price_usd = 34.99`
+  - `price_usd_latam = 34.99`
+  - `price_usd_tienda = 34.99`
+  - `price_pen = 135.00`
+  - `original_price = 97.00`
 
-### Frontend Code
-- **`src/data/products.ts`**: Update the digital product price from $97.00 (which was incorrectly set in a previous turn) to **34.99**.
-- **`src/config/checkoutCatalog.ts`**: Verify `5000-spanish-words` has `price: 34.99` and all `regionPrices` at `34.99`.
-- **`src/pages/ProductSpanish5000Digital.tsx`**: Ensure the fallback prices in `useCountryTierRouting` match the new $34.99 global price.
+### 2. Frontend Hardcoded Fallbacks
+- **`src/pages/ProductSpanish5000Digital.tsx`**: Update the `PRICE` and `ORIGINAL_PRICE` constants and the `useCountryTierRouting` fallback values to match **$34.99**.
+- **`src/config/checkoutCatalog.ts`**: Update the `5000-spanish-words` entry to set `price: 34.99`, `originalPrice: 97`, and all `regionPrices` to `34.99`.
+- **`src/data/products.ts`**: Update the product with ID `spanish-5000-digital` to have `price: 34.99` and `originalPrice: 97.00`.
+- **`src/pages/ProductSpanish5000.tsx`**: Ensure any cross-sell links to the digital version reflect the **$34.99** price.
 
 ## Verification Plan
-- Check the admin panel to confirm the SKU shows $34.99 for all tiers.
-- Use Playwright to simulate a user from a non-LATAM region (e.g., USA) and verify the product page and checkout show $34.99.
+- **Database Check**: Run a query to confirm the `digital_products` table is updated.
+- **Visual Verification**: Use Playwright to check:
+  - The main landing page (`/products/5-000-spanish-words-with-english-pronunciation-digital`).
+  - The checkout page for that product (`/checkouts/5000-spanish-words`).
+  - The cross-sell section on the physical book page.
+- **Regional Testing**: Simulate a user from the USA and a user from Peru to ensure the $34.99 and S/135.00 prices are displayed respectively.

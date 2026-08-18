@@ -12,9 +12,9 @@ import appPreview2 from "@/assets/app-preview-2.png.asset.json";
 
 export const Hero = () => {
   return (
-    <section className="relative w-full overflow-hidden bg-background py-4 sm:py-6 md:py-8">
-      <div className="container mx-auto px-0 sm:px-4 max-w-6xl">
-        <div className="relative w-full overflow-hidden sm:rounded-2xl bg-black/5 hero-swiper-container">
+    <section className="relative w-full overflow-hidden bg-background py-4 sm:py-6 md:py-8 lg:py-12">
+      <div className="container mx-auto px-0 sm:px-4 lg:max-w-4xl">
+        <div className="relative w-full overflow-hidden sm:rounded-2xl bg-black/5 hero-swiper-container lg:shadow-hero">
           <Swiper
             modules={[Autoplay, EffectFade, Pagination, Navigation]}
             effect={'fade'}
@@ -31,21 +31,21 @@ export const Hero = () => {
             className="w-full h-full"
           >
             <SwiperSlide key="slide-1" className="flex items-center justify-center bg-black/5">
-              <div className="w-full relative overflow-hidden flex items-center justify-center">
+              <div className="w-full h-full relative overflow-hidden flex items-center justify-center">
                 <img
                   src={`${appPreview1.url}?v=${new Date().getTime()}`}
                   alt="iLingue Relax App Preview 1"
-                  className="w-full h-auto max-h-[500px] md:max-h-[600px] object-cover sm:object-contain transition-opacity duration-700 block"
+                  className="w-full h-auto max-h-[500px] md:max-h-[600px] lg:max-h-[550px] object-cover sm:object-contain lg:object-cover transition-opacity duration-700 block mx-auto"
                   loading="eager"
                 />
               </div>
             </SwiperSlide>
             <SwiperSlide key="slide-2" className="flex items-center justify-center bg-black/5">
-              <div className="w-full relative overflow-hidden flex items-center justify-center">
+              <div className="w-full h-full relative overflow-hidden flex items-center justify-center">
                 <img
                   src={`${appPreview2.url}?v=${new Date().getTime()}`}
                   alt="iLingue Relax App Preview 2"
-                  className="w-full h-auto max-h-[500px] md:max-h-[600px] object-cover sm:object-contain transition-opacity duration-700 block"
+                  className="w-full h-auto max-h-[500px] md:max-h-[600px] lg:max-h-[550px] object-cover sm:object-contain lg:object-cover transition-opacity duration-700 block mx-auto"
                   loading="lazy"
                 />
               </div>
@@ -58,24 +58,28 @@ export const Hero = () => {
         .hero-swiper-container .swiper-button-next,
         .hero-swiper-container .swiper-button-prev {
           background: rgba(255, 255, 255, 0.2);
-          backdrop-filter: blur(4px);
+          backdrop-filter: blur(8px);
           width: 32px;
           height: 32px;
           border-radius: 50%;
           color: white;
           transition: all 0.3s ease;
+          z-index: 20;
         }
         .hero-swiper-container .swiper-button-next:after,
         .hero-swiper-container .swiper-button-prev:after {
           font-size: 14px;
           font-weight: bold;
         }
-        .hero-swiper-container .swiper-button-next { right: 8px; }
-        .hero-swiper-container .swiper-button-prev { left: 8px; }
+        .hero-swiper-container .swiper-button-next { right: 12px; }
+        .hero-swiper-container .swiper-button-prev { left: 12px; }
+        
         .hero-swiper-container .swiper-button-next:hover,
         .hero-swiper-container .swiper-button-prev:hover {
           background: rgba(255, 255, 255, 0.4);
+          transform: translateY(-50%) scale(1.1);
         }
+
         @media (min-width: 640px) {
           .hero-swiper-container .swiper-button-next,
           .hero-swiper-container .swiper-button-prev {
@@ -86,6 +90,11 @@ export const Hero = () => {
           .hero-swiper-container .swiper-button-prev:after {
             font-size: 18px;
           }
+        }
+
+        @media (min-width: 1024px) {
+          .hero-swiper-container .swiper-button-next { right: 16px; }
+          .hero-swiper-container .swiper-button-prev { left: 16px; }
         }
       `}} />
 

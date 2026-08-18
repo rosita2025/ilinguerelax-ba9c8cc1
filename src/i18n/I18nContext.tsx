@@ -19,7 +19,7 @@ interface I18nContextType {
   currency: Currency;
   setCurrency: (currency: Currency) => void;
   t: Translations;
-  formatPrice: (priceInUSD: number) => string;
+  formatPrice: (priceInUSD: number, overrides?: any, localUsdPrices?: any) => string;
   countryCode: string;
   languageNames: typeof languageNames;
   languageFlags: typeof languageFlags;

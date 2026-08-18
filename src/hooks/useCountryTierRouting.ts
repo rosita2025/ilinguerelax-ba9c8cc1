@@ -25,17 +25,22 @@ export interface CountryTierRouting {
   useTiendaOnly: boolean;
   /** Precio USD a mostrar/cobrar según el tier. */
   priceUsd: number;
+  compareAtPriceUsd: number | null;
   priceGlobalUsd: number;
   priceLatamUsd: number;
   priceTiendaUsd: number;
   pricePen: number | null;
+  compareAtPricePen: number | null;
   hotmartUrl: string | null;
   /** Label listo para renderizar en hero y sticky bar. */
   priceLabel: string;
   currencyCode: string;
-  originalLabel: string;
+  originalLabel: string | null;
+  isOnSale: boolean;
+  discountPercentage: number;
   /** Regional USD overrides for specific currencies. */
   localUsdPrices: Record<string, number> | null;
+  localCompareAtPrices: Record<string, number> | null;
 }
 
 interface Options {

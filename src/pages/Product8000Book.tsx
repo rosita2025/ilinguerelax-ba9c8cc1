@@ -675,11 +675,11 @@ const Product8000Book = () => {
       />
 
       {/* Sticky Buy Bar */}
-      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="english_8000" title="8,000 Palabras — Libro Físico · Pago seguro" />
+      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="english_8000" title="8,000 Essential Words - Physical Book" />
       <StickyBuyBar
         price="$34.99"
-        originalPrice="$45"
-        productName="INGLÉS RELAX v1.0 - 8,000 Palabras en Inglés - Libro físico"
+        originalPrice="$49.99"
+        productName="8,000 Words - Physical Book"
         ctaText="Comprar ahora"
         onBuyClick={handleAddToCart}
         isLoading={cartLoading}
@@ -687,6 +687,8 @@ const Product8000Book = () => {
         rating={4.89}
         reviewCount={246}
         isPhysical={true}
+        goesToInternalCheckout={true}
+        sku="ILINGUE-8000-BOOK"
       />
 
       {/* Spacer for sticky bar */}

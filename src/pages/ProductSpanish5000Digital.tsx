@@ -20,6 +20,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { LiveViewers } from "@/components/LiveViewers";
 import SalesNotification from "@/components/SalesNotification";
@@ -81,6 +82,7 @@ const countryToFlag = (cc: string): string => {
 };
 
 const ProductSpanish5000Digital = () => {
+  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
   const shortTestimonials = [
     "\"Best Spanish kit I've bought\" — Sarah, USA",
     "\"The pronunciation guide is a game changer\" — Sarah, USA",
@@ -605,12 +607,12 @@ const ProductSpanish5000Digital = () => {
                 Get the physical book shipped to your door and receive the full Digital Mastery Kit (PDF, MP3s, Flashcards) 100% FREE.
               </p>
             </div>
-            <a
-              href="/products/5-000-spanish-words-with-english-pronunciation-physical"
+            <button
+              onClick={() => setPhysicalCheckoutOpen(true)}
               className="relative z-10 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-8 py-4 text-sm font-black text-white shadow-xl hover:bg-emerald-500 transition-all hover:scale-105 active:scale-95"
             >
               Upgrade to Physical + Digital Free — $44 USD
-            </a>
+            </button>
             <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/10 blur-3xl -mr-32 -mt-32 rounded-full" />
           </div>
 
@@ -690,6 +692,7 @@ const ProductSpanish5000Digital = () => {
         calmMode
       />
       <ScrollToTop />
+      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="spanish_5000" title="Spanish Mastery System - Physical Book" />
       <WhatsAppButton />
       <SalesNotification />
     </main>

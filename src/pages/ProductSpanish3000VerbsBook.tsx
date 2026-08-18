@@ -625,12 +625,13 @@ const ProductSpanish3000VerbsBook = () => {
         isLoading={cartLoading}
         disabled={false}
         isPhysical={true}
+        goesToInternalCheckout={true}
       />
       <PhysicalBookCheckout 
         open={physicalCheckoutOpen} 
         onOpenChange={setPhysicalCheckoutOpen} 
         book="spanish_3000_verbs" 
-        title="3,000 Spanish Verbs — Secure checkout" 
+        title="3,000 Spanish Verbs - Physical Book" 
       />
     </main>
   );

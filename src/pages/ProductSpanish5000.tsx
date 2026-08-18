@@ -131,8 +131,12 @@ const BonusPreviewDialog = ({ triggerLabel = "See sample", title, subtitle, chil
 
 const ProductSpanish5000 = () => {
   // Libro físico: cobro siempre se realiza en USD para internal checkout.
-  const detected = useCampaignPrice(44.00, 59);
-  const campaign = { ...detected, currency: "USD" as const, symbol: "$", price: "$44.00", originalPrice: "$59.00" };
+  const campaign = {
+    price: "$44.00",
+    originalPrice: "$59.00",
+    currency: "USD" as const,
+    discountPercentage: 25
+  };
 
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({
@@ -181,7 +185,7 @@ const ProductSpanish5000 = () => {
   const stickyCtaText = "BUY NOW";
 
   // Physical book — Stripe checkout with international shipping.
-  const isPhysicalBundle = false;
+  const isPhysicalBundle = true;
   const dynamicCtaText = stickyCtaText;
   const stickyPriceLabel = campaign.price;
   const stickyOriginalLabel = campaign.originalPrice;
@@ -810,8 +814,8 @@ const ProductSpanish5000 = () => {
       </Suspense>
 
       {/* Sticky Buy Bar */}
-      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="spanish_5000" title="Spanish Relax 5,000 Words — Secure checkout" />
-      <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName="Book Physical & Digital — FREE Bonuses" onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={isPhysicalBundle} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible isLoading={isCreatingDigitalCheckout} disabled={isCreatingDigitalCheckout} sku="SPANISH-5000-PHYSICAL" />
+      <PhysicalBookCheckout open={physicalCheckoutOpen} onOpenChange={setPhysicalCheckoutOpen} book="spanish_5000" title="Spanish Mastery System - Physical Book" />
+      <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName="Book Physical & Digital — FREE Bonuses" onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={true} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible isLoading={isCreatingDigitalCheckout} disabled={isCreatingDigitalCheckout} sku="SPANISH-5000-PHYSICAL" goesToInternalCheckout={true} />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />

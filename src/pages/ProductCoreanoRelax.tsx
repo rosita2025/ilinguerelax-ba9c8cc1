@@ -194,7 +194,7 @@ const ProductCoreanoRelax = () => {
       <CoreanoCategories />
       <CoreanoForWho />
 
-      {/* Vista previa - Slider de mapas mentales */}
+      {/* Vista previa - Páginas reales del listado de palabras */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-background to-primary/5">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
@@ -206,7 +206,7 @@ const ProductCoreanoRelax = () => {
                 Mira dentro del <span className="text-gradient">ebook</span>
               </h3>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Ejemplos reales de mapas mentales con Hangul, pronunciación en español y vocabulario práctico.
+                Listado de palabras esenciales con Hangul, pronunciación en español y vocabulario práctico.
               </p>
 
             </div>

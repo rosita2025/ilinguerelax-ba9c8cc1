@@ -48,7 +48,7 @@ const VistaPreviaCoreano = () => {
                 Coreano Sin Complicaciones · <span className="text-gradient">1,000 Palabras Esenciales</span>
               </h1>
               <p className="text-muted-foreground max-w-2xl mx-auto text-pretty">
-                Páginas reales del PDF con Hangul, pronunciación para hispanohablantes y vocabulario práctico. Marca de agua incluida.
+                Páginas reales del PDF con Hangul, pronunciación para hispanohablantes y vocabulario práctico.
               </p>
             </div>
 
@@ -152,7 +152,7 @@ const VistaPreviaCoreano = () => {
                       className="absolute inset-0 w-full h-full object-contain"
                       onContextMenu={(e) => e.preventDefault()}
                     />
-                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-0">
                       <span className="text-2xl md:text-4xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap select-none">
                         ilinguerelax.com
                       </span>
@@ -230,7 +230,7 @@ const VistaPreviaCoreano = () => {
             </div>
 
             <p className="text-center text-xs text-muted-foreground mt-6">
-              Vistas previas con marca de agua. El PDF completo se entrega tras la compra.
+              Vistas previas optimizadas. El PDF completo se entrega tras la compra.
             </p>
           </div>
         </div>

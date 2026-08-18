@@ -608,7 +608,7 @@ const ProductSpanish5000Digital = () => {
               </p>
             </div>
             <button
-              onClick={() => setPhysicalCheckoutOpen(true)}
+              onClick={() => navigate("/products/5-000-spanish-words-with-english-pronunciation-physical")}
               className="relative z-10 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-8 py-4 text-sm font-black text-white shadow-xl hover:bg-emerald-500 transition-all hover:scale-105 active:scale-95"
             >
               Upgrade to Physical + Digital Free — $44 USD

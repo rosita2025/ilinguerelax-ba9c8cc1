@@ -286,6 +286,7 @@ const ProductCoreanoRelax = () => {
 
       {/* Sticky Buy Bar — 4-tier routing (Perú/VE-CU-NI/Global → Tienda · LATAM → Hotmart) */}
       <StickyBuyBar
+        sku={ADMIN_SKU}
         price={displayPrice}
         originalPrice={"$39"}
         currencyCode={currencyLabel}
@@ -294,7 +295,7 @@ const ProductCoreanoRelax = () => {
         ctaText={"Comprar ahora"}
         buyUrl={TIENDA_CHECKOUT_PATH}
         onBuyClick={handleBuy}
-
+        usdValue={priceUsd}
         rating={4.9}
         reviewCount={120}
         lang="es"

@@ -39,6 +39,13 @@ import { WhatsAppTestimoniosCoreano } from "@/components/WhatsAppTestimoniosCore
 import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { PinterestSave } from "@/components/PinterestSave";
+import { CoreanoHeroRedesign } from "@/components/coreano/CoreanoHeroRedesign";
+import { CoreanoBonuses } from "@/components/coreano/CoreanoBonuses";
+import { CoreanoFeaturesGrid } from "@/components/coreano/CoreanoFeaturesGrid";
+import { CoreanoUpdates } from "@/components/coreano/CoreanoUpdates";
+import { CoreanoHowItWorks } from "@/components/coreano/CoreanoHowItWorks";
+import { CoreanoCategories } from "@/components/coreano/CoreanoCategories";
+import { CoreanoForWho } from "@/components/coreano/CoreanoForWho";
 
 const HOTMART_URL_LATAM = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
 const TIENDA_CHECKOUT_PATH = "/checkouts/coreano-100-mapas";

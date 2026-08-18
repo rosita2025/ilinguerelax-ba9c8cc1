@@ -1007,34 +1007,51 @@ const AdminProductEdit = () => {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-primary">$</span>
                     <Input
-                      type="number" step="0.01"
-                      className="w-24 h-8 text-sm font-bold border-primary/30"
-                      value={product.price_usd}
-                      onChange={(e) => {
-                        const val = e.target.value === "" ? 0 : Number(e.target.value);
-                        update("price_usd", val);
-                      }}
-                      placeholder="72.99"
-                    />
+                        type="number" step="0.01"
+                        className="w-24 h-8 text-sm font-bold border-primary/30"
+                        value={product.price_usd}
+                        onChange={(e) => {
+                          const val = e.target.value === "" ? 0 : Number(e.target.value);
+                          update("price_usd", val);
+                        }}
+                        placeholder="72.99"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className="text-right">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">BASE USD - ASIA Y RESTO DEL MUNDO</Label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-primary">$</span>
-                    <Input
-                      type="number" step="0.01"
-                      className="w-24 h-8 text-sm font-bold border-primary/30"
-                      value={product.price_usd_tienda ?? ""}
-                      onChange={(e) => {
-                        const val = e.target.value === "" ? null : Number(e.target.value);
-                        update("price_usd_tienda", val);
-                      }}
-                      placeholder="68.00"
-                    />
+                  <div className="text-right">
+                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">BASE ANTES - GLOBAL</Label>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-muted-foreground">$</span>
+                      <Input
+                        type="number" step="0.01"
+                        className="w-24 h-8 text-sm font-bold border-muted-foreground/30"
+                        value={product.compare_at_price_usd ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value === "" ? null : Number(e.target.value);
+                          update("compare_at_price_usd", val);
+                        }}
+                        placeholder="97.00"
+                      />
+                    </div>
                   </div>
-                </div>
+
+                  <div className="text-right">
+                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">BASE USD - ASIA Y RESTO DEL MUNDO</Label>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-primary">$</span>
+                      <Input
+                        type="number" step="0.01"
+                        className="w-24 h-8 text-sm font-bold border-primary/30"
+                        value={product.price_usd_tienda ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value === "" ? null : Number(e.target.value);
+                          update("price_usd_tienda", val);
+                        }}
+                        placeholder="68.00"
+                      />
+                    </div>
+                  </div>
               </div>
             </div>
 
@@ -1107,6 +1124,7 @@ const AdminProductEdit = () => {
                   { code: "NIO", flag: "🇳🇮", label: "Nicaragua", region: "LATAM" },
                   { code: "VES", flag: "🇻🇪", label: "Venezuela", region: "LATAM" },
                   // Global / Anglosphere / Europe
+                  { code: "US", flag: "🇺🇸", label: "Estados Unidos", region: "Anglosphere/Europe" },
                   { code: "EUR", flag: "🇪🇺", label: "Europa", region: "Anglosphere/Europe" },
                   { code: "GBP", flag: "🇬🇧", label: "Reino Unido", region: "Anglosphere/Europe" },
                   { code: "CAD", flag: "🇨🇦", label: "Canadá", region: "Anglosphere/Europe" },

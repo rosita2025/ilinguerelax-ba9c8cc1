@@ -110,6 +110,8 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
   const manualCompareFixed = pricing.localCompareAtPrices?.[currency];
   const globalCompareUsd = pricing.compareAtPriceGlobalUsd;
   
+  // Si el usuario está en US, currency es USD, rate es 1. 
+  // manualCompareFixed vendrá de local_compare_at_prices['USD']
   const finalCompareAmount = typeof manualCompareFixed === "number" && manualCompareFixed > 0
     ? manualCompareFixed
     : globalCompareUsd && globalCompareUsd > 0

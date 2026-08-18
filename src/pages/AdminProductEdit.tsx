@@ -1041,11 +1041,12 @@ const AdminProductEdit = () => {
             <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg flex items-start gap-3">
               <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
               <div className="text-xs text-amber-800 space-y-1">
-                <p className="font-bold">Estructura Simplificada:</p>
+                <p className="font-bold">Estructura de 3 Tiers:</p>
                 <ul className="list-disc ml-4 space-y-0.5">
-                  <li><b>LATAM:</b> Usa el precio base LATAM ($ {product.price_usd_latam || product.price_usd}).</li>
-                  <li><b>Angloparlantes/Europa:</b> Usa el precio base Global ($ {product.price_usd}).</li>
-                  <li><b>Resto del Mundo:</b> Usa el precio Resto del Mundo ($ {product.price_usd_tienda || product.price_usd}).</li>
+                  <li><b>LATAM:</b> Basado en BASE USD - LATAM ($ {product.price_usd_latam || product.price_usd}).</li>
+                  <li><b>ANGLO / EU:</b> Basado en BASE USD - ANGLOSPHERE / EU ($ {product.price_usd}).</li>
+                  <li><b>ASIA / RESTO:</b> Basado en BASE USD - ASIA Y RESTO DEL MUNDO ($ {product.price_usd_tienda || product.price_usd}).</li>
+
                   <li>Los precios tachados se controlan ahora de forma manual por moneda en las tarjetas de abajo para mayor precisión.</li>
                 </ul>
               </div>
@@ -1257,12 +1258,12 @@ const AdminProductEdit = () => {
                             )}
                           </div>
                           <p className="text-[9px] text-muted-foreground/70 italic">
-                            Ref: ${currentUsdValue.toFixed(2)} USD
+                            Ref: USD {currentUsdValue.toFixed(2)}
                           </p>
                         </div>
                         
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="text-[8px] uppercase font-bold text-muted-foreground/60 shrink-0">USD Ref:</span>
+                          <span className="text-[8px] uppercase font-bold text-muted-foreground/60 shrink-0">USD REF:</span>
                           <Input
                             type="text"
                             inputMode="decimal"

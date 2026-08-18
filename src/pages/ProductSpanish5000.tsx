@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, Suspense } from "react";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
+import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useCartStore } from "@/stores/cartStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -157,7 +158,9 @@ const ProductSpanish5000 = () => {
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [isCreatingDigitalCheckout, setIsCreatingDigitalCheckout] = useState(false);
   const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
+  const navigate = useNavigate();
   const checkoutLockRef = useRef(false);
+
   const addItem = useCartStore(state => state.addItem);
   const setDrawerOpen = useCartStore(state => state.setDrawerOpen);
 
@@ -192,6 +195,11 @@ const ProductSpanish5000 = () => {
   const handleBuyNow = async () => {
     setPhysicalCheckoutOpen(true);
   };
+
+  const handleViewDigital = () => {
+    navigate("/products/5-000-spanish-words-with-english-pronunciation-digital");
+  };
+
   return <main className="min-h-screen bg-background">
       <Helmet>
         <link rel="preload" as="image" href={productSpanish5000BundleImageAvif} type="image/avif" />

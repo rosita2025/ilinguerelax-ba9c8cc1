@@ -94,11 +94,12 @@ const ProductPatronesEspeciales = () => {
     tiendaPath: TIENDA_CHECKOUT_PATH,
   });
 
-  const { isPeru, useHotmartLatam, useTiendaOnly, priceUsd: PRICE_USD, priceGlobalUsd: GLOBAL_USD, priceLatamUsd: LATAM_USD, priceTiendaUsd: TIENDA_USD, pricePen, country } = tier;
+  const { isPeru, priceUsd: PRICE_USD, priceGlobalUsd: GLOBAL_USD, priceLatamUsd: LATAM_USD, priceTiendaUsd: TIENDA_USD, pricePen, country } = tier;
   const pricingReady = tier.loaded;
   const displayCurrency = tier.currencyCode as Currency;
   const priceLabel = tier.priceLabel;
   const originalLabel = tier.originalLabel;
+
 
   
   const hasLongPriceLabel = priceLabel.length > 9;

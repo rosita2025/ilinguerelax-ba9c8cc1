@@ -4,6 +4,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -111,11 +112,9 @@ const ProductSpanish3000VerbsBook = () => {
   }, []);
 
   const AMAZON_URL_3000 = "https://www.amazon.com/s?k=Spanish+Relax+3000+Verbs";
+  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
   const handleAddToCart = async () => {
-    // Physical book — Shopify removed. Send buyers to Amazon.
-    if (typeof window !== "undefined") {
-      window.open(AMAZON_URL_3000, "_blank", "noopener,noreferrer");
-    }
+    setPhysicalCheckoutOpen(true);
   };
 
 
@@ -649,6 +648,12 @@ const ProductSpanish3000VerbsBook = () => {
         isLoading={cartLoading}
         disabled={false}
         isPhysical={true}
+      />
+      <PhysicalBookCheckout 
+        open={physicalCheckoutOpen} 
+        onOpenChange={setPhysicalCheckoutOpen} 
+        book="spanish_5000" 
+        title="3,000 Spanish Verbs — Secure checkout" 
       />
     </main>
   );

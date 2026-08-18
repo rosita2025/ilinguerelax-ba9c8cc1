@@ -4,6 +4,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { PhysicalBookCheckout } from "@/components/PhysicalBookCheckout";
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -93,11 +94,9 @@ const ProductSpanishGrammarPatterns = () => {
   }, []);
 
   const AMAZON_URL_GRAMMAR = "https://www.amazon.com/s?k=Spanish+Relax+Grammar+Patterns";
+  const [physicalCheckoutOpen, setPhysicalCheckoutOpen] = useState(false);
   const handleAddToCart = async () => {
-    // Physical book — Shopify removed. Send buyers to Amazon.
-    if (typeof window !== "undefined") {
-      window.open(AMAZON_URL_GRAMMAR, "_blank", "noopener,noreferrer");
-    }
+    setPhysicalCheckoutOpen(true);
   };
 
 
@@ -620,6 +619,12 @@ const ProductSpanishGrammarPatterns = () => {
         isLoading={cartLoading}
         disabled={false}
         isPhysical={true}
+      />
+      <PhysicalBookCheckout 
+        open={physicalCheckoutOpen} 
+        onOpenChange={setPhysicalCheckoutOpen} 
+        book="spanish_5000" 
+        title="Grammar Patterns Mastery — Secure checkout" 
       />
     </main>
   );

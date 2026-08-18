@@ -17,7 +17,7 @@ const resenas = [
     contacto: "Nouveau Apis",
     telefono: "+54 9 11 **** 8822",
     pais: "Argentina 🇦🇷",
-    resumen: "Exactamente fue rápido envío digital sin demoras. El material de coreano es increíblemente visual."
+    resumen: "Exactamente fue rápido envío digital sin demoras. El listado de palabras es increíblemente visual."
   },
   {
     src: (r2 as any).url || r2,

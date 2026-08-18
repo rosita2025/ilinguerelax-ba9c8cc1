@@ -309,9 +309,13 @@ const ProductSpanish5000Digital = () => {
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   Add to cart
                 </Button>
-                <p className="text-[11px] text-center text-muted-foreground mt-2 flex items-center justify-center gap-1">
-                  <Shield className="w-3 h-3" /> Secure checkout by Stripe · 7-day money-back guarantee
-                </p>
+                <div className="mt-4 pt-4 border-t border-slate-200">
+                  <div className="flex items-center justify-center gap-6 grayscale opacity-60">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Stripe" className="h-4" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4" />
+                  </div>
+                </div>
               </div>
 
               <StockCounter />

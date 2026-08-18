@@ -1259,7 +1259,7 @@ const AdminProductEdit = () => {
                         </div>
                         
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="text-[8px] uppercase font-bold text-muted-foreground/60 shrink-0">USD Region:</span>
+                          <span className="text-[8px] uppercase font-bold text-muted-foreground/60 shrink-0">USD Ref:</span>
                           <Input
                             type="text"
                             inputMode="decimal"
@@ -1278,7 +1278,7 @@ const AdminProductEdit = () => {
                               }
                               update("local_usd_prices", next);
                             }}
-                            placeholder={baseUsdRef.toString()}
+                            placeholder={baseUsdRef.toFixed(2)}
                           />
                         </div>
                         {exchangeRates[code as Currency] && (

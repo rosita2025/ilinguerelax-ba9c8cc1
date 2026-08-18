@@ -195,7 +195,7 @@ const ProductSpanish5000 = () => {
   };
 
   const handleBuyNow = async () => {
-    navigate("/checkouts/spanish_5000_physical");
+    navigate("/checkouts/5-000-spanish-words-with-english-pronunciation-physical");
   };
 
   const handleViewDigital = () => {

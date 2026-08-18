@@ -70,7 +70,7 @@ const ProductSpanishGrammarPatterns = () => {
 
 
   const handleAddToCart = async () => {
-    navigate("/checkouts/spanish_grammar");
+    navigate("/checkouts/spanish-relax-structural-spanish-grammar-a1-c1-book-physical-n9ct");
   };
 
   const AMAZON_URL_GRAMMAR = "https://www.amazon.com/s?k=Spanish+Relax+Grammar+Patterns";

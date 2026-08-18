@@ -97,7 +97,7 @@ const Product5000Book = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isLoading: cartLoading } = useCartStore();
   const handleAddToCart = async () => {
-    navigate("/checkouts/english_5000");
+    navigate("/checkouts/5-000-palabras-libro-fisico");
   };
 
   const pixelParams = useMemo(() => ({

@@ -1,36 +1,36 @@
-# Plan: Fix Korean Product Previews and Testimonials
+# Separate the two Korean products into their own pages
 
-Correct lingering references to "Mind Maps" (Mapas Mentales) and remove watermarks in the "1,000 Essential Korean Words" product flow to ensure visual consistency with the ebook content.
+Right now both Korean URLs render the exact same page component (`ProductCoreanoRelax`), which was recently rebranded to "1,000 palabras esenciales". That is why the mind-maps URL shows the wrong product.
 
-## User Review Required
+Confirmed in `src/App.tsx`:
+- `/products/100-mapas-mentales-para-aprender-coreano-hangul-c1` -> ProductCoreanoRelax
+- `/products/1-000-palabras-esenciales-para-aprender-coreano` -> ProductCoreanoRelax
 
-> [!IMPORTANT]
-> The current WhatsApp testimonials in `ResenasWhatsAppCoreano.tsx` mention "mapas mentales" in their text summaries. I will update these to focus on "vocabulario visual" or "1,000 palabras" to match the product.
+## Target result
 
-## Proposed Changes
+1. `/products/100-mapas-mentales-para-aprender-coreano-hangul-c1` = **+100 Mapas Mentales de Coreano** (own page, mind-map imagery, mind-map copy, own price/SKU `100-mapas-mentales-para-aprender-coreano-hangul-c1`, checkout key `coreano-100-mapas`).
+2. `/products/1-000-palabras-esenciales-para-aprender-coreano` = **Aprende las 1,000 palabras esenciales del coreano** (current page, unchanged, word-list imagery, SKU `1-000-palabras-esenciales-para-aprender-coreano`, $12).
 
-### Korean Product Page & Previews
-#### [src/pages/ProductCoreanoRelax.tsx]
-- Update preview captions and descriptions to ensure they strictly refer to "Listado de palabras" or thematic vocabulary lists.
-- Confirm the `coverImageUrl` and storage path use the "1,000 palabras" asset.
+## Changes
 
-#### [src/pages/VistaPreviaCoreano.tsx]
-- Remove any residual "ilinguerelax.com" watermark text overlays or mentions in the grid.
-- Update the YouTube Short description or context if it mentions mind maps.
+### New page: `src/pages/ProductCoreano100Mapas.tsx`
+- Dedicated page for the mind-maps product, reusing the same layout patterns (SEO, Navbar, hero, features, preview carousel, FAQ, reviews, StickyBuyBar, Footer).
+- Copy focused on mind maps: 100 visual mind maps, Hangul, thematic memorization.
+- Preview carousel uses the mind-map assets (`coreano-mapa-01-saludos`, `-02-vocales`, `-09-familia`, `-15-ropa`, `-16-cuerpo`, `-18-escuela`, `-19-profesiones`, `objetos-casa`).
+- Pricing via `useAdminPricing` / `useCountryTierRouting` with `adminSku = 100-mapas-mentales-para-aprender-coreano-hangul-c1`, checkout path from the `coreano-100-mapas` catalog entry.
+- Canonical URL, title, description and SKU set for the mind-maps product.
 
-#### [src/components/coreano/CoreanoHowItWorks.tsx]
-- Update the mockup header to say "Listado de Palabras" instead of generic "Greetings".
-- Ensure the sample words visual doesn't resemble a "mind map" structure but a clean list.
+### `src/App.tsx`
+- Point `/products/100-mapas-mentales-para-aprender-coreano-hangul-c1` at the new page.
+- Leave the 1,000-words route as is.
+- Keep `/vista-previa/coreano-100-mapas-mentales` pointing at a mind-maps preview.
 
-### Testimonials & Social Proof
-#### [src/components/ResenasWhatsAppCoreano.tsx]
-- Update the `resenas` array text summaries to replace "mapas mentales" with phrases like "material visual de vocabulario" or "listado de 1,000 palabras".
+### `src/pages/VistaPreviaCoreano.tsx`
+- This preview is currently branded 1,000 words but is routed from the `coreano-100-mapas-mentales` path. Add a matching route `/vista-previa/coreano-1000-palabras` for the words preview (the words page links to it and it currently 404s), and keep the mind-maps preview path mapped to mind-map content.
 
-### Layout & Features
-#### [src/components/coreano/CoreanoFeaturesGrid.tsx]
-- Double-check that "1,000 PALABRAS" is the lead feature and "Mind Maps" is not mentioned.
+### `src/pages/ProductCoreanoRelax.tsx`
+- No content changes; it stays the 1,000-words page.
 
-## Verification Plan
-1. **Visual Audit**: Navigate to `/products/1-000-palabras-esenciales-para-aprender-coreano` and check the carousel captions.
-2. **Preview Audit**: Navigate to `/vista-previa/coreano-1000-palabras` to verify watermark removal and page numbering captions.
-3. **Testimonial Check**: Verify the WhatsApp slider text does not mention "mapas mentales".
+## Verification
+- Open both product URLs and confirm each shows its own title, images, price and checkout target.
+- Confirm the "Ver vista previa completa" link from the words page resolves.

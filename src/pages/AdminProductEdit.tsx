@@ -980,7 +980,7 @@ const AdminProductEdit = () => {
           <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between border-b pb-2">
               <h2 className="font-semibold text-lg flex items-center gap-2">💰 Configuración de Precios Globales</h2>
-              <div className="flex items-center gap-6">
+              <div className="flex flex-wrap items-center gap-6">
                 <div className="text-right">
                   <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Precio Normal (USD)</Label>
                   <div className="flex items-center gap-2">
@@ -988,10 +988,10 @@ const AdminProductEdit = () => {
                     <Input
                       type="number" step="0.01"
                       className="w-24 h-8 text-sm font-bold border-dashed opacity-70"
-                      value={product.price_usd_tienda || ""}
+                      value={product.compare_at_price_usd || ""}
                       onChange={(e) => {
                         const val = e.target.value === "" ? null : Number(e.target.value);
-                        update("price_usd_tienda", val);
+                        update("compare_at_price_usd", val);
                       }}
                       placeholder="97.00"
                     />
@@ -1011,6 +1011,20 @@ const AdminProductEdit = () => {
                         update("price_usd", val);
                       }}
                       placeholder="15.00"
+                    />
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">PEN (Perú)</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-muted-foreground/60">S/</span>
+                    <Input
+                      type="number" step="0.1"
+                      className="w-20 h-8 text-xs"
+                      value={product.price_pen ?? ""}
+                      onChange={(e) => update("price_pen", e.target.value === "" ? null : Number(e.target.value))}
+                      placeholder="59.90"
                     />
                   </div>
                 </div>

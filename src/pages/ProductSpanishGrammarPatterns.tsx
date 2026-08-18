@@ -592,6 +592,7 @@ const ProductSpanishGrammarPatterns = () => {
         isLoading={cartLoading}
         disabled={false}
         isPhysical={true}
+        goesToInternalCheckout={true}
       />
       <PhysicalBookCheckout 
         open={physicalCheckoutOpen} 

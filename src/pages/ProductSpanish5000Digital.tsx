@@ -7,7 +7,7 @@ import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import {
   Check, BookOpen, Sparkles, Brain, Download, Zap, Shield, ShoppingCart,
-  Star, Eye, Globe, Smartphone, FileText, CreditCard, ArrowRight, Package, Lock, Headphones, Layers, FilePlus
+  Star, Eye, Globe, Smartphone, FileText, CreditCard, ArrowRight, Package, Lock, Headphones, Layers, FilePlus, Zap, ShoppingCart, Download
 } from "lucide-react";
 import { GuaranteeSeal } from "@/components/SpanishMasteryBadges";
 

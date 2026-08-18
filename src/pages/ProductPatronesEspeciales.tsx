@@ -28,15 +28,12 @@ import { detectCurrency, formatPrice, formatCurrencyAmount, exchangeRates, type 
 import { useLocalOverrides } from "@/lib/livePrices";
 import { useI18n } from "@/i18n/I18nContext";
 
-const HOTMART_URL_LATAM = "https://pay.hotmart.com/Q105880946X?checkoutMode=10&bid=1783106038717";
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
 // ÚNICA regla final para Patrones:
 // Perú → tienda interna PEN. VE/CU/NI → tienda interna USD. Global → tienda interna USD.
 // Solo LATAM permitido (sin PE/VE/CU/NI) usa Hotmart LATAM.
 const TIENDA_USD_COUNTRIES = new Set(["VE", "CU", "NI"]);
-const LATAM_HOTMART_COUNTRIES = new Set([
-  "AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "PA", "PY", "PR", "UY",
-]);
+
 
 const productImage = "/images/product-patrones-especiales.webp";
 
@@ -94,11 +91,12 @@ const ProductPatronesEspeciales = () => {
     tiendaPath: TIENDA_CHECKOUT_PATH,
   });
 
-  const { isPeru, useHotmartLatam, useTiendaOnly, priceUsd: PRICE_USD, priceGlobalUsd: GLOBAL_USD, priceLatamUsd: LATAM_USD, priceTiendaUsd: TIENDA_USD, pricePen, country } = tier;
+  const { isPeru, priceUsd: PRICE_USD, priceGlobalUsd: GLOBAL_USD, priceLatamUsd: LATAM_USD, priceTiendaUsd: TIENDA_USD, pricePen, country } = tier;
   const pricingReady = tier.loaded;
   const displayCurrency = tier.currencyCode as Currency;
   const priceLabel = tier.priceLabel;
   const originalLabel = tier.originalLabel;
+
 
   
   const hasLongPriceLabel = priceLabel.length > 9;
@@ -226,7 +224,7 @@ const ProductPatronesEspeciales = () => {
           { question: `¿Por qué cuesta solo ${priceLabel}?`, answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba." },
           { question: "¿Qué incluye este ebook?", answer: "Patrones especiales de pronunciación, alfabeto inglés letra por letra, combinaciones secretas, letras mudas, contracciones y mini retos prácticos con respuestas." },
           { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Recibes la descarga inmediata después del pago. Puedes leerlo en móvil, tablet, computadora o imprimirlo." },
-          { question: "¿Cómo realizo el pago?", answer: "Según tu país: tienda interna de iLingue Relax o Hotmart LATAM." },
+          { question: "¿Cómo realizo el pago?", answer: "Según tu país: tienda interna de iLingue Relax o pago directo con tarjeta/transferencia." },
         ]}
       />
 

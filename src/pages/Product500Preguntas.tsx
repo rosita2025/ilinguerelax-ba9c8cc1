@@ -290,6 +290,7 @@ const Product500Preguntas = () => {
       <Footer />
 
       <StickyBuyBar
+        sku={ADMIN_SKU}
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}
         productName="INGLÉS RELAX - 500 Preguntas en Inglés (Digital PDF)"
@@ -301,6 +302,7 @@ const Product500Preguntas = () => {
         buyUrl={CHECKOUT_PATH}
         ctaText={"Comprar ahora"}
         onBuyClick={handleBuy}
+        usdValue={currentPrice}
       />
 
       <div className="h-20 md:h-16" />

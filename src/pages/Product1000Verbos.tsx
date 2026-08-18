@@ -326,6 +326,7 @@ const Product1000Verbos = () => {
       <Footer />
 
       <StickyBuyBar
+        sku={ADMIN_SKU_1000_VERBOS}
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}
         productName="INGLÉS RELAX - 1,000 Verbos Esenciales (Digital PDF)"

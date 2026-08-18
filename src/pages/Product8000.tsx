@@ -146,7 +146,7 @@ const Product8000 = () => {
   const tier = useCountryTierRouting(ADMIN_SKU_8000, {
     tiendaPath: TIENDA_PATH_8000,
   });
-  const { useTiendaOnly, priceUsd } = tier;
+  const { priceUsd } = tier;
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(
@@ -604,7 +604,7 @@ const Product8000 = () => {
         {
           question: "¿Cómo realizo el pago?",
           answer:
-          "Puedes pagar de forma segura mediante: Tarjeta de crédito o débito internacional (Stripe) o Hotmart, donde puedes elegir distintos métodos de pago, incluyendo transferencias según tu país.",
+          "Puedes pagar de forma segura mediante tarjeta de crédito o débito internacional (Stripe), Yape, Plin o transferencias según tu país.",
           icon: CreditCard
         }]
         }
@@ -661,7 +661,10 @@ const Product8000 = () => {
         ctaText={"Comprar ahora"}
         buyUrl={TIENDA_PATH_8000}
 
-        onBuyClick={handleBuyNow} />
+        onBuyClick={handleBuyNow}
+        sku={ADMIN_SKU_8000}
+        usdValue={priceUsd}
+      />
       
 
       {/* Spacer for sticky bar */}

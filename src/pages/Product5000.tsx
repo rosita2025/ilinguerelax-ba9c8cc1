@@ -193,8 +193,8 @@ const Product5000 = () => {
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   
-  const { isPeru, useHotmartLatam, useTiendaOnly, priceUsd: priceUSD, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen, country } = tier;
-  const isLatam = useHotmartLatam;
+  const { isPeru, priceUsd: priceUSD, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen, country } = tier;
+  const isLatam = false; // Internal checkout for everyone
   const pricing5000Ready = tier.loaded;
   const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
   // Fuente única: los labels del hook (respetan los montos exactos por moneda
@@ -582,21 +582,15 @@ const Product5000 = () => {
                   size="xl"
                   className="w-full mb-4 text-lg py-6 shadow-2xl relative overflow-hidden group"
                 >
-                  <a
-                    href={buyUrl}
-                    target={useTiendaOnly ? "_self" : "_blank"}
-                    rel={useTiendaOnly ? undefined : "noopener noreferrer"}
-                    onClick={handleBuyClick}
+                  <button
+                    className="flex items-center justify-center w-full h-full"
+                    onClick={handleBuy}
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                     <ShoppingCart className="w-6 h-6 mr-2" />
-                    {isPeru
-                      ? "COMPRAR EN TIENDA (PERÚ)"
-                      : useHotmartLatam
-                      ? "COMPRAR EN HOTMART"
-                      : "COMPRAR AHORA"}
+                    COMPRAR AHORA
                     <ArrowRight className="w-6 h-6 ml-2" />
-                  </a>
+                  </button>
                 </Button>
               </motion.div>
 
@@ -604,8 +598,6 @@ const Product5000 = () => {
               <p className="text-center text-sm text-muted-foreground mb-6">
                 {isPeru
                   ? "👆 Pago local en soles (Yape, Plin, tarjetas, transferencia)"
-                  : useHotmartLatam
-                  ? "👆 Pago en tu moneda local vía Hotmart"
                   : "👆 Pago seguro en USD (tarjetas internacionales)"}
               </p>
 

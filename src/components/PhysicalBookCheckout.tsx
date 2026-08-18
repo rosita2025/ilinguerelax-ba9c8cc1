@@ -76,7 +76,7 @@ export function PhysicalBookCheckout({ open, onOpenChange, book, title }: Physic
                       Tarifa plana: <span className="font-bold text-slate-900">$8 USD</span>
                     </p>
                     <p className="text-[10px] text-emerald-600 font-black uppercase tracking-wider mt-1.5 inline-block bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
-                      🎁 GRATIS > $50
+                      🎁 GRATIS {'>'} $50
                     </p>
                   </div>
                 </div>

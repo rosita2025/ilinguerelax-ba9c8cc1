@@ -471,14 +471,14 @@ const ProductSpanish5000 = () => {
                     ))}
                   </ul>
                   <div className="flex items-baseline justify-center md:justify-start gap-3 pt-2 flex-wrap">
-                    <span className="text-4xl font-bold text-foreground">$97</span>
-                    <span className="text-lg text-muted-foreground line-through">$215.00</span>
+                    <span className="text-4xl font-bold text-foreground">$34.99</span>
+                    <span className="text-lg text-muted-foreground line-through">$97.00</span>
                     <span className="text-xs font-bold text-accent bg-accent/10 px-2 py-1 rounded-full">SAVE 55%</span>
                   </div>
                   <Button asChild size="xl" variant="hero" className="w-full">
                     <a href="/products/5-000-spanish-words-with-english-pronunciation-digital">
                       <CreditCard className="w-5 h-5" />
-                      View Digital Version — $97
+                      View Digital Version — $34.99
                       <ArrowRight className="w-5 h-5" />
                     </a>
                   </Button>

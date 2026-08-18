@@ -513,6 +513,20 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
       const initiallyRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(country);
 
       const fetchSecret = async (retryForRestricted = false) => {
+        const pricing = {
+          priceUsd: currentUsdRef,
+          currencyCode: countryCode,
+          priceLabel: localTotalLabel,
+          exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
+          finalPriceAmount: localTotalAmount,
+        };
+
+        const payload = getPaymentPayload(
+          pricing,
+          selected === "stripe_ach" ? "stripe" : selected === "stripe_cashapp" ? "stripe" : selected === "stripe_klarna" ? "stripe" : "stripe",
+          country
+        );
+
         const { data, error } = await invokeWithRetry<{ clientSecret?: string }>("create-checkout-prueba", {
           body: {
             environment: getStripeEnvironment(),
@@ -520,7 +534,8 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
               id: i.id, name: i.name, price: itemPrice(i, region.tier),
               quantity: i.quantity, image: toAbsUrl(i.image), description: i.description,
             })),
-            currency: "usd",
+            currency: payload.currency,
+            amount: payload.amount,
             stripePaymentMethod: selected === "stripe_ach" ? "us_bank_account" : selected === "stripe_cashapp" ? "cashapp" : selected === "stripe_klarna" ? "klarna" : "card",
             couponPercent: s.couponPercent,
             couponCode: s.coupon ?? undefined,
@@ -531,7 +546,6 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
               country,
             },
             returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
-            // In the edge function we'll use this to skip adaptive pricing if we are retrying
             isRestrictedRetry: retryForRestricted || initiallyRestricted,
           },
         }, { attempts: 3, baseDelayMs: 500 });

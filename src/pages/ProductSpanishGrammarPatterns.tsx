@@ -595,7 +595,10 @@ const ProductSpanishGrammarPatterns = () => {
         isPhysical={true}
         goesToInternalCheckout={true}
       />
+    </main>
   );
 };
+
+export default ProductSpanishGrammarPatterns;
 
 export default ProductSpanishGrammarPatterns;

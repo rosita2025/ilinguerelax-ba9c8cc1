@@ -653,6 +653,7 @@ const ProductSpanish3000VerbsBook = () => {
         open={physicalCheckoutOpen} 
         onOpenChange={setPhysicalCheckoutOpen} 
         book="spanish_5000" 
+
         title="3,000 Spanish Verbs — Secure checkout" 
       />
     </main>

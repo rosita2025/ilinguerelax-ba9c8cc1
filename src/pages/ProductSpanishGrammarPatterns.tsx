@@ -624,6 +624,7 @@ const ProductSpanishGrammarPatterns = () => {
         open={physicalCheckoutOpen} 
         onOpenChange={setPhysicalCheckoutOpen} 
         book="spanish_5000" 
+
         title="Grammar Patterns Mastery — Secure checkout" 
       />
     </main>

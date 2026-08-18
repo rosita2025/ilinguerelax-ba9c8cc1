@@ -28,7 +28,7 @@ export const CoreanoUpdates = () => {
                 🎁 Actualizaciones gratuitas incluidas
               </h3>
               <p className="text-slate-300 text-lg md:text-xl font-medium max-w-2xl">
-                Cuando actualicemos el material con nuevas palabras, categorías o mejoras visuales, podrás recibir las nuevas versiones <span className="text-white font-bold underline decoration-primary decoration-2">sin pagar nuevamente</span> por ellas.
+                ¡Próxima expansión a <span className="text-white font-bold underline decoration-amber-500">2,000 palabras</span> incluida! Podrás recibir las nuevas versiones <span className="text-white font-bold underline decoration-primary decoration-2">sin pagar nuevamente</span> por ellas.
               </p>
             </div>
           </div>

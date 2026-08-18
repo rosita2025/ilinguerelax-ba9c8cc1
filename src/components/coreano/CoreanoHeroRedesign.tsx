@@ -1,4 +1,4 @@
-import { Check, Star, ShieldCheck, Zap, Download, Lock } from "lucide-react";
+import { Check, Star, ShieldCheck, Zap, Download, Lock, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import coverAsset from "@/assets/coreano-100-mapas-cover.webp.asset.json";

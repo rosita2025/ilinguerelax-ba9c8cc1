@@ -5,8 +5,8 @@ export const CoreanoFeaturesGrid = () => {
   const features = [
     {
       icon: <BookOpen className="w-6 h-6" />,
-      title: "2,000 PALABRAS",
-      description: "Vocabulario esencial organizado para estudiar de forma progresiva.",
+      title: "1,000 PALABRAS",
+      description: "Vocabulario esencial + 100 mapas mentales para estudiar de forma progresiva.",
       color: "bg-blue-500"
     },
     {

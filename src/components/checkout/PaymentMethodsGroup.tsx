@@ -2463,9 +2463,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 </div>
                 <div className="flex justify-center w-full px-2">
                 <PayPalButtons
-                  amountUsd={currentUsdRef}
+                  amountUsd={Number(totalUsd)}
                   localCurrency={countryCode === "PE" ? "PEN" : currency}
-                  localAmount={countryCode === "PE" ? (penTotals?.total || totalLocal) : totalLocal}
+                  localAmount={totalLocal}
                   description={items.map((i) => i.name).join(" + ").slice(0, 120) || "iLingue Relax"}
                   buyerEmail={buyer.email.trim() || undefined}
                   buyerName={buyer.fullName.trim() || undefined}

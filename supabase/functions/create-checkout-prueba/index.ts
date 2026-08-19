@@ -185,7 +185,7 @@ Deno.serve(async (req) => {
       source: "checkout-prueba-1",
       customer_email: body.contact.email,
       customer_name: fullName,
-      customer_phone: body.contact.phone,
+      customer_phone: body.contact.phone ?? "",
       customer_country: body.contact.country,
       ship_address: String((body.contact as any).address ?? "").slice(0, 160),
       ship_city: String((body.contact as any).city ?? "").slice(0, 80),

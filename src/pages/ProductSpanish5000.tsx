@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, Suspense } from "react";
+import { useState, useMemo, useRef, Suspense, useEffect } from "react";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";

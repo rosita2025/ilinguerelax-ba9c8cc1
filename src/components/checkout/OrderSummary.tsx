@@ -128,7 +128,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           </span>
           <span className="text-right flex flex-col items-end">
             <span className="text-base font-bold leading-tight">
-              {penMode ? formatPen(localTotalAmount) : localTotalLabel}
+              {penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel}
             </span>
             {showLocalRef && !breakdown.isUsd && (
               <span className="text-[10px] font-normal text-muted-foreground leading-none">

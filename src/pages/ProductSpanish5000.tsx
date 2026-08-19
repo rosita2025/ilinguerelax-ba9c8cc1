@@ -429,7 +429,7 @@ const ProductSpanish5000 = () => {
                 >
                   <span className="flex items-center justify-center gap-2 font-black text-sm sm:text-lg">
                     <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
-                    GET THE PHYSICAL + DIGITAL COMBO NOW · {formatPrice(44)}
+                    GET THE PHYSICAL + DIGITAL COMBO NOW · {campaign.price}
                   </span>
                 </Button>
                 <p className="text-[11px] text-center text-muted-foreground mt-2">

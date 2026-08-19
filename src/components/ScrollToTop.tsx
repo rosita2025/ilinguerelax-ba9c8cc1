@@ -42,7 +42,7 @@ export const ScrollToTop = ({ showAfter = 400 }: ScrollToTopProps) => {
           style={{
             // Stay clear of the sticky buy bar and the WhatsApp button on the right,
             // stacking above whatever height the bar currently has.
-            bottom: "calc(var(--sticky-bar-h, 0px) + 112px + env(safe-area-inset-bottom, 0px))",",",
+            bottom: "calc(var(--sticky-bar-h, 0px) + 112px + env(safe-area-inset-bottom, 0px))",
           }}
           aria-label="Scroll to top"
         >

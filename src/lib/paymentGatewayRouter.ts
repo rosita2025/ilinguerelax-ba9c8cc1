@@ -16,21 +16,24 @@ export interface PaymentPayload {
  * Mapeo dinámico de montos y monedas para pasarelas de pago basado en la lógica regional.
  */
 export function getPaymentPayload(
-  countryPricing: Partial<CountryTierRouting>, 
+  countryPricing: {
+    priceUsd: number;
+    currencyCode: string;
+    finalPriceAmount: number;
+    priceLabel?: string;
+    exchangeRate?: number;
+  }, 
   gateway: PaymentGateway,
   countryCode: string
 ): PaymentPayload {
-  // Extraemos los valores calculados por el hook useCountryTierRouting
-  // Si no vienen (ej. en un contexto de prueba), hacemos fallback a la lógica base
   const finalAmount = countryPricing.finalPriceAmount || 0;
   const currency = (countryPricing.currencyCode || "USD") as Currency;
-  const rate = countryPricing.exchangeRate || exchangeRates[currency] || 1;
-  const regionUsdPrice = countryPricing.priceUsd || (finalAmount / rate);
+  const regionUsdPrice = countryPricing.priceUsd;
 
   switch (gateway) {
     case 'paypal': {
-      // PayPal: Si la moneda no es soportada (PEN, COP, etc), reconvertimos al USD del Tier Regional
-      const paypalSupported = ['USD', 'EUR', 'MXN', 'GBP', 'CAD', 'AUD'].includes(currency);
+      // PayPal: Si la moneda no es soportada, reconvertimos al USD del Tier Regional
+      const paypalSupported = ['USD', 'EUR', 'MXN', 'GBP', 'CAD', 'AUD', 'BRL'].includes(currency);
       return {
         gateway,
         countryCode,
@@ -40,8 +43,8 @@ export function getPaymentPayload(
     }
 
     case 'stripe': {
-      // Stripe: Usa centavos (x100) para la mayoría, excepto zero-decimal (CLP, PYG, etc)
-      const zeroDecimalCurrencies = ['CLP', 'PYG', 'UGX', 'VND', 'DJF', 'GNF', 'KMF', 'KRW', 'LAK', 'MGA', 'PYG', 'RWF', 'VUV', 'XAF', 'XOF', 'XPF'];
+      // Stripe: Usa centavos (x100) para la mayoría, excepto zero-decimal
+      const zeroDecimalCurrencies = ['CLP', 'PYG', 'UGX', 'VND', 'DJF', 'GNF', 'KMF', 'KRW', 'LAK', 'MGA', 'RWF', 'VUV', 'XAF', 'XOF', 'XPF'];
       const isZeroDecimal = zeroDecimalCurrencies.includes(currency);
       
       return {
@@ -54,25 +57,15 @@ export function getPaymentPayload(
     }
 
     case 'mercadopago':
-      // Mercado Pago: MX/PE usan moneda local
-      return {
-        gateway,
-        countryCode,
-        amount: Math.round(finalAmount * 100) / 100,
-        currency: currency
-      };
-
     case 'dlocal':
-      // dLocal Go: Siempre moneda local LATAM redondeada
       return {
         gateway,
         countryCode,
-        amount: Math.round(finalAmount * 100) / 100,
+        amount: Number(finalAmount.toFixed(2)),
         currency: currency
       };
 
     case 'binance':
-      // Binance Pay: Usa el equivalente en USD del Tier Regional (USDT)
       return {
         gateway,
         countryCode,
@@ -82,7 +75,7 @@ export function getPaymentPayload(
       };
     
     case 'manual':
-      // Yape/Plin (PEN) o SPEI (MXN)
+      // Para Yape usamos soles, para SPEI usamos MXN, etc.
       return {
         gateway,
         countryCode,

@@ -312,7 +312,10 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
         setLoading(false);
       }
     })();
-    return () => { cancelled = true; };
+    return () => { 
+      cancelled = true; 
+      isMounted = false;
+    };
   }, [amount, amountUsd, currency, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skusKey, reloadKey, onApproved, onError]);
 
   const correlationId = correlationIdRef.current;

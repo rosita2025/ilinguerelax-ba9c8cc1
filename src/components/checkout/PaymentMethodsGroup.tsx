@@ -834,6 +834,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   };
 
   const redirectToHotmart = useCallback(async () => {
+    if (!valid) { requestBuyerInfo(); return; }
+    
     const c = (region.country || "").toUpperCase();
     const url = hotmartCfg.urlsByCountry[c] || hotmartCfg.fallbackUrl || null;
     if (!url) {
@@ -847,7 +849,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       });
       return;
     }
-    if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
     
     setMpLoading("hotmart");

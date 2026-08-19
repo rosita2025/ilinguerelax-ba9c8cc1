@@ -1,8 +1,7 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import { formatCurrencyAmount } from "@/i18n";
+import { useMemo } from "react";
+import { detectCurrency, exchangeRates, type Currency } from "@/i18n";
+import { itemPrice, type PruebaItem } from "@/stores/checkoutStore";
 import type { RegionTier } from "@/hooks/useRegionTier";
-import { itemPrice, type PruebaItem, BuyerInfo, PruebaStore } from "./checkoutStore"; // Import types if possible or redefine lightly
 
 /**
  * Hook centralizado para calcular los totales del checkout en la moneda local
@@ -16,11 +15,10 @@ export const useCheckoutTotal = (
   shippingCostUSD: number, // Costo de envío base en USD
   resolver: (id: string) => { local_prices: any; local_usd_prices: any }
 ) => {
-  const { detectCurrency, exchangeRates } = require("@/i18n");
-  const currency = detectCurrency((country || "US").toUpperCase());
+  const currency = detectCurrency((country || "US").toUpperCase()) as Currency;
   const rate = exchangeRates[currency] ?? 1;
 
-  const { subtotal, total, discount } = useMemo(() => {
+  const totals = useMemo(() => {
     let subtotalUSD = 0;
     let subtotalLocal = 0;
 
@@ -44,14 +42,16 @@ export const useCheckoutTotal = (
       ? (subtotalUSD >= 50 ? 0 : shippingCostUSD * rate) 
       : 0;
 
+    const totalLocal = Math.max(0, subtotalLocal - discountLocal + shippingLocal);
+
     return {
-      subtotal: subtotalLocal,
-      discount: discountLocal,
-      total: Math.max(0, subtotalLocal - discountLocal + shippingLocal),
-      shipping: shippingLocal,
+      subtotalLocal,
+      discountLocal,
+      shippingLocal,
+      totalLocal,
       currency
     };
   }, [items, couponPercent, tier, country, shippingCostUSD, resolver, currency, rate]);
 
-  return { subtotal, discount, total, shipping, currency };
+  return totals;
 };

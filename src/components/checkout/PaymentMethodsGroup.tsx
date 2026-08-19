@@ -2185,39 +2185,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             )}
 
 
-            {m.id === "paypal" && isSelected && (
-              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4">
-                <PayPalButtons
-                  amountUsd={total}
-                  description={items.map((i) => i.name).join(", ")}
-                  buyerEmail={buyer.email}
-                  buyerName={buyer.fullName}
-                  buyerPhone={buyer.phone}
-                  buyerCountry={buyer.country || region.country || ""}
-                  buyerAddress={buyer.address}
-                  buyerCity={buyer.city}
-                  buyerZip={buyer.zip}
-                  buyerState={buyer.state}
-                  skus={items.map((i) => i.id)}
-                  localCurrency={local.currency}
-                  localAmount={local.amount}
-                  items={items.map(i => ({
-                    id: i.id,
-                    name: i.name,
-                    price: itemPrice(i, region.tier),
-                    quantity: i.quantity
-                  }))}
-                  couponCode={coupon ?? undefined}
-                  onApproved={(orderId) => {
-                    trackPurchase(orderId, "paypal");
-                    navigate(`/checkouts/success?order_id=${orderId}&method=paypal`);
-                  }}
-                  onError={(err) => {
-                    setMethodError({ method: "paypal", message: err instanceof Error ? err.message : String(err) });
-                  }}
-                />
-              </div>
-            )}
 
             {m.id === "dlocal_card" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4">

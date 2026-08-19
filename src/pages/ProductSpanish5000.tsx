@@ -154,13 +154,14 @@ const ProductSpanish5000 = () => {
     // Get regional base price from admin
     let basePrice = productPricing.priceGlobalUsd || 44;
     
-    // PEN special case
+    // PEN special case (prioritize manual PEN price)
     if (isPen && productPricing.pricePen) {
+      const penOriginal = productPricing.compareAtPricePen || productPricing.pricePen * 1.35;
       return {
         price: formatPrice(44, { PEN: productPricing.pricePen }),
-        originalPrice: formatPrice(59, { PEN: productPricing.compareAtPricePen || productPricing.pricePen * 1.35 }),
+        originalPrice: formatPrice(59, { PEN: penOriginal }),
         currency: "PEN" as const,
-        discountPercentage: 25
+        discountPercentage: Math.round((1 - productPricing.pricePen / penOriginal) * 100)
       };
     }
     

@@ -14,14 +14,21 @@ import { checkEmail } from "@/lib/emailGuard";
 export function isBuyerValid(buyer: { 
   fullName: string; 
   email: string;
+  phone?: string;
   address?: string;
   city?: string;
   zip?: string;
   country?: string;
 }, hasPhysicalItems = false) {
   try {
-    const basicOk = (buyer.fullName || "").trim().length >= 3 && checkEmail(buyer.email || "").ok;
+    const nameValid = (buyer.fullName || "").trim().length >= 3;
+    const emailValid = checkEmail(buyer.email || "").ok;
+    const phoneValid = (buyer.phone || "").trim().length >= 7; // Mínimo para ser un número real
+    
+    const basicOk = nameValid && emailValid && phoneValid;
+    
     if (!hasPhysicalItems) return basicOk;
+
     return (
       basicOk &&
       (buyer.address || "").trim().length >= 8 &&
@@ -112,6 +119,7 @@ export function BuyerInfoForm() {
   const nameInvalid = localName.trim().length < 3;
   const emailCheckResult = useMemo(() => checkEmail(localEmail), [localEmail]);
   const emailInvalid = !emailCheckResult.ok;
+  const phoneInvalid = localPhone.trim().length < 7;
   
   const addressInvalid = hasPhysicalItems && localAddress.trim().length < 8;
   const cityInvalid = hasPhysicalItems && localCity.trim().length < 3;
@@ -121,11 +129,12 @@ export function BuyerInfoForm() {
   const valid = useMemo(() => isBuyerValid({
     fullName: localName,
     email: localEmail,
+    phone: localPhone,
     address: localAddress,
     city: localCity,
     zip: localZip,
     country: localCountry
-  }, hasPhysicalItems), [localName, localEmail, localAddress, localCity, localZip, localCountry, hasPhysicalItems]);
+  }, hasPhysicalItems), [localName, localEmail, localPhone, localAddress, localCity, localZip, localCountry, hasPhysicalItems]);
 
   useEffect(() => {
     const handler = () => {
@@ -136,6 +145,11 @@ export function BuyerInfoForm() {
       setTimeout(() => {
         if (nameInvalid) nameRef.current?.focus();
         else if (emailInvalid) emailRef.current?.focus();
+        else if (phoneInvalid) {
+          // Focus phone input - using a data attribute or selector since it's a wrapper component
+          const phoneInput = containerRef.current?.querySelector('input[type="tel"]');
+          if (phoneInput instanceof HTMLInputElement) phoneInput.focus();
+        }
         else if (addressInvalid) document.getElementById("shipping-address")?.focus();
         else if (cityInvalid) document.getElementById("shipping-city")?.focus();
         else if (zipInvalid) document.getElementById("shipping-zip")?.focus();
@@ -144,7 +158,7 @@ export function BuyerInfoForm() {
     };
     window.addEventListener(BUYER_ERRORS_EVENT, handler);
     return () => window.removeEventListener(BUYER_ERRORS_EVENT, handler);
-  }, [nameInvalid, emailInvalid, addressInvalid, cityInvalid, zipInvalid, countryInvalid]);
+  }, [nameInvalid, emailInvalid, phoneInvalid, addressInvalid, cityInvalid, zipInvalid, countryInvalid]);
 
   useEffect(() => {
     if (valid) setShowErrors(false);
@@ -152,6 +166,7 @@ export function BuyerInfoForm() {
 
   const showNameError = showErrors && nameInvalid;
   const showEmailError = showErrors && emailInvalid;
+  const showPhoneError = showErrors && phoneInvalid;
 
   return (
     <div
@@ -267,9 +282,17 @@ export function BuyerInfoForm() {
               onChange={(v) => setLocalPhone(v ?? "")}
               onBlur={() => updateGlobalBuyer({ phone: localPhone })}
               placeholder="999 999 999"
-              className="w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus-within:ring-2 focus-within:ring-primary/40"
+              className={cn(
+                "w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus-within:ring-2 transition-all",
+                showPhoneError 
+                  ? "border-destructive focus-within:ring-destructive/40" 
+                  : "focus-within:ring-primary/40"
+              )}
             />
           </div>
+          {showPhoneError && (
+            <p className="text-[11px] text-destructive mt-1">El teléfono es obligatorio para soporte/verificación.</p>
+          )}
         </label>
 
         {hasPhysicalItems && (

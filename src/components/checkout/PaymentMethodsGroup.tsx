@@ -834,6 +834,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   };
 
   const redirectToHotmart = useCallback(async () => {
+    if (!valid) { requestBuyerInfo(); return; }
+    
     const c = (region.country || "").toUpperCase();
     const url = hotmartCfg.urlsByCountry[c] || hotmartCfg.fallbackUrl || null;
     if (!url) {
@@ -847,7 +849,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       });
       return;
     }
-    if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
     
     setMpLoading("hotmart");
@@ -916,18 +917,38 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       toast({ title: t.selectMethod, variant: "destructive" });
       return;
     }
-    // Hotmart: guarda carrito abandonado y luego redirige (esperando máx 2s).
-    if (selected === "hotmart") { await redirectToHotmart(); return; }
-    // Cada método vuelve a capturar el carrito en segundo plano, así que aquí
-    // no esperamos: el clic en "Continuar" ya no paga la espera de la auditoría.
-    void captureAbandonedCheckout(selected, true);
-    if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setShowStripe(true); return; }
-    if (selected === "dlocal_transfer") { await payDlocal("transfer"); return; }
-    if (selected === "dlocal_cash") { await payDlocal("cash"); return; }
-    if (selected === "dlocal_wallet") { await payDlocal("wallet"); return; }
-    if (selected === "transfer") { payMercado("transfer"); return; }
-    if (selected === "cash") { payMercado("cash"); return; }
-    // yape → user uses "Ya pagué" button in the manual panel
+
+    try {
+      // Hotmart: guarda carrito abandonado y luego redirige (esperando máx 2s).
+      if (selected === "hotmart") { await redirectToHotmart(); return; }
+      
+      // Cada método vuelve a capturar el carrito en segundo plano, así que aquí
+      // no esperamos: el clic en "Continuar" ya no paga la espera de la auditoría.
+      void captureAbandonedCheckout(selected, true);
+      
+      if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { 
+        setShowStripe(true); 
+        // Scroll to stripe anchor
+        setTimeout(() => {
+          stripeAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+        return; 
+      }
+      if (selected === "dlocal_transfer") { await payDlocal("transfer"); return; }
+      if (selected === "dlocal_cash") { await payDlocal("cash"); return; }
+      if (selected === "dlocal_wallet") { await payDlocal("wallet"); return; }
+      if (selected === "transfer") { await payMercado("transfer"); return; }
+      if (selected === "cash") { await payMercado("cash"); return; }
+      
+      // yape → user uses "Ya pagué" button in the manual panel
+    } catch (err) {
+      console.error("handleBuyNow error:", err);
+      toast({
+        title: t.errorPayment,
+        description: err instanceof Error ? err.message : "Ocurrió un error inesperado.",
+        variant: "destructive"
+      });
+    }
   };
 
   const retryStripe = useCallback(() => {
@@ -1931,7 +1952,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               type="button"
               onClick={() => { setSelectedCardRow(rowKey); handleSelect(m.id); }}
               disabled={isLoading}
-              aria-disabled={!valid}
               className={cn(
                 "w-full text-left flex items-center transition-colors",
                 "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl",
@@ -1941,7 +1961,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 isSelected
                   ? "bg-neutral-200/60 dark:bg-neutral-800"
                   : "hover:bg-neutral-100 dark:hover:bg-neutral-800/60",
-                !valid && "cursor-not-allowed",
+                !valid && "opacity-50 grayscale cursor-pointer hover:bg-transparent hover:grayscale-0",
               )}
             >
               {m.id !== "hotmart" && (
@@ -2505,12 +2525,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         <button
           type="button"
           onClick={handleBuyNow}
-          disabled={!valid || !selected || mpLoading !== null}
+          disabled={!selected || mpLoading !== null}
           className={cn(
             "w-full mt-4 py-4 rounded-xl font-bold text-white text-base transition-colors",
             "bg-[hsl(142,72%,42%)] hover:bg-[hsl(142,72%,36%)]",
-            "disabled:opacity-50 disabled:cursor-not-allowed",
             "flex items-center justify-center gap-2",
+            !valid && "opacity-60 cursor-pointer",
           )}
         >
           {mpLoading ? (

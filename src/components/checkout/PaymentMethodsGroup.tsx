@@ -514,6 +514,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const s = useCheckoutPruebaStore.getState();
+    // Return early if we already have a secret in the store to avoid double fetching
+    if (s.clientSecret) return s.clientSecret;
+
     if (!isBuyerValid(s.buyer)) throw new Error(t.completeYourData);
     // No bloquea el checkout: la captura del carrito viaja en segundo plano.
     void captureAbandonedCheckout(selected || "stripe", true);

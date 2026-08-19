@@ -378,18 +378,29 @@ const ProductDynamic = () => {
 
               <div className="flex flex-col gap-1 mb-5">
                 <div className="flex items-baseline gap-3">
-                  <span className="text-4xl font-black text-primary">{displayFormatted}</span>
-                  <span className="text-xl text-muted-foreground line-through opacity-70">
-                    {originalFormatted}
-                  </span>
+                  {region.loading || loading ? (
+                    <Skeleton className="h-10 w-32" />
+                  ) : (
+                    <>
+                      <span className="text-4xl font-black text-primary">{displayFormatted}</span>
+                      <span className="text-xl text-muted-foreground line-through opacity-70">
+                        {originalFormatted}
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
-                  {!isPEN && !local.isUsd && (
-                    <span className="text-xs text-muted-foreground font-medium">≈ ${effectiveUsd.toFixed(2)} USD</span>
+                  {!region.loading && !loading && (
+                    <>
+                      {!isPEN && !local.isUsd && (
+                        <span className="text-xs text-muted-foreground font-medium">≈ ${effectiveUsd.toFixed(2)} USD</span>
+                      )}
+                      {isPEN && (
+                        <span className="text-xs text-muted-foreground font-medium">≈ ${effectiveUsd.toFixed(2)} USD</span>
+                      )}
+                    </>
                   )}
-                  {isPEN && (
-                    <span className="text-xs text-muted-foreground font-medium">≈ ${effectiveUsd.toFixed(2)} USD</span>
-                  )}
+                </div>
                   <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 shadow-sm">
                     {isPEN ? "Perú Directo" : local.currency === "USD" ? "Global USD" : `Local ${local.currency}`}
                   </span>

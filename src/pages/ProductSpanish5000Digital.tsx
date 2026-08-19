@@ -597,8 +597,8 @@ const ProductSpanish5000Digital = () => {
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-8 rounded-3xl bg-slate-900 text-white shadow-2xl relative overflow-hidden mb-12">
-            <div className="relative z-10 flex-1 text-center md:text-left w-full max-w-full overflow-hidden px-2">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-8 rounded-3xl bg-slate-900 text-white shadow-2xl relative overflow-hidden mb-12 w-full max-w-full box-border text-center md:text-left">
+            <div className="relative z-10 flex-1 w-full max-w-full overflow-hidden px-2">
               <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
                 <Package className="w-5 h-5 text-emerald-400" />
                 <span className="text-xs font-black uppercase tracking-widest text-emerald-400">Physical Edition Available</span>

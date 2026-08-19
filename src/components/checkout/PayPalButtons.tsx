@@ -61,7 +61,7 @@ export function PayPalButtons({
   const localSupported = providedLocal && PAYPAL_SUPPORTED.has(localCurrency!.toUpperCase());
   const useLocal = providedLocal && localSupported;
   const currency = useLocal ? localCurrency!.toUpperCase() : "USD";
-  const amount = useLocal ? Number(localAmount!.toFixed(2)) : Number(amountUsd.toFixed(2));
+  const amount = Number(amountUsd.toFixed(2)); // Always use amountUsd which already includes shipping in PaymentMethodsGroup.tsx
   const fallbackToUsd = providedLocal && !localSupported;
 
   useEffect(() => {
@@ -175,7 +175,7 @@ export function PayPalButtons({
                 body: { 
                   amount, 
                   currency, 
-                  amountUsd: Number(amountUsd.toFixed(2)), 
+                  amountUsd: amount, // amount here is already amountUsd.toFixed(2) from the calculation above 
                   description, 
                   buyerEmail, 
                   buyerName, // Added name to payload

@@ -7,19 +7,26 @@ let loadedCurrency = null;
 async function loadPayPalSdk(currency, attempts = 3) {
     const sdkCorrId = `sdk-${Date.now()}`;
     // Limpieza agresiva de scripts de PayPal previos para evitar conflictos
-    document.querySelectorAll('script[src*="paypal.com/sdk/js"]').forEach((s) => {
-        try {
-            s.parentNode?.removeChild(s);
-        }
-        catch {
-            s.remove();
-        }
-    });
-    window.paypal = undefined;
-    sdkPromise = null;
+    const cleanup = () => {
+        document.querySelectorAll('script[src*="paypal.com/sdk/js"]').forEach((s) => {
+            try {
+                s.parentNode?.removeChild(s);
+            }
+            catch {
+                s.remove();
+            }
+        });
+        window.paypal = undefined;
+        sdkPromise = null;
+    };
+    if (!sdkPromise)
+        cleanup();
     let lastError = null;
     for (let i = 1; i <= attempts; i++) {
         try {
+            // Check if already loaded by another instance
+            if (window.paypal && loadedClientId && loadedCurrency === currency)
+                return;
             const { data, error } = await invokeEdge("paypal-config", {
                 method: "GET",
                 headers: { "x-correlation-id": sdkCorrId }
@@ -28,19 +35,12 @@ async function loadPayPalSdk(currency, attempts = 3) {
                 throw new Error("PayPal no está configurado");
             }
             const clientId = data.clientId;
+            // Double check window.paypal again before starting a new injection
             if (window.paypal && loadedClientId === clientId && loadedCurrency === currency)
                 return;
             if (sdkPromise && loadedClientId === clientId && loadedCurrency === currency)
                 return sdkPromise;
-            document.querySelectorAll('script[data-paypal-sdk="1"]').forEach((s) => {
-                try {
-                    s.parentNode?.removeChild(s);
-                }
-                catch {
-                    s.remove();
-                }
-            });
-            window.paypal = undefined;
+            cleanup();
             loadedClientId = clientId;
             loadedCurrency = currency;
             sdkPromise = new Promise((resolve, reject) => {
@@ -156,11 +156,16 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
         let cancelled = false;
         setLoading(true);
         setErr(null);
+        let isMounted = true;
         (async () => {
             try {
                 await loadPayPalSdk(currency);
-                if (cancelled || !ref.current || !window.paypal)
+                if (!isMounted || cancelled || !ref.current)
                     return;
+                // Final safety check for window.paypal
+                if (!window.paypal || !window.paypal.Buttons) {
+                    throw new Error("SDK de PayPal cargado pero Buttons no disponible. Verifica bloqueadores de anuncios.");
+                }
                 ref.current.innerHTML = "";
                 window.paypal.Buttons({
                     style: { layout: "vertical", color: "gold", shape: "pill", label: "paypal", height: 45 },
@@ -242,7 +247,10 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
                 setLoading(false);
             }
         })();
-        return () => { cancelled = true; };
+        return () => {
+            cancelled = true;
+            isMounted = false;
+        };
     }, [amount, amountUsd, currency, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skusKey, reloadKey, onApproved, onError]);
     const correlationId = correlationIdRef.current;
     const copyCorrelation = async () => {

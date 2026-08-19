@@ -12,10 +12,10 @@ export const WhatsAppButton = ({ url, label = "¿Dudas?" }: WhatsAppButtonProps)
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"
-      className="fixed left-4 z-40 group touch-manipulation"
+      className="fixed right-4 z-40 group touch-manipulation"
       style={{
         // Sit safely above the sticky buy bar (whatever its current height).
-        bottom: "calc(var(--sticky-bar-h, 0px) + 105px + env(safe-area-inset-bottom, 0px))",
+        bottom: "calc(var(--sticky-bar-h, 0px) + 110px + env(safe-area-inset-bottom, 0px))",
       }}
     >
       <div className="flex items-center gap-2">

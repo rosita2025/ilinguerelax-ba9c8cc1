@@ -460,7 +460,7 @@ const ProductSpanish5000 = () => {
               <Button 
                 onClick={handleViewDigital}
                 size="xl"
-                className="w-full max-w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black shadow-[0_8px_30px_rgba(16,185,129,0.3)] text-base sm:text-lg py-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] h-auto whitespace-normal"
+                className="w-full max-w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black shadow-[0_8px_30px_rgba(16,185,129,0.3)] text-base sm:text-lg py-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] h-auto whitespace-normal text-center"
               >
                 View Digital Version — {formatPrice(72.99)}
                 <ArrowRight className="ml-2 w-5 h-5" />

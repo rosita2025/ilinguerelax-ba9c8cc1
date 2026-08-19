@@ -592,7 +592,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           
           throw new Error(msg);
         }
-        return data.clientSecret;
+        const secret = data.clientSecret;
+        // Store secret globally so retry logic can clear it
+        useCheckoutPruebaStore.getState().setClientSecret(secret);
+        return secret;
       };
 
       const clientSecret = await fetchSecret();

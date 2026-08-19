@@ -541,13 +541,56 @@ const ProductSpanish5000 = () => {
               Digital-Only Version
             </div>
             <h2 className="text-3xl md:text-4xl font-black leading-tight break-words px-2">
-              Looking for a <span className="text-emerald-400">Digital-Only</span> version?
+              Spanish Mastery System <span className="text-emerald-400">DIGITAL PDF</span>
             </h2>
             <p className="text-slate-400 text-base md:text-lg leading-relaxed px-2">
-              Get instant access to the PDF version without waiting for international shipping. 
+              Get instant access to the full digital bundle without waiting for international shipping.
               Study on your phone, tablet, or computer right away.
             </p>
-            <div className="pt-4 px-2">
+
+            <div className="grid gap-4 sm:grid-cols-2 text-left px-2">
+              <div className="rounded-2xl border border-slate-700 bg-slate-800/60 p-5">
+                <p className="text-[11px] font-black uppercase tracking-widest text-emerald-400 mb-3">
+                  Included Today (Instant Download)
+                </p>
+                <ul className="space-y-2">
+                  {[
+                    "5,000 Words + Pronunciation (250 Pages)",
+                    "A1–C1 Grammar Guide (250 Pages)",
+                    "1,000 Essential Verbs + Pronunciation",
+                    "500 Practice Questions + Pronunciation",
+                    "Interactive Flashcards (Anki/Quizlet)",
+                    "Top 100 Conversations Miniguide",
+                    "7-Day Money-Back Guarantee",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm text-slate-200">
+                      <Check className="w-4 h-4 mt-0.5 shrink-0 text-emerald-400" />
+                      <span className="break-words">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5">
+                <p className="text-[11px] font-black uppercase tracking-widest text-amber-400 mb-3">
+                  Launch Bonuses (Early Access) · Coming Soon
+                </p>
+                <ul className="space-y-2">
+                  {[
+                    "Future Audio MP3 Pack (FREE Bonus)",
+                    "iLingue Relax App (FREE Early Access)",
+                    "Free Lifetime Updates",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm text-slate-200">
+                      <Check className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
+                      <span className="break-words">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="pt-2 px-2">
               <Button 
                 onClick={handleViewDigital}
                 size="xl"

@@ -149,7 +149,7 @@ Deno.serve(async (req) => {
     if (shippingAmountCents > 0) {
       line_items.push({
         price_data: {
-          currency,
+          currency: targetCurrency,
           product_data: {
             name: country === "ES" || isLatam ? "Costo de Envío" : "Shipping Cost",
             description: "Standard Shipping",

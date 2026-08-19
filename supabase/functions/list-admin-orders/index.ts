@@ -31,49 +31,65 @@ Deno.serve(async (req) => {
         throw new Error("Tracking number, provider, or proof URL is required");
       }
 
-      const table = source === "manual" ? "manual_payments" : 
-                    source === "shopify" ? "shopify_sales" : null;
-      
+      const table = source === "manual" ? "manual_payments" :
+                    source === "shopify" ? "shopify_sales" :
+                    source === "gateway" ? "physical_shipments" : null;
+
       if (!table) throw new Error("Source table not supported for tracking updates");
 
-      const idField = table === "manual_payments" ? "order_number" : "id";
-      
+      const idField = table === "shopify_sales" ? "id" : "order_number";
+
+      const patch: Record<string, unknown> = {
+        tracking_number: trackingNumber || null,
+        shipping_provider: shippingProvider || null,
+        shipping_proof_url: shippingProofUrl || null,
+      };
+      if (table === "physical_shipments") {
+        patch.status = trackingNumber ? "shipped" : "pending";
+      }
+
       const { error: updateError } = await admin
         .from(table)
-        .update({ 
-          tracking_number: trackingNumber || null,
-          shipping_provider: shippingProvider || null,
-          shipping_proof_url: shippingProofUrl || null
-        })
+        .update(patch)
         .eq(idField, orderId);
 
       if (updateError) throw updateError;
 
       // Log event with more metadata
       await admin.from("order_events").insert({
-        order_id: orderId,
-        event_type: "tracking_updated",
-        details: { 
-          trackingNumber, 
-          shippingProvider, 
+        order_number: String(orderId),
+        event: "tracking_updated",
+        status: trackingNumber ? "shipped" : "pending",
+        provider: source === "gateway" ? "gateway" : source,
+        reference: trackingNumber || null,
+        detail: [shippingProvider, trackingNumber].filter(Boolean).join(" · ").slice(0, 500) || null,
+        metadata: {
+          trackingNumber,
+          shippingProvider,
           shippingProofUrl,
           source,
-          updated_at: new Date().toISOString()
-        }
+          updated_at: new Date().toISOString(),
+        },
       });
 
       // Send tracking email if tracking was added (and not just cleared)
       if (trackingNumber) {
         try {
           // Fetch order details to get customer email
+          const selectCols = table === "manual_payments"
+            ? "buyer_email, buyer_name"
+            : table === "shopify_sales"
+              ? "customer_email, customer_name"
+              : "email, customer_name";
           const { data: orderData } = await admin
             .from(table)
-            .select(idField === "order_number" ? "buyer_email, buyer_name" : "customer_email, customer_name")
+            .select(selectCols)
             .eq(idField, orderId)
             .maybeSingle();
 
-          const email = orderData?.buyer_email || orderData?.customer_email;
+          const email = orderData?.buyer_email || orderData?.customer_email || orderData?.email;
           const name = orderData?.buyer_name || orderData?.customer_name || "Cliente";
+
 
           if (email) {
             const isAmazon = shippingProvider?.toLowerCase().includes("amazon");

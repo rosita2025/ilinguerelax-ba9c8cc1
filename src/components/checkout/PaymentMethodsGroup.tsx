@@ -974,12 +974,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   };
 
   const retryStripe = useCallback(() => {
-    console.log("[Stripe] Manual retry triggered");
+    console.log("[Stripe] Manual retry triggered - clearing state and refreshing intent");
     setStripeError(null);
-    setStripeLoading(false);
+    setStripeLoading(true);
     setStripeFrameMounted(false);
     setStripeElapsed(0);
-    // Explicitly invalidate client secret to force fresh fetch
+    
+    // Ejecuta el refresco del PaymentIntent sin recargar página
+    // Primero limpiamos el secret para forzar la regeneración en la Edge Function
     useCheckoutPruebaStore.getState().setClientSecret(null);
     setStripeRetryKey((k) => k + 1);
   }, []);

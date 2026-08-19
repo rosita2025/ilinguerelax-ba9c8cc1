@@ -39,6 +39,14 @@ Deno.serve(async (req) => {
 
       const idField = table === "shopify_sales" ? "id" : "order_number";
 
+      // Guardamos el tracking anterior para distinguir "enviado" de "actualizado".
+      const { data: prevRow } = await admin
+        .from(table)
+        .select("tracking_number")
+        .eq(idField, orderId)
+        .maybeSingle();
+      const prevTracking = String((prevRow as { tracking_number?: string | null } | null)?.tracking_number ?? "").trim();
+
       const patch: Record<string, unknown> = {
         tracking_number: trackingNumber || null,
         shipping_provider: shippingProvider || null,

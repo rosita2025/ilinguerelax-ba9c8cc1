@@ -156,9 +156,11 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
       couponPercent: 0,
       buyer: { fullName: "", email: "", phone: "" },
       selectedMethod: null,
+      clientSecret: null,
 
       setBuyer: (patch) => set({ buyer: { ...get().buyer, ...patch } }),
       setSelectedMethod: (method) => set({ selectedMethod: method }),
+      setClientSecret: (secret) => set({ clientSecret: secret }),
       hasPhysicalItems: () => get().items.some((i) => i.isPhysical),
 
 

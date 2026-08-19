@@ -330,7 +330,7 @@ export const StickyBuyBar = ({
   }
 
   return (
-    <div ref={barRef} className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t-2 border-primary/20 shadow-[0_-8px_30px_rgba(0,0,0,0.25)]">
+    <div ref={barRef} className="fixed bottom-0 left-0 right-0 z-[70] bg-background/95 backdrop-blur-sm border-t-2 border-primary/20 shadow-[0_-8px_30px_rgba(0,0,0,0.25)]">
       {dismissible && (
         <button
           type="button"

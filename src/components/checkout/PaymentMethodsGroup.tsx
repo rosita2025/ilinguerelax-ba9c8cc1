@@ -649,6 +649,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     const totals = calcTotals(s.items, s.couponPercent, region.tier);
     redirectingRef.current = true;
     setMpLoading(paymentType);
+    setMethodError(null);
+    
     try {
       void captureAbandonedCheckout(`mercadopago_${paymentType}`, true);
       void supabase.from("email_contacts").upsert({
@@ -692,30 +694,38 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           paymentType,
         },
       }, { attempts: 3, baseDelayMs: 500 });
-      if (error || !data?.init_point) throw new Error((error as { message?: string } | null)?.message || t.mpError);
+
+      if (error || !data?.init_point) {
+        throw new Error((error as { message?: string } | null)?.message || t.mpError);
+      }
 
       window.location.assign(data.init_point);
     } catch (err) {
       redirectingRef.current = false;
       setMpLoading(null);
+      
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      
       try {
         const s3 = useCheckoutPruebaStore.getState();
         const totals = calcTotals(s3.items, s3.couponPercent, region.tier);
         trackPaymentError({
           provider: `mercadopago_${paymentType}`,
           skus: s3.items.map((i) => i.id),
-          reason: err instanceof Error ? err.message : String(err),
+          reason: errorMessage,
           value: totals.total,
-          currency: "USD", // Forzado a USD para Ads/Tracking
+          currency: "USD",
         });
       } catch { /* noop */ }
+
       setMethodError({
         method: paymentType === "transfer" ? "transfer" : "cash",
-        message: err instanceof Error ? err.message : t.tryAgain,
+        message: errorMessage,
       });
+
       toast({
         title: t.mpError,
-        description: err instanceof Error ? err.message : t.tryAgain,
+        description: errorMessage,
         variant: "destructive",
       });
     }

@@ -1,6 +1,6 @@
 # Plan: Sincronización de Precios Dinámicos desde el Admin
 
-Vincular las páginas de productos y la barra de compra persistente (Sticky Buy Bar) con la configuración de precios real de la base de datos (Supabase) para eliminar valores estáticos en PEN y asegurar que se respeten las 3 regiones (LATAM, Global, Tienda) y la conversión automática por IP.
+Vincular las páginas de productos y la barra de compra persistente (Sticky Buy Bar) con la configuración de precios real de la base de datos (Supabase) para eliminar valores estáticos y asegurar que se respeten las 3 regiones (LATAM, Global, Tienda) y la conversión automática por IP.
 
 ## Cambios Propuestos
 
@@ -16,7 +16,7 @@ Vincular las páginas de productos y la barra de compra persistente (Sticky Buy 
 - **`src/components/StickyBuyBar.tsx`**: Eliminar cualquier lógica de parsing de texto para el precio. Recibir el objeto `tier` completo o los valores dinámicos calculados para asegurar que el símbolo, monto y código de moneda sean exactos.
 - **`src/pages/ProductSpanish5000.tsx`** y **`src/pages/ProductSpanish5000Digital.tsx`**:
     - Refactorizar el `useMemo` de `campaign` para usar exclusivamente los datos de `useAdminPricing` y `useCountryTierRouting`.
-    - Reemplazar cualquier string estático (como "S/ 131.20" o "$34.99") por llamadas a `tier.priceLabel`.
+    - Reemplazar cualquier string estático o cálculo manual de PEN por llamadas a `tier.priceLabel`.
     - Asegurar que el Hero, los botones y la Sticky Bar compartan el mismo estado de precio.
 
 ### Internacionalización

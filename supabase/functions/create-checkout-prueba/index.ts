@@ -1,13 +1,17 @@
-const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { z } from "npm:zod@3.23.8";
 import { type StripeEnv, createStripeClient } from "../_shared/stripe.ts";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
-import { resolveServerPricing, PricingError, isRestrictedCurrency } from "../_shared/catalogPricing.ts";
+import { resolveServerPricing, PricingError, isRestrictedCurrency, tierForCountry } from "../_shared/catalogPricing.ts";
+import { localAmountFromUsd } from "../_shared/fxRates.ts";
 
+const corsHeaders = { 
+  "Access-Control-Allow-Origin": "*", 
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", 
+  "Access-Control-Allow-Methods": "POST, OPTIONS" 
+};
 
 // SEGURIDAD: solo se aceptan id y cantidad. El precio, el nombre y el
-// descuento se resuelven en el servidor desde el catálogo; los valores que
-// mande el navegador se ignoran.
+// descuento se resuelven en el servidor desde el catálogo.
 const ItemSchema = z.object({
   id: z.string().min(1).max(180),
   name: z.string().max(200).optional(),
@@ -58,13 +62,14 @@ Deno.serve(async (req) => {
     const stripe = createStripeClient(env);
 
     const currency = body.currency.toLowerCase();
+    const country = body.contact.country.toUpperCase();
 
     // Precio autoritativo del servidor (ignora price/couponPercent del cliente).
     let pricing;
     try {
       pricing = await resolveServerPricing({
         items: body.items.map((i) => ({ id: i.id, quantity: i.quantity, price: i.price })),
-        country: body.contact.country,
+        country: country,
         couponCode: body.couponCode,
         currency: currency,
       });
@@ -79,6 +84,28 @@ Deno.serve(async (req) => {
     }
 
     const discountMultiplier = 1 - pricing.couponPercent / 100;
+
+    // --- LÓGICA DE ENVÍO (Debe ser idéntica al Frontend) ---
+    const isPhysical = pricing.items.some(i => i.isPhysical);
+    const isLatam = tierForCountry(country) === "latam";
+    const shippingUsdBase = isLatam ? 9 : 8;
+    const shippingUsd = isPhysical ? (pricing.totalUsd >= 50 ? 0 : shippingUsdBase) : 0;
+    
+    // Convertir el envío a la moneda local si es necesario
+    let shippingAmountCents = 0;
+    if (shippingUsd > 0) {
+      if (currency === "usd") {
+        shippingAmountCents = Math.round(shippingUsd * 100);
+      } else {
+        const shippingLocal = await localAmountFromUsd(shippingUsd, currency.toUpperCase());
+        if (shippingLocal) {
+          shippingAmountCents = Math.round(shippingLocal * 100);
+        } else {
+          // Fallback a conversión simple si no hay tasa configurada
+          shippingAmountCents = Math.round(shippingUsd * 100);
+        }
+      }
+    }
 
     const line_items = pricing.items.map((item) => {
       const unit_amount = Math.round(item.unitUsd * discountMultiplier * 100);
@@ -96,18 +123,30 @@ Deno.serve(async (req) => {
       };
     });
 
-    const total = Math.round(pricing.totalUsd * 100);
+    // Agregar el costo de envío como un item de línea si existe
+    if (shippingAmountCents > 0) {
+      line_items.push({
+        price_data: {
+          currency,
+          product_data: {
+            name: country === "ES" || isLatam ? "Costo de Envío" : "Shipping Cost",
+            description: "Standard Shipping",
+          },
+          unit_amount: shippingAmountCents,
+        },
+        quantity: 1,
+      });
+    }
 
-    if (total < 50) {
+    const totalCents = line_items.reduce((sum, item) => sum + (item.price_data.unit_amount * item.quantity), 0);
+
+    if (totalCents < 50) {
       return new Response(
         JSON.stringify({ error: "El monto total debe ser al menos $0.50 USD" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    // Guest checkout: keep this function fast. Avoid customer list/update/create
-    // calls before opening the payment form; Stripe will collect/prefill the
-    // buyer email directly on the Checkout Session.
     const fullName = `${body.contact.firstName} ${body.contact.lastName}`.trim().slice(0, 100);
 
     const productSummary = pricing.items
@@ -115,6 +154,7 @@ Deno.serve(async (req) => {
       .join(" · ")
       .slice(0, 300);
     const deliverySkus = normalizeSkus(pricing.items.map((i) => i.sku)).join(",").slice(0, 490);
+    
     const checkoutMetadata = {
       source: "checkout-prueba-1",
       customer_email: body.contact.email,
@@ -126,33 +166,22 @@ Deno.serve(async (req) => {
       items_count: String(pricing.items.length),
       items_summary: productSummary,
       skus: deliverySkus,
+      shipping_usd: String(shippingUsd),
     };
 
-    // Respeta exactamente la opción elegida en /admin/checkout-methods.
-    // Antes, al elegir "Tarjeta", se omitía payment_method_types y Stripe
-    // volvía a mostrar automáticamente PayPal, Klarna y todos los métodos
-    // activados en la cuenta, aunque el administrador no los hubiera elegido.
-    
-    // Favor local currency if supported and not restricted.
-    const forceUsd = body.isRestrictedRetry || isRestrictedCurrency(body.contact.country);
-    
-    // Explicitly target the detected currency to help Stripe Adaptive Pricing 
-    // align with our displayed local badges, while maintaining USD as base.
+    const forceUsd = body.isRestrictedRetry || isRestrictedCurrency(country);
     const targetCurrency = forceUsd ? "usd" : currency;
 
-    console.log(`[Stripe] Creating session. TargetCurrency: ${targetCurrency}, ForceUSD: ${forceUsd}, Country: ${body.contact.country}`);
+    console.log(`[Stripe] Creating session. TargetCurrency: ${targetCurrency}, Total: ${totalCents}, Country: ${country}`);
 
     const session = await stripe.checkout.sessions.create({
       line_items,
       mode: "payment",
       ui_mode: "embedded_page",
       return_url: body.returnUrl,
-      // Adaptive Pricing allows Stripe to present local currency automatically if enabled.
-      // We pass the currency explicitly to encourage it to match our front-end sum.
       adaptive_pricing: { enabled: !forceUsd },
       currency: targetCurrency,
       customer_email: body.contact.email,
-
       payment_intent_data: {
         description: productSummary || "iLingue Relax Digital",
         receipt_email: body.contact.email,
@@ -161,23 +190,18 @@ Deno.serve(async (req) => {
       metadata: checkoutMetadata,
     });
 
-
     return new Response(JSON.stringify({ clientSecret: session.client_secret }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
     console.error("create-checkout-prueba error:", err);
-    // No exponemos el detalle interno de la pasarela, pero sí un código corto
-    // (tipo/código de Stripe) para poder diagnosticar en /admin/payment-errors.
     const e = err as any;
     const stripeCode = e?.code || e?.type || "unknown_error";
     const stripeParam = e?.param || "";
     const reason = [e?.type, e?.code, stripeParam].filter(Boolean).join(":").slice(0, 80) || 
                    (e?.message && e.message.length < 100 ? e.message : "gateway_error");
     
-    console.error(`Stripe Error [${stripeCode}]:`, e.message, "Param:", stripeParam);
-
     const message = e?.message && e.message.length < 200 && !e.message.includes("api.stripe.com")
       ? e.message 
       : "No se pudo iniciar el pago. Intenta nuevamente.";
@@ -194,4 +218,3 @@ Deno.serve(async (req) => {
     );
   }
 });
-

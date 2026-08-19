@@ -302,12 +302,12 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
         <div className="border-t pt-4 space-y-2 text-sm">
           <div className="flex justify-between text-muted-foreground">
             <span>{t.subtotal}</span>
-            <span>{penMode ? formatPen(localSubtotalAmount) : showLocalRef ? formatLocalDirect(localItemsSum.amount, region.country || "") : formatCurrencyAmount(subtotal, "USD")}</span>
+            <span>{penMode && penTotals ? formatPen(penTotals.subtotal) : formatLocalDirect(subtotalLocal, country)}</span>
           </div>
-          {discount > 0 && (
+          {discountLocal > 0 && (
             <div className="flex justify-between text-primary">
               <span>{t.discount}</span>
-              <span>-{penMode ? formatPen(localSubtotalAmount - (localTotalAmount - shipping)) : showLocalRef ? formatLocalDirect(localItemsSum.amount - (localTotalAmount - shipping), region.country || "") : formatCurrencyAmount(discount, "USD")}</span>
+              <span>-{penMode && penTotals ? formatPen(penTotals.discount) : formatLocalDirect(discountLocal, country)}</span>
             </div>
           )}
           <div className="flex justify-between text-muted-foreground text-xs">

@@ -293,7 +293,7 @@ export function BuyerInfoForm() {
             />
           </div>
           {showPhoneError && (
-            <p className="text-[11px] text-destructive mt-1">El teléfono es obligatorio para soporte/verificación.</p>
+            <p className="text-[11px] text-destructive mt-1">Si escribes un teléfono, debe tener al menos 7 dígitos.</p>
           )}
         </label>
 

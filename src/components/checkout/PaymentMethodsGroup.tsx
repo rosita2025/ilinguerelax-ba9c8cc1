@@ -745,10 +745,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     }
     const pricing = {
       priceUsd: currentUsdRef,
-      currencyCode: local.currency,
+      currencyCode: currency,
       priceLabel: localTotalLabel,
-      exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
-      finalPriceAmount: localTotalAmount,
+      exchangeRate: totalLocal / currentUsdRef,
+      finalPriceAmount: totalLocal,
     };
     const payload = getPaymentPayload(pricing, "dlocal", ctry);
     const dlCurrency = payload.currency;

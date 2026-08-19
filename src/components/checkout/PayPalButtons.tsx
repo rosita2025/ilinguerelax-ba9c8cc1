@@ -66,7 +66,7 @@ export function PayPalButtons({
         });
         
         if (error || !data?.clientId) {
-          throw new Error(error?.message || "PayPal no está configurado (faltan credenciales)");
+          throw new Error(error ? (error as any).message : "PayPal no está configurado (faltan credenciales)");
         }
         setClientId(data.clientId);
       } catch (e) {
@@ -157,7 +157,7 @@ export function PayPalButtons({
                 headers: { "x-correlation-id": correlationId }
               });
 
-              if (error || !data?.id) throw new Error(error?.message || "No se pudo crear la orden");
+              if (error || !data?.id) throw new Error(error ? (error as any).message : "No se pudo crear la orden");
               return data.id;
             } catch (e) {
               setErr((e as any)?.message || String(e));
@@ -186,7 +186,7 @@ export function PayPalButtons({
               });
 
               if (error || cap?.status !== "COMPLETED") {
-                throw new Error(error?.message || `Estado inesperado: ${cap?.status ?? "desconocido"}`);
+                throw new Error(error ? (error as any).message : `Estado inesperado: ${cap?.status ?? "desconocido"}`);
               }
               onApproved(data.orderID);
             } catch (e) {

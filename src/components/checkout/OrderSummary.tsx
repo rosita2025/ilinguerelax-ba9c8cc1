@@ -8,10 +8,11 @@ import { useRegionTier } from "@/hooks/useRegionTier";
 import { useLocalCurrency, formatLocalAmount, useSkuOverridesResolver, sumItemsLocal, formatLocalDirect, useCurrencyBreakdown } from "@/hooks/useLocalCurrency";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
-import { formatCurrencyAmount } from "@/i18n";
+import { formatCurrencyAmount, exchangeRates } from "@/i18n";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCheckoutTotal } from "@/hooks/useCheckoutTotal";
 
 
 
@@ -40,19 +41,32 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(!collapsible);
+
+  const overridesFor = useSkuOverridesResolver();
+  const shippingCostUSD = isLatam ? 9 : 8;
+
+  const { 
+    subtotalLocal, 
+    discountLocal, 
+    shippingLocal, 
+    totalLocal, 
+    totalUsd,
+    currency 
+  } = useCheckoutTotal(
+    items, 
+    couponPercent, 
+    region.tier, 
+    country, 
+    shippingCostUSD, 
+    overridesFor
+  );
+
   const totals = useMemo(() => calcTotals(items, couponPercent, region.tier), [items, couponPercent, region.tier]);
   const { subtotal, discount, total } = totals;
-  
-  // Lógica de costo de envío: Latam $9, Resto (USA/CAN/UK) $8 (o free > 50). 
-  // Si es Asia no se permite pagar (se maneja en PaymentMethodsGroup, pero aquí mostramos costo estimado o aviso)
-  const shippingCost = isLatam ? 9 : 8;
-  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : shippingCost) : 0;
+  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : shippingCostUSD) : 0;
   const grandTotal = total + shipping;
+
   const penTotals = calcTotalsPen(items, couponPercent, country);
-  const overridesFor = useSkuOverridesResolver();
-  const localTotal = useLocalCurrency(total);
-  const localSubtotal = useLocalCurrency(subtotal);
-  const localDiscount = useLocalCurrency(discount);
   const isGlobalGateway = selectedMethod && (
     selectedMethod.startsWith("stripe") || 
     selectedMethod.startsWith("dlocal") || 
@@ -65,27 +79,13 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   );
 
   const penMode = penTotals !== null && !isGlobalGateway;
-  const showLocalRef = !localTotal.loading; // Remove !penMode restriction to ensure USD ref always shows
-  // Local totals honoring per-sku overrides from /admin/products/:sku
-  const localItemsSum = useMemo(() => sumItemsLocal(
-    items.map((i) => ({ id: i.id, sku: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
-    region.country || "",
-    overridesFor,
-  ), [items, region.country, region.tier, overridesFor]);
-  const localSubtotalAmount = localItemsSum.amount;
-  const localTotalAmount = (localSubtotalAmount * (1 - (couponPercent || 0) / 100)) + shipping;
-  const currentUsdRef = localItemsSum.usdReference;
-  const localTotalLabel = showLocalRef ? formatLocalDirect(localTotalAmount, region.country || "") : formatCurrencyAmount(grandTotal, "USD");
-  const breakdown = useCurrencyBreakdown(total, null, items[0]?.localUsdPrices);
+  const showLocalRef = currency !== "USD";
 
-  const fmtMoney = (usd: number, _local: { formatted: string }, penAmount?: number) =>
-    penMode && penAmount != null
-      ? formatPen(penAmount)
-      : showLocalRef
-        ? _local.formatted
-        : formatCurrencyAmount(usd, "USD");
-  void localSubtotal; void localDiscount;
-  const hasRegionalItem = items.some((i) => i.regionPrices);
+  const localTotalLabel = formatLocalDirect(totalLocal, country);
+  const currentUsdRef = totalUsd;
+  const breakdown = useCurrencyBreakdown(totalLocal / (exchangeRates[currency] || 1), null, items[0]?.localUsdPrices);
+
+
 
 
   const handleApplyCoupon = () => {
@@ -129,7 +129,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           </span>
           <span className="text-right flex flex-col items-end">
             <span className="text-base font-bold leading-tight">
-              {penMode ? formatPen(localTotalAmount) : localTotalLabel}
+              {penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel}
             </span>
             {showLocalRef && !breakdown.isUsd && (
               <span className="text-[10px] font-normal text-muted-foreground leading-none">
@@ -303,19 +303,19 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
         <div className="border-t pt-4 space-y-2 text-sm">
           <div className="flex justify-between text-muted-foreground">
             <span>{t.subtotal}</span>
-            <span>{penMode ? formatPen(localSubtotalAmount) : showLocalRef ? formatLocalDirect(localItemsSum.amount, region.country || "") : formatCurrencyAmount(subtotal, "USD")}</span>
+            <span>{penMode && penTotals ? formatPen(penTotals.subtotal) : formatLocalDirect(subtotalLocal, country)}</span>
           </div>
-          {discount > 0 && (
+          {discountLocal > 0 && (
             <div className="flex justify-between text-primary">
               <span>{t.discount}</span>
-              <span>-{penMode ? formatPen(localSubtotalAmount - (localTotalAmount - shipping)) : showLocalRef ? formatLocalDirect(localItemsSum.amount - (localTotalAmount - shipping), region.country || "") : formatCurrencyAmount(discount, "USD")}</span>
+              <span>-{penMode && penTotals ? formatPen(penTotals.discount) : formatLocalDirect(discountLocal, country)}</span>
             </div>
           )}
           <div className="flex justify-between text-muted-foreground text-xs">
             <span>{t.shipping}</span>
             <span>
               {items.some(i => i.isPhysical) 
-                ? (shipping === 0 ? t.freeShipping : formatCurrencyAmount(shipping, "USD"))
+                ? (shippingLocal === 0 ? t.freeShipping : formatLocalDirect(shippingLocal, country))
                 : t.freeDigitalDelivery
               }
             </span>
@@ -327,7 +327,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div className="text-xl">{penMode ? formatPen(localTotalAmount) : showLocalRef ? localTotalLabel : formatCurrencyAmount(grandTotal, "USD")}</div>
+              <div className="text-xl">{penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel}</div>
               {showLocalRef && !breakdown.isUsd && (
                 <div className="text-[11px] text-muted-foreground font-normal mt-0.5">
                   ≈ USD ${currentUsdRef.toFixed(2)}

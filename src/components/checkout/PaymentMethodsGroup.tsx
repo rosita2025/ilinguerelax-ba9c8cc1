@@ -18,7 +18,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
-import { formatCurrencyAmount, formatAmountLocalized } from "@/i18n";
+import { formatCurrencyAmount, formatAmountLocalized, exchangeRates } from "@/i18n";
 import { PayPalButtons } from "@/components/checkout/PayPalButtons";
 import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
@@ -33,6 +33,7 @@ import { saveDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
 import { extractEdgeErrorMessage, looksTechnical } from "@/lib/edgeError";
 import { getPaymentPayload } from "@/lib/paymentGatewayRouter";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
+import { useCheckoutTotal } from "@/hooks/useCheckoutTotal";
 
 
 type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
@@ -340,28 +341,35 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const isLatam = ["AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "PA", "PY", "PE", "PR", "UY"].includes(countryCode);
   const { language } = useI18n();
   const t = getCheckoutUI(language);
+  const overridesFor = useSkuOverridesResolver();
+  const shippingCostUSD = isLatam ? 9 : 8;
+
+  const { 
+    subtotalLocal, 
+    discountLocal, 
+    shippingLocal, 
+    totalLocal, 
+    currency 
+  } = useCheckoutTotal(
+    items, 
+    couponPercent, 
+    region.tier, 
+    countryCode, 
+    shippingCostUSD, 
+    overridesFor
+  );
+
   const totals = useMemo(() => calcTotals(items, couponPercent, region.tier), [items, couponPercent, region.tier]);
   const { total, subtotal } = totals;
-  const shippingCost = isLatam ? 9 : 8;
-  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : shippingCost) : 0;
+  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : shippingCostUSD) : 0;
   const grandTotal = total + shipping;
   const totalUsd = useMemo(() => grandTotal.toFixed(2), [grandTotal]);
+  
   const penTotals = calcTotalsPen(items, couponPercent, countryCode);
-  const overridesFor = useSkuOverridesResolver();
   const isRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(countryCode);
   const local = useLocalCurrency(total); // For overrides and loading state
-  void local; // Silenciar advertencia si no se usa local.isUsd etc directamente
+  void local;
 
-  // Replicating exactly the logic from OrderSummary.tsx
-  const localItemsSum = useMemo(() => sumItemsLocal(
-    items.map((i) => ({ id: i.id, sku: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
-    countryCode,
-    overridesFor,
-  ), [items, countryCode, region.tier, overridesFor]);
-  const localSubtotalAmount = localItemsSum.amount;
-  const localTotalAmount = useMemo(() => (localSubtotalAmount * (1 - (couponPercent || 0) / 100)) + shipping, [localSubtotalAmount, couponPercent, shipping]);
-  const currentUsdRef = localItemsSum.usdReference; // The unified USD base for this cart in this region
-  
   const [isFallingBackToUsd, setIsFallingBackToUsd] = useState(false);
 
   // Si el país tiene restricciones o se elige un método global,
@@ -378,9 +386,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   );
   
   const showUsdOnly = isFallingBackToUsd;
-  const localTotalLabel = formatLocalDirect(localTotalAmount, countryCode);
+  const localTotalLabel = formatLocalDirect(totalLocal, countryCode);
+  const currentUsdRef = totalLocal / (exchangeRates[currency] || 1);
 
-  const penBadge = (penTotals && !isGlobalGateway) ? formatPen(penTotals.total + shipping) : null;
+  const penBadge = (penTotals && !isGlobalGateway) ? formatPen(penTotals.total + shippingLocal) : null;
   const isActuallyShowingLocal = !local.loading;
   
   // Badge principal: SIEMPRE en moneda local del país EXCEPTO en países restringidos (AR/HN) 
@@ -516,10 +525,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       const fetchSecret = async (retryForRestricted = false) => {
         const pricing = {
           priceUsd: currentUsdRef,
-          currencyCode: local.currency,
+          currencyCode: currency,
           priceLabel: localTotalLabel,
-          exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
-          finalPriceAmount: localTotalAmount,
+          exchangeRate: totalLocal / currentUsdRef,
+          finalPriceAmount: totalLocal,
         };
 
         const payload = getPaymentPayload(
@@ -651,10 +660,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
       const pricing = {
         priceUsd: currentUsdRef,
-        currencyCode: local.currency,
+        currencyCode: currency,
         priceLabel: localTotalLabel,
-        exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
-        finalPriceAmount: localTotalAmount,
+        exchangeRate: totalLocal / currentUsdRef,
+        finalPriceAmount: totalLocal,
       };
       const payload = getPaymentPayload(pricing, "mercadopago", countryCode);
 
@@ -736,10 +745,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     }
     const pricing = {
       priceUsd: currentUsdRef,
-      currencyCode: local.currency,
+      currencyCode: currency,
       priceLabel: localTotalLabel,
-      exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
-      finalPriceAmount: localTotalAmount,
+      exchangeRate: totalLocal / currentUsdRef,
+      finalPriceAmount: totalLocal,
     };
     const payload = getPaymentPayload(pricing, "dlocal", ctry);
     const dlCurrency = payload.currency;
@@ -984,8 +993,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         buyer_phone: s.buyer.phone ?? null,
         buyer_country: (region.country || "").toUpperCase() || null,
         amount_usd: Number(totalUsd),
-        amount_local: penTotals ? penTotals.total : (local.loading || local.isUsd ? null : Number(localTotalAmount.toFixed(2))),
-        currency_local: penTotals ? "PEN" : (local.currency || "USD"),
+        amount_local: penTotals ? penTotals.total : (local.loading || local.isUsd ? null : Number(totalLocal.toFixed(2))),
+        currency_local: penTotals ? "PEN" : (currency || "USD"),
         method: "yape_plin",
         items: s.items.map((i) => ({ sku: i.id, name: i.name, quantity: i.quantity, price: i.price })),
         status: "pending",
@@ -1006,8 +1015,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           customerPhone: s.buyer.phone ?? "",
           customerCountry: (region.country || "").toUpperCase(),
           productName: s.items.map((i) => i.name).join(" + "),
-          amount: penTotals ? penTotals.total : (local.loading || local.isUsd ? Number(totalUsd) : Number(localTotalAmount.toFixed(2))),
-          currency: penTotals ? "PEN" : (local.currency || "USD"),
+          amount: penTotals ? penTotals.total : (local.loading || local.isUsd ? Number(totalUsd) : Number(totalLocal.toFixed(2))),
+          currency: penTotals ? "PEN" : (currency || "USD"),
           method: "Yape/Plin",
           orderDate: new Date().toISOString(),
         },
@@ -1024,8 +1033,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           orderNumber,
           customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
           productName: s.items.map((i) => i.name).join(" + "),
-          amount: penTotals ? penTotals.total : (local.loading || local.isUsd ? Number(totalUsd) : Number(localTotalAmount.toFixed(2))),
-          currency: penTotals ? "PEN" : (local.currency || "USD"),
+          amount: penTotals ? penTotals.total : (local.loading || local.isUsd ? Number(totalUsd) : Number(totalLocal.toFixed(2))),
+          currency: penTotals ? "PEN" : (currency || "USD"),
           amountUsd: Number(totalUsd),
           method: "Yape/Plin",
           orderDate: new Date().toISOString(),
@@ -2167,10 +2176,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                       {(() => {
                         const pricing = {
                           priceUsd: currentUsdRef,
-                          currencyCode: local.currency,
+                          currencyCode: currency,
                           priceLabel: localTotalLabel,
-                          exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
-                          finalPriceAmount: localTotalAmount,
+                          exchangeRate: totalLocal / currentUsdRef,
+                          finalPriceAmount: totalLocal,
                         };
                         const payload = getPaymentPayload(pricing, "manual", countryCode);
                         return formatCurrencyAmount(Number(payload.amount), "PEN");
@@ -2261,10 +2270,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                       {(() => {
                         const pricing = {
                           priceUsd: currentUsdRef,
-                          currencyCode: local.currency,
+                          currencyCode: currency,
                           priceLabel: localTotalLabel,
-                          exchangeRate: localItemsSum.amount / localItemsSum.usdReference,
-                          finalPriceAmount: localTotalAmount,
+                          exchangeRate: totalLocal / currentUsdRef,
+                          finalPriceAmount: totalLocal,
                         };
                         const payload = getPaymentPayload(pricing, "binance", countryCode);
                         return `USD $${payload.amountUsdt || payload.amount}`;
@@ -2380,8 +2389,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 </div>
                 <PayPalButtons
                   amountUsd={currentUsdRef}
-                  localCurrency={countryCode === "PE" ? "PEN" : local.currency}
-                  localAmount={countryCode === "PE" ? (penTotals?.total || localTotalAmount) : localTotalAmount}
+                  localCurrency={countryCode === "PE" ? "PEN" : currency}
+                  localAmount={countryCode === "PE" ? (penTotals?.total || totalLocal) : totalLocal}
                   description={items.map((i) => i.name).join(" + ").slice(0, 120) || "iLingue Relax"}
                   buyerEmail={buyer.email.trim() || undefined}
                   buyerName={buyer.fullName.trim() || undefined}

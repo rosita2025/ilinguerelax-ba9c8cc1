@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useI18n } from "@/i18n/I18nContext";
 import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -60,6 +61,7 @@ const pillars = [
 ];
 
 const ProductSpanishGrammarPatterns = () => {
+  const { currency, formatPrice } = useI18n();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
@@ -586,16 +588,18 @@ const ProductSpanishGrammarPatterns = () => {
       <StickyBuyBar
         lang="en"
         productName="Grammar Patterns A1-C1 Mastery"
-        price={`$${PRICE}`}
+        price={formatPrice(PRICE, currency)}
         rating={4.9}
         reviewCount={1500}
-        ctaText={`ADD TO CART — $${PRICE}.00`}
+        ctaText={`ADD TO CART — ${formatPrice(PRICE, currency)}`}
         sku={PRODUCT_SKU}
         onBuyClick={handleAddToCart}
         isLoading={cartLoading}
         disabled={false}
         isPhysical={true}
         goesToInternalCheckout={true}
+        currencyCode={currency}
+        flag={currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎"}
       />
     </main>
   );

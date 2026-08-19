@@ -32,7 +32,7 @@ interface OrderItem {
 
 interface PhysicalOrder {
   id: string;
-  source: "manual" | "shopify";
+  source: "manual" | "shopify" | "gateway";
   created_at: string;
   order_ref: string;
   customer: string;
@@ -44,6 +44,8 @@ interface PhysicalOrder {
   tracking_number: string | null;
   shipping_provider: string | null;
   shipping_proof_url: string | null;
+  shipping_address?: string | null;
+  payment_provider?: string | null;
 }
 
 const AdminPhysicalOrders = () => {

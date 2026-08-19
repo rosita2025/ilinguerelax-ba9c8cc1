@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, Suspense } from "react";
+import { useState, useMemo, useRef, Suspense, useEffect } from "react";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -130,6 +130,16 @@ const BonusPreviewDialog = ({ triggerLabel = "See sample", title, subtitle, chil
 
 const ProductSpanish5000 = () => {
   const { formatPrice, currency } = useI18n();
+  const PRODUCT_SKU = "5-000-spanish-words-with-english-pronunciation-physical";
+  const productPricing = useAdminPricing(PRODUCT_SKU);
+  const [activeImage, setActiveImage] = useState<string>("");
+
+  useEffect(() => {
+    if (productPricing.coverImageUrl) {
+      setActiveImage(productPricing.coverImageUrl);
+    }
+  }, [productPricing.coverImageUrl]);
+
 
   // Libro físico: cobro siempre se realiza en USD para internal checkout.
   const campaign = {
@@ -195,7 +205,6 @@ const ProductSpanish5000 = () => {
     await handleBuyNow();
   };
 
-  const PRODUCT_SKU = "5-000-spanish-words-with-english-pronunciation-physical";
   const handleBuyNow = async () => {
     navigate(`/checkouts/${PRODUCT_SKU}`);
   };
@@ -250,25 +259,66 @@ const ProductSpanish5000 = () => {
               </div>
 
               <div className="absolute -inset-4 bg-gradient-to-br from-purple-500/20 to-blue-500/20 opacity-60 blur-3xl rounded-3xl" />
-              <div className="relative">
+              <div className="relative group">
                 <picture>
-                  <source type="image/avif" srcSet={productSpanish5000BundleImageAvif} />
-                  <source type="image/webp" srcSet={productSpanish5000BundleImage} />
-                  <img
-                    src={productSpanish5000BundleImage}
-                    alt="Spanish Relax - Buy the physical book, get the digital version FREE"
-                    className="w-full h-auto rounded-2xl shadow-hero"
-                    width={1200}
-                    height={1200}
-                    fetchPriority="high"
-                    decoding="async"
-                  />
-                  <PinterestSave overlay />
+                  {activeImage ? (
+                    <img
+                      src={activeImage}
+                      alt="Spanish Relax - Buy the physical book, get the digital version FREE"
+                      className="w-full h-auto rounded-2xl shadow-hero transition-all duration-300"
+                      width={1200}
+                      height={1200}
+                      fetchPriority="high"
+                      decoding="async"
+                    />
+                  ) : (
+                    <>
+                      <source type="image/avif" srcSet={productSpanish5000BundleImageAvif} />
+                      <source type="image/webp" srcSet={productSpanish5000BundleImage} />
+                      <img
+                        src={productSpanish5000BundleImage}
+                        alt="Spanish Relax - Buy the physical book, get the digital version FREE"
+                        className="w-full h-auto rounded-2xl shadow-hero"
+                        width={1200}
+                        height={1200}
+                        fetchPriority="high"
+                        decoding="async"
+                      />
+                    </>
+                  )}
+                  <PinterestSave overlay media={activeImage || productSpanish5000BundleImage} />
                 </picture>
                 <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-black shadow-lg">
                   <Package className="w-3.5 h-3.5" /> PHYSICAL + DIGITAL FREE
                 </div>
               </div>
+
+              {/* Gallery Thumbnails */}
+              {productPricing.galleryImages && productPricing.galleryImages.length > 0 && (
+                <div className="mt-4 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                  {[productPricing.coverImageUrl || productSpanish5000BundleImage, ...productPricing.galleryImages].map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveImage(img)}
+                      className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all shrink-0 ${
+                        activeImage === img ? "border-emerald-500 shadow-sm scale-95" : "border-transparent opacity-70 hover:opacity-100"
+                      }`}
+                    >
+                      <img 
+                        src={img} 
+                        alt={`Vista ${i + 1}`} 
+                        className="w-full h-full object-cover" 
+                      />
+                      {activeImage === img && (
+                        <div className="absolute inset-0 bg-emerald-500/10 flex items-center justify-center">
+                          <Check className="w-5 h-5 text-emerald-500 drop-shadow-md" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+
             </div>
 
             {/* Product Info */}

@@ -68,6 +68,7 @@ interface Props {
 }
 
 export const CountryPicker = ({ lang = "es", className = "" }: Props) => {
+  const { setCountryCode } = useI18n();
   const region = useRegionTier();
   const [open, setOpen] = useState(false);
   const cc = (region.country || "").toUpperCase();
@@ -87,24 +88,13 @@ export const CountryPicker = ({ lang = "es", className = "" }: Props) => {
   };
 
   const pick = (code: string) => {
-    setManualCountryOverride(code);
+    setCountryCode(code);
     setOpen(false);
-    
-    // Dispatch a custom event to notify useRegionTier and other listeners
-    // without a full page reload for a smoother experience.
-    window.dispatchEvent(new Event("country_changed"));
-    
-    // If we have access to context, we update it there too
-    // In many cases, window.location.reload() is still the safest fallback
-    // to ensure ALL hooks (like useAdminPricing) re-trigger if they rely on country.
-    // For now, let's keep the reload as a safety net but trigger the event first.
-    window.location.reload();
   };
 
   const auto = () => {
     clearManualCountryOverride();
     setOpen(false);
-    window.dispatchEvent(new Event("country_changed"));
     window.location.reload();
   };
 

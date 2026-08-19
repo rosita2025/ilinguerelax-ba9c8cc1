@@ -138,11 +138,17 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
   const setCountryCode = (code: string) => {
     setCountryCodeState(code);
-    try { localStorage.setItem("ilr_country", code); } catch { /* ignore */ }
+    try { 
+      localStorage.setItem("ilr_country", code);
+      localStorage.setItem("ilr_country_manual", code);
+    } catch { /* ignore */ }
     
-    // Also update currency automatically if it's not manually locked
+    // Also update currency automatically
     const newCurrency = detectCurrency(code);
     setCurrency(newCurrency);
+    
+    // Notify other listeners that don't use this context
+    window.dispatchEvent(new Event("country_changed"));
   };
 
   const t = translations[language];

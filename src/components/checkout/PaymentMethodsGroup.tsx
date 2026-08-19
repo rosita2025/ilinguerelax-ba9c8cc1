@@ -2225,6 +2225,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   payerName={buyer.fullName}
                   payerEmail={buyer.email}
                   payerPhone={buyer.phone ?? undefined}
+                  payerAddress={buyer.address ?? undefined}
+                  payerCity={buyer.city ?? undefined}
+                  payerState={buyer.state ?? undefined}
+                  payerZip={buyer.zip ?? undefined}
                   language={language}
                   onPaid={(orderId) => {
                     trackPurchase(orderId, "mercadopago_transfer");

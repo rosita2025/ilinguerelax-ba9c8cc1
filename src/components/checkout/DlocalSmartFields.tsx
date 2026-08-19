@@ -141,7 +141,11 @@ export function DlocalSmartFields(props: DlocalSmartFieldsProps) {
           couponCode,
           payerEmail: payerEmail.trim(),
           payerName: payerName.trim(),
-          payerPhone,
+          payerPhone: (payerPhone ?? "").trim() || undefined,
+          payerAddress: (payerAddress ?? "").trim().slice(0, 160) || undefined,
+          payerCity: (payerCity ?? "").trim().slice(0, 80) || undefined,
+          payerState: (payerState ?? "").trim().slice(0, 80) || undefined,
+          payerZip: (payerZip ?? "").trim().slice(0, 24) || undefined,
           country: country.toUpperCase(),
           currency: currency.toUpperCase(),
           amount: Number(amount.toFixed(2)),
@@ -180,7 +184,7 @@ export function DlocalSmartFields(props: DlocalSmartFieldsProps) {
     } finally {
       setLoading(false);
     }
-  }, [amount, country, couponCode, couponPercent, currency, expectedTotalUsd, items, loading, onError, onPaid, payerEmail, payerName, payerPhone]);
+  }, [amount, country, couponCode, couponPercent, currency, expectedTotalUsd, items, loading, onError, onPaid, payerEmail, payerName, payerPhone, payerAddress, payerCity, payerState, payerZip]);
 
   return (
     <div className="space-y-3">

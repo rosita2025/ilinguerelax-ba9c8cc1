@@ -356,9 +356,15 @@ export const StickyBuyBar = ({
           <div className="flex items-start justify-between gap-2">
             <div className="flex flex-col gap-0.5 min-w-0 flex-shrink">
               <div className="flex items-baseline gap-1.5 flex-wrap">
-                <span className={`${isVeryLongPrice ? 'text-base' : isLongPrice ? 'text-lg' : 'text-xl'} sm:text-2xl font-black text-foreground tabular-nums leading-none whitespace-nowrap`}>{price}</span>
-                {originalPrice && (
-                  <span className="text-[11px] sm:text-xs text-muted-foreground line-through tabular-nums whitespace-nowrap opacity-70">{originalPrice}</span>
+                {isLoading ? (
+                  <div className="h-6 w-24 bg-foreground/10 animate-pulse rounded" />
+                ) : (
+                  <>
+                    <span className={`${isVeryLongPrice ? 'text-base' : isLongPrice ? 'text-lg' : 'text-xl'} sm:text-2xl font-black text-foreground tabular-nums leading-none whitespace-nowrap`}>{price}</span>
+                    {originalPrice && (
+                      <span className="text-[11px] sm:text-xs text-muted-foreground line-through tabular-nums whitespace-nowrap opacity-70">{originalPrice}</span>
+                    )}
+                  </>
                 )}
               </div>
               <div className="flex items-center gap-1.5">

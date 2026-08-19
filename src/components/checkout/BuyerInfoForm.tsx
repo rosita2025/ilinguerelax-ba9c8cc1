@@ -14,14 +14,21 @@ import { checkEmail } from "@/lib/emailGuard";
 export function isBuyerValid(buyer: { 
   fullName: string; 
   email: string;
+  phone?: string;
   address?: string;
   city?: string;
   zip?: string;
   country?: string;
 }, hasPhysicalItems = false) {
   try {
-    const basicOk = (buyer.fullName || "").trim().length >= 3 && checkEmail(buyer.email || "").ok;
+    const nameValid = (buyer.fullName || "").trim().length >= 3;
+    const emailValid = checkEmail(buyer.email || "").ok;
+    const phoneValid = (buyer.phone || "").trim().length >= 7; // Mínimo para ser un número real
+    
+    const basicOk = nameValid && emailValid && phoneValid;
+    
     if (!hasPhysicalItems) return basicOk;
+
     return (
       basicOk &&
       (buyer.address || "").trim().length >= 8 &&

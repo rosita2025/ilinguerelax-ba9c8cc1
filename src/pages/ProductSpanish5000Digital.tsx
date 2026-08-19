@@ -46,7 +46,6 @@ import verbsV2PreviewAsset from "@/assets/spanish-verbs-preview.png.asset.json";
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
 const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then(m => ({ default: m.LooxStyleReviews })));
-import { CustomerReviewsSlider } from "@/components/CustomerReviewsSlider";
 
 
 // Fallbacks (referenciales, el hook useCountryTierRouting manda)
@@ -456,9 +455,6 @@ const ProductSpanish5000Digital = () => {
             </div>
           </div>
       </section>
-      
-      {/* Real Student Reviews & Screenshots Slider */}
-      <CustomerReviewsSlider />
 
       {/* Look Inside */}
       <section className="py-12 md:py-20 bg-muted/30 overflow-hidden">

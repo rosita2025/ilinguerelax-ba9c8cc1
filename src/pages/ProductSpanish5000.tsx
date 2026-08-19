@@ -62,7 +62,6 @@ const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then
 const Top3ReviewsCarousel = lazy(() => import("@/components/Top3ReviewsCarousel").then(m => ({ default: m.Top3ReviewsCarousel })));
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
 const InfluencerVideoCarousel = lazy(() => import("@/components/InfluencerVideoCarousel").then(m => ({ default: m.InfluencerVideoCarousel })));
-import { CustomerReviewsSlider } from "@/components/CustomerReviewsSlider";
 import { useTrackProductView, useScrollTimeTracking } from "@/hooks/useGoogleAnalytics";
 
 // Store logos
@@ -453,9 +452,6 @@ const ProductSpanish5000 = () => {
           </div>
         </div>
       </section>
-      
-      {/* Real Student Reviews & Screenshots Slider */}
-      <CustomerReviewsSlider />
 
       {/* Top 3 reviews carousel — fills the gap before Meet the Author */}
       <Suspense fallback={<div className="h-32" />}>

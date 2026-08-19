@@ -1952,7 +1952,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               type="button"
               onClick={() => { setSelectedCardRow(rowKey); handleSelect(m.id); }}
               disabled={isLoading}
-              aria-disabled={!valid}
               className={cn(
                 "w-full text-left flex items-center transition-colors",
                 "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl",
@@ -1962,7 +1961,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 isSelected
                   ? "bg-neutral-200/60 dark:bg-neutral-800"
                   : "hover:bg-neutral-100 dark:hover:bg-neutral-800/60",
-                !valid && "cursor-not-allowed",
+                !valid && "opacity-50 grayscale cursor-pointer hover:bg-transparent hover:grayscale-0",
               )}
             >
               {m.id !== "hotmart" && (

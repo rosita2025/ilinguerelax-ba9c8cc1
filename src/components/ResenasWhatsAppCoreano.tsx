@@ -88,6 +88,7 @@ export const ResenasWhatsAppCoreano = () => {
                         src={r.src}
                         alt={`Reseña real WhatsApp · ${r.contacto} · ${r.pais}`}
                         loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-contain pointer-events-none select-none"
                         draggable={false}
                         onContextMenu={(e) => e.preventDefault()}

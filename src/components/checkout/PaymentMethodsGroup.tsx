@@ -845,7 +845,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         method: "hotmart",
         message:
           language === "en" ? "We couldn't open the Hotmart checkout. Please try again."
-          : language === "pt" ? "Não conseguimos abrir o checkout da Hotmart. Tente novamente."
+          : language === "pt" ? "Não conseguimos abrir o checkout da Hotmart. Tente nuevamente."
           : language === "fr" ? "Impossible d'ouvrir le paiement Hotmart. Réessaie."
           : "No pudimos abrir el pago con Hotmart. Inténtalo de nuevo.",
       });
@@ -853,17 +853,24 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     }
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
+    
+    setMpLoading("hotmart");
+    setMethodError(null);
     redirectingRef.current = true;
-    // Guarda el carrito abandonado ANTES de redirigir a Hotmart para no perder al cliente.
-    // Esperamos hasta 2s máx; si la red tarda más, redirigimos igual (la captura ya salió al servidor).
+
     try {
       await Promise.race([
         captureAbandonedCheckout("hotmart", true),
         new Promise((resolve) => setTimeout(resolve, 2000)),
       ]);
-    } catch { /* noop */ }
-    // Reemplaza la tienda por Hotmart en la misma pestaña (evita bloqueo de popups).
-    window.location.replace(url);
+      window.location.replace(url);
+    } catch (err) {
+      redirectingRef.current = false;
+      setMpLoading(null);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setMethodError({ method: "hotmart", message: errorMessage });
+      toast({ title: "Error Hotmart", description: errorMessage, variant: "destructive" });
+    }
   }, [hotmartCfg, region.country, valid, captureAbandonedCheckout, language, requestBuyerInfo]);
 
 

@@ -142,43 +142,21 @@ const ProductSpanish5000 = () => {
 
 
   // Configuración de precios dinámica basada en SKU
+  const tier = useCountryTierRouting(PRODUCT_SKU, {
+    fallbackPriceGlobalUsd: 44,
+    fallbackPriceLatamUsd: 44,
+    fallbackPriceTiendaUsd: 44,
+    fallbackPricePen: 168.40,
+  });
+
   const campaign = useMemo(() => {
-    // Determine target tier for calculation
-    const isPen = currency === "PEN" || countryCode === "PE";
-    const isLatam = ["MXN", "COP", "ARS", "CLP", "BRL", "CRC", "DOP", "GTQ", "HNL", "NIO", "PYG", "UYU", "VES"].includes(currency) || 
-                  ["MX", "CO", "AR", "CL", "BR", "EC", "BO", "PY", "UY", "CR", "PA", "GT", "HN", "SV", "DO", "PR"].includes(countryCode);
-    const isEurope = ["EUR", "GBP", "CHF", "SEK", "NOK", "DKK", "PLN", "CZK"].includes(currency) ||
-                    ["ES", "FR", "DE", "IT", "PT", "GB", "NL", "BE", "AT", "IE", "FI", "GR", "LU", "SK", "SI", "EE", "LV", "LT", "MT", "CY", "HR"].includes(countryCode);
-    const isOceania = ["AUD", "NZD"].includes(currency) || ["AU", "NZ"].includes(countryCode);
-
-    // Get regional base price from admin
-    let basePrice = productPricing.priceGlobalUsd || 44;
-    
-    // PEN special case (prioritize manual PEN price)
-    if (isPen && productPricing.pricePen) {
-      const penOriginal = productPricing.compareAtPricePen || productPricing.pricePen * 1.35;
-      return {
-        price: formatPrice(44, { PEN: productPricing.pricePen }),
-        originalPrice: formatPrice(59, { PEN: penOriginal }),
-        currency: "PEN" as const,
-        discountPercentage: Math.round((1 - productPricing.pricePen / penOriginal) * 100)
-      };
-    }
-    
-    if (isLatam) basePrice = productPricing.priceLatamUsd || 44;
-    else if (isEurope || isOceania) basePrice = productPricing.priceGlobalUsd || 44;
-
-    const comparePrice = isLatam 
-      ? (productPricing.compareAtPriceLatamUsd || basePrice * 1.35)
-      : (productPricing.compareAtPriceGlobalUsd || basePrice * 1.35);
-    
     return {
-      price: formatPrice(basePrice, null, productPricing.localUsdPrices),
-      originalPrice: formatPrice(comparePrice, null, productPricing.localCompareAtPrices),
-      currency: currency as any,
-      discountPercentage: Math.round((1 - basePrice / comparePrice) * 100)
+      price: tier.priceLabel,
+      originalPrice: tier.originalLabel || undefined,
+      currency: tier.currencyCode,
+      discountPercentage: tier.discountPercentage
     };
-  }, [formatPrice, productPricing, currency, countryCode]);
+  }, [tier]);
 
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({
@@ -563,7 +541,7 @@ const ProductSpanish5000 = () => {
                 size="xl"
                 className="w-full max-w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black shadow-[0_8px_30px_rgba(16,185,129,0.3)] text-base sm:text-lg py-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] h-auto whitespace-normal text-center"
               >
-                View Digital Version — {formatPrice(72.99)}
+                View Digital Version — {digitalTier.priceLabel}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </div>

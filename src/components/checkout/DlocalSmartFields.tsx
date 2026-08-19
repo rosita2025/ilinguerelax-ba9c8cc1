@@ -61,6 +61,11 @@ export interface DlocalSmartFieldsProps {
   payerName: string;
   payerEmail: string;
   payerPhone?: string;
+  /** Dirección de envío (solo se envía cuando hay productos físicos). */
+  payerAddress?: string;
+  payerCity?: string;
+  payerState?: string;
+  payerZip?: string;
   language?: string;
   onPaid: (orderId: string) => void;
   onError?: (message: string) => void;
@@ -68,7 +73,8 @@ export interface DlocalSmartFieldsProps {
 
 export function DlocalSmartFields(props: DlocalSmartFieldsProps) {
   const { country, currency, amount, expectedTotalUsd, items, couponPercent, couponCode,
-    payerName, payerEmail, payerPhone, language = "es", onPaid, onError } = props;
+    payerName, payerEmail, payerPhone, payerAddress, payerCity, payerState, payerZip,
+    language = "es", onPaid, onError } = props;
 
   const cardRef = useRef<HTMLDivElement | null>(null);
   const fieldRef = useRef<unknown>(null);
@@ -135,7 +141,11 @@ export function DlocalSmartFields(props: DlocalSmartFieldsProps) {
           couponCode,
           payerEmail: payerEmail.trim(),
           payerName: payerName.trim(),
-          payerPhone,
+          payerPhone: (payerPhone ?? "").trim() || undefined,
+          payerAddress: (payerAddress ?? "").trim().slice(0, 160) || undefined,
+          payerCity: (payerCity ?? "").trim().slice(0, 80) || undefined,
+          payerState: (payerState ?? "").trim().slice(0, 80) || undefined,
+          payerZip: (payerZip ?? "").trim().slice(0, 24) || undefined,
           country: country.toUpperCase(),
           currency: currency.toUpperCase(),
           amount: Number(amount.toFixed(2)),
@@ -174,7 +184,7 @@ export function DlocalSmartFields(props: DlocalSmartFieldsProps) {
     } finally {
       setLoading(false);
     }
-  }, [amount, country, couponCode, couponPercent, currency, expectedTotalUsd, items, loading, onError, onPaid, payerEmail, payerName, payerPhone]);
+  }, [amount, country, couponCode, couponPercent, currency, expectedTotalUsd, items, loading, onError, onPaid, payerEmail, payerName, payerPhone, payerAddress, payerCity, payerState, payerZip]);
 
   return (
     <div className="space-y-3">

@@ -6,6 +6,7 @@ import { z } from "npm:zod@3.23.8";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { resolveServerPricing, PricingError, localTotalFromPricing } from "../_shared/catalogPricing.ts";
 import { dlocalApiBase } from "../_shared/dlocal.ts";
+import { logOrderEvent } from "../_shared/orderEvents.ts";
 
 // SEGURIDAD: precio/nombre del cliente se ignoran; se resuelven en servidor.
 const ItemSchema = z.object({
@@ -26,6 +27,10 @@ const BodySchema = z.object({
   payerName: z.string().min(1).max(120),
   payerPhone: z.string().max(30).optional(),
   payerDocument: z.string().max(30).optional(),
+  payerAddress: z.string().max(160).optional(),
+  payerCity: z.string().max(80).optional(),
+  payerState: z.string().max(80).optional(),
+  payerZip: z.string().max(24).optional(),
   country: z.string().length(2),
   currency: z.string().length(3).default("USD"),
   // Ignorados: el importe se calcula en el servidor (catálogo + FX propio).
@@ -131,8 +136,18 @@ Deno.serve(async (req) => {
         email: body.payerEmail,
         ...(body.payerPhone ? { phone: body.payerPhone } : {}),
         ...(body.payerDocument ? { document: body.payerDocument } : {}),
+        ...(body.payerAddress ? {
+          address: {
+            street: body.payerAddress,
+            city: body.payerCity,
+            state: body.payerState,
+            zip_code: body.payerZip,
+            country: body.country.toUpperCase(),
+          },
+        } : {}),
       },
     };
+
 
     const resp = await fetch(`${dlocalApiBase()}/payments`, {
       method: "POST",
@@ -153,6 +168,32 @@ Deno.serve(async (req) => {
     const status = String(data.status || "").toUpperCase();
     // 3DS / verificación adicional: dLocal devuelve una URL de redirección.
     const redirectUrl = data.redirect_url || data.redirectUrl || null;
+
+    // Guarda la dirección de envío para que el webhook pueda crear el envío físico.
+    await logOrderEvent({
+      orderNumber: orderId,
+      event: "order_created",
+      provider: "dlocalgo",
+      status,
+      method: "card",
+      reference: String(data.id ?? ""),
+      customerEmail: body.payerEmail,
+      amount: calculatedUsd,
+      currency: "USD",
+      metadata: {
+        country: body.country.toUpperCase(),
+        skus,
+        customerName: body.payerName,
+        customerPhone: body.payerPhone ?? null,
+        shipping: {
+          address: body.payerAddress ?? null,
+          city: body.payerCity ?? null,
+          state: body.payerState ?? null,
+          zip: body.payerZip ?? null,
+          country: body.country.toUpperCase(),
+        },
+      },
+    });
 
     return json({ id: data.id, orderId, status, redirect_url: redirectUrl });
   } catch (err) {

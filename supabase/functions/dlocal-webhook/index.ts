@@ -433,13 +433,37 @@ Deno.serve(async (req) => {
       console.error("dLocal thank-you failed:", e);
     }
 
+    // Recupera la dirección capturada al crear el pago (order_events.metadata.shipping)
+    // para que los pedidos físicos pagados con dLocal lleguen completos al admin.
+    let shipMeta: Record<string, unknown> | null = null;
+    try {
+      const { data: evRows } = await supabase
+        .from("order_events")
+        .select("metadata")
+        .eq("order_number", orderNumber)
+        .order("created_at", { ascending: true })
+        .limit(20);
+      for (const row of evRows ?? []) {
+        const s = (row as { metadata?: { shipping?: Record<string, unknown> } })?.metadata?.shipping;
+        if (s && (s.address || s.city || s.zip)) { shipMeta = s; break; }
+      }
+    } catch (e) {
+      console.error("dLocal shipping metadata lookup failed:", e);
+    }
+
     await upsertPhysicalShipment({
       adminClient: supabase,
       orderNumber,
       email: customerEmail,
       customerName,
       provider: "dlocalgo",
-      address: { country: country ?? null },
+      address: {
+        country: country ?? (shipMeta?.country as string | undefined) ?? null,
+        address: (shipMeta?.address as string | undefined) ?? null,
+        city: (shipMeta?.city as string | undefined) ?? null,
+        state: (shipMeta?.state as string | undefined) ?? null,
+        zip: (shipMeta?.zip as string | undefined) ?? null,
+      },
       skus,
     });
 

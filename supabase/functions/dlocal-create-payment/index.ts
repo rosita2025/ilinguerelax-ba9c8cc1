@@ -29,6 +29,10 @@ const BodySchema = z.object({
   payerName: z.string().min(1).max(120),
   payerPhone: z.string().max(30).optional(),
   payerDocument: z.string().max(30).optional(),
+  payerAddress: z.string().max(160).optional(),
+  payerCity: z.string().max(80).optional(),
+  payerState: z.string().max(80).optional(),
+  payerZip: z.string().max(24).optional(),
   country: z.string().length(2),
   paymentType: z.enum(["transfer", "cash", "wallet"]).optional(),
   currency: z.string().length(3).default("USD"),
@@ -114,6 +118,15 @@ Deno.serve(async (req) => {
         email: body.payerEmail,
         document: opts.minimal ? undefined : body.payerDocument,
         phone: opts.minimal ? undefined : body.payerPhone,
+        // Dirección de envío: dLocal la acepta como parte del pagador y nos
+        // sirve para despachar libros físicos desde /admin/orders-physical.
+        address: opts.minimal || !body.payerAddress ? undefined : {
+          street: body.payerAddress,
+          city: body.payerCity,
+          state: body.payerState,
+          zip_code: body.payerZip,
+          country: body.country.toUpperCase(),
+        },
       },
     });
 
@@ -277,6 +290,15 @@ Deno.serve(async (req) => {
               localCurrency: usedUsdFallback ? "USD" : localCurrency,
               usdFallback: usedUsdFallback,
               expirationDays: EXPIRATION_DAYS,
+              customerName: body.payerName,
+              customerPhone: body.payerPhone ?? null,
+              shipping: {
+                address: body.payerAddress ?? null,
+                city: body.payerCity ?? null,
+                state: body.payerState ?? null,
+                zip: body.payerZip ?? null,
+                country: body.country.toUpperCase(),
+              },
             },
           }),
           sendInternalEmail({

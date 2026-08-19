@@ -32,7 +32,8 @@ import { useI18n } from "@/i18n/I18nContext";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
-import productDigitalImage from "@/assets/spanish-5000-digital-only.webp";
+import productDigitalAsset from "@/assets/mastery-system-spanish-digital.png.asset.json";
+const productDigitalImage = productDigitalAsset.url;
 import previewSpanishVocab from "@/assets/preview-spanish-vocab.png";
 import previewSpanishPhrases from "@/assets/preview-spanish-phrases.webp";
 import { PinterestSave } from "@/components/PinterestSave";

@@ -876,6 +876,7 @@ const ProductSpanish5000 = () => {
         usdValue={productPricing.priceGlobalUsd || 44}
         localUsdPrices={productPricing.localUsdPrices}
         flag={productPricing.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
+      />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />

@@ -1,5 +1,5 @@
 import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
-import { sendEmail } from "../_shared/brevo.ts";
+import { sendShippingEmail } from "../_shared/shippingEmails.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = adminCorsHeaders;

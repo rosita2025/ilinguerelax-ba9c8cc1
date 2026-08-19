@@ -239,6 +239,7 @@ const ProductSpanish5000Digital = () => {
                   width={1200}
                   height={1200}
                   fetchPriority="high"
+                  loading="eager"
                   decoding="async"
                 />
                 <PinterestSave overlay />

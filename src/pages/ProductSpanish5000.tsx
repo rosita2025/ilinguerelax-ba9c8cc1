@@ -42,7 +42,6 @@ import productGrammarPatternsImage from "@/assets/product-grammar-patterns-a1c1.
 import product3000VerbsImage from "@/assets/product-spanish-3000-verbs-book.webp";
 import productSpanish5000DigitalOnlyImage from "@/assets/spanish-5000-digital-only.webp";
 
-// Preview images
 import previewSpanishVocab from "@/assets/preview-spanish-vocab.png";
 import previewSpanishPhrases from "@/assets/preview-spanish-phrases.webp";
 import previewSpanishIndex from "@/assets/preview-spanish-index.png";

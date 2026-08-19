@@ -93,7 +93,6 @@ export const InfluencerVideoCarousel = ({ onCta }: { onCta?: () => void }) => {
                       muted
                       loop
                       preload="none"
-                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
                     <button

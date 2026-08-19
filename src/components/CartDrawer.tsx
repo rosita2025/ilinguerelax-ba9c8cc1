@@ -696,7 +696,7 @@ export const CartDrawer = () => {
                       { label: "Visa", bg: "bg-[#1a1f71]", color: "text-white" },
                       { label: "Mastercard", bg: "bg-white border border-border", color: "text-[#eb001b]" },
                       { label: "Amex", bg: "bg-[#2e77bb]", color: "text-white" },
-                      { label: "PayPal", bg: "bg-[#003087]", color: "text-white" },
+                      { label: "Visa / MC", bg: "bg-primary", color: "text-white" },
                       { label: "Apple Pay", bg: "bg-black", color: "text-white" },
                       { label: "Google Pay", bg: "bg-white border border-border", color: "text-foreground" },
                       { label: "Shop Pay", bg: "bg-[#5a31f4]", color: "text-white" },

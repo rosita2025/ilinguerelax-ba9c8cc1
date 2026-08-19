@@ -66,7 +66,7 @@ export function PayPalButtons({
         });
         
         if (error || !data?.clientId) {
-          throw new Error(error?.message || "PayPal no está configurado (faltan credenciales)");
+          throw new Error(error ? (error as any).message : "PayPal no está configurado (faltan credenciales)");
         }
         setClientId(data.clientId);
       } catch (e) {

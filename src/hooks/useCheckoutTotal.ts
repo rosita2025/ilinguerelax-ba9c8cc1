@@ -39,15 +39,12 @@ export const useCheckoutTotal = (
 
     const discountLocal = (subtotalLocal * Math.max(0, Math.min(100, couponPercent || 0))) / 100;
     
-    // Lógica de Envío Crítica (Unificada con Upsell)
-    // - Si hay Upsell (items.length > 1), el envío es GRATIS ($0.00).
-    // - Si es venta normal (items.length == 1) y es físico, se cobra envío base.
-    const hasUpsell = items.length > 1;
+    // Lógica de Envío Unificada:
+    // - Productos digitales: SIEMPRE $0.
+    // - Productos físicos: tarifa plana única para todo el mundo.
+    // No hay envío gratis por monto mínimo ni por upsell.
     const isPhysical = items.some(i => i.isPhysical);
-    // Digital products ALWAYS $0 shipping. Physical depends on Upsell.
-    const shippingUsd = (isPhysical && !hasUpsell)
-      ? (subtotalUSD >= 50 ? 0 : shippingCostUSD)
-      : 0;
+    const shippingUsd = isPhysical ? shippingCostUSD : 0;
     
     const shippingLocal = shippingUsd * rate;
     const totalLocal = Math.max(0, subtotalLocal - discountLocal + shippingLocal);

@@ -92,17 +92,17 @@ Deno.serve(async (req) => {
     const shippingUsd = isPhysical ? (pricing.totalUsd >= 50 ? 0 : shippingUsdBase) : 0;
     
     // Convertir el envío a la moneda local si es necesario
-    let shippingAmount = 0;
+    let shippingAmountCents = 0;
     if (shippingUsd > 0) {
       if (currency === "usd") {
-        shippingAmount = Math.round(shippingUsd * 100);
+        shippingAmountCents = Math.round(shippingUsd * 100);
       } else {
         const shippingLocal = await localAmountFromUsd(shippingUsd, currency.toUpperCase());
         if (shippingLocal) {
-          shippingAmount = Math.round(shippingLocal * 100);
+          shippingAmountCents = Math.round(shippingLocal * 100);
         } else {
           // Fallback a conversión simple si no hay tasa configurada
-          shippingAmount = Math.round(shippingUsd * 100);
+          shippingAmountCents = Math.round(shippingUsd * 100);
         }
       }
     }
@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
     });
 
     // Agregar el costo de envío como un item de línea si existe
-    if (shippingAmount > 0) {
+    if (shippingAmountCents > 0) {
       line_items.push({
         price_data: {
           currency,
@@ -132,7 +132,7 @@ Deno.serve(async (req) => {
             name: country === "ES" || isLatam ? "Costo de Envío" : "Shipping Cost",
             description: "Standard Shipping",
           },
-          unit_amount: shippingAmount,
+          unit_amount: shippingAmountCents,
         },
         quantity: 1,
       });

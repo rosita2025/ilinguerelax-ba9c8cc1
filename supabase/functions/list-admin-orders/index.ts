@@ -1,5 +1,5 @@
 import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
-import { sendShippingEmail } from "../_shared/shippingEmails.ts";
+import { sendShippingEmail, normalizeTracking } from "../_shared/shippingEmails.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = adminCorsHeaders;
@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   if (csrfBlock) return csrfBlock;
 
   try {
-    const { adminKey, action, orderId, trackingNumber, shippingProvider, source, shippingProofUrl } = await req.json().catch(() => ({}));
+    const { adminKey, action, orderId, trackingNumber, shippingProvider, source, shippingProofUrl, notifyCustomer } = await req.json().catch(() => ({}));
     const expected = Deno.env.get("ADMIN_REVIEW_KEY");
     if (!expected || adminKey !== expected) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -25,10 +25,63 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    /** Busca el nombre real del cliente en las tablas del pedido. */
+    const resolveCustomerName = async (orderNumber: string): Promise<string | null> => {
+      const pick = (v: unknown) => {
+        const s = String(v ?? "").trim();
+        return s && s.toLowerCase() !== "cliente" ? s : null;
+      };
+      const { data: ship } = await admin
+        .from("physical_shipments").select("customer_name").eq("order_number", orderNumber).maybeSingle();
+      if (pick(ship?.customer_name)) return pick(ship?.customer_name);
+
+      const { data: manual } = await admin
+        .from("manual_payments").select("buyer_name").eq("order_number", orderNumber).maybeSingle();
+      if (pick(manual?.buyer_name)) return pick(manual?.buyer_name);
+
+      const { data: digital } = await admin
+        .from("digital_email_sends").select("customer_name").eq("order_id", orderNumber)
+        .order("created_at", { ascending: false }).limit(1).maybeSingle();
+      if (pick(digital?.customer_name)) return pick(digital?.customer_name);
+
+      const { data: events } = await admin
+        .from("order_events").select("metadata").eq("order_number", orderNumber)
+        .order("created_at", { ascending: false }).limit(20);
+      for (const ev of events ?? []) {
+        const m = (ev as { metadata?: Record<string, unknown> }).metadata ?? {};
+        const candidate = m.customer_name ?? m.name ?? m.buyer_name
+          ?? (m.buyer as Record<string, unknown> | undefined)?.name
+          ?? (m.shipping as Record<string, unknown> | undefined)?.name;
+        if (pick(candidate)) return pick(candidate);
+      }
+      return null;
+    };
+
     // Acción: Actualizar tracking
     if (action === "update_tracking" && orderId) {
       if (!trackingNumber && !shippingProvider && !shippingProofUrl) {
         throw new Error("Tracking number, provider, or proof URL is required");
+      }
+
+      // Validación en servidor: el número no puede ser una URL genérica.
+      let trackingCode: string | null = null;
+      let trackingLink: string | null = null;
+      if (trackingNumber) {
+        const norm = normalizeTracking(trackingNumber);
+        if (norm.error || !norm.code) {
+          return new Response(JSON.stringify({ ok: false, error: norm.error ?? "Número de seguimiento inválido." }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        if (!String(shippingProvider ?? "").trim()) {
+          return new Response(JSON.stringify({ ok: false, error: "Selecciona el transportista antes de guardar el seguimiento." }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        trackingCode = norm.code;
+        trackingLink = norm.url;
       }
 
       const table = source === "manual" ? "manual_payments" :
@@ -48,7 +101,7 @@ Deno.serve(async (req) => {
       const prevTracking = String((prevRow as { tracking_number?: string | null } | null)?.tracking_number ?? "").trim();
 
       const patch: Record<string, unknown> = {
-        tracking_number: trackingNumber || null,
+        tracking_number: trackingCode,
         shipping_provider: shippingProvider || null,
         shipping_proof_url: shippingProofUrl || null,
       };
@@ -56,7 +109,7 @@ Deno.serve(async (req) => {
       if (table === "physical_shipments") {
         // Los pedidos pagados por pasarela pueden no tener aún fila de envío
         // (pagos anteriores a esta función): la creamos al guardar el tracking.
-        patch.status = trackingNumber ? "shipped" : "pending";
+        patch.status = trackingCode ? "shipped" : "pending";
         const { data: existingShipment } = await admin
           .from("physical_shipments")
           .select("order_number")
@@ -96,12 +149,13 @@ Deno.serve(async (req) => {
       await admin.from("order_events").insert({
         order_number: String(orderId),
         event: "tracking_updated",
-        status: trackingNumber ? "shipped" : "pending",
+        status: trackingCode ? "shipped" : "pending",
         provider: source === "gateway" ? "gateway" : source,
-        reference: trackingNumber || null,
-        detail: [shippingProvider, trackingNumber].filter(Boolean).join(" · ").slice(0, 500) || null,
+        reference: trackingCode || null,
+        detail: [shippingProvider, trackingCode].filter(Boolean).join(" · ").slice(0, 500) || null,
         metadata: {
-          trackingNumber,
+          trackingNumber: trackingCode,
+          trackingUrl: trackingLink,
           shippingProvider,
           shippingProofUrl,
           source,
@@ -111,7 +165,7 @@ Deno.serve(async (req) => {
 
       // Notificación al cliente: envío nuevo o tracking actualizado.
       let emailResult: Record<string, unknown> = { sent: false, skipped: "no_tracking" };
-      if (trackingNumber) {
+      if (trackingCode && notifyCustomer !== false) {
         try {
           const selectCols = table === "manual_payments"
             ? "buyer_email, buyer_name"
@@ -125,17 +179,18 @@ Deno.serve(async (req) => {
             .maybeSingle();
 
           const email = orderData?.buyer_email || orderData?.customer_email || orderData?.email;
-          const name = orderData?.buyer_name || orderData?.customer_name || "Cliente";
+          const name = await resolveCustomerName(String(orderId));
 
           if (email) {
             emailResult = await sendShippingEmail(admin, {
-              kind: prevTracking && prevTracking !== String(trackingNumber).trim()
+              kind: prevTracking && prevTracking !== trackingCode
                 ? "tracking_updated"
                 : "tracking_new",
               orderNumber: String(orderId),
               email: String(email),
               name,
-              trackingNumber,
+              trackingNumber: trackingCode,
+              trackingUrl: trackingLink,
               shippingProvider,
             });
           } else {
@@ -146,6 +201,7 @@ Deno.serve(async (req) => {
           emailResult = { sent: false, error: String((emailError as Error)?.message ?? emailError) };
         }
       }
+
 
       return new Response(JSON.stringify({ ok: true, email: emailResult }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -185,7 +241,7 @@ Deno.serve(async (req) => {
           : "pre_notice",
         orderNumber: String(orderId),
         email: String(email),
-        name: orderData?.buyer_name || orderData?.customer_name || "Cliente",
+        name: await resolveCustomerName(String(orderId)),
         trackingNumber: tracking,
         shippingProvider: orderData?.shipping_provider || shippingProvider || null,
       });

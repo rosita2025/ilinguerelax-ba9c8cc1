@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { adminInvoke } from "@/lib/adminInvoke";
+import { normalizeTracking, SHIPPING_CARRIERS } from "@/lib/tracking";
 import { 
   Package, 
   Truck, 
@@ -166,7 +167,29 @@ const AdminPhysicalOrders = () => {
       toast.error("Ingresa al menos un dato de seguimiento");
       return;
     }
-    
+
+    let trackingCode = tracking;
+    if (tracking) {
+      const norm = normalizeTracking(tracking);
+      if (norm.error || !norm.code) {
+        toast.error(norm.error ?? "Número de seguimiento inválido.");
+        return;
+      }
+      trackingCode = norm.code;
+      if (!provider.trim()) {
+        toast.error("Selecciona el transportista (no se envía 'Courier' genérico).");
+        return;
+      }
+      const ok = window.confirm(
+        `Se enviará el correo de seguimiento a ${order.email || "(sin correo)"}\n\n` +
+          `Pedido: ${order.order_ref || order.id}\n` +
+          `Cliente: ${order.customer || "(sin nombre)"}\n` +
+          `Transportista: ${provider}\n` +
+          `Tracking: ${trackingCode}\n\n¿Confirmas el envío?`,
+      );
+      if (!ok) return;
+    }
+
     setSaving(order.id);
     try {
       const { data, error } = await adminInvoke("list-admin-orders", {
@@ -174,7 +197,7 @@ const AdminPhysicalOrders = () => {
           adminKey,
           action: "update_tracking",
           orderId: order.order_ref || order.id,
-          trackingNumber: tracking,
+          trackingNumber: trackingCode,
           shippingProvider: provider,
           shipping_provider: provider,
           shippingProofUrl: proofUrl,
@@ -182,6 +205,11 @@ const AdminPhysicalOrders = () => {
         },
       });
       if (error) throw error;
+      const errMsg = (data as { ok?: boolean; error?: string } | null)?.error;
+      if (errMsg) {
+        toast.error(errMsg);
+        return;
+      }
       const emailInfo = (data as { email?: { sent?: boolean; error?: string; skipped?: string } } | null)?.email;
       toast.success("Seguimiento actualizado para " + (order.order_ref || order.id));
       if (tracking) {
@@ -339,18 +367,24 @@ const AdminPhysicalOrders = () => {
                     <label className="text-xs font-bold uppercase text-muted-foreground flex items-center gap-1">
                       <Truck className="w-3 h-3" /> Transportista
                     </label>
-                    <Input 
-                      placeholder="Ej: Amazon, DHL..." 
+                    <Input
+                      placeholder="Elige o escribe: Amazon, DHL..."
+                      list={`carriers-${order.id}`}
                       defaultValue={order.shipping_provider || ""}
                       id={`provider-${order.id}`}
                     />
+                    <datalist id={`carriers-${order.id}`}>
+                      {SHIPPING_CARRIERS.map((c) => (
+                        <option key={c} value={c} />
+                      ))}
+                    </datalist>
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase text-muted-foreground flex items-center gap-1">
                       <ExternalLink className="w-3 h-3" /> Tracking
                     </label>
                     <Input 
-                      placeholder="ID o enlace..." 
+                      placeholder="Código real (no un enlace genérico)"
                       defaultValue={order.tracking_number || ""}
                       id={`tracking-${order.id}`}
                     />

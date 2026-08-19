@@ -531,6 +531,8 @@ const ProductDynamic = () => {
         </div>
       </main>
       
+      {product.sku === "coreano-100-mapas-mentales" && <ResenasWhatsAppCoreano />}
+      
       <FAQ
         title={(t as any).product.whyUnique}
         subtitle={product.name}

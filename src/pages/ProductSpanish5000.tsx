@@ -188,9 +188,9 @@ const ProductSpanish5000 = () => {
   // Physical book — Stripe checkout with international shipping.
   const isPhysicalBundle = true;
   const dynamicCtaText = stickyCtaText;
-  const stickyPriceLabel = campaign.price;
-  const stickyOriginalLabel = campaign.originalPrice;
-  const stickyCurrency = campaign.currency;
+  const stickyPriceLabel = formatPrice(44);
+  const stickyOriginalLabel = formatPrice(59);
+  const stickyCurrency = "USD";
   const handleStickyBuy = async () => {
     await handleBuyNow();
   };

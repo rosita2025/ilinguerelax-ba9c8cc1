@@ -40,6 +40,9 @@ async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
   
   for (let i = 1; i <= attempts; i++) {
     try {
+      // Check if already loaded by another instance
+      if (window.paypal && loadedClientId && loadedCurrency === currency) return;
+
       const { data, error } = await invokeEdge<{ clientId?: string }>(
         "paypal-config",
         { 
@@ -55,13 +58,11 @@ async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
       
       const clientId = data.clientId as string;
       
+      // Double check window.paypal again before starting a new injection
       if (window.paypal && loadedClientId === clientId && loadedCurrency === currency) return;
       if (sdkPromise && loadedClientId === clientId && loadedCurrency === currency) return sdkPromise;
       
-      document.querySelectorAll('script[data-paypal-sdk="1"]').forEach((s) => {
-        try { s.parentNode?.removeChild(s); } catch { s.remove(); }
-      });
-      window.paypal = undefined;
+      cleanup();
       loadedClientId = clientId;
       loadedCurrency = currency;
       

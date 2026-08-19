@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useI18n } from "@/i18n/I18nContext";
 import { useMetaPixelViewContent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -85,6 +86,7 @@ const categories = [
 ];
 
 const ProductSpanish3000VerbsBook = () => {
+  const { currency, formatPrice } = useI18n();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
@@ -619,17 +621,19 @@ const ProductSpanish3000VerbsBook = () => {
       <StickyBuyBar
         lang="en"
         productName="3,000 Spanish Verbs Mastery — Pre-Order"
-        price={`$${PREORDER_PRICE}`}
-        originalPrice={`$${RETAIL_PRICE}`}
+        price={formatPrice(PREORDER_PRICE, currency)}
+        originalPrice={formatPrice(RETAIL_PRICE, currency)}
         rating={4.9}
         reviewCount={1200}
-        ctaText={`PRE-ORDER NOW — $${PREORDER_PRICE}`}
+        ctaText={`PRE-ORDER NOW — ${formatPrice(PREORDER_PRICE, currency)}`}
         onBuyClick={handleAddToCart}
         isLoading={cartLoading}
         disabled={false}
         isPhysical={true}
         goesToInternalCheckout={true}
         sku={PRODUCT_SKU}
+        currencyCode={currency}
+        flag={currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎"}
       />
     </main>
   );

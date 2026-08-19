@@ -129,7 +129,7 @@ const BonusPreviewDialog = ({ triggerLabel = "See sample", title, subtitle, chil
 );
 
 const ProductSpanish5000 = () => {
-  const { formatPrice, currency } = useI18n();
+  const { formatPrice, currency, countryCode } = useI18n();
   const PRODUCT_SKU = "5-000-spanish-words-with-english-pronunciation-physical";
   const productPricing = useAdminPricing(PRODUCT_SKU);
   const [activeImage, setActiveImage] = useState<string>("");
@@ -144,20 +144,24 @@ const ProductSpanish5000 = () => {
   // Configuración de precios dinámica basada en SKU
   const campaign = useMemo(() => {
     // Determine target tier for calculation
-    const isPen = currency === "PEN";
-    const isLatam = ["MXN", "COP", "ARS", "CLP", "BRL", "CRC", "DOP", "GTQ", "HNL", "NIO", "PYG", "UYU", "VES"].includes(currency);
-    const isEurope = ["EUR", "GBP", "CHF", "SEK", "NOK", "DKK", "PLN", "CZK"].includes(currency);
-    const isOceania = ["AUD", "NZD"].includes(currency);
+    const isPen = currency === "PEN" || countryCode === "PE";
+    const isLatam = ["MXN", "COP", "ARS", "CLP", "BRL", "CRC", "DOP", "GTQ", "HNL", "NIO", "PYG", "UYU", "VES"].includes(currency) || 
+                  ["MX", "CO", "AR", "CL", "BR", "EC", "BO", "PY", "UY", "CR", "PA", "GT", "HN", "SV", "DO", "PR"].includes(countryCode);
+    const isEurope = ["EUR", "GBP", "CHF", "SEK", "NOK", "DKK", "PLN", "CZK"].includes(currency) ||
+                    ["ES", "FR", "DE", "IT", "PT", "GB", "NL", "BE", "AT", "IE", "FI", "GR", "LU", "SK", "SI", "EE", "LV", "LT", "MT", "CY", "HR"].includes(countryCode);
+    const isOceania = ["AUD", "NZD"].includes(currency) || ["AU", "NZ"].includes(countryCode);
 
     // Get regional base price from admin
     let basePrice = productPricing.priceGlobalUsd || 44;
+    
+    // PEN special case (prioritize manual PEN price)
     if (isPen && productPricing.pricePen) {
-      // PEN special case
+      const penOriginal = productPricing.compareAtPricePen || productPricing.pricePen * 1.35;
       return {
         price: formatPrice(44, { PEN: productPricing.pricePen }),
-        originalPrice: formatPrice(59, { PEN: productPricing.compareAtPricePen || productPricing.pricePen * 1.35 }),
+        originalPrice: formatPrice(59, { PEN: penOriginal }),
         currency: "PEN" as const,
-        discountPercentage: 25
+        discountPercentage: Math.round((1 - productPricing.pricePen / penOriginal) * 100)
       };
     }
     
@@ -174,7 +178,7 @@ const ProductSpanish5000 = () => {
       currency: currency as any,
       discountPercentage: Math.round((1 - basePrice / comparePrice) * 100)
     };
-  }, [formatPrice, productPricing, currency]);
+  }, [formatPrice, productPricing, currency, countryCode]);
 
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({
@@ -381,6 +385,20 @@ const ProductSpanish5000 = () => {
                   </>
                 )}
               </h1>
+              
+              {/* Regional Pricing Display */}
+              <div className="flex flex-col items-center md:items-start mb-6">
+                <div className="flex items-baseline flex-wrap gap-x-3 gap-y-2 mb-2">
+                  <span className="text-3xl sm:text-4xl md:text-6xl font-black text-foreground leading-none">{campaign.price}</span>
+                  <span className="text-lg sm:text-xl md:text-2xl text-muted-foreground line-through opacity-70">{campaign.originalPrice}</span>
+                  <span className="px-2.5 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs sm:text-sm font-bold shadow-lg whitespace-nowrap">
+                    SAVE {campaign.discountPercentage}%
+                  </span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] sm:text-xs font-bold uppercase tracking-wide">
+                  <Package className="w-3 h-3" /> Special Limited Offer
+                </div>
+              </div>
 
               <p className="text-base md:text-lg text-muted-foreground mb-4 text-center md:text-left mx-auto">
                 <strong className="text-foreground">Buy the physical book and get the digital version FREE</strong> — plus <strong className="text-foreground">3 exclusive bonuses</strong> still available. 5,000 essential Spanish words written the way they <em>actually sound</em> in English.
@@ -425,7 +443,7 @@ const ProductSpanish5000 = () => {
                 >
                   <span className="flex items-center justify-center gap-2 font-black text-sm sm:text-lg">
                     <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
-                    GET THE PHYSICAL + DIGITAL COMBO NOW · {formatPrice(44)}
+                    GET THE PHYSICAL + DIGITAL COMBO NOW · {campaign.price}
                   </span>
                 </Button>
                 <p className="text-[11px] text-center text-muted-foreground mt-2">
@@ -860,6 +878,8 @@ const ProductSpanish5000 = () => {
         price={campaign.price} 
         originalPrice={campaign.originalPrice} 
         currencyCode={currency} 
+
+
         productName={productPricing.name ?? "Book Physical & Digital — FREE Bonuses"} 
         onBuyClick={handleStickyBuy} 
         ctaText={stickyCtaText} 

@@ -7,6 +7,7 @@ import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useNavigate } from "react-router-dom";
+import { useI18n } from "@/i18n/I18nContext";
 
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
@@ -142,6 +143,7 @@ const TIENDA_PATH_8000 = `/checkouts/${PRODUCT_SKU}`;
 const HOTMART_8000_LATAM = "https://pay.hotmart.com/U103990323W?checkoutMode=10";
 
 const Product8000 = () => {
+  const { currency, countryCode } = useI18n();
   const campaign = useCampaignPrice(20, 54);
   const navigate = useNavigate();
   const addItem = useCartStore((s) => s.addItem);
@@ -149,7 +151,7 @@ const Product8000 = () => {
   const tier = useCountryTierRouting(ADMIN_SKU_8000, {
     tiendaPath: TIENDA_PATH_8000,
   });
-  const { priceUsd } = tier;
+  const { priceUsd, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen } = tier;
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(
@@ -309,13 +311,14 @@ const Product8000 = () => {
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button variant="hero" size="xl" className="w-full text-lg py-6 shadow-2xl" onClick={handleBuyNow}>
                     <CreditCard className="w-6 h-6 mr-2" />
-                    ¡COMPRAR AHORA!
+                    ¡COMPRAR AHORA! — {tier.priceLabel}
                     <ArrowRight className="w-6 h-6 ml-2" />
                   </Button>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button 
                     variant="outline" 
+
                     size="xl" 
                     className="w-full text-lg py-6 border-2 border-primary/30 hover:bg-primary/5" 
                     onClick={handleAddToCart}
@@ -656,7 +659,7 @@ const Product8000 = () => {
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}
         currencyCode={tier.currencyCode}
-        flag={tier.isPeru ? "🇵🇪" : undefined}
+        flag={tier.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
         rating={4.9}
         reviewCount={10000}
         ctaText={"Comprar ahora"}

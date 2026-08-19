@@ -94,7 +94,7 @@ const ProductSpanish5000Digital = () => {
 
   const [isRedirecting, setIsRedirecting] = useState(false);
   const lockRef = useRef(false);
-  const { currency, countryCode, formatPrice } = useI18n();
+  const { currency, countryCode, formatPrice, setCurrency, setCountryCode } = useI18n();
   const ADMIN_SKU_SP5K = "5-000-spanish-words-with-english-pronunciation-digital";
   const PRODUCT_SKU = "5-000-spanish-words-with-english-pronunciation-digital";
   const TIENDA_PATH_SP5K = `/checkouts/${PRODUCT_SKU}`;
@@ -286,7 +286,7 @@ const ProductSpanish5000Digital = () => {
                   {tier.isOnSale && (
                     <>
                       <span className="text-lg sm:text-xl text-muted-foreground line-through mb-1 opacity-70">{tier.originalLabel}</span>
-                      <span className="px-2 py-0.5 sm:py-1 rounded-md bg-red-500 text-white text-[10px] sm:text-xs font-black shadow-sm">
+                      <span className="px-2.5 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] sm:text-xs font-black shadow-lg">
                         SAVE {tier.discountPercentage}%
                       </span>
                     </>
@@ -613,7 +613,7 @@ const ProductSpanish5000Digital = () => {
                 onClick={() => navigate("/products/5-000-spanish-words-with-english-pronunciation-physical")}
                 className="w-full relative z-10 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-8 py-6 text-base font-black text-white shadow-xl hover:bg-emerald-500 transition-all hover:scale-105 active:scale-95 h-auto whitespace-normal text-center"
               >
-                Get Physical Book + Free Digital — {formatPrice(44.00)}
+                Get Physical Book + Free Digital — {formatPrice(44.00, currency)}
               </Button>
             </div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/10 blur-3xl -mr-32 -mt-32 rounded-full" />
@@ -682,7 +682,7 @@ const ProductSpanish5000Digital = () => {
         price={tier.priceLabel}
         originalPrice={tier.isOnSale ? (tier.originalLabel || undefined) : undefined}
         currencyCode={tier.currencyCode}
-        flag={flag}
+        flag={pricingReady ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
         usdValue={currentPrice}
         localUsdPrices={pricing.localUsdPrices}
         buyUrl={undefined}

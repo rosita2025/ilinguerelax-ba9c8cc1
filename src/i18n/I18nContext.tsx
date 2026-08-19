@@ -21,6 +21,7 @@ interface I18nContextType {
   t: Translations;
   formatPrice: (priceInUSD: number, overrides?: any, localUsdPrices?: any) => string;
   countryCode: string;
+  setCountryCode: (code: string) => void;
   languageNames: typeof languageNames;
   languageFlags: typeof languageFlags;
 }
@@ -80,7 +81,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       : (savedCurrency || "USD");
   const [language, setLanguageState] = useState<Language>(initialLang);
   const [currency, setCurrencyState] = useState<Currency>(initialCurrency);
-  const [countryCode, setCountryCode] = useState<string>(subCountry || savedCountry || "US");
+  const [countryCode, setCountryCodeState] = useState<string>(subCountry || savedCountry || "US");
 
   // Detect country in background WITHOUT blocking render
   useEffect(() => {
@@ -135,6 +136,21 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     try { localStorage.setItem(CURRENCY_STORAGE_KEY, curr); } catch { /* ignore */ }
   };
 
+  const setCountryCode = (code: string) => {
+    setCountryCodeState(code);
+    try { 
+      localStorage.setItem("ilr_country", code);
+      localStorage.setItem("ilr_country_manual", code);
+    } catch { /* ignore */ }
+    
+    // Also update currency automatically
+    const newCurrency = detectCurrency(code);
+    setCurrency(newCurrency);
+    
+    // Notify other listeners that don't use this context
+    window.dispatchEvent(new Event("country_changed"));
+  };
+
   const t = translations[language];
 
   const formatPriceWithCurrency = (priceInUSD: number, overrides?: any, localUsdPrices?: any): string => {
@@ -149,6 +165,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     t,
     formatPrice: formatPriceWithCurrency,
     countryCode,
+    setCountryCode,
     languageNames,
     languageFlags,
   };

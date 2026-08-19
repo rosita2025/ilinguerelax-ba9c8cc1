@@ -342,3 +342,5 @@ export const languageFlags: Record<Language, string> = {
   fr: "🇫🇷",
   pt: "🇧🇷",
 };
+
+export { useI18n } from "./I18nContext";

@@ -26,7 +26,7 @@ import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useNavigate } from "react-router-dom";
 import { toast as sonnerToast } from "sonner";
-import { detectCurrency, formatPrice } from "@/i18n";
+import { detectCurrency, formatPrice, useI18n } from "@/i18n";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -183,6 +183,7 @@ const Product5000 = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
+  const { currency, countryCode } = useI18n();
   const ADMIN_SKU_5000 = "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa";
   const PRODUCT_SKU = "5-000-palabras-libro-fisico";
   const TIENDA_CHECKOUT_5000 = `/checkouts/${PRODUCT_SKU}`;
@@ -197,11 +198,11 @@ const Product5000 = () => {
   const { isPeru, priceUsd: priceUSD, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen, country } = tier;
   const isLatam = false; // Internal checkout for everyone
   const pricing5000Ready = tier.loaded;
-  const displayCurrency = isPeru ? "PEN" : detectCurrency(country || "US");
+  const displayCurrency = currency;
   // Fuente única: los labels del hook (respetan los montos exactos por moneda
   // fijados en /admin/productos/:sku y el formato local punto/coma).
-  const displayPrice = (isPeru && pricePen && Number(pricePen) > 0) ? `S/ ${Number(pricePen).toFixed(2)}` : tier.priceLabel;
-  const displayOriginalPrice = (isPeru && pricePen && Number(pricePen) > 0) ? `S/ ${(Number(pricePen) * 2.5).toFixed(2)}` : tier.originalLabel;
+  const displayPrice = tier.priceLabel;
+  const displayOriginalPrice = tier.originalLabel;
   const regionLabel = isPeru ? "PE" : isLatam ? "LATAM" : "Global";
   const buyUrl = TIENDA_CHECKOUT_5000;
   const safePriceLabel = pricing5000Ready ? displayPrice : "Cargando precio…";

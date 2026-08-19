@@ -1,97 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Globe, Check } from "lucide-react";
-import { useRegionTier, setManualCountryOverride, clearManualCountryOverride } from "@/hooks/useRegionTier";
+import { useRegionTier, clearManualCountryOverride } from "@/hooks/useRegionTier";
+import { useI18n } from "@/i18n/I18nContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-
-/**
- * Small pill: "¿No estás en {country}? · Cambiar"
- * Opens a dialog with the countries we support so the user can override
- * IP detection when it's wrong (VPN, roaming, mislabelled IP).
- */
-
-interface CountryOption {
-  code: string;
-  name: string;
-  flag: string;
-  tier: "PE" | "TiendaUSD" | "LATAM" | "Global";
-}
-
-const COUNTRIES: CountryOption[] = [
-  // Perú (PEN nativo)
-  { code: "PE", name: "Perú", flag: "🇵🇪", tier: "PE" },
-  // Tienda USD ($7)
-  { code: "VE", name: "Venezuela", flag: "🇻🇪", tier: "TiendaUSD" },
-  { code: "CU", name: "Cuba", flag: "🇨🇺", tier: "TiendaUSD" },
-  { code: "NI", name: "Nicaragua", flag: "🇳🇮", tier: "TiendaUSD" },
-  // LATAM Hotmart (moneda local)
-  { code: "MX", name: "México", flag: "🇲🇽", tier: "LATAM" },
-  { code: "CO", name: "Colombia", flag: "🇨🇴", tier: "LATAM" },
-  { code: "AR", name: "Argentina", flag: "🇦🇷", tier: "LATAM" },
-  { code: "CL", name: "Chile", flag: "🇨🇱", tier: "LATAM" },
-  { code: "BR", name: "Brasil", flag: "🇧🇷", tier: "LATAM" },
-  { code: "EC", name: "Ecuador", flag: "🇪🇨", tier: "LATAM" },
-  { code: "BO", name: "Bolivia", flag: "🇧🇴", tier: "LATAM" },
-  { code: "PY", name: "Paraguay", flag: "🇵🇾", tier: "LATAM" },
-  { code: "UY", name: "Uruguay", flag: "🇺🇾", tier: "LATAM" },
-  { code: "CR", name: "Costa Rica", flag: "🇨🇷", tier: "LATAM" },
-  { code: "PA", name: "Panamá", flag: "🇵🇦", tier: "LATAM" },
-  { code: "GT", name: "Guatemala", flag: "🇬🇹", tier: "LATAM" },
-  { code: "HN", name: "Honduras", flag: "🇭🇳", tier: "LATAM" },
-  { code: "SV", name: "El Salvador", flag: "🇸🇻", tier: "LATAM" },
-  { code: "DO", name: "R. Dominicana", flag: "🇩🇴", tier: "LATAM" },
-  { code: "PR", name: "Puerto Rico", flag: "🇵🇷", tier: "LATAM" },
-  // Global (USD)
-  { code: "US", name: "Estados Unidos", flag: "🇺🇸", tier: "Global" },
-  { code: "CA", name: "Canadá", flag: "🇨🇦", tier: "Global" },
-  { code: "ES", name: "España", flag: "🇪🇸", tier: "Global" },
-  { code: "FR", name: "Francia", flag: "🇫🇷", tier: "Global" },
-  { code: "DE", name: "Alemania", flag: "🇩🇪", tier: "Global" },
-  { code: "IT", name: "Italia", flag: "🇮🇹", tier: "Global" },
-  { code: "PT", name: "Portugal", flag: "🇵🇹", tier: "Global" },
-  { code: "GB", name: "Reino Unido", flag: "🇬🇧", tier: "Global" },
-  { code: "AU", name: "Australia", flag: "🇦🇺", tier: "Global" },
-  { code: "JP", name: "Japón", flag: "🇯🇵", tier: "Global" },
-  { code: "KR", name: "Corea", flag: "🇰🇷", tier: "Global" },
-];
-
-const TIER_LABEL: Record<CountryOption["tier"], string> = {
-  PE: "Soles PEN",
-  TiendaUSD: "USD Tienda",
-  LATAM: "Moneda local (LATAM)",
-  Global: "USD internacional",
-};
+import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { countries } from "@/hooks/useRegionTier";
 
 interface Props {
-  lang?: "es" | "en";
+  lang?: "es" | "en" | "fr" | "pt";
   className?: string;
 }
 
 export const CountryPicker = ({ lang = "es", className = "" }: Props) => {
+  const { setCountryCode } = useI18n();
   const region = useRegionTier();
   const [open, setOpen] = useState(false);
-  const cc = (region.country || "").toUpperCase();
-  const current = COUNTRIES.find((c) => c.code === cc);
-  const currentName = current?.name || cc || (lang === "en" ? "your country" : "tu país");
-  const currentFlag = current?.flag || "🌍";
+  const [activeCountry, setActiveCountry] = useState<string | null>(null);
 
-  const t = {
-    notIn: lang === "en" ? "Not in" : "¿No estás en",
-    change: lang === "en" ? "Change" : "Cambiar",
-    title: lang === "en" ? "Choose your country" : "Elige tu país",
-    desc:
-      lang === "en"
-        ? "Prices adjust automatically to your region. If detection is wrong, pick the correct country."
-        : "Los precios se ajustan a tu región. Si la detección es incorrecta, elige el país correcto.",
-    autoDetect: lang === "en" ? "Auto-detect by IP" : "Detectar automáticamente por IP",
+  useEffect(() => {
+    if (region.country) {
+      setActiveCountry(region.country);
+    }
+  }, [region.country]);
+
+  const currentCountry = countries.find((c) => c.code === activeCountry) || {
+    code: "US",
+    name: "United States",
+    flag: "🇺🇸",
   };
 
   const pick = (code: string) => {
-    setManualCountryOverride(code);
+    setCountryCode(code);
     setOpen(false);
-    // Full reload so every hook (pricing, tier routing, cart) picks up the
-    // new region cleanly. Simpler than propagating a global event bus.
-    window.location.reload();
   };
 
   const auto = () => {
@@ -100,56 +42,109 @@ export const CountryPicker = ({ lang = "es", className = "" }: Props) => {
     window.location.reload();
   };
 
+  const labels = {
+    es: {
+      title: "Selecciona tu país",
+      desc: "Los precios y métodos de pago se ajustarán automáticamente.",
+      auto: "Detectar automáticamente",
+      current: "País actual",
+    },
+    en: {
+      title: "Select your country",
+      desc: "Prices and payment methods will adjust automatically.",
+      auto: "Detect automatically",
+      current: "Current country",
+    },
+    fr: {
+      title: "Choisissez votre pays",
+      desc: "Les prix et méthodes de paiement s'adapteront automatiquement.",
+      auto: "Détecter automatiquement",
+      current: "Pays actuel",
+    },
+    pt: {
+      title: "Selecione seu país",
+      desc: "Os preços e métodos de pagamento serão ajustados automaticamente.",
+      auto: "Detectar automaticamente",
+      current: "País atual",
+    },
+  };
+
+  const l = labels[lang as keyof typeof labels] || labels.es;
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button
-          type="button"
-          aria-label={`${t.notIn} ${currentName}? ${t.change}`}
-          className={`inline-flex items-center gap-1.5 text-xs sm:text-[11px] font-medium text-muted-foreground hover:text-foreground underline underline-offset-2 decoration-dotted transition-colors min-h-[32px] px-2 py-1 rounded-md max-w-full ${className}`}
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn(
+            "h-9 px-3 gap-2 text-muted-foreground hover:text-foreground transition-colors",
+            className
+          )}
         >
-          <Globe className="w-3.5 h-3.5 flex-shrink-0" />
-          <span className="truncate">
-            {t.notIn} <span className="font-semibold">{currentFlag} {currentName}</span>? · {t.change}
+          <Globe className="w-4 h-4" />
+          <span className="text-xs font-medium uppercase tracking-wider">
+            {currentCountry.flag} {currentCountry.code}
           </span>
-        </button>
+        </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md w-[calc(100vw-1.5rem)] p-0 gap-0 max-h-[90vh] sm:max-h-[85vh] flex flex-col">
-        <DialogHeader className="p-4 sm:p-6 pb-2 sm:pb-3 flex-shrink-0 text-left">
-          <DialogTitle className="text-base sm:text-lg">{t.title}</DialogTitle>
-          <DialogDescription className="text-xs sm:text-sm">{t.desc}</DialogDescription>
+      <DialogContent className="max-w-md p-6">
+        <DialogHeader>
+          <DialogTitle>{l.title}</DialogTitle>
+          <DialogDescription>{l.desc}</DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-2 overscroll-contain">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {COUNTRIES.map((c) => {
-              const active = c.code === cc;
-              return (
+
+        <div className="grid gap-4 py-4">
+          <Button
+            variant="outline"
+            className="justify-start gap-3 h-12"
+            onClick={auto}
+          >
+            <Globe className="w-5 h-5 text-primary" />
+            <div className="text-left">
+              <div className="text-sm font-semibold">{l.auto}</div>
+              <div className="text-xs text-muted-foreground uppercase">IP Geolocation</div>
+            </div>
+          </Button>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                O elige manualmente
+              </span>
+            </div>
+          </div>
+
+          <ScrollArea className="h-[300px] pr-4">
+            <div className="grid grid-cols-1 gap-1">
+              {countries.map((c) => (
                 <button
                   key={c.code}
-                  type="button"
                   onClick={() => pick(c.code)}
-                  className={`flex items-center gap-2.5 px-3 py-2.5 min-h-[48px] rounded-lg border text-left text-sm transition-all active:scale-[0.98] ${
-                    active
-                      ? "border-primary bg-primary/10 text-foreground"
-                      : "border-border hover:border-primary/50 hover:bg-muted"
-                  }`}
+                  className={cn(
+                    "flex items-center justify-between px-3 py-2.5 rounded-lg transition-all text-left",
+                    activeCountry === c.code
+                      ? "bg-primary/10 text-primary font-semibold"
+                      : "hover:bg-muted text-foreground/80"
+                  )}
                 >
-                  <span className="text-xl leading-none flex-shrink-0">{c.flag}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold truncate">{c.name}</div>
-                    <div className="text-[10px] text-muted-foreground truncate">{TIER_LABEL[c.tier]}</div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl leading-none">{c.flag}</span>
+                    <span className="text-sm">{c.name}</span>
                   </div>
-                  {active && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
+                  {activeCountry === c.code && <Check className="w-4 h-4" />}
                 </button>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          </ScrollArea>
         </div>
-        <div className="p-4 sm:p-6 pt-3 border-t border-border flex-shrink-0 bg-background">
-          <Button variant="outline" size="default" onClick={auto} className="w-full min-h-[44px]">
-            <Globe className="w-4 h-4 mr-2" />
-            {t.autoDetect}
-          </Button>
+
+        <div className="pt-2 flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground opacity-50">
+          <Globe className="w-3 h-3" />
+          iLingue Relax Global Store v4.2
         </div>
       </DialogContent>
     </Dialog>

@@ -97,11 +97,8 @@ export function clearManualCountryOverride() {
 export function useRegionTier(): RegionInfo {
   const [state, setState] = useState<RegionInfo>(() => {
     if (typeof window !== "undefined") {
-      // Limpia overrides antiguos que quedaban persistidos para siempre y
-      // hacían que la IP nunca ganara (ej. un ?country=ES de un test viejo).
       try { localStorage.removeItem("ilr_country_override"); } catch { /* ignore */ }
 
-      // ?country=XX sigue funcionando pero SÓLO en esta carga (no se persiste).
       const params = new URLSearchParams(window.location.search);
       const urlOverride = params.get("country")?.toUpperCase();
       if (urlOverride) {
@@ -109,18 +106,32 @@ export function useRegionTier(): RegionInfo {
         return { tier: classify(urlOverride), country: urlOverride, loading: false };
       }
 
-      // Manual override (from CountryPicker) beats IP detection.
       const manual = getManualCountryOverride();
       if (manual) {
         try { localStorage.setItem("ilr_country", manual); } catch { /* ignore */ }
         return { tier: classify(manual), country: manual, loading: false };
       }
     }
-    // Prioridad: cache de detección por IP
     const cached = readCache();
     if (cached) return { tier: cached.tier, country: cached.country, loading: false };
     return { tier: "global", country: "", loading: true };
   });
+
+  // Re-sync if the manual override changes in localStorage (e.g. from another component)
+  useEffect(() => {
+    const sync = () => {
+      const manual = getManualCountryOverride();
+      if (manual && manual !== state.country) {
+        setState({ tier: classify(manual), country: manual, loading: false });
+      }
+    };
+    window.addEventListener("storage", sync);
+    window.addEventListener("country_changed", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("country_changed", sync);
+    };
+  }, [state.country]);
 
   useEffect(() => {
     if (!state.loading) return;
@@ -145,4 +156,37 @@ export function useRegionTier(): RegionInfo {
 
   return state;
 }
+
+export const countries = [
+  { code: "US", name: "Estados Unidos", flag: "🇺🇸" },
+  { code: "MX", name: "México", flag: "🇲🇽" },
+  { code: "ES", name: "España", flag: "🇪🇸" },
+  { code: "PE", name: "Perú", flag: "🇵🇪" },
+  { code: "CO", name: "Colombia", flag: "🇨🇴" },
+  { code: "AR", name: "Argentina", flag: "🇦🇷" },
+  { code: "CL", name: "Chile", flag: "🇨🇱" },
+  { code: "EC", name: "Ecuador", flag: "🇪🇨" },
+  { code: "BO", name: "Bolivia", flag: "🇧🇴" },
+  { code: "CR", name: "Costa Rica", flag: "🇨🇷" },
+  { code: "DO", name: "Rep. Dominicana", flag: "🇩🇴" },
+  { code: "GT", name: "Guatemala", flag: "🇬🇹" },
+  { code: "HN", name: "Honduras", flag: "🇭🇳" },
+  { code: "NI", name: "Nicaragua", flag: "🇳🇮" },
+  { code: "PA", name: "Panamá", flag: "🇵🇦" },
+  { code: "PY", name: "Paraguay", flag: "🇵🇾" },
+  { code: "UY", name: "Uruguay", flag: "🇺🇾" },
+  { code: "VE", name: "Venezuela", flag: "🇻🇪" },
+  { code: "PR", name: "Puerto Rico", flag: "🇵🇷" },
+  { code: "CA", name: "Canadá", flag: "🇨🇦" },
+  { code: "GB", name: "Reino Unido", flag: "🇬🇧" },
+  { code: "FR", name: "Francia", flag: "🇫🇷" },
+  { code: "DE", name: "Alemania", flag: "🇩🇪" },
+  { code: "IT", name: "Italia", flag: "🇮🇹" },
+  { code: "PT", name: "Portugal", flag: "🇵🇹" },
+  { code: "BR", name: "Brasil", flag: "🇧🇷" },
+  { code: "AU", name: "Australia", flag: "🇦🇺" },
+  { code: "NZ", name: "Nueva Zelanda", flag: "🇳🇿" },
+  { code: "JP", name: "Japón", flag: "🇯🇵" },
+  { code: "KR", name: "Corea del Sur", flag: "🇰🇷" },
+];
 

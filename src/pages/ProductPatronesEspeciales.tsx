@@ -82,7 +82,7 @@ const features = [
 ];
 
 const ProductPatronesEspeciales = () => {
-  const { t } = useI18n();
+  const { t, currency, countryCode } = useI18n();
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   const ADMIN_SKU = "patrones-especiales-alfabeto-combinaciones-secretas-ingles";
@@ -221,7 +221,7 @@ const ProductPatronesEspeciales = () => {
         keywords="pronunciación en inglés, patrones de pronunciación inglés, letras mudas en inglés, combinaciones de letras inglés, alfabeto en inglés con pronunciación, cómo pronunciar en inglés, mejorar pronunciación inglés, fonética inglés para hispanohablantes, ebook pronunciación inglés pdf, contracciones en inglés"
         reviews={productReviews}
         faqItems={[
-          { question: `¿Por qué cuesta solo ${priceLabel}?`, answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba." },
+          { question: `¿Por qué cuesta solo ${tier.priceLabel}?`, answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba." },
           { question: "¿Qué incluye este ebook?", answer: "Patrones especiales de pronunciación, alfabeto inglés letra por letra, combinaciones secretas, letras mudas, contracciones y mini retos prácticos con respuestas." },
           { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Recibes la descarga inmediata después del pago. Puedes leerlo en móvil, tablet, computadora o imprimirlo." },
           { question: "¿Cómo realizo el pago?", answer: "Según tu país: tienda interna de iLingue Relax o pago directo con tarjeta/transferencia." },
@@ -341,8 +341,8 @@ const ProductPatronesEspeciales = () => {
                   <DigitalProductNotice compact />
                 </div>
                 <div className="flex items-baseline flex-wrap gap-x-3 gap-y-2 mb-2">
-                  <span className="text-3xl sm:text-4xl md:text-6xl font-black text-foreground leading-none">{(isPeru && pricePen && Number(pricePen) > 0) ? `S/ ${Number(pricePen).toFixed(2)}` : priceLabel}</span>
-                  <span className="text-lg sm:text-xl md:text-2xl text-muted-foreground line-through opacity-70">{(isPeru && pricePen && Number(pricePen) > 0) ? `S/ ${(Number(pricePen) * 2.5).toFixed(2)}` : originalLabel}</span>
+                  <span className="text-3xl sm:text-4xl md:text-6xl font-black text-foreground leading-none">{tier.priceLabel}</span>
+                  <span className="text-lg sm:text-xl md:text-2xl text-muted-foreground line-through opacity-70">{tier.originalLabel}</span>
                   <span className="px-2.5 py-1 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs sm:text-sm font-bold shadow-lg whitespace-nowrap">
                     AHORRA 75%
                   </span>
@@ -724,7 +724,7 @@ const ProductPatronesEspeciales = () => {
         originalPrice={originalLabel}
         currencyCode={displayCurrency}
         usdValue={PRICE_USD}
-        flag={tier.country ? (code => String.fromCodePoint(...[...code.toUpperCase()].map(c => c.charCodeAt(0) + 127397)))(tier.country) : undefined}
+        flag={tier.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
         productName={pricingAdmin.name ?? "Patrones Especiales en Inglés"}
         rating={pricingAdmin.rating != null ? pricingAdmin.rating : 4.9}
         reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}

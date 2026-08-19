@@ -385,6 +385,20 @@ const ProductSpanish5000 = () => {
                   </>
                 )}
               </h1>
+              
+              {/* Regional Pricing Display */}
+              <div className="flex flex-col items-center md:items-start mb-6">
+                <div className="flex items-baseline flex-wrap gap-x-3 gap-y-2 mb-2">
+                  <span className="text-3xl sm:text-4xl md:text-6xl font-black text-foreground leading-none">{campaign.price}</span>
+                  <span className="text-lg sm:text-xl md:text-2xl text-muted-foreground line-through opacity-70">{campaign.originalPrice}</span>
+                  <span className="px-2.5 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs sm:text-sm font-bold shadow-lg whitespace-nowrap">
+                    SAVE {campaign.discountPercentage}%
+                  </span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] sm:text-xs font-bold uppercase tracking-wide">
+                  <Package className="w-3 h-3" /> Special Limited Offer
+                </div>
+              </div>
 
               <p className="text-base md:text-lg text-muted-foreground mb-4 text-center md:text-left mx-auto">
                 <strong className="text-foreground">Buy the physical book and get the digital version FREE</strong> — plus <strong className="text-foreground">3 exclusive bonuses</strong> still available. 5,000 essential Spanish words written the way they <em>actually sound</em> in English.

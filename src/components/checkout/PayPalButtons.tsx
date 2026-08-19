@@ -10,6 +10,10 @@ interface Props {
   buyerName?: string;
   buyerPhone?: string;
   buyerCountry?: string;
+  buyerAddress?: string;
+  buyerCity?: string;
+  buyerZip?: string;
+  buyerState?: string;
   skus?: string[];
   localCurrency?: string;
   localAmount?: number;
@@ -32,6 +36,10 @@ export function PayPalButtons({
   buyerName, 
   buyerPhone, 
   buyerCountry, 
+  buyerAddress,
+  buyerCity,
+  buyerZip,
+  buyerState,
   skus = [], 
   localCurrency, 
   localAmount, 
@@ -146,6 +154,18 @@ export function PayPalButtons({
         <PayPalButtonsOfficial
           style={{ layout: "vertical", color: "gold", shape: "pill", label: "paypal", height: 45 }}
           createOrder={async () => {
+            // Re-validate fields before calling createOrder
+            if (!buyerEmail || !buyerName) {
+              window.dispatchEvent(new CustomEvent("checkout:showBuyerErrors"));
+              throw new Error("Por favor completa tus datos de contacto.");
+            }
+
+            const hasPhysical = items.some(i => i.isPhysical);
+            if (hasPhysical && (!buyerAddress || !buyerCity || !buyerCountry)) {
+              window.dispatchEvent(new CustomEvent("checkout:showBuyerErrors"));
+              throw new Error("Por favor completa tu dirección y teléfono para continuar con el pago.");
+            }
+
             setProcessing("create");
             setErr(null);
             try {
@@ -157,8 +177,17 @@ export function PayPalButtons({
                   amountUsd: Number(amountUsd.toFixed(2)), 
                   description, 
                   buyerEmail, 
+                  buyerName, // Added name to payload
                   couponCode, 
-                  country: buyerCountry, 
+                  country: buyerCountry,
+                  shipping: hasPhysical ? {
+                    full_name: buyerName,
+                    address_line_1: buyerAddress,
+                    admin_area_2: buyerCity,
+                    admin_area_1: buyerState,
+                    postal_code: buyerZip,
+                    country_code: buyerCountry
+                  } : undefined,
                   items,
                   correlationId 
                 },

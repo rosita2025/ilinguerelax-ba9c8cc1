@@ -382,7 +382,17 @@ const AdminPhysicalOrders = () => {
                             <Save className="w-4 h-4" />
                           )}
                         </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={saving === order.id || !order.email}
+                          title="Reenviar correo de seguimiento al cliente"
+                          onClick={() => resendTrackingEmail(order)}
+                        >
+                          <Mail className="w-4 h-4" />
+                        </Button>
                       </div>
+
                     </div>
                   </div>
                 </div>

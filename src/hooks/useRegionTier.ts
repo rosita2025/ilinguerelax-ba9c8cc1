@@ -157,3 +157,36 @@ export function useRegionTier(): RegionInfo {
   return state;
 }
 
+export const countries = [
+  { code: "US", name: "Estados Unidos", flag: "🇺🇸" },
+  { code: "MX", name: "México", flag: "🇲🇽" },
+  { code: "ES", name: "España", flag: "🇪🇸" },
+  { code: "PE", name: "Perú", flag: "🇵🇪" },
+  { code: "CO", name: "Colombia", flag: "🇨🇴" },
+  { code: "AR", name: "Argentina", flag: "🇦🇷" },
+  { code: "CL", name: "Chile", flag: "🇨🇱" },
+  { code: "EC", name: "Ecuador", flag: "🇪🇨" },
+  { code: "BO", name: "Bolivia", flag: "🇧🇴" },
+  { code: "CR", name: "Costa Rica", flag: "🇨🇷" },
+  { code: "DO", name: "Rep. Dominicana", flag: "🇩🇴" },
+  { code: "GT", name: "Guatemala", flag: "🇬🇹" },
+  { code: "HN", name: "Honduras", flag: "🇭🇳" },
+  { code: "NI", name: "Nicaragua", flag: "🇳🇮" },
+  { code: "PA", name: "Panamá", flag: "🇵🇦" },
+  { code: "PY", name: "Paraguay", flag: "🇵🇾" },
+  { code: "UY", name: "Uruguay", flag: "🇺🇾" },
+  { code: "VE", name: "Venezuela", flag: "🇻🇪" },
+  { code: "PR", name: "Puerto Rico", flag: "🇵🇷" },
+  { code: "CA", name: "Canadá", flag: "🇨🇦" },
+  { code: "GB", name: "Reino Unido", flag: "🇬🇧" },
+  { code: "FR", name: "Francia", flag: "🇫🇷" },
+  { code: "DE", name: "Alemania", flag: "🇩🇪" },
+  { code: "IT", name: "Italia", flag: "🇮🇹" },
+  { code: "PT", name: "Portugal", flag: "🇵🇹" },
+  { code: "BR", name: "Brasil", flag: "🇧🇷" },
+  { code: "AU", name: "Australia", flag: "🇦🇺" },
+  { code: "NZ", name: "Nueva Zelanda", flag: "🇳🇿" },
+  { code: "JP", name: "Japón", flag: "🇯🇵" },
+  { code: "KR", name: "Corea del Sur", flag: "🇰🇷" },
+];
+

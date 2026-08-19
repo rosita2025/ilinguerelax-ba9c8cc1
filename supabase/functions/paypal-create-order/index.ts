@@ -13,7 +13,7 @@ const PAYPAL_BASE = PAYPAL_ENV === "sandbox" ? "https://api-m.sandbox.paypal.com
 
 async function getAccessToken(): Promise<string> {
   const id = Deno.env.get("PAYPAL_CLIENT_ID");
-  const secret = Deno.env.get("PAYPAL_SECRET");
+  const secret = Deno.env.get("PAYPAL_SECRET") || Deno.env.get("PAYPAL_CLIENT_SECRET");
   if (!id || !secret) throw new Error("PayPal credentials not configured");
   const res = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
     method: "POST",

@@ -334,15 +334,15 @@ const ProductSpanish5000 = () => {
               </div>
 
               {/* Buy Now CTA */}
-              <div className="w-full mx-auto p-4 md:p-5 mb-4 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 overflow-hidden w-full max-w-full px-4 box-border">
+              <div className="w-full mx-auto p-3 sm:p-5 mb-4 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 overflow-hidden box-border">
                 <Button
                   type="button"
                   size="xl"
                   onClick={handleBuyNow}
-                  className="w-full text-base md:text-lg py-6 px-4 h-auto min-h-[64px] whitespace-normal touch-manipulation shadow-[0_8px_30px_rgba(234,179,8,0.45)] bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-500 hover:to-amber-500 text-slate-900 border border-amber-500 transition-all hover:scale-[1.02] active:scale-[0.99]"
+                  className="w-full text-base sm:text-lg py-5 px-3 h-auto min-h-[56px] whitespace-normal touch-manipulation shadow-[0_8px_30px_rgba(234,179,8,0.45)] bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-500 hover:to-amber-500 text-slate-900 border border-amber-500 transition-all hover:scale-[1.02] active:scale-[0.99]"
                 >
-                  <span className="flex items-center justify-center gap-2 font-black">
-                    <ShoppingCart className="w-5 h-5" />
+                  <span className="flex items-center justify-center gap-2 font-black text-sm sm:text-lg">
+                    <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
                     BUY NOW · {campaign.price}
                   </span>
                 </Button>

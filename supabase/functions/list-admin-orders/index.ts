@@ -282,6 +282,7 @@ Deno.serve(async (req) => {
         funnel: funnel.data ?? [],
         emailLog: emailLog.data ?? [],
         products: products.data ?? [],
+        gateway,
         tokenAccess,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },

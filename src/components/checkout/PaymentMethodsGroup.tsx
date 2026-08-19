@@ -572,7 +572,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             couponCode: s.coupon ?? undefined,
             contact: {
               email: s.buyer.email.trim(),
-              phone: (s.buyer.phone ?? "").slice(0, 20) || "+10000000000",
+              phone: (s.buyer.phone ?? "").trim().slice(0, 20) || undefined,
               firstName, lastName,
               country,
               address: (s.buyer.address ?? "").slice(0, 160) || undefined,
@@ -810,7 +810,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           couponCode: s.coupon ?? undefined,
           payerEmail: s.buyer.email.trim(),
           payerName: s.buyer.fullName.trim(),
-          payerPhone: s.buyer.phone ?? undefined,
+          payerPhone: (s.buyer.phone ?? "").trim() || undefined,
+          // Mismos datos que enviamos a Stripe: necesarios para despachar libros físicos.
+          payerAddress: (s.buyer.address ?? "").trim().slice(0, 160) || undefined,
+          payerCity: (s.buyer.city ?? "").trim().slice(0, 80) || undefined,
+          payerState: (s.buyer.state ?? "").trim().slice(0, 80) || undefined,
+          payerZip: (s.buyer.zip ?? "").trim().slice(0, 24) || undefined,
           country: ctry,
           paymentType: kind,
           currency: dlCurrency,

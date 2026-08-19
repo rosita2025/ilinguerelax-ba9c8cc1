@@ -899,7 +899,7 @@ const Product5000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        sku={ADMIN_SKU_5000}
+        sku={PRODUCT_SKU}
         price={safePriceLabel}
            originalPrice={pricing5000Ready ? displayOriginalPrice : undefined}
            currencyCode={displayCurrency}

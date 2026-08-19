@@ -661,7 +661,7 @@ const Product8000 = () => {
         reviewCount={10000}
         ctaText={"Comprar ahora"}
         onBuyClick={handleBuyNow}
-        sku={ADMIN_SKU_8000}
+        sku={PRODUCT_SKU}
         usdValue={priceUsd}
       />
       

@@ -135,7 +135,7 @@ export function buildShippingEmail(input: BuildInput): { subject: string; html: 
         preheader: "Tu material digital ya está en tu correo. El tracking del libro llega en breve.",
         headline: "¡Gracias por tu compra!",
         orderNumber: input.orderNumber,
-        intro: `Hola ${name}, tu pedido <strong>${order}</strong> ya está confirmado.`,
+        intro: `${greeting}, tu pedido <strong>${order}</strong> ya está confirmado.`,
         bodyHtml: `
           <div style="background:${BRAND.soft};border:1px solid ${BRAND.border};padding:18px;border-radius:12px;margin:18px 0;">
             <p style="margin:0 0 10px;font-size:15px;color:${BRAND.text};"><strong>1. Material digital:</strong> ya fue enviado a este mismo correo. Puedes empezar a estudiar hoy mismo.</p>
@@ -156,7 +156,7 @@ export function buildShippingEmail(input: BuildInput): { subject: string; html: 
         preheader: "Tu pedido figura como entregado.",
         headline: "Tu pedido fue entregado",
         orderNumber: input.orderNumber,
-        intro: `Hola ${name}, el transportista marcó tu pedido <strong>${order}</strong> como entregado.`,
+        intro: `${greeting}, el transportista marcó tu pedido <strong>${order}</strong> como entregado.`,
         bodyHtml: `${tracking ? trackingBox : ""}
           <p style="font-size:14px;color:#4b5563;line-height:1.6;margin:0;">Si aún no lo recibiste, respóndenos a este correo y lo revisamos contigo.</p>`,
         ctaText: "Ver mi pedido",
@@ -177,8 +177,8 @@ export function buildShippingEmail(input: BuildInput): { subject: string; html: 
       headline: updated ? "Seguimiento actualizado" : "¡Tu pedido está en camino!",
       orderNumber: input.orderNumber,
       intro: updated
-        ? `Hola ${name}, actualizamos los datos de envío de tu pedido <strong>${order}</strong>.`
-        : `Hola ${name}, tu pedido <strong>${order}</strong> ya fue despachado.`,
+        ? `${greeting}, actualizamos los datos de envío de tu pedido <strong>${order}</strong>.`
+        : `${greeting}, tu pedido <strong>${order}</strong> ya fue despachado.`,
       bodyHtml: `${trackingBox}
         ${trackingUrl ? "" : `<p style="font-size:14px;color:#4b5563;line-height:1.6;margin:0;">Puedes rastrearlo ingresando el número anterior en la web del transportista.</p>`}`,
       ctaText: trackingUrl ? "Rastrear mi pedido" : "Ver mi pedido",

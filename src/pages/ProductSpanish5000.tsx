@@ -857,7 +857,7 @@ const ProductSpanish5000 = () => {
         sku={PRODUCT_SKU}
         price={campaign.price} 
         originalPrice={campaign.originalPrice} 
-        currencyCode={currency} 
+        currencyCode={campaign.currency} 
 
 
         productName={productPricing.name ?? "Book Physical & Digital — FREE Bonuses"} 

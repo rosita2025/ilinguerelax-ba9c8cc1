@@ -144,7 +144,20 @@ Deno.serve(async (req) => {
         purchase_units: [{
           reference_id: correlationId.slice(0, 255),
           custom_id: correlationId.slice(0, 127),
-          amount: { currency_code: currency, value: amount.toFixed(2) },
+          amount: { 
+            currency_code: currency, 
+            value: amount.toFixed(2),
+            breakdown: {
+              item_total: {
+                currency_code: currency,
+                value: (amount - (shippingUsd * (currency === "USD" ? 1 : (amount / pricing.totalUsd))) ).toFixed(2)
+              },
+              shipping: {
+                currency_code: currency,
+                value: (shippingUsd * (currency === "USD" ? 1 : (amount / pricing.totalUsd))).toFixed(2)
+              }
+            }
+          },
           description,
         }],
         ...(buyerEmail && { payer: { email_address: buyerEmail } }),

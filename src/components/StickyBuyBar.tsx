@@ -237,7 +237,7 @@ export const StickyBuyBar = ({
         const regionalUsd = localUsdPrices && localUsdPrices[currency];
         const finalUsdValue = typeof regionalUsd === "number" && regionalUsd > 0 
           ? regionalUsd 
-          : (usdValue || parseFloat(String(price).replace(/[^\d.,-]/g, "").replace(",", ".")));
+          : (usdValue || parseFloat(String(price).replace(/[^\d.,]/g, "").replace(",", ".")));
 
         trackHotmartEvent("AddToCart", {
           content_ids: sku ? [sku] : undefined,

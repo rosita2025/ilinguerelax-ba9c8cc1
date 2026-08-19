@@ -93,11 +93,12 @@ Deno.serve(async (req) => {
     
     // Server-side subtotal for shipping threshold
     const subtotalUsd = pricing.items.reduce((sum, it) => sum + (it.unitUsd * it.quantity), 0);
-    const shippingUsd = isPhysical ? (subtotalUsd >= 50 ? 0 : shippingUsdBase) : 0;
+    const hasUpsell = pricing.items.length > 1;
+    const shippingUsd = (isPhysical && !hasUpsell) ? (subtotalUsd >= 50 ? 0 : shippingUsdBase) : 0;
     
     // Convert shipping to local currency if needed
     let shippingAmountCents = 0;
-    if (shippingUsd > 0) {
+    if (shippingUsd > 0 && !hasUpsell) {
       if (currency === "usd") {
         shippingAmountCents = Math.round(shippingUsd * 100);
       } else {

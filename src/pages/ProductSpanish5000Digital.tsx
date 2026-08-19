@@ -327,7 +327,7 @@ const ProductSpanish5000Digital = () => {
               </div>
 
               {/* Added Trust Icons */}
-              <div className="grid grid-cols-2 gap-4 mt-6">
+              <div className="grid grid-cols-2 gap-4 mt-6 w-full max-w-md mx-auto md:mx-0">
                 <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
                   <Shield className="w-5 h-5 text-emerald-600" />
                   <div>

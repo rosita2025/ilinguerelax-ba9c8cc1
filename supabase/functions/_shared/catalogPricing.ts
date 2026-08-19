@@ -133,11 +133,13 @@ function pickTierPrice(row: Record<string, unknown>, tier: RegionTier, currency?
   const global = Number(row.price_usd) || 0;
   const latam = row.price_usd_latam != null ? Number(row.price_usd_latam) : global;
   const tienda = row.price_usd_tienda != null ? Number(row.price_usd_tienda) : latam;
+  
+  // Rule: strictly 3-tier USD model
   const value = tier === "tienda" ? tienda : tier === "latam" ? latam : global;
   
   const finalPrice = Number.isFinite(value) && value > 0 ? value : global;
   if (currency) {
-    console.log(`[Pricing] No regional USD override for ${currency.toUpperCase()}, using tier ${tier}: $${finalPrice} (SKU: ${row.sku})`);
+    console.log(`[Pricing] Resolving for currency ${currency.toUpperCase()}, Tier: ${tier}, Final Price: $${finalPrice} (SKU: ${row.sku})`);
   }
   return finalPrice;
 }

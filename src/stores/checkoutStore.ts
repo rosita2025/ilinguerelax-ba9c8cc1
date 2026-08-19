@@ -32,9 +32,13 @@ export function itemPrice(item: PruebaItem, tier: RegionTier): number {
     if (typeof window === "undefined") return "";
     try { return (localStorage.getItem("ilr_country") || "").toUpperCase(); } catch { return ""; }
   })();
+  
+  // TIER TIENDA (VE, CU, NI)
   if (["VE", "CU", "NI"].includes(country) && item.regionPrices?.tienda) {
     return item.regionPrices.tienda;
   }
+  
+  // TIER LATAM vs GLOBAL
   return item.regionPrices?.[tier] ?? item.price;
 }
 

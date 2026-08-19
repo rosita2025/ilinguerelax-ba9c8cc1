@@ -39,7 +39,8 @@ export const useCheckoutTotal = (
 
     const discountLocal = (subtotalLocal * Math.max(0, Math.min(100, couponPercent || 0))) / 100;
     
-    // El envío es gratis si el subtotal USD >= 50
+    // El envío es obligatorio $8.00 / $9.00 USD para productos físicos
+    // Gratis si el subtotal USD >= 50
     const shippingUsd = items.some(i => i.isPhysical) 
       ? (subtotalUSD >= 50 ? 0 : shippingCostUSD) 
       : 0;
@@ -47,8 +48,8 @@ export const useCheckoutTotal = (
     const shippingLocal = shippingUsd * rate;
     const totalLocal = Math.max(0, subtotalLocal - discountLocal + shippingLocal);
 
-    // Referencia USD real del total (para Gateways que no soportan moneda local)
-    const totalUsd = totalLocal / rate;
+    // TOTAL USD COMPLETO (Base + Envío) - Crítico para pasarelas
+    const totalUsd = subtotalUSD - (subtotalUSD * couponPercent / 100) + shippingUsd;
 
     return {
       subtotalLocal,

@@ -360,10 +360,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   );
 
   const totals = useMemo(() => calcTotals(items, couponPercent, region.tier), [items, couponPercent, region.tier]);
-  const { total, subtotal } = totals;
-  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : shippingCostUSD) : 0;
-  const grandTotal = total + shipping;
-  const totalUsd = useMemo(() => grandTotal.toFixed(2), [grandTotal]);
+  const { total: subtotalAfterDiscount, subtotal: subtotalRaw } = totals;
+  
+  // Lógica de envío centralizada
+  const shippingUsd = items.some((i) => i.isPhysical) ? (subtotalRaw >= 50 ? 0 : shippingCostUSD) : 0;
+  const grandTotalUsd = subtotalAfterDiscount + shippingUsd;
+  const totalUsd = useMemo(() => grandTotalUsd.toFixed(2), [grandTotalUsd]);
   
   const penTotals = calcTotalsPen(items, couponPercent, countryCode);
   const isRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(countryCode);
@@ -2531,14 +2533,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
           ) : selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) ? (
             <><Lock className="w-4 h-4" /> {language === "en"
-              ? `Checkout Securely · ${finalPriceLabel}`
+              ? `Checkout Securely · USD $${totalUsd}`
               : language === "pt"
-                ? `Continuar para pagamento · ${finalPriceLabel}`
+                ? `Continuar para pagamento · USD $${totalUsd}`
                 : language === "fr"
-                  ? `Continuer vers le paiement · ${finalPriceLabel}`
-                  : `Continuar de Pago · ${finalPriceLabel}`}</>
+                  ? `Continuer vers le paiement · USD $${totalUsd}`
+                  : `Continuar de Pago · USD $${totalUsd}`}</>
           ) : (
-            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? `Checkout with Hotmart · ${finalPriceLabel}` : `Pagar con Hotmart · ${finalPriceLabel}`) : `${t.buyNow} · ${finalPriceLabel}`}</>
+            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? `Checkout with Hotmart · USD $${totalUsd}` : `Pagar con Hotmart · USD $${totalUsd}`) : `${t.buyNow} · USD $${totalUsd}`}</>
           )}
         </button>
       )}

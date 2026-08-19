@@ -432,6 +432,18 @@ Deno.serve(async (req) => {
       console.error("dLocal thank-you failed:", e);
     }
 
+    await upsertPhysicalShipment({
+      adminClient: supabase,
+      orderNumber,
+      email: customerEmail,
+      customerName,
+      provider: "dlocalgo",
+      address: { country: country ?? null },
+      skus,
+    });
+
+
+
     if (skus.length > 0) {
       // Una sola ruta de entrega. Usa `manual-material-<pedido>`, la misma llave
       // que conciliación y barrido, evitando los dos correos de materiales que

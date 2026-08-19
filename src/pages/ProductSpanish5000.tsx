@@ -495,11 +495,17 @@ const ProductSpanish5000 = () => {
                     <span className="text-lg text-muted-foreground line-through">{campaign.originalPrice}</span>
                     <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-1 rounded-full">BEST VALUE</span>
                   </div>
-                  <Button onClick={handleBuyNow} size="xl" className="w-full bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-500 hover:to-amber-500 text-slate-900 border-amber-500 font-bold shadow-lg">
-                    <ShoppingCart className="w-5 h-5" />
-                    ORDER PHYSICAL BOOK — {campaign.price}
-                    <ArrowRight className="w-5 h-5" />
-                  </Button>
+                  <div className="w-full px-1">
+                    <Button 
+                      onClick={handleBuyNow} 
+                      size="xl" 
+                      className="w-full max-w-full bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-500 hover:to-amber-500 text-slate-900 border-amber-500 font-bold shadow-lg text-xs sm:text-sm py-3 px-2 whitespace-normal text-center rounded-xl h-auto min-h-[50px]"
+                    >
+                      <ShoppingCart className="w-4 h-4 sm:w-5 h-5" />
+                      ORDER PHYSICAL BOOK — {campaign.price}
+                      <ArrowRight className="w-4 h-4 sm:w-5 h-5" />
+                    </Button>
+                  </div>
 
 
                   <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground pt-1">
@@ -508,7 +514,9 @@ const ProductSpanish5000 = () => {
                   </div>
 
                 </div>
+                </div>
               </div>
+              <div className="mb-12 pb-8" />
             </div>
           </div>
         </div>

@@ -71,7 +71,7 @@ export function PayPalButtons({
         setClientId(data.clientId);
       } catch (e) {
         console.error("[paypal-buttons] config error:", e);
-        setConfigError((e as Error).message);
+        setConfigError((e as any)?.message || String(e));
       } finally {
         setLoadingConfig(false);
       }

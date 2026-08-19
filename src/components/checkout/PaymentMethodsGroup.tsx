@@ -1116,6 +1116,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       `Adjunto captura del pago. Gracias!`;
     const waUrl = `https://wa.me/12512724704?text=${encodeURIComponent(msg)}`;
 
+    setMpLoading("binance");
+    setMethodError(null);
+
     try {
       await supabase.from("manual_payments").insert({
         order_number: orderNumber,
@@ -1130,67 +1133,70 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         items: s.items.map((i) => ({ sku: i.id, name: i.name, quantity: i.quantity, price: i.price })),
         status: "pending",
       });
-    } catch (e) {
-      console.warn("[manual_payments] binance insert failed", e);
+
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "admin-manual-pending",
+          idempotencyKey: `manual-pending-${orderNumber}`,
+          templateData: {
+            orderNumber,
+            customerName: s.buyer.fullName.trim(),
+            customerEmail: s.buyer.email.trim().toLowerCase(),
+            customerPhone: s.buyer.phone ?? "",
+            customerCountry: (region.country || "").toUpperCase(),
+            productName: s.items.map((i) => i.name).join(" + "),
+            amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+            currency: local.currency || "USD",
+            method: "Binance Pay",
+            orderDate: new Date().toISOString(),
+          },
+        },
+      }).catch((err) => console.warn("[admin-manual-pending] binance notify failed", err));
+
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "customer-manual-pending",
+          recipientEmail: s.buyer.email.trim().toLowerCase(),
+          idempotencyKey: `customer-manual-pending-${orderNumber}`,
+          templateData: {
+            orderNumber,
+            customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
+            productName: s.items.map((i) => i.name).join(" + "),
+            amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+            currency: local.currency || "USD",
+            amountUsd: Number(totalUsd),
+            method: "Binance Pay",
+            binancePayId: binanceCfg.pay_id,
+            binanceAddress: binanceCfg.address,
+            binanceNetwork: binanceCfg.network,
+            orderDate: new Date().toISOString(),
+          },
+        },
+      }).catch((err) => console.warn("[customer-manual-pending] binance notify failed", err));
+
+      supabase.from("email_contacts").upsert({
+        email: s.buyer.email.trim().toLowerCase(),
+        name: s.buyer.fullName.trim(),
+        source: "checkout-prueba-1",
+        metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "binance_pay", orderNumber },
+      }, { onConflict: "email,source" }).then(() => {});
+
+      window.open(waUrl, "_blank", "noopener,noreferrer");
+      const q = new URLSearchParams({
+        order: orderNumber,
+        name: s.buyer.fullName.trim(),
+        email: s.buyer.email.trim(),
+        amount: `${amountText} (USD $${totalUsd})`,
+        method: "Binance Pay",
+        products: s.items.map((i) => `${i.name} x${i.quantity}`).join(" | "),
+      }).toString();
+      navigate(`/checkouts/pendiente-manual?${q}`);
+    } catch (err) {
+      setMpLoading(null);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setMethodError({ method: "binance", message: errorMessage });
+      toast({ title: "Error Binance", description: errorMessage, variant: "destructive" });
     }
-
-    supabase.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "admin-manual-pending",
-        idempotencyKey: `manual-pending-${orderNumber}`,
-        templateData: {
-          orderNumber,
-          customerName: s.buyer.fullName.trim(),
-          customerEmail: s.buyer.email.trim().toLowerCase(),
-          customerPhone: s.buyer.phone ?? "",
-          customerCountry: (region.country || "").toUpperCase(),
-          productName: s.items.map((i) => i.name).join(" + "),
-          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
-          currency: local.currency || "USD",
-          method: "Binance Pay",
-          orderDate: new Date().toISOString(),
-        },
-      },
-    }).catch((err) => console.warn("[admin-manual-pending] binance notify failed", err));
-
-    supabase.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "customer-manual-pending",
-        recipientEmail: s.buyer.email.trim().toLowerCase(),
-        idempotencyKey: `customer-manual-pending-${orderNumber}`,
-        templateData: {
-          orderNumber,
-          customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
-          productName: s.items.map((i) => i.name).join(" + "),
-          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
-          currency: local.currency || "USD",
-          amountUsd: Number(totalUsd),
-          method: "Binance Pay",
-          binancePayId: binanceCfg.pay_id,
-          binanceAddress: binanceCfg.address,
-          binanceNetwork: binanceCfg.network,
-          orderDate: new Date().toISOString(),
-        },
-      },
-    }).catch((err) => console.warn("[customer-manual-pending] binance notify failed", err));
-
-    supabase.from("email_contacts").upsert({
-      email: s.buyer.email.trim().toLowerCase(),
-      name: s.buyer.fullName.trim(),
-      source: "checkout-prueba-1",
-      metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "binance_pay", orderNumber },
-    }, { onConflict: "email,source" }).then(() => {});
-
-    window.open(waUrl, "_blank", "noopener,noreferrer");
-    const q = new URLSearchParams({
-      order: orderNumber,
-      name: s.buyer.fullName.trim(),
-      email: s.buyer.email.trim(),
-      amount: `${amountText} (USD $${totalUsd})`,
-      method: "Binance Pay",
-      products: s.items.map((i) => `${i.name} x${i.quantity}`).join(" | "),
-    }).toString();
-    navigate(`/checkouts/pendiente-manual?${q}`);
   };
 
   const copyClabe = async () => {

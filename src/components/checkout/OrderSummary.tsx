@@ -40,19 +40,26 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(!collapsible);
-  const totals = useMemo(() => calcTotals(items, couponPercent, region.tier), [items, couponPercent, region.tier]);
-  const { subtotal, discount, total } = totals;
-  
-  // Lógica de costo de envío: Latam $9, Resto (USA/CAN/UK) $8 (o free > 50). 
-  // Si es Asia no se permite pagar (se maneja en PaymentMethodsGroup, pero aquí mostramos costo estimado o aviso)
-  const shippingCost = isLatam ? 9 : 8;
-  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : shippingCost) : 0;
-  const grandTotal = total + shipping;
-  const penTotals = calcTotalsPen(items, couponPercent, country);
+
   const overridesFor = useSkuOverridesResolver();
-  const localTotal = useLocalCurrency(total);
-  const localSubtotal = useLocalCurrency(subtotal);
-  const localDiscount = useLocalCurrency(discount);
+  const shippingCostUSD = isLatam ? 9 : 8;
+
+  const { 
+    subtotalLocal, 
+    discountLocal, 
+    shippingLocal, 
+    totalLocal, 
+    currency 
+  } = require("@/hooks/useCheckoutTotal").useCheckoutTotal(
+    items, 
+    couponPercent, 
+    region.tier, 
+    country, 
+    shippingCostUSD, 
+    overridesFor
+  );
+
+  const penTotals = calcTotalsPen(items, couponPercent, country);
   const isGlobalGateway = selectedMethod && (
     selectedMethod.startsWith("stripe") || 
     selectedMethod.startsWith("dlocal") || 
@@ -65,27 +72,12 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   );
 
   const penMode = penTotals !== null && !isGlobalGateway;
-  const showLocalRef = !localTotal.loading; // Remove !penMode restriction to ensure USD ref always shows
-  // Local totals honoring per-sku overrides from /admin/products/:sku
-  const localItemsSum = useMemo(() => sumItemsLocal(
-    items.map((i) => ({ id: i.id, sku: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
-    region.country || "",
-    overridesFor,
-  ), [items, region.country, region.tier, overridesFor]);
-  const localSubtotalAmount = localItemsSum.amount;
-  const localTotalAmount = (localSubtotalAmount * (1 - (couponPercent || 0) / 100)) + shipping;
-  const currentUsdRef = localItemsSum.usdReference;
-  const localTotalLabel = showLocalRef ? formatLocalDirect(localTotalAmount, region.country || "") : formatCurrencyAmount(grandTotal, "USD");
-  const breakdown = useCurrencyBreakdown(total, null, items[0]?.localUsdPrices);
+  const showLocalRef = currency !== "USD";
 
-  const fmtMoney = (usd: number, _local: { formatted: string }, penAmount?: number) =>
-    penMode && penAmount != null
-      ? formatPen(penAmount)
-      : showLocalRef
-        ? _local.formatted
-        : formatCurrencyAmount(usd, "USD");
-  void localSubtotal; void localDiscount;
-  const hasRegionalItem = items.some((i) => i.regionPrices);
+  const localTotalLabel = formatLocalDirect(totalLocal, country);
+  const currentUsdRef = totalLocal / (require("@/i18n").exchangeRates[currency] || 1);
+  const breakdown = useCurrencyBreakdown(totalLocal / (require("@/i18n").exchangeRates[currency] || 1), null, items[0]?.localUsdPrices);
+
 
 
   const handleApplyCoupon = () => {

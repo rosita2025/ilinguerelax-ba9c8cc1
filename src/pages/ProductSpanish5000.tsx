@@ -33,6 +33,7 @@ import bonus2ImageAvif from "@/assets/bonus-2-daily-planner.avif";
 import bonus3Image from "@/assets/bonus-3-pronunciation.webp";
 import bonus3ImageAvif from "@/assets/bonus-3-pronunciation.avif";
 import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp, Eye, Package, Tag, BadgeCheck, Truck, CalendarClock } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Product image
 import productSpanish5000Image from "@/assets/spanish-5000-physical-cover.webp";

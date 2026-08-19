@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { formatCurrencyAmount, formatAmountLocalized, exchangeRates } from "@/i18n";
-import { PayPalButtons } from "@/components/checkout/PayPalButtons";
+
 import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { trackPaymentError, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -36,7 +36,7 @@ import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useCheckoutTotal } from "@/hooks/useCheckoutTotal";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
 
 const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
@@ -121,7 +121,7 @@ function methodSection(id: string): MethodSection {
   if (["card", "dlocal_card", "stripe_klarna"].includes(id)) return "cards";
   if (["transfer", "stripe_ach", "dlocal_transfer", "clabe"].includes(id)) return "transfer";
   if (["cash", "dlocal_cash"].includes(id)) return "cash";
-  if (["paypal", "yape", "binance", "dlocal_wallet", "stripe_cashapp"].includes(id)) return "wallet";
+  if (["yape", "binance", "dlocal_wallet", "stripe_cashapp"].includes(id)) return "wallet";
   return "other";
 }
 
@@ -380,7 +380,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     selectedMethod.startsWith("stripe") || 
     selectedMethod.startsWith("dlocal") || 
     selectedMethod === "card" || 
-    selectedMethod === "paypal" || 
     selectedMethod === "binance" ||
     selectedMethod === "clabe" ||
     selectedMethod === "yape" ||
@@ -1515,7 +1514,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     { id: "stripe_ach", icon: Building2, title: language === "en" ? "ACH Bank Transfer" : "Transferencia bancaria ACH", sub: language === "en" ? "Pay from a US bank account inside Stripe." : "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe.", badge: finalPriceLabel },
     { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: language === "en" ? "Pay with Cash App within Stripe's secure form." : "Paga con Cash App dentro del formulario seguro de Stripe.", badge: finalPriceLabel },
     { id: "stripe_klarna", icon: Wallet, title: language === "en" ? "Klarna — Pay in 4" : "Klarna — Paga en 4", sub: language === "en" ? "Split your purchase into 4 interest-free installments inside Stripe." : "Divide tu compra en 4 cuotas sin interés dentro de Stripe.", badge: finalPriceLabel },
-    { id: "paypal", icon: Wallet, title: "PayPal", sub: language === "en" ? "Pay with your PayPal balance or linked card." : language === "pt" ? "Pague com seu saldo PayPal ou cartão vinculado." : language === "fr" ? "Payez avec votre solde PayPal ou carte liée." : "Paga con tu saldo PayPal o tarjeta vinculada.", badge: finalPriceLabel },
+    
     { id: "transfer", icon: Building2, title: t.bankTransfer, sub: t.bankTransferSub(localBadge), badge: finalPriceLabel },
     { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: finalPriceLabel },
     { id: "yape", icon: Smartphone, title: t.yapePlin, sub: t.yapePlinSub, badge: finalPriceLabel },
@@ -1668,7 +1667,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         if (m.id === "stripe_ach") return isUsa && methodsConfig.stripeAch;
         if (m.id === "stripe_cashapp") return isUsa && methodsConfig.stripeCashApp;
         if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna;
-        if (m.id === "paypal") return methodsConfig.paypal;
+        
         // Rails locales de Perú (transferencia BCP/Interbank, efectivo, Yape/Plin)
         // SOLO deben verse desde Perú. Un comprador en México no puede pagar a
         // cuentas peruanas: para MX el rail local es SPEI/CLABE.
@@ -2455,57 +2454,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
 
-            {m.id === "paypal" && isSelected && (
-              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-4 py-6 space-y-6">
-                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-4 text-center border border-neutral-200 dark:border-neutral-700">
-                  <p className="text-[10px] uppercase tracking-wider font-bold text-neutral-500 dark:text-neutral-400 mb-1">{t.amountToPay}</p>
-                  <p className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-                    USD ${totalUsd}
-                  </p>
-                </div>
-                <div className="flex justify-center w-full px-2">
-                <PayPalButtons
-                  amountUsd={Number(totalUsd)}
-                  localCurrency={countryCode === "PE" ? "PEN" : currency}
-                  localAmount={totalLocal}
-                  description={items.map((i) => i.name).join(" + ").slice(0, 120) || "iLingue Relax"}
-                  buyerEmail={buyer.email.trim() || undefined}
-                  buyerName={buyer.fullName.trim() || undefined}
-                  buyerPhone={buyer.phone || undefined}
-                  buyerCountry={countryCode || undefined}
-                  skus={items.map((i) => i.id)}
-                  couponCode={coupon ?? undefined}
-                  items={items.map(i => ({ id: i.id, quantity: i.quantity || 1, price: itemPrice(i, region.tier) }))}
-                  onApproved={(orderId) => {
-                    supabase.from("email_contacts").upsert({
-                      email: buyer.email.trim().toLowerCase(),
-                      name: buyer.fullName.trim(),
-                      source: "checkout-prueba-1",
-                      metadata: { phone: buyer.phone ?? "", processor: "paypal", orderId },
-                    }, { onConflict: "email,source" }).then(() => {});
-                    trackPurchase(orderId, "paypal");
-                    navigate(`/checkouts/success?paypal_order=${encodeURIComponent(orderId)}`);
-                  }}
-                  onError={(err) => {
-                    try {
-                      const totals = calcTotals(items, couponPercent, region.tier);
-                      trackPaymentError({
-                        provider: "paypal",
-                        skus: items.map((i) => i.id),
-                        reason: err instanceof Error ? err.message : String(err),
-                        value: totals.total,
-                        currency: "USD", // Forzado a USD para Ads/Tracking
-                      });
-                    } catch { /* noop */ }
-                  }}
-                />
-                </div>
-
-                <p className="text-[11px] text-center text-neutral-500">
-                  {language === "en" ? "Secure checkout by PayPal." : language === "pt" ? "Checkout seguro pelo PayPal." : language === "fr" ? "Paiement sécurisé par PayPal." : "Pago seguro procesado por PayPal."}
-                </p>
-              </div>
-            )}
           </div>
           </React.Fragment>
         );
@@ -2517,7 +2465,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         </p>
       )}
 
-      {selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "paypal" && selected !== "dlocal_card" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
+      {selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "dlocal_card" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
         <button
           type="button"
           onClick={handleBuyNow}

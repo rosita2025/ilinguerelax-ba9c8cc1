@@ -32,9 +32,9 @@ const LOCAL_METHODS: Record<string, string> = {
   VE: "Binance Pay (USDT)",
   CU: "Binance Pay (USDT)",
   NI: "Binance Pay (USDT)",
-  US: "PayPal",
-  CA: "PayPal",
-  ES: "PayPal y Hotmart",
+  US: "Stripe",
+  CA: "Stripe",
+  ES: "Stripe y Hotmart",
 };
 
 const REASON_LABEL: Record<string, string> = {
@@ -60,7 +60,7 @@ function suggestionsFor(reason: string, country: string): Suggestion[] {
   if (reason.includes("502") || reason.includes("503") || reason.includes("Gateway") || reason.includes("Network")) {
     out.push({
       kind: "provider",
-      text: `Downtime detectado en el proveedor. Si los errores persisten, considera priorizar otros métodos como ${local || "PayPal"} temporalmente.`,
+      text: `Downtime detectado en el proveedor. Si los errores persisten, considera priorizar otros métodos como ${local || "tarjeta"} temporalmente.`,
     });
     out.push({
       kind: "copy",
@@ -76,7 +76,7 @@ function suggestionsFor(reason: string, country: string): Suggestion[] {
         kind: "method",
         text: local
           ? `Muestra primero ${local} en ${country}: el banco emisor está rechazando la tarjeta internacional.`
-          : "Prioriza PayPal sobre tarjeta: el banco emisor está rechazando el cargo internacional.",
+          : "Prioriza otro método sobre tarjeta: el banco emisor está rechazando el cargo internacional.",
       });
       out.push({ kind: "copy", text: "Añade el aviso «Si tu banco rechaza el pago, autoriza compras internacionales o usa otro método» debajo del formulario." });
       break;
@@ -92,7 +92,7 @@ function suggestionsFor(reason: string, country: string): Suggestion[] {
       break;
     case "authentication_required":
       out.push({ kind: "copy", text: "Avisa antes de pagar: «Tu banco te pedirá confirmar con un código (3D Secure). No cierres la ventana»." });
-      out.push({ kind: "method", text: local ? `Deja visible ${local} como alternativa sin 3D Secure.` : "Deja visible PayPal como alternativa sin 3D Secure." });
+      out.push({ kind: "method", text: local ? `Deja visible ${local} como alternativa sin 3D Secure.` : "Deja visible otro método como alternativa sin 3D Secure." });
       break;
     case "processing_error":
       out.push({ kind: "provider", text: "Fallo del procesador: reintenta automáticamente una vez y ofrece cambiar de proveedor si vuelve a fallar." });
@@ -102,7 +102,7 @@ function suggestionsFor(reason: string, country: string): Suggestion[] {
       break;
     case "StripeInvalidRequestError":
       out.push({ kind: "provider", text: "Error de configuración en Stripe: forzamos el modo 'embedded' sin tipos de método explícitos para USD." });
-      out.push({ kind: "method", text: local ? `Usa ${local} como alternativa segura mientras Stripe se estabiliza.` : "Usa PayPal como alternativa." });
+      out.push({ kind: "method", text: local ? `Usa ${local} como alternativa segura mientras Stripe se estabiliza.` : "Usa un método alternativo." });
       break;
     default:
       out.push({ kind: "method", text: local ? `Prueba destacando ${local} para este país y compara la tasa de conversión.` : "Prueba reordenando los métodos de pago para este país." });

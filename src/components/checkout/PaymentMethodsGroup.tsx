@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { formatCurrencyAmount, formatAmountLocalized, exchangeRates } from "@/i18n";
-import { PayPalButtons } from "@/components/checkout/PayPalButtons";
+
 import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { trackPaymentError, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -36,7 +36,7 @@ import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useCheckoutTotal } from "@/hooks/useCheckoutTotal";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
 
 const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
@@ -121,7 +121,7 @@ function methodSection(id: string): MethodSection {
   if (["card", "dlocal_card", "stripe_klarna"].includes(id)) return "cards";
   if (["transfer", "stripe_ach", "dlocal_transfer", "clabe"].includes(id)) return "transfer";
   if (["cash", "dlocal_cash"].includes(id)) return "cash";
-  if (["paypal", "yape", "binance", "dlocal_wallet", "stripe_cashapp"].includes(id)) return "wallet";
+  if (["yape", "binance", "dlocal_wallet", "stripe_cashapp"].includes(id)) return "wallet";
   return "other";
 }
 
@@ -380,7 +380,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     selectedMethod.startsWith("stripe") || 
     selectedMethod.startsWith("dlocal") || 
     selectedMethod === "card" || 
-    selectedMethod === "paypal" || 
     selectedMethod === "binance" ||
     selectedMethod === "clabe" ||
     selectedMethod === "yape" ||

@@ -1928,6 +1928,48 @@ export type Database = {
         }
         Relationships: []
       }
+      physical_shipments: {
+        Row: {
+          created_at: string
+          customer_name: string | null
+          email: string | null
+          order_number: string
+          provider: string | null
+          shipping_address: Json | null
+          shipping_proof_url: string | null
+          shipping_provider: string | null
+          status: string
+          tracking_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_name?: string | null
+          email?: string | null
+          order_number: string
+          provider?: string | null
+          shipping_address?: Json | null
+          shipping_proof_url?: string | null
+          shipping_provider?: string | null
+          status?: string
+          tracking_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_name?: string | null
+          email?: string | null
+          order_number?: string
+          provider?: string | null
+          shipping_address?: Json | null
+          shipping_proof_url?: string | null
+          shipping_provider?: string | null
+          status?: string
+          tracking_number?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pinterest_publications: {
         Row: {
           created_at: string

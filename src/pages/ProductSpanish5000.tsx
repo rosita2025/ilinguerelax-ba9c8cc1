@@ -154,7 +154,9 @@ const ProductSpanish5000 = () => {
       price: tier.priceLabel,
       originalPrice: tier.originalLabel || undefined,
       currency: tier.currencyCode,
-      discountPercentage: tier.discountPercentage
+      discountPercentage: tier.discountPercentage,
+      finalPriceAmount: tier.finalPriceAmount,
+      priceUsd: tier.priceUsd
     };
   }, [tier]);
 
@@ -208,7 +210,7 @@ const ProductSpanish5000 = () => {
   const dynamicCtaText = stickyCtaText;
   const stickyPriceLabel = campaign.price;
   const stickyOriginalLabel = campaign.originalPrice;
-  const stickyCurrency = currency;
+  const stickyCurrency = campaign.currency;
   const handleStickyBuy = async () => {
     navigate('/checkout/5-000-spanish-words-with-english-pronunciation-physical');
   };
@@ -855,7 +857,7 @@ const ProductSpanish5000 = () => {
         sku={PRODUCT_SKU}
         price={campaign.price} 
         originalPrice={campaign.originalPrice} 
-        currencyCode={currency} 
+        currencyCode={campaign.currency} 
 
 
         productName={productPricing.name ?? "Book Physical & Digital — FREE Bonuses"} 
@@ -871,7 +873,7 @@ const ProductSpanish5000 = () => {
         isLoading={isCreatingDigitalCheckout} 
         disabled={isCreatingDigitalCheckout} 
         goesToInternalCheckout={true}
-        usdValue={productPricing.priceGlobalUsd || 44}
+        usdValue={campaign.priceUsd}
         localUsdPrices={productPricing.localUsdPrices}
         flag={productPricing.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
       />

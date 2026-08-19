@@ -6,6 +6,8 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
+import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 
 import { FAQ } from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
@@ -95,6 +97,12 @@ const ProductSpanish3000VerbsBook = () => {
 
 
   const PRODUCT_SKU = "spanish-3000-verbs-book";
+  const pricing = useAdminPricing(PRODUCT_SKU);
+  const tier = useCountryTierRouting(PRODUCT_SKU, {
+    fallbackPriceGlobalUsd: PREORDER_PRICE,
+    fallbackPriceLatamUsd: PREORDER_PRICE,
+  });
+
   const handleAddToCart = async () => {
     navigate(`/checkouts/${PRODUCT_SKU}`);
   };
@@ -270,10 +278,9 @@ const ProductSpanish3000VerbsBook = () => {
 
                 <div className="flex items-baseline gap-3 mb-1 flex-wrap">
                   <span className="text-5xl md:text-6xl font-black text-white">
-                    ${PREORDER_PRICE}
+                    {tier.priceLabel}
                   </span>
-                  <span className="text-2xl text-slate-500 line-through">${RETAIL_PRICE}</span>
-                  <span className="text-cyan-300 font-bold">USD</span>
+                  <span className="text-2xl text-slate-500 line-through">{tier.originalLabel}</span>
                 </div>
 
                 <p className="text-sm text-slate-300 mb-3">
@@ -323,7 +330,7 @@ const ProductSpanish3000VerbsBook = () => {
                 ) : (
                   <ShoppingCart className="w-6 h-6 mr-2" />
                 )}
-                {`PRE-ORDER THE 3,000 VERBS BOOK — $${PREORDER_PRICE}`}
+                {`PRE-ORDER THE 3,000 VERBS BOOK — ${tier.priceLabel}`}
               </Button>
               <p className="text-xs text-center text-slate-400 mb-5">
                 Add the Verb Mastery to my collection · Secure checkout · Ships June 2026
@@ -621,11 +628,11 @@ const ProductSpanish3000VerbsBook = () => {
       <StickyBuyBar
         lang="en"
         productName="3,000 Spanish Verbs Mastery — Pre-Order"
-        price={formatPrice(PREORDER_PRICE, currency)}
-        originalPrice={formatPrice(RETAIL_PRICE, currency)}
+        price={tier.priceLabel}
+        originalPrice={tier.originalLabel || undefined}
         rating={4.9}
         reviewCount={1200}
-        ctaText={`PRE-ORDER NOW — ${formatPrice(PREORDER_PRICE, currency)}`}
+        ctaText={`PRE-ORDER NOW — ${tier.priceLabel}`}
         onBuyClick={handleAddToCart}
         isLoading={cartLoading}
         disabled={false}
@@ -633,7 +640,9 @@ const ProductSpanish3000VerbsBook = () => {
         goesToInternalCheckout={true}
         sku={PRODUCT_SKU}
         currencyCode={currency}
-        flag={currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎"}
+        flag={tier.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
+        usdValue={tier.priceUsd}
+        localUsdPrices={pricing.localUsdPrices}
       />
     </main>
   );

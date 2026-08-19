@@ -4,7 +4,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { useCampaignPrice } from "@/hooks/useCampaignPrice";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/i18n/I18nContext";
@@ -144,7 +144,7 @@ const HOTMART_8000_LATAM = "https://pay.hotmart.com/U103990323W?checkoutMode=10"
 
 const Product8000 = () => {
   const { currency, countryCode } = useI18n();
-  const campaign = useCampaignPrice(20, 54);
+  const pricing = useAdminPricing(ADMIN_SKU_8000);
   const navigate = useNavigate();
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
@@ -665,7 +665,8 @@ const Product8000 = () => {
         ctaText={"Comprar ahora"}
         onBuyClick={handleBuyNow}
         sku={PRODUCT_SKU}
-        usdValue={priceUsd}
+        usdValue={tier.priceUsd}
+        localUsdPrices={pricing.localUsdPrices}
       />
       
 

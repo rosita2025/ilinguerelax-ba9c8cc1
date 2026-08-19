@@ -720,6 +720,7 @@ const ProductPatronesEspeciales = () => {
 
       <StickyBuyBar
         sku={ADMIN_SKU}
+        goesToInternalCheckout={true}
         price={priceLabel}
         originalPrice={originalLabel}
         currencyCode={displayCurrency}

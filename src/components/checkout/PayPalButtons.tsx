@@ -160,7 +160,7 @@ export function PayPalButtons({
               if (error || !data?.id) throw new Error(error?.message || "No se pudo crear la orden");
               return data.id;
             } catch (e) {
-              setErr((e as Error).message);
+              setErr((e as any)?.message || String(e));
               onError?.(e);
               throw e;
             } finally {

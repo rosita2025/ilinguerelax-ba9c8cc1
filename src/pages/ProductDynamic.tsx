@@ -13,6 +13,7 @@ import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PinterestSave } from "@/components/PinterestSave";
 import { VerifiedReviews } from "@/components/VerifiedReviews";
 import { CartBadge } from "@/components/CartBadge";
+import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
 import { StockAlert } from "@/components/StockAlert";
 import { SocialProofPill } from "@/components/SocialProofPill";
 import { ProductTypeBadge } from "@/components/ProductTypeBadge";
@@ -378,22 +379,34 @@ const ProductDynamic = () => {
 
               <div className="flex flex-col gap-1 mb-5">
                 <div className="flex items-baseline gap-3">
-                  <span className="text-4xl font-black text-primary">{displayFormatted}</span>
-                  <span className="text-xl text-muted-foreground line-through opacity-70">
-                    {originalFormatted}
-                  </span>
+                  {region.loading || loading ? (
+                    <Skeleton className="h-10 w-32" />
+                  ) : (
+                    <>
+                      <span className="text-4xl font-black text-primary">{displayFormatted}</span>
+                      <span className="text-xl text-muted-foreground line-through opacity-70">
+                        {originalFormatted}
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
-                  {!isPEN && !local.isUsd && (
-                    <span className="text-xs text-muted-foreground font-medium">≈ ${effectiveUsd.toFixed(2)} USD</span>
+                  {!region.loading && !loading && (
+                    <>
+                      {!isPEN && !local.isUsd && (
+                        <span className="text-xs text-muted-foreground font-medium">≈ ${effectiveUsd.toFixed(2)} USD</span>
+                      )}
+                      {isPEN && (
+                        <span className="text-xs text-muted-foreground font-medium">≈ ${effectiveUsd.toFixed(2)} USD</span>
+                      )}
+                    </>
                   )}
-                  {isPEN && (
-                    <span className="text-xs text-muted-foreground font-medium">≈ ${effectiveUsd.toFixed(2)} USD</span>
-                  )}
-                  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 shadow-sm">
+                </div>
+                {!region.loading && !loading && (
+                  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 shadow-sm w-fit">
                     {isPEN ? "Perú Directo" : local.currency === "USD" ? "Global USD" : `Local ${local.currency}`}
                   </span>
-                </div>
+                )}
               </div>
 
               <div className="grid grid-cols-3 gap-2 mb-6 text-xs">
@@ -517,6 +530,8 @@ const ProductDynamic = () => {
           )}
         </div>
       </main>
+      
+      {product.sku === "coreano-100-mapas-mentales" && <ResenasWhatsAppCoreano />}
       
       <FAQ
         title={(t as any).product.whyUnique}

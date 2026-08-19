@@ -15,6 +15,7 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
@@ -391,7 +392,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const currentUsdRef = totalLocal / (exchangeRates[currency] || 1);
 
   const penBadge = (penTotals && !isGlobalGateway) ? formatPen(penTotals.total + shippingLocal) : null;
-  const isActuallyShowingLocal = !local.loading;
+  const isActuallyShowingLocal = !region.loading && !local.loading;
   
   // Badge principal: SIEMPRE en moneda local del país EXCEPTO en países restringidos (AR/HN) 
   // o cuando se usa un gateway global, donde se fuerza USD.
@@ -400,7 +401,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const usdSuffix = (isActuallyShowingLocal && !local.isUsd) 
     ? ` ≈ USD $${currentUsdRef.toFixed(2)}`
     : "";
-  const finalPriceLabel = `${priceBadge}${usdSuffix}`;
+  const finalPriceLabel = isActuallyShowingLocal ? `${priceBadge}${usdSuffix}` : "...";
+  
+  // Loading state detection for pricing across all components
+  const pricingIsLoading = region.loading || local.loading;
   const localBadge = "";
 
 
@@ -2219,7 +2223,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   <div className="rounded-lg bg-white/50 dark:bg-black/20 p-3 text-center border border-[#742282]/10">
                     <p className="text-xs text-[#742282]/70 dark:text-[#a356b1]/70 uppercase tracking-wider font-bold">{t.amountToPay}</p>
                     <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                      {(() => {
+                      {region.loading ? (
+                        <Skeleton className="h-8 w-32 mx-auto" />
+                      ) : (() => {
                         const pricing = {
                           priceUsd: currentUsdRef,
                           currencyCode: currency,
@@ -2313,7 +2319,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   <div className="rounded-lg bg-[#F0B90B]/10 p-3 text-center border border-[#F0B90B]/20">
                     <p className="text-xs text-[#b38a08] uppercase tracking-wider font-bold">{t.amountToPay}</p>
                     <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                      {(() => {
+                      {region.loading ? (
+                        <Skeleton className="h-8 w-32 mx-auto" />
+                      ) : (() => {
                         const pricing = {
                           priceUsd: currentUsdRef,
                           currencyCode: currency,
@@ -2398,7 +2406,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   <div className="rounded-lg bg-white/50 dark:bg-black/20 p-3 text-center border border-amber-100 dark:border-amber-900/10">
                     <p className="text-xs text-amber-700/70 dark:text-amber-500/50 uppercase tracking-wider font-bold">{t.amountToPay}</p>
                     <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                      {local.loading || local.isUsd ? `USD $${totalUsd}` : local.formatted}
+                      {region.loading ? (
+                        <Skeleton className="h-8 w-32 mx-auto" />
+                      ) : (
+                        local.loading || local.isUsd ? `USD $${totalUsd}` : local.formatted
+                      )}
                     </p>
                   </div>
 
@@ -2452,14 +2464,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
           ) : selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) ? (
             <><Lock className="w-4 h-4" /> {language === "en"
-              ? `Checkout Securely · USD $${totalUsd}`
+              ? `Checkout Securely · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`
               : language === "pt"
-                ? `Continuar para pagamento · USD $${totalUsd}`
+                ? `Continuar para pagamento · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`
                 : language === "fr"
-                  ? `Continuer vers le paiement · USD $${totalUsd}`
-                  : `Continuar de Pago · USD $${totalUsd}`}</>
+                  ? `Continuer vers le paiement · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`
+                  : `Continuar de Pago · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`}</>
           ) : (
-            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? `Checkout with Hotmart · USD $${totalUsd}` : `Pagar con Hotmart · USD $${totalUsd}`) : `${t.buyNow} · USD $${totalUsd}`}</>
+            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? `Checkout with Hotmart · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}` : `Pagar con Hotmart · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`) : `${t.buyNow} · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`}</>
           )}
         </button>
       )}

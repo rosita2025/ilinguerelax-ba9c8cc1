@@ -14,7 +14,7 @@ import r3 from "@/assets/resena-mapas-korea-3.webp.asset.json";
 const resenas = [
   {
     src: (r1 as any).url || r1,
-    contacto: "Nouveau Apis",
+    contacto: "Comprador Verificado",
     telefono: "+54 9 11 **** 8822",
     pais: "Argentina 🇦🇷",
     resumen: "Exactamente fue rápido envío digital sin demoras. El listado de palabras es increíblemente visual."

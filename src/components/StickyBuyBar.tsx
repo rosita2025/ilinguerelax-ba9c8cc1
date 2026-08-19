@@ -356,9 +356,15 @@ export const StickyBuyBar = ({
           <div className="flex items-start justify-between gap-2">
             <div className="flex flex-col gap-0.5 min-w-0 flex-shrink">
               <div className="flex items-baseline gap-1.5 flex-wrap">
-                <span className={`${isVeryLongPrice ? 'text-base' : isLongPrice ? 'text-lg' : 'text-xl'} sm:text-2xl font-black text-foreground tabular-nums leading-none whitespace-nowrap`}>{price}</span>
-                {originalPrice && (
-                  <span className="text-[11px] sm:text-xs text-muted-foreground line-through tabular-nums whitespace-nowrap opacity-70">{originalPrice}</span>
+                {isLoading ? (
+                  <div className="h-6 w-24 bg-foreground/10 animate-pulse rounded" />
+                ) : (
+                  <>
+                    <span className={`${isVeryLongPrice ? 'text-base' : isLongPrice ? 'text-lg' : 'text-xl'} sm:text-2xl font-black text-foreground tabular-nums leading-none whitespace-nowrap`}>{price}</span>
+                    {originalPrice && (
+                      <span className="text-[11px] sm:text-xs text-muted-foreground line-through tabular-nums whitespace-nowrap opacity-70">{originalPrice}</span>
+                    )}
+                  </>
                 )}
               </div>
               <div className="flex items-center gap-1.5">
@@ -570,17 +576,23 @@ export const StickyBuyBar = ({
             {/* Price */}
             <div className="text-right">
               <div className="flex items-baseline gap-2 whitespace-nowrap">
-                <span className="text-3xl font-black text-foreground">{price}</span>
-                {originalPrice && (
-                  <span className="text-base text-muted-foreground line-through opacity-70">{originalPrice}</span>
+                {isLoading ? (
+                  <div className="h-8 w-32 bg-foreground/10 animate-pulse rounded" />
+                ) : (
+                  <>
+                    <span className="text-3xl font-black text-foreground">{price}</span>
+                    {originalPrice && (
+                      <span className="text-base text-muted-foreground line-through opacity-70">{originalPrice}</span>
+                    )}
+                    {savingsLabel && (
+                      <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
+                        {lang === "en" ? `Save ${savingsLabel}` : `Ahorras ${savingsLabel}`}
+                      </span>
+                    )}
+                    {flagBadge}
+                    <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">{currencyCode}</span>
+                  </>
                 )}
-                {savingsLabel && (
-                  <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
-                    {lang === "en" ? `Save ${savingsLabel}` : `Ahorras ${savingsLabel}`}
-                  </span>
-                )}
-                {flagBadge}
-                <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">{currencyCode}</span>
               </div>
             </div>
 

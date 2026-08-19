@@ -129,11 +129,19 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           </span>
           <span className="text-right flex flex-col items-end">
             <span className="text-base font-bold leading-tight">
-              {penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel}
+              {region.loading ? (
+                <Skeleton className="h-5 w-20" />
+              ) : (
+                penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel
+              )}
             </span>
             {showLocalRef && !breakdown.isUsd && (
-              <span className="text-[10px] font-normal text-muted-foreground leading-none">
-                  ≈ USD ${currentUsdRef.toFixed(2)}
+              <span className="text-[10px] font-normal text-muted-foreground leading-none mt-1">
+                {region.loading ? (
+                  <Skeleton className="h-3 w-16" />
+                ) : (
+                  <>≈ USD ${currentUsdRef.toFixed(2)}</>
+                )}
               </span>
             )}
           </span>
@@ -246,12 +254,16 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                   )}
                 </div>
                 <div className="text-sm font-semibold shrink-0 text-right">
-                  {showLocalRef
-                    ? (() => {
-                        const { local_prices, local_usd_prices } = overridesFor(item.id);
-                        return formatLocalAmount(itemPrice(item, region.tier), region.country, local_prices, local_usd_prices).formatted;
-                      })()
-                    : formatCurrencyAmount(itemPrice(item, region.tier), "USD")}
+                  {region.loading ? (
+                    <Skeleton className="h-4 w-16 ml-auto" />
+                  ) : (
+                    showLocalRef
+                      ? (() => {
+                          const { local_prices, local_usd_prices } = overridesFor(item.id);
+                          return formatLocalAmount(itemPrice(item, region.tier), region.country, local_prices, local_usd_prices).formatted;
+                        })()
+                      : formatCurrencyAmount(itemPrice(item, region.tier), "USD")
+                  )}
                 </div>
               </div>
 
@@ -334,10 +346,20 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           <div className="flex justify-between items-baseline text-base font-bold pt-2 border-t">
             <span>{t.total}</span>
             <div className="text-right">
-              <div className="text-xl">{penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel}</div>
+              <div className="text-xl">
+                {region.loading ? (
+                  <Skeleton className="h-7 w-24 ml-auto" />
+                ) : (
+                  penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel
+                )}
+              </div>
               {showLocalRef && !breakdown.isUsd && (
                 <div className="text-[11px] text-muted-foreground font-normal mt-0.5">
-                  ≈ USD ${currentUsdRef.toFixed(2)}
+                  {region.loading ? (
+                    <Skeleton className="h-3 w-20 ml-auto mt-1" />
+                  ) : (
+                    <>≈ USD ${currentUsdRef.toFixed(2)}</>
+                  )}
                 </div>
               )}
               

@@ -157,13 +157,14 @@ export function PayPalButtons({
             // Re-validate fields before calling createOrder
             if (!buyerEmail || !buyerName) {
               window.dispatchEvent(new CustomEvent("checkout:showBuyerErrors"));
-              throw new Error("Por favor completa tus datos de contacto.");
+              // Use a generic error message that will be handled by PayPal buttons or captured in the toast
+              throw new Error("Missing contact info");
             }
 
             const hasPhysical = items.some(i => i.isPhysical);
             if (hasPhysical && (!buyerAddress || !buyerCity || !buyerCountry)) {
               window.dispatchEvent(new CustomEvent("checkout:showBuyerErrors"));
-              throw new Error("Por favor completa tu dirección y teléfono para continuar con el pago.");
+              throw new Error("Missing shipping info");
             }
 
             setProcessing("create");

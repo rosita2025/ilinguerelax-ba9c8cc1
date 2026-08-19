@@ -33,6 +33,7 @@ import bonus2ImageAvif from "@/assets/bonus-2-daily-planner.avif";
 import bonus3Image from "@/assets/bonus-3-pronunciation.webp";
 import bonus3ImageAvif from "@/assets/bonus-3-pronunciation.avif";
 import { Check, BookOpen, Sparkles, ArrowRight, Brain, User, FileText, GraduationCap, Lightbulb, CreditCard, Globe, Download, Zap, Shield, ShoppingCart, Star, ChevronDown, ChevronUp, Eye, Package, Tag, BadgeCheck, Truck, CalendarClock } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Product image
 import productSpanish5000Image from "@/assets/spanish-5000-physical-cover.webp";
@@ -369,8 +370,17 @@ const ProductSpanish5000 = () => {
               {/* Regional Pricing Display */}
               <div className="flex flex-col items-center md:items-start mb-6">
                 <div className="flex items-baseline flex-wrap gap-x-3 gap-y-2 mb-2">
-                  <span className="text-3xl sm:text-4xl md:text-6xl font-black text-foreground leading-none">{campaign.price}</span>
-                  <span className="text-lg sm:text-xl md:text-2xl text-muted-foreground line-through opacity-70">{campaign.originalPrice}</span>
+                  {tier.loaded ? (
+                    <>
+                      <span className="text-3xl sm:text-4xl md:text-6xl font-black text-foreground leading-none">{campaign.price}</span>
+                      <span className="text-lg sm:text-xl md:text-2xl text-muted-foreground line-through opacity-70">{campaign.originalPrice}</span>
+                    </>
+                  ) : (
+                    <div className="flex items-baseline gap-3">
+                      <Skeleton className="h-12 w-48 sm:h-16 sm:w-64" />
+                      <Skeleton className="h-8 w-24 opacity-50" />
+                    </div>
+                  )}
                   <span className="px-2.5 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs sm:text-sm font-bold shadow-lg whitespace-nowrap">
                     SAVE {campaign.discountPercentage}%
                   </span>

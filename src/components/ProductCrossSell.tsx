@@ -152,7 +152,10 @@ export const ProductCrossSell = ({ currentProduct, lang = "es" }: ProductCrossSe
                 {/* Price */}
                 <div className="flex items-baseline gap-2 mb-4">
                   {!cardPrice.ready ? (
-                    <Skeleton className="h-10 w-32" />
+                    <div className="flex items-baseline gap-2">
+                      <Skeleton className="h-9 w-28" />
+                      <Skeleton className="h-6 w-16 opacity-50" />
+                    </div>
                   ) : (
                     <>
                       <span className="text-3xl font-black text-foreground">

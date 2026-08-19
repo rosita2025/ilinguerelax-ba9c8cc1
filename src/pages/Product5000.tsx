@@ -184,7 +184,8 @@ const Product5000 = () => {
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
   const ADMIN_SKU_5000 = "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa";
-  const TIENDA_CHECKOUT_5000 = "/checkouts/5000-palabras";
+  const PRODUCT_SKU = "5-000-palabras-libro-fisico";
+  const TIENDA_CHECKOUT_5000 = `/checkouts/${PRODUCT_SKU}`;
   const HOTMART_5000_LATAM = "https://pay.hotmart.com/O100578526P?checkoutMode=10&bid=1779846934153";
   const pricing5000 = useAdminPricing(ADMIN_SKU_5000);
   const tier = useCountryTierRouting(ADMIN_SKU_5000, {
@@ -898,7 +899,7 @@ const Product5000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar
-        sku={ADMIN_SKU_5000}
+        sku={PRODUCT_SKU}
         price={safePriceLabel}
            originalPrice={pricing5000Ready ? displayOriginalPrice : undefined}
            currencyCode={displayCurrency}

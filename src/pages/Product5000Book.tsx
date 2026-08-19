@@ -96,8 +96,9 @@ const Product5000Book = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isLoading: cartLoading } = useCartStore();
+  const PRODUCT_SKU = "5-000-palabras-libro-fisico";
   const handleAddToCart = async () => {
-    navigate("/checkouts/5-000-palabras-libro-fisico");
+    navigate(`/checkouts/${PRODUCT_SKU}`);
   };
 
   const pixelParams = useMemo(() => ({
@@ -494,7 +495,7 @@ const Product5000Book = () => {
         showReviews={false}
         isPhysical={true}
         goesToInternalCheckout={true}
-        sku="ILINGUE-5000-BOOK"
+        sku={PRODUCT_SKU}
       />
       <SalesNotification />
       <ScrollToTop />

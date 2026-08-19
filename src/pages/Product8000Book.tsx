@@ -102,8 +102,9 @@ const Product8000Book = () => {
   const { isLoading: cartLoading } = useCartStore();
   const navigate = useNavigate();
 
+  const PRODUCT_SKU = "8-000-palabras-libro-fisico";
   const handleAddToCart = async () => {
-    navigate("/checkouts/8-000-palabras-libro-fisico");
+    navigate(`/checkouts/${PRODUCT_SKU}`);
   };
 
   const AMAZON_URL_8000 = "https://www.amazon.com/s?k=Ingl%C3%A9s+Relax+8000+Palabras";
@@ -689,7 +690,7 @@ const Product8000Book = () => {
         reviewCount={246}
         isPhysical={true}
         goesToInternalCheckout={true}
-        sku="ILINGUE-8000-BOOK"
+        sku={PRODUCT_SKU}
       />
 
       {/* Spacer for sticky bar */}

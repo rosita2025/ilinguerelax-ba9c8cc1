@@ -92,8 +92,9 @@ const ProductSpanish3000VerbsBook = () => {
   const navigate = useNavigate();
 
 
+  const PRODUCT_SKU = "spanish-3000-verbs-book";
   const handleAddToCart = async () => {
-    navigate("/checkouts/spanish_3000_verbs");
+    navigate(`/checkouts/${PRODUCT_SKU}`);
   };
 
   const AMAZON_URL_3000 = "https://www.amazon.com/s?k=Spanish+Relax+3000+Verbs";
@@ -628,6 +629,7 @@ const ProductSpanish3000VerbsBook = () => {
         disabled={false}
         isPhysical={true}
         goesToInternalCheckout={true}
+        sku={PRODUCT_SKU}
       />
     </main>
   );

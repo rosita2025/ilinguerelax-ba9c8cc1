@@ -69,8 +69,9 @@ const ProductSpanishGrammarPatterns = () => {
   const navigate = useNavigate();
 
 
+  const PRODUCT_SKU = "spanish-relax-structural-spanish-grammar-a1-c1-book-physical-n9ct";
   const handleAddToCart = async () => {
-    navigate("/checkouts/spanish-relax-structural-spanish-grammar-a1-c1-book-physical-n9ct");
+    navigate(`/checkouts/${PRODUCT_SKU}`);
   };
 
   const AMAZON_URL_GRAMMAR = "https://www.amazon.com/s?k=Spanish+Relax+Grammar+Patterns";
@@ -589,7 +590,7 @@ const ProductSpanishGrammarPatterns = () => {
         rating={4.9}
         reviewCount={1500}
         ctaText={`ADD TO CART — $${PRICE}.00`}
-        sku="SPANISH-GRAMMAR-PATTERNS"
+        sku={PRODUCT_SKU}
         onBuyClick={handleAddToCart}
         isLoading={cartLoading}
         disabled={false}

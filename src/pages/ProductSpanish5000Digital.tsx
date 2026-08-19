@@ -96,7 +96,8 @@ const ProductSpanish5000Digital = () => {
   const lockRef = useRef(false);
   const { currency, countryCode, formatPrice } = useI18n();
   const ADMIN_SKU_SP5K = "5-000-spanish-words-with-english-pronunciation-digital";
-  const TIENDA_PATH_SP5K = "/checkouts/5000-spanish-words";
+  const PRODUCT_SKU = "5-000-spanish-words-with-english-pronunciation-digital";
+  const TIENDA_PATH_SP5K = `/checkouts/${PRODUCT_SKU}`;
   const HOTMART_SP5K_LATAM = "https://pay.hotmart.com/L106545921C?checkoutMode=10";
   const pricing = useAdminPricing(ADMIN_SKU_SP5K);
   const tier = useCountryTierRouting(ADMIN_SKU_SP5K, {
@@ -674,7 +675,7 @@ const ProductSpanish5000Digital = () => {
       </Suspense>
 
       <StickyBuyBar
-        sku={ADMIN_SKU_SP5K}
+        sku={PRODUCT_SKU}
         productName={pricing.name ?? "Spanish Mastery System — DIGITAL PDF"}
         price={tier.priceLabel}
         originalPrice={tier.isOnSale ? (tier.originalLabel || undefined) : undefined}

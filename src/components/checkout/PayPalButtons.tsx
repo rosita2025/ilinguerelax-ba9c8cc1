@@ -1,112 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { Loader2, AlertTriangle, RefreshCw, Copy, Check, Info } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
+import { PayPalScriptProvider, PayPalButtons as PayPalButtonsOfficial } from "@paypal/react-paypal-js";
+import { Loader2, AlertTriangle, RefreshCw, Info, Check, Copy } from "lucide-react";
 import { invokeWithRetry as invokeEdge } from "@/lib/invokeWithRetry";
-
-declare global {
-  interface Window {
-    paypal?: {
-      Buttons: (options: PayPalButtonOptions) => { render: (container: HTMLElement) => void | Promise<void> };
-    };
-  }
-}
-
-interface PayPalButtonOptions {
-  style: { layout: string; color: string; shape: string; label: string; height: number };
-  createOrder: () => Promise<string>;
-  onApprove: (data: { orderID: string }) => Promise<void>;
-  onError: (error: unknown) => void;
-  onCancel: () => void;
-}
-
-let sdkPromise: Promise<void> | null = null;
-let loadedClientId: string | null = null;
-let loadedCurrency: string | null = null;
-
-async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
-  const sdkCorrId = `sdk-${Date.now()}`;
-  
-  // Limpieza agresiva de scripts de PayPal previos para evitar conflictos
-  const cleanup = () => {
-    document.querySelectorAll('script[src*="paypal.com/sdk/js"]').forEach((s) => {
-      try { s.parentNode?.removeChild(s); } catch { s.remove(); }
-    });
-    window.paypal = undefined;
-    sdkPromise = null;
-  };
-  
-  if (!sdkPromise) cleanup();
-  
-  let lastError: Error | null = null;
-  
-  for (let i = 1; i <= attempts; i++) {
-    try {
-      // Check if already loaded by another instance
-      if (window.paypal && loadedClientId && loadedCurrency === currency) return;
-
-      const { data, error } = await invokeEdge<{ clientId?: string }>(
-        "paypal-config",
-        { 
-          method: "GET",
-          headers: { "x-correlation-id": sdkCorrId }
-        },
-        { attempts: 2 },
-      );
-      
-      if (error || !data?.clientId) {
-        throw new Error("PayPal no está configurado");
-      }
-      
-      const clientId = data.clientId as string;
-      
-      // Double check window.paypal again before starting a new injection
-      if (window.paypal && loadedClientId === clientId && loadedCurrency === currency) return;
-      if (sdkPromise && loadedClientId === clientId && loadedCurrency === currency) return sdkPromise;
-      
-      cleanup();
-      loadedClientId = clientId;
-      loadedCurrency = currency;
-      
-      sdkPromise = new Promise<void>((resolve, reject) => {
-        const s = document.createElement("script");
-        s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${encodeURIComponent(currency)}&intent=capture&components=buttons`;
-        s.async = true;
-        s.dataset.paypalSdk = "1";
-        s.onload = () => {
-          // Verify window.paypal is actually present
-          if (window.paypal) {
-            resolve();
-          } else {
-            sdkPromise = null;
-            reject(new Error("Script de PayPal cargado pero no inicializado. Verifica si tienes un bloqueador de anuncios activo."));
-          }
-        };
-        s.onerror = () => {
-          sdkPromise = null;
-          reject(new Error("No se pudo cargar el script de PayPal. Verifica si tienes un bloqueador de anuncios."));
-        };
-        document.head.appendChild(s);
-      });
-      
-      return await sdkPromise;
-    } catch (err) {
-      lastError = err as Error;
-      if (i < attempts) {
-        console.warn(`[paypal] SDK load attempt ${i} failed, retrying in 2s...`, err);
-        await new Promise(r => setTimeout(r, 2000));
-        sdkPromise = null; // Clear promise to allow real retry
-      }
-    }
-  }
-  
-  console.error("[paypal] loadPayPalSdk failed all attempts", lastError);
-  throw lastError || new Error("PayPal no disponible");
-}
-
-// Currencies natively supported by PayPal. Others fall back to USD.
-const PAYPAL_SUPPORTED = new Set([
-  "AUD","BRL","CAD","CNY","CZK","DKK","EUR","HKD","HUF","ILS","JPY",
-  "MYR","MXN","TWD","NZD","NOK","PHP","PLN","GBP","RUB","SGD","SEK","CHF","THB","USD",
-]);
 
 interface Props {
   amountUsd: number;
@@ -120,265 +15,207 @@ interface Props {
   localAmount?: number;
   onApproved: (orderId: string) => void;
   onError?: (err: unknown) => void;
+  couponCode?: string;
+  items?: any[];
 }
 
-type Phase = "create" | "capture" | "sdk";
+// Currencies natively supported by PayPal. Others fall back to USD.
+const PAYPAL_SUPPORTED = new Set([
+  "AUD", "BRL", "CAD", "CNY", "CZK", "DKK", "EUR", "HKD", "HUF", "ILS", "JPY",
+  "MYR", "MXN", "TWD", "NZD", "NOK", "PHP", "PLN", "GBP", "RUB", "SGD", "SEK", "CHF", "THB", "USD",
+]);
 
-interface ErrState {
-  message: string;
-  phase: Phase;
-  attempt: number;
-  canRetry: boolean;
-}
-
-const MAX_ATTEMPTS = 3;
-const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-function friendlyMessage(phase: Phase, raw: string): string {
-  const r = (raw || "").toLowerCase();
-  if (r.includes("failed to fetch") || r.includes("network") || r.includes("load failed")) {
-    return "Problema de conexión. Verifica tu internet o desactiva bloqueadores de anuncios.";
-  }
-  if (r.includes("403") || r.includes("forbidden")) {
-    return "Acceso denegado. Intenta recargar la página o usa otro navegador.";
-  }
-  if (r.includes("401") || r.includes("unauthorized")) {
-    return "Sesión expirada o error de configuración. Por favor, recarga.";
-  }
-  if (r.includes("no está configurado") || r.includes("clientid")) {
-    return "PayPal no está disponible en este momento.";
-  }
-  if (phase === "create") return "No se pudo crear la orden en PayPal.";
-  if (phase === "capture") return "El pago no se pudo confirmar. Si se cobró, escríbenos con el ID para verificar.";
-  return raw || "Ocurrió un error con PayPal.";
-}
-
-export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skus = [], localCurrency, localAmount, onApproved, onError, couponCode, items = [] }: Props & { couponCode?: string; items?: any[] }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<ErrState | null>(null);
+export function PayPalButtons({ 
+  amountUsd, 
+  description, 
+  buyerEmail, 
+  buyerName, 
+  buyerPhone, 
+  buyerCountry, 
+  skus = [], 
+  localCurrency, 
+  localAmount, 
+  onApproved, 
+  onError, 
+  couponCode, 
+  items = [] 
+}: Props) {
+  const [clientId, setClientId] = useState<string | null>(null);
+  const [configError, setConfigError] = useState<string | null>(null);
+  const [loadingConfig, setLoadingConfig] = useState(true);
+  const [processing, setProcessing] = useState<"create" | "capture" | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const [correlationId] = useState(() => globalThis.crypto?.randomUUID?.() ?? `pp-${Date.now()}`);
   const [copied, setCopied] = useState(false);
-  const [reloadKey, setReloadKey] = useState(0);
-  const [processing, setProcessing] = useState<Phase | null>(null);
 
+  // Determine currency and amount
   const providedLocal = !!localCurrency && localCurrency.toUpperCase() !== "USD" && !!localAmount && localAmount > 0;
   const localSupported = providedLocal && PAYPAL_SUPPORTED.has(localCurrency!.toUpperCase());
   const useLocal = providedLocal && localSupported;
   const currency = useLocal ? localCurrency!.toUpperCase() : "USD";
   const amount = useLocal ? Number(localAmount!.toFixed(2)) : Number(amountUsd.toFixed(2));
-  // Fallback ocurre cuando el comprador tiene una moneda local detectada
-  // pero PayPal no la acepta (p. ej. PEN, ARS, COP, CLP).
   const fallbackToUsd = providedLocal && !localSupported;
-  const skusKey = skus.map((sku) => String(sku).trim()).filter(Boolean).join(",");
-
-  const correlationIdRef = useRef<string>(
-    (globalThis.crypto?.randomUUID?.() ?? `pp-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`)
-  );
-
-  async function invokeWithRetry<T>(
-    fnName: string,
-    body: Record<string, unknown>,
-    phase: Phase,
-  ): Promise<T> {
-    const correlationId = correlationIdRef.current;
-    
-    // We use the shared invokeWithRetry which already has the directFetchFallback
-    // for "Failed to send" errors.
-    const { data, error } = await invokeEdge<T>(fnName, {
-      method: "POST",
-      body: { ...body, correlationId },
-      headers: { "x-correlation-id": correlationId },
-    }, { 
-      attempts: MAX_ATTEMPTS,
-      onAttemptError: (info: any) => {
-        console.warn(`[paypal] ${fnName} attempt ${info.attempt} failed`, { 
-          correlationId, 
-          error: (info.error as Error)?.message 
-        });
-        setErr({
-          message: `${friendlyMessage(phase, (info.error as Error)?.message)} Reintentando…`,
-          phase,
-          attempt: info.attempt,
-          canRetry: false,
-        });
-      }
-    });
-
-    if (error) {
-      console.error(`[paypal] ${fnName} exhausted all attempts`, { correlationId, error });
-      throw error;
-    }
-    
-    console.info(`[paypal] ${fnName} ok`, { correlationId });
-    return data as T;
-  }
 
   useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setErr(null);
-    let isMounted = true;
-    (async () => {
+    async function fetchConfig() {
       try {
-        await loadPayPalSdk(currency);
-        if (!isMounted || cancelled || !ref.current) return;
-        
-        // Final safety check for window.paypal
-        if (!window.paypal || !window.paypal.Buttons) {
-          throw new Error("SDK de PayPal cargado pero Buttons no disponible. Verifica bloqueadores de anuncios.");
-        }
-
-        ref.current.innerHTML = "";
-        window.paypal.Buttons({
-          style: { layout: "vertical", color: "gold", shape: "pill", label: "paypal", height: 45 },
-          createOrder: async () => {
-            const correlationId = correlationIdRef.current;
-            console.info("[paypal] createOrder", { correlationId, currency, amount, amountUsd });
-            setErr(null);
-            setProcessing("create");
-            try {
-              const data = await invokeWithRetry<{ id: string }>(
-                "paypal-create-order",
-                { amount, currency, amountUsd: Number(amountUsd.toFixed(2)), description, buyerEmail, couponCode, country: buyerCountry, items },
-                "create",
-              );
-              if (!data?.id) throw new Error("No se pudo crear la orden");
-              setErr(null);
-              setProcessing(null);
-              return data.id;
-            } catch (e) {
-              const msg = friendlyMessage("create", (e as Error).message);
-              setErr({ message: msg, phase: "create", attempt: MAX_ATTEMPTS, canRetry: true });
-              setProcessing(null);
-              onError?.(e);
-              throw e;
-            }
-          },
-          onApprove: async (data: { orderID: string }) => {
-            const correlationId = correlationIdRef.current;
-            console.info("[paypal] onApprove", { correlationId, orderId: data.orderID });
-            setErr(null);
-            setProcessing("capture");
-            try {
-              const cap = await invokeWithRetry<{ status: string }>(
-                "paypal-capture-order",
-                {
-                  orderId: data.orderID,
-                  buyerEmail,
-                  buyerName,
-                  buyerPhone,
-                  buyerCountry,
-                  skus: skusKey.split(",").filter(Boolean),
-                },
-                "capture",
-              );
-              if (cap?.status !== "COMPLETED") {
-                throw new Error(`Estado inesperado: ${cap?.status ?? "desconocido"}`);
-              }
-              setErr(null);
-              setProcessing(null);
-              onApproved(data.orderID);
-            } catch (e) {
-              const msg = friendlyMessage("capture", (e as Error).message);
-              setErr({ message: msg, phase: "capture", attempt: MAX_ATTEMPTS, canRetry: false });
-              setProcessing(null);
-              onError?.(e);
-            }
-          },
-          onError: (e: unknown) => {
-            console.warn("[paypal] sdk onError", e);
-            setErr({
-              message: "Ocurrió un error con PayPal. Intenta de nuevo.",
-              phase: "sdk",
-              attempt: 1,
-              canRetry: true,
-            });
-            setProcessing(null);
-            onError?.(e);
-          },
-          onCancel: () => {
-            setProcessing(null);
-          },
-        }).render(ref.current);
-        setLoading(false);
-      } catch (e) {
-        if (cancelled) return;
-        setErr({
-          message: friendlyMessage("sdk", (e as Error).message),
-          phase: "sdk",
-          attempt: 1,
-          canRetry: true,
+        setLoadingConfig(true);
+        const { data, error } = await invokeEdge<{ clientId?: string }>("paypal-config", { 
+          method: "GET",
+          headers: { "x-correlation-id": correlationId }
         });
-        setLoading(false);
+        
+        if (error || !data?.clientId) {
+          throw new Error(error?.message || "PayPal no está configurado (faltan credenciales)");
+        }
+        setClientId(data.clientId);
+      } catch (e) {
+        console.error("[paypal-buttons] config error:", e);
+        setConfigError((e as any)?.message || String(e));
+      } finally {
+        setLoadingConfig(false);
       }
-    })();
-    return () => { 
-      cancelled = true; 
-      isMounted = false;
-    };
-  }, [amount, amountUsd, currency, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skusKey, reloadKey, onApproved, onError]);
+    }
+    fetchConfig();
+  }, [correlationId]);
 
-  const correlationId = correlationIdRef.current;
+  const scriptOptions = useMemo(() => {
+    if (!clientId) return null;
+    return {
+      clientId,
+      currency,
+      intent: "capture",
+      components: "buttons"
+    };
+  }, [clientId, currency]);
+
+  if (loadingConfig) {
+    return (
+      <div className="flex items-center justify-center py-6 text-sm text-neutral-500">
+        <Loader2 className="w-4 h-4 animate-spin mr-2" /> Preparando PayPal…
+      </div>
+    );
+  }
+
+  if (configError) {
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700 flex items-start gap-2">
+        <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+        <p className="flex-1">{configError}</p>
+      </div>
+    );
+  }
+
+  if (!scriptOptions) return null;
 
   const copyCorrelation = async () => {
     try {
       await navigator.clipboard.writeText(correlationId);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
-    } catch {
-      setCopied(false);
-    }
-  };
-
-  const handleReload = () => {
-    setErr(null);
-    setReloadKey((k) => k + 1);
+    } catch {}
   };
 
   return (
     <div className="space-y-2">
-      {loading && (
-        <div className="flex items-center justify-center py-6 text-sm text-neutral-500">
-          <Loader2 className="w-4 h-4 animate-spin mr-2" /> Cargando PayPal…
-        </div>
-      )}
-      {processing && !err && (
-        <div className="flex items-center justify-center py-2 text-xs text-neutral-500">
-          <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" />
-          {processing === "create" ? "Creando orden…" : "Confirmando pago…"}
-        </div>
-      )}
-      {!loading && fallbackToUsd && (
+      {fallbackToUsd && (
         <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-snug text-amber-800">
           <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
           <p className="flex-1">
-            PayPal no procesa pagos en <span className="font-semibold">{localCurrency!.toUpperCase()}</span>, por eso el cobro se hará en <span className="font-semibold">USD ${amountUsd.toFixed(2)}</span>. Tu banco convertirá al tipo de cambio del día. Es un cobro normal y seguro.
+            PayPal no procesa pagos en <span className="font-semibold">{localCurrency!.toUpperCase()}</span>, por eso el cobro se hará en <span className="font-semibold">USD ${amountUsd.toFixed(2)}</span>. Tu banco convertirá al tipo de cambio del día.
           </p>
         </div>
       )}
-      <div ref={ref} />
+
+      {processing && (
+        <div className="flex items-center justify-center py-2 text-xs text-neutral-500">
+          <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" />
+          {processing === "create" ? "Generando orden…" : "Confirmando pago…"}
+        </div>
+      )}
+
+      <PayPalScriptProvider options={scriptOptions}>
+        <PayPalButtonsOfficial
+          style={{ layout: "vertical", color: "gold", shape: "pill", label: "paypal", height: 45 }}
+          createOrder={async () => {
+            setProcessing("create");
+            setErr(null);
+            try {
+              const { data, error } = await invokeEdge<{ id: string }>("paypal-create-order", {
+                method: "POST",
+                body: { 
+                  amount, 
+                  currency, 
+                  amountUsd: Number(amountUsd.toFixed(2)), 
+                  description, 
+                  buyerEmail, 
+                  couponCode, 
+                  country: buyerCountry, 
+                  items,
+                  correlationId 
+                },
+                headers: { "x-correlation-id": correlationId }
+              });
+
+              if (error || !data?.id) throw new Error(error?.message || "No se pudo crear la orden");
+              return data.id;
+            } catch (e) {
+              setErr((e as any)?.message || String(e));
+              onError?.(e);
+              throw e;
+            } finally {
+              setProcessing(null);
+            }
+          }}
+          onApprove={async (data) => {
+            setProcessing("capture");
+            setErr(null);
+            try {
+              const { data: cap, error } = await invokeEdge<{ status: string }>("paypal-capture-order", {
+                method: "POST",
+                body: {
+                  orderId: data.orderID,
+                  buyerEmail,
+                  buyerName,
+                  buyerPhone,
+                  buyerCountry,
+                  skus: skus.map(s => String(s).trim()).filter(Boolean),
+                  correlationId
+                },
+                headers: { "x-correlation-id": correlationId }
+              });
+
+              if (error || cap?.status !== "COMPLETED") {
+                throw new Error(error?.message || `Estado inesperado: ${cap?.status ?? "desconocido"}`);
+              }
+              onApproved(data.orderID);
+            } catch (e) {
+              setErr((e as any)?.message || String(e));
+              onError?.(e);
+            } finally {
+              setProcessing(null);
+            }
+          }}
+          onError={(e) => {
+            console.warn("[paypal-buttons] sdk onError", e);
+            setErr("Ocurrió un error con el SDK de PayPal. Por favor, intenta de nuevo o usa otro método.");
+            onError?.(e);
+          }}
+        />
+      </PayPalScriptProvider>
+
       {err && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700 space-y-2">
           <div className="flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-            <p className="flex-1">{err.message}</p>
+            <p className="flex-1">{err}</p>
           </div>
-          {err.canRetry && (
-            <button
-              type="button"
-              onClick={handleReload}
-              className="inline-flex items-center gap-1.5 rounded-md bg-red-600 text-white px-3 py-1.5 font-medium hover:bg-red-700 transition"
-            >
-              <RefreshCw className="w-3.5 h-3.5" /> Reintentar
-            </button>
-          )}
           <div className="flex items-center gap-2 pt-1 border-t border-red-200 text-[11px] text-red-600/80">
             <span className="font-mono truncate">ID: {correlationId}</span>
             <button
               type="button"
               onClick={copyCorrelation}
               className="inline-flex items-center gap-1 hover:text-red-800"
-              aria-label="Copiar ID de referencia"
             >
               {copied ? <><Check className="w-3 h-3" /> Copiado</> : <><Copy className="w-3 h-3" /> Copiar</>}
             </button>

@@ -151,14 +151,20 @@ export const ProductCrossSell = ({ currentProduct, lang = "es" }: ProductCrossSe
 
                 {/* Price */}
                 <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-3xl font-black text-foreground">
-                    {cardPrice.format(product.sku, product.priceUsd)}
-                  </span>
-                  <span className="text-lg text-muted-foreground line-through">
-                    {product.originalPrice}
-                  </span>
-                  <span className="text-sm text-primary font-semibold">{cardPrice.currencyLabel(product.sku)}</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
+                  {!cardPrice.ready ? (
+                    <Skeleton className="h-10 w-32" />
+                  ) : (
+                    <>
+                      <span className="text-3xl font-black text-foreground">
+                        {cardPrice.format(product.sku, product.priceUsd)}
+                      </span>
+                      <span className="text-lg text-muted-foreground line-through opacity-70">
+                        {cardPrice.formatOriginal(product.sku, product.priceUsd * 2.5)}
+                      </span>
+                      <span className="text-sm text-primary font-semibold">{cardPrice.currencyLabel(product.sku)}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
+                    </>
+                  )}
                 </div>
 
                 {/* CTA Button */}

@@ -145,6 +145,11 @@ export function BuyerInfoForm() {
       setTimeout(() => {
         if (nameInvalid) nameRef.current?.focus();
         else if (emailInvalid) emailRef.current?.focus();
+        else if (phoneInvalid) {
+          // Focus phone input - using a data attribute or selector since it's a wrapper component
+          const phoneInput = containerRef.current?.querySelector('input[type="tel"]');
+          if (phoneInput instanceof HTMLInputElement) phoneInput.focus();
+        }
         else if (addressInvalid) document.getElementById("shipping-address")?.focus();
         else if (cityInvalid) document.getElementById("shipping-city")?.focus();
         else if (zipInvalid) document.getElementById("shipping-zip")?.focus();
@@ -153,7 +158,7 @@ export function BuyerInfoForm() {
     };
     window.addEventListener(BUYER_ERRORS_EVENT, handler);
     return () => window.removeEventListener(BUYER_ERRORS_EVENT, handler);
-  }, [nameInvalid, emailInvalid, addressInvalid, cityInvalid, zipInvalid, countryInvalid]);
+  }, [nameInvalid, emailInvalid, phoneInvalid, addressInvalid, cityInvalid, zipInvalid, countryInvalid]);
 
   useEffect(() => {
     if (valid) setShowErrors(false);
@@ -161,6 +166,7 @@ export function BuyerInfoForm() {
 
   const showNameError = showErrors && nameInvalid;
   const showEmailError = showErrors && emailInvalid;
+  const showPhoneError = showErrors && phoneInvalid;
 
   return (
     <div

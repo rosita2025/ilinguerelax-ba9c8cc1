@@ -534,6 +534,15 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       const country = (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2);
       const initiallyRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(country);
 
+      /**
+       * Refresca el PaymentIntent solicitando un nuevo clientSecret si el actual falla
+       * o si la conexión fue inestable.
+       */
+      const refreshPaymentIntent = async () => {
+        useCheckoutPruebaStore.getState().setClientSecret(null);
+        return fetchSecret();
+      };
+
       const fetchSecret = async (retryForRestricted = false) => {
         const pricing = {
           priceUsd: currentUsdRef,
@@ -965,12 +974,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   };
 
   const retryStripe = useCallback(() => {
-    console.log("[Stripe] Manual retry triggered");
+    console.log("[Stripe] Manual retry triggered - clearing state and refreshing intent");
     setStripeError(null);
-    setStripeLoading(false);
+    setStripeLoading(true);
     setStripeFrameMounted(false);
     setStripeElapsed(0);
-    // Explicitly invalidate client secret to force fresh fetch
+    
+    // Ejecuta el refresco del PaymentIntent sin recargar página
+    // Primero limpiamos el secret para forzar la regeneración en la Edge Function
     useCheckoutPruebaStore.getState().setClientSecret(null);
     setStripeRetryKey((k) => k + 1);
   }, []);

@@ -38,10 +38,10 @@ const DICT: Record<
   Record<Lang, { title: string; message: string }>
 > = {
   network: {
-    es: { title: "Sin conexión", message: "No pudimos conectar con Stripe. Revisa tu internet e intenta de nuevo." },
-    en: { title: "Connection error", message: "We couldn't reach Stripe. Check your internet and try again." },
-    pt: { title: "Sem conexão", message: "Não conseguimos conectar à Stripe. Verifique sua internet e tente novamente." },
-    fr: { title: "Pas de connexion", message: "Impossible de joindre Stripe. Vérifie ta connexion et réessaie." },
+    es: { title: "Sin conexión", message: "Conexión inestable detectada. Por favor verifica tu red o intenta de nuevo en unos segundos." },
+    en: { title: "Connection error", message: "Unstable connection detected. Please check your network or try again in a few seconds." },
+    pt: { title: "Sem conexão", message: "Conexão instável detectada. Por favor, verifique sua rede ou tente novamente em alguns segundos." },
+    fr: { title: "Pas de connexion", message: "Connexion instable détectée. Veuillez vérifier votre réseau ou réessayer dans quelques secondes." },
   },
   timeout: {
     es: { title: "Tiempo agotado", message: "Stripe está tardando demasiado en responder. Intenta de nuevo." },

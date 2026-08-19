@@ -15,14 +15,14 @@ export const WhatsAppButton = ({ url, label = "¿Dudas?" }: WhatsAppButtonProps)
       className="fixed left-4 z-40 group touch-manipulation"
       style={{
         // Sit safely above the sticky buy bar (whatever its current height).
-        bottom: "calc(var(--sticky-bar-h, 0px) + 96px + env(safe-area-inset-bottom, 0px))",
+        bottom: "calc(var(--sticky-bar-h, 0px) + 105px + env(safe-area-inset-bottom, 0px))",
       }}
     >
       <div className="flex items-center gap-2">
         <span className="px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-sm font-semibold shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
           {label}
         </span>
-        <div className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-[#25D366] hover:bg-[#20bd5a] shadow-xl ring-2 ring-white/40 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shrink-0 aspect-square">
+        <div className="w-11 h-11 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-[#25D366] hover:bg-[#20bd5a] shadow-xl ring-2 ring-white/40 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shrink-0 aspect-square">
           {/* WhatsApp brand glyph (Simple Icons), centered */}
           <svg
             viewBox="0 0 24 24"

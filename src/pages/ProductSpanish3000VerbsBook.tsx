@@ -629,6 +629,7 @@ const ProductSpanish3000VerbsBook = () => {
         disabled={false}
         isPhysical={true}
         goesToInternalCheckout={true}
+        sku={PRODUCT_SKU}
       />
     </main>
   );

@@ -495,7 +495,7 @@ const Product5000Book = () => {
         showReviews={false}
         isPhysical={true}
         goesToInternalCheckout={true}
-        sku="ILINGUE-5000-BOOK"
+        sku={PRODUCT_SKU}
       />
       <SalesNotification />
       <ScrollToTop />

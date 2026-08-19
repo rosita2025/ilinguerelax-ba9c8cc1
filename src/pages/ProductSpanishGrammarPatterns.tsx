@@ -590,7 +590,7 @@ const ProductSpanishGrammarPatterns = () => {
         rating={4.9}
         reviewCount={1500}
         ctaText={`ADD TO CART — $${PRICE}.00`}
-        sku="SPANISH-GRAMMAR-PATTERNS"
+        sku={PRODUCT_SKU}
         onBuyClick={handleAddToCart}
         isLoading={cartLoading}
         disabled={false}

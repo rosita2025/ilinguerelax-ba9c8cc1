@@ -690,7 +690,7 @@ const Product8000Book = () => {
         reviewCount={246}
         isPhysical={true}
         goesToInternalCheckout={true}
-        sku="ILINGUE-8000-BOOK"
+        sku={PRODUCT_SKU}
       />
 
       {/* Spacer for sticky bar */}

@@ -453,6 +453,9 @@ const ProductSpanish5000 = () => {
           </div>
         </div>
       </section>
+      
+      {/* Real Student Reviews & Screenshots Slider */}
+      <CustomerReviewsSlider />
 
       {/* Top 3 reviews carousel — fills the gap before Meet the Author */}
       <Suspense fallback={<div className="h-32" />}>

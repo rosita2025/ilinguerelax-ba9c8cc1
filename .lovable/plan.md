@@ -1,32 +1,29 @@
-# Plan de Corrección del Footer y Botones Flotantes
+# Plan: Corregir Lógica de Ofertas Cruzadas en Spanish Mastery System
 
-El usuario reporta que el Footer tiene fondo blanco con letras blancas (invisible) y solicita restaurar el fondo oscuro, limpiar la estructura móvil, ajustar la posición de los botones flotantes y traducir contenidos específicos al inglés para el producto "5,000 Spanish Words".
+El objetivo es separar claramente las ofertas físicas y digitales en sus respectivas páginas para evitar redundancias, corregir el precio de la versión digital a $72.99 USD y asegurar un diseño móvil perfecto sin desbordamientos.
 
-## Cambios Realizados
+## Cambios en el Frontend
 
-### Frontend
+### 1. Página del Libro Físico (`src/pages/ProductSpanish5000.tsx`)
+- Eliminar la sección `#physical-bundle` (líneas 444-522) que duplica la oferta del Hero.
+- Insertar un nuevo bloque "Looking for a Digital-Only version?" elegante después de la sección de beneficios.
+- **Texto**: "Get instant access to the PDF version without waiting for international shipping."
+- **Botón**: "View Digital Version — $72.99 USD" (usando `formatPrice` para moneda local).
+- **Ruta**: Redirigir a `/products/5-000-spanish-words-with-english-pronunciation-digital`.
+- **Estilo**: Asegurar `w-full max-w-full px-4 box-border text-center` para evitar overflow móvil.
 
-#### Componente Footer (`src/components/Footer.tsx`)
-- Se restaurará el fondo oscuro `#111827` en el contenedor principal.
-- Se actualizarán las clases de los títulos (`h3`) para que sean `text-white font-bold text-base mb-3`.
-- Se actualizarán los enlaces (`a` y `Link`) para que sean `text-gray-400 hover:text-white text-sm transition-colors block py-1`.
-- Se simplificará la estructura del grid a una sola columna en móvil usando `grid-cols-1 md:grid-cols-4`.
-- Se asegurará de que el texto sea visible y no use colores semánticos que dependan del tema (shadcn) si están causando problemas de contraste.
-
-#### Botones Flotantes (`src/components/WhatsAppButton.tsx` y `src/components/ScrollToTop.tsx`)
-- Se ajustará la posición fija a `bottom-[115px]` para que floten exactamente sobre la barra de compra (que tiene `bottom-0`).
-- Se aumentará el `z-index` a `50` para asegurar visibilidad.
-
-#### Traducción y Contenidos
-- Se verificará que las traducciones al inglés en `src/components/Footer.tsx` coincidan con lo solicitado:
-  - CATEGORIES (All Products, English, Spanish, Other Languages)
-  - SERVICES (About Us, Blog, FAQ, Shipping & Delivery, Terms & Conditions, Privacy Policy)
-  - COMMUNITY (Instagram, Facebook, WhatsApp)
+### 2. Página Digital (`src/pages/ProductSpanish5000Digital.tsx`)
+- Modificar la tarjeta de "Upgrade" (líneas 600-618) o agregar una nueva sección similar.
+- **Texto**: "Want the Physical Printed Book?"
+- **Botón**: "Get Physical Book + Free Digital — $44.00 USD" (usando `formatPrice`).
+- **Ruta**: Redirigir a `/products/5-000-spanish-words-with-english-pronunciation-physical`.
+- **Precios**: Actualizar los fallbacks de `useCountryTierRouting` para la versión digital a $72.99 USD.
 
 ## Detalles Técnicos
-- El Footer usa `text-primary-foreground` actualmente, lo cual en temas claros/oscuros puede fallar si no está bien definido. Se forzará `text-gray-400` y `text-white` para el fondo `#111827`.
-- Se eliminarán paddings excesivos en móvil que puedan estar rompiendo la rejilla.
+- Se utilizará `formatPrice(72.99)` de `useI18n` para que el precio digital se muestre correctamente en la moneda del usuario (EUR, GBP, MXN, etc.).
+- Se aplicarán clases de Tailwind `break-words` y `overflow-hidden` en los contenedores de texto.
 
-## Validación
-- Se verificará visualmente en la ruta `/products/5-000-spanish-words-with-english-pronunciation-physical` que el footer sea legible.
-- Se comprobará que los botones de WhatsApp y Scroll-to-Top no se solapen con la Sticky Bar.
+## Verificación
+- Abrir la página física en modo móvil (375px) y verificar que no haya scroll horizontal.
+- Confirmar que el botón digital lleve a la ruta correcta.
+- Verificar en la página digital que el precio mostrado sea $72.99 USD (o equivalente local).

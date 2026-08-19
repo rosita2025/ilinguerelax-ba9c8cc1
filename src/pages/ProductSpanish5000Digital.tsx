@@ -255,8 +255,8 @@ const ProductSpanish5000Digital = () => {
             </div>
 
             {/* Copy */}
-            <div className="space-y-5">
-              <div className="flex flex-col sm:flex-row items-center gap-4 mb-2">
+            <div className="space-y-5 flex flex-col items-center md:items-start text-center md:text-left">
+              <div className="flex flex-col sm:flex-row items-center gap-4 mb-2 justify-center md:justify-start">
                 <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-emerald-500 text-emerald-500" />
@@ -268,14 +268,14 @@ const ProductSpanish5000Digital = () => {
               <LiveViewers minViewers={18} maxViewers={54} lang="en" />
               <PurchaseCounter />
 
-              <h1 className="text-xl sm:text-2xl md:text-5xl font-black leading-tight text-slate-900 break-words text-center md:text-left overflow-x-hidden w-full max-w-full px-1">
+              <h1 className="text-xl sm:text-2xl md:text-5xl font-black leading-tight text-slate-900 break-words text-center md:text-left overflow-x-hidden w-full max-w-full px-1 mx-auto">
                 {pricing.name ?? (<>Spanish Mastery System: 5,000 Essential Words —{" "}
                   <span className="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
                     with English Pronunciation
                   </span></>)}
               </h1>
 
-              <p className="text-base md:text-lg text-muted-foreground">
+              <p className="text-base md:text-lg text-muted-foreground text-center md:text-left mx-auto">
                 {pricing.description ?? (<>Digital-only PDF designed for English speakers learning Latin American Spanish. Every word written the way it{" "}
                 <em>actually sounds</em>. No dictionaries, no stress — start speaking Spanish today.</>)}
               </p>

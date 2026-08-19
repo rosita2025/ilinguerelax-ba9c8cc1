@@ -339,7 +339,7 @@ const ProductSpanish5000 = () => {
               </div>
 
               <h1
-                className="text-xl sm:text-2xl md:text-4xl font-bold text-foreground mb-3 leading-tight break-words text-center md:text-left overflow-x-hidden w-full max-w-full px-1"
+                className="text-xl sm:text-2xl md:text-4xl font-bold text-foreground mb-3 leading-tight break-words text-center md:text-left overflow-x-hidden w-full max-w-full px-1 mx-auto"
                 data-ab-experiment="spanish5000_headline_v1"
                 data-ab-variant={headlineVariant ?? "loading"}
               >
@@ -356,26 +356,28 @@ const ProductSpanish5000 = () => {
                 )}
               </h1>
 
-                <p className="text-base md:text-lg text-muted-foreground mb-4">
-                  <strong className="text-foreground">Buy the physical book and get the digital version FREE</strong> — plus <strong className="text-foreground">3 exclusive bonuses</strong> still available. 5,000 essential Spanish words written the way they <em>actually sound</em> in English.
-                </p>
+              <p className="text-base md:text-lg text-muted-foreground mb-4 text-center md:text-left mx-auto">
+                <strong className="text-foreground">Buy the physical book and get the digital version FREE</strong> — plus <strong className="text-foreground">3 exclusive bonuses</strong> still available. 5,000 essential Spanish words written the way they <em>actually sound</em> in English.
+              </p>
 
               {/* Benefits bullets — scannable above the fold */}
-                <ul className="space-y-1.5 mb-4 px-1">
+              <div className="flex flex-col items-center md:items-start my-4 w-full">
+                <ul className="inline-block space-y-1.5 px-1 max-w-md text-left">
                   {[
                     "📦 Physical book shipped to your door (limited stock — no preorder)",
                     "📱 Digital PDF version included FREE — instant access",
                     "🎁 Only 3 bonuses left + lifetime updates",
                   ].map((b) => (
-                  <li key={b} className="flex items-start gap-2 text-xs sm:text-base text-foreground leading-tight">
-                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <span className="break-words">{b}</span>
-                  </li>
-                ))}
-              </ul>
+                    <li key={b} className="flex items-start gap-2 text-xs sm:text-base text-foreground leading-tight">
+                      <Check className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                      <span className="break-words">{b}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
               {/* Reviews — responsive single row, no wrap on 320/375/480+ */}
-              <div className="flex items-center gap-1 xs:gap-1.5 mb-4 whitespace-nowrap">
+              <div className="flex items-center justify-center md:justify-start gap-1 xs:gap-1.5 mb-4 whitespace-nowrap mx-auto md:mx-0">
                 <div className="flex items-center gap-0.5 shrink-0">
                   {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 fill-amber-400 text-amber-400" />)}
                 </div>

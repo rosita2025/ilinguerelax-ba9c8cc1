@@ -135,8 +135,18 @@ Deno.serve(async (req) => {
         email: body.payerEmail,
         ...(body.payerPhone ? { phone: body.payerPhone } : {}),
         ...(body.payerDocument ? { document: body.payerDocument } : {}),
+        ...(body.payerAddress ? {
+          address: {
+            street: body.payerAddress,
+            city: body.payerCity,
+            state: body.payerState,
+            zip_code: body.payerZip,
+            country: body.country.toUpperCase(),
+          },
+        } : {}),
       },
     };
+
 
     const resp = await fetch(`${dlocalApiBase()}/payments`, {
       method: "POST",

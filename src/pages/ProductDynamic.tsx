@@ -38,7 +38,13 @@ interface DBProduct {
   price_usd_latam: number | null;
   price_usd_tienda: number | null;
   price_pen: number | null;
+  compare_at_price_usd: number | null;
+  compare_at_price_usd_latam: number | null;
+  compare_at_price_usd_tienda: number | null;
+  compare_at_price_pen: number | null;
+  local_compare_at_prices: Record<string, number> | null;
   local_usd_prices: Record<string, number> | null;
+
   cover_image_url: string | null;
   gallery_images: string[] | null;
   is_upsell: boolean;

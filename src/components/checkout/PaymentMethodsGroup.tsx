@@ -402,6 +402,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     ? ` ≈ USD $${currentUsdRef.toFixed(2)}`
     : "";
   const finalPriceLabel = isActuallyShowingLocal ? `${priceBadge}${usdSuffix}` : "...";
+  
+  // Loading state detection for pricing across all components
+  const pricingIsLoading = region.loading || local.loading;
   const localBadge = "";
 
 

@@ -29,7 +29,7 @@ export const Navbar = () => {
       <div className="container px-4 md:px-4 py-2">
         <nav className="flex items-center justify-between bg-card/80 backdrop-blur-lg rounded-2xl px-4 py-2 border border-border shadow-card">
           {/* Logo */}
-          <Link to="/" className="flex items-center">
+          <Link to="/" className="flex items-center gap-2">
             <span className="text-xl font-bold text-foreground tracking-tight">
               iLingue <span className="font-light">Relax</span>
             </span>
@@ -92,12 +92,12 @@ export const Navbar = () => {
             </Link>
           </div>
 
-          {/* Mobile Cart and Hamburger */}
+          {/* Mobile Actions: Cart + Hamburger */}
           <div className="lg:hidden flex items-center gap-2">
             <CartDrawer />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
+              className="p-2 text-foreground hover:bg-secondary rounded-lg transition-colors border border-border"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

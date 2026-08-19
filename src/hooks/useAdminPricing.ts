@@ -42,6 +42,10 @@ export interface AdminPricing {
   localUsdPrices: Record<string, number> | null;
   /** Regional comparison prices overrides for specific currencies. */
   localCompareAtPrices: Record<string, number> | null;
+  /** Gallery images from admin. */
+  galleryImages: string[] | null;
+  /** Gallery metadata from admin. */
+  galleryMetadata: Record<string, any> | null;
 }
 
 const INITIAL: AdminPricing = {
@@ -65,6 +69,8 @@ const INITIAL: AdminPricing = {
   reviewCount: null,
   localUsdPrices: null,
   localCompareAtPrices: null,
+  galleryImages: null,
+  galleryMetadata: null,
 };
 
 /**
@@ -104,11 +110,14 @@ export function useAdminPricing(sku: string): AdminPricing {
         review_count: number | null;
         local_usd_prices: Record<string, number> | null;
         local_compare_at_prices: Record<string, number> | null;
+        gallery_images: string[] | null;
+        gallery_metadata: Record<string, any> | null;
       } | null = null;
       try {
         const result = await supabase
           .from("digital_products")
-          .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, compare_at_price_usd, compare_at_price_usd_latam, compare_at_price_usd_tienda, compare_at_price_pen, name, description, hotmart_url, store_enabled, cover_image_url, active, rating, review_count, local_usd_prices, local_compare_at_prices")
+          .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, compare_at_price_usd, compare_at_price_usd_latam, compare_at_price_usd_tienda, compare_at_price_pen, name, description, hotmart_url, store_enabled, cover_image_url, active, rating, review_count, local_usd_prices, local_compare_at_prices, gallery_images, gallery_metadata")
+
           .eq("sku", sku)
           .maybeSingle();
         data = result.data as typeof data;
@@ -151,6 +160,8 @@ export function useAdminPricing(sku: string): AdminPricing {
         reviewCount: (data as any).review_count != null ? Number((data as any).review_count) : null,
         localUsdPrices: (data as any).local_usd_prices ?? null,
         localCompareAtPrices: (data as any).local_compare_at_prices ?? null,
+        galleryImages: (data as any).gallery_images ?? null,
+        galleryMetadata: (data as any).gallery_metadata ?? null,
         loaded: true,
         missing: false,
       });

@@ -144,7 +144,7 @@ const HOTMART_8000_LATAM = "https://pay.hotmart.com/U103990323W?checkoutMode=10"
 
 const Product8000 = () => {
   const { currency, countryCode } = useI18n();
-  const campaign = useCampaignPrice(20, 54);
+  const pricing = useAdminPricing(ADMIN_SKU_8000);
   const navigate = useNavigate();
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);

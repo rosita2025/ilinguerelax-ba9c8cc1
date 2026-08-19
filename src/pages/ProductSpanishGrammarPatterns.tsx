@@ -596,10 +596,11 @@ const ProductSpanishGrammarPatterns = () => {
       <StickyBuyBar
         lang="en"
         productName="Grammar Patterns A1-C1 Mastery"
-        price={formatPrice(PRICE, currency)}
+        price={tier.priceLabel}
+        originalPrice={tier.originalLabel || undefined}
         rating={4.9}
         reviewCount={1500}
-        ctaText={`ADD TO CART — ${formatPrice(PRICE, currency)}`}
+        ctaText={`ADD TO CART — ${tier.priceLabel}`}
         sku={PRODUCT_SKU}
         onBuyClick={handleAddToCart}
         isLoading={cartLoading}
@@ -607,7 +608,9 @@ const ProductSpanishGrammarPatterns = () => {
         isPhysical={true}
         goesToInternalCheckout={true}
         currencyCode={currency}
-        flag={currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎"}
+        flag={tier.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
+        usdValue={tier.priceUsd}
+        localUsdPrices={pricing.localUsdPrices}
       />
     </main>
   );

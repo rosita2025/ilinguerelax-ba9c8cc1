@@ -873,7 +873,7 @@ const ProductSpanish5000 = () => {
         isLoading={isCreatingDigitalCheckout} 
         disabled={isCreatingDigitalCheckout} 
         goesToInternalCheckout={true}
-        usdValue={productPricing.priceGlobalUsd || 44}
+        usdValue={campaign.priceUsd}
         localUsdPrices={productPricing.localUsdPrices}
         flag={productPricing.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
       />

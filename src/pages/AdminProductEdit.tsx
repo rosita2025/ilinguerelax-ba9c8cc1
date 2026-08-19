@@ -1195,7 +1195,7 @@ const AdminProductEdit = () => {
                       </div>
                       <div className="space-y-1.5">
                         <div className="relative">
-                          <Label className="text-[8px] absolute -top-2 left-1 bg-background px-0.5 text-primary font-bold z-10">AHORA</Label>
+                          <Label className="text-[8px] absolute -top-2 left-1 bg-background px-0.5 text-primary font-bold z-10">Precio Oferta Local (Monto Exacto)</Label>
                           <Input
                             type="text" 
                             inputMode="decimal"

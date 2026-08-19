@@ -273,7 +273,7 @@ Deno.serve(async (req) => {
               country: body.country.toUpperCase(),
               skus,
               productName: description,
-              localAmount: usedUsdFallback ? calculatedUsd : localAmount,
+              localAmount: usedUsdFallback ? calculatedUsd : (localAmount ?? calculatedUsd),
               localCurrency: usedUsdFallback ? "USD" : localCurrency,
               usdFallback: usedUsdFallback,
               expirationDays: EXPIRATION_DAYS,

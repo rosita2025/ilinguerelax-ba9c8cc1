@@ -965,6 +965,16 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   }, []);
 
   useEffect(() => {
+    const handleOnline = () => {
+      if (stripeError && (stripeError.code === "network" || stripeError.code === "timeout")) {
+        retryStripe();
+      }
+    };
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
+  }, [stripeError, retryStripe]);
+
+  useEffect(() => {
     if (!(showStripe && selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected))) return;
     setStripeFrameMounted(false);
     setStripeElapsed(0);

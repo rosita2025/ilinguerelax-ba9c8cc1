@@ -217,10 +217,17 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
     let cancelled = false;
     setLoading(true);
     setErr(null);
+    let isMounted = true;
     (async () => {
       try {
         await loadPayPalSdk(currency);
-        if (cancelled || !ref.current || !window.paypal) return;
+        if (!isMounted || cancelled || !ref.current) return;
+        
+        // Final safety check for window.paypal
+        if (!window.paypal || !window.paypal.Buttons) {
+          throw new Error("SDK de PayPal cargado pero Buttons no disponible. Verifica bloqueadores de anuncios.");
+        }
+
         ref.current.innerHTML = "";
         window.paypal.Buttons({
           style: { layout: "vertical", color: "gold", shape: "pill", label: "paypal", height: 45 },

@@ -87,11 +87,15 @@ Deno.serve(async (req) => {
 
     // --- LÓGICA DE ENVÍO (Debe ser idéntica al Frontend) ---
     const isPhysical = pricing.items.some(i => i.isPhysical);
-    const isLatam = tierForCountry(country) === "latam";
+    const tier = tierForCountry(country);
+    const isLatam = tier === "latam";
     const shippingUsdBase = isLatam ? 9 : 8;
-    const shippingUsd = isPhysical ? (pricing.totalUsd >= 50 ? 0 : shippingUsdBase) : 0;
     
-    // Convertir el envío a la moneda local si es necesario
+    // Server-side subtotal for shipping threshold
+    const subtotalUsd = pricing.items.reduce((sum, it) => sum + (it.unitUsd * it.quantity), 0);
+    const shippingUsd = isPhysical ? (subtotalUsd >= 50 ? 0 : shippingUsdBase) : 0;
+    
+    // Convert shipping to local currency if needed
     let shippingAmountCents = 0;
     if (shippingUsd > 0) {
       if (currency === "usd") {
@@ -101,7 +105,7 @@ Deno.serve(async (req) => {
         if (shippingLocal) {
           shippingAmountCents = Math.round(shippingLocal * 100);
         } else {
-          // Fallback a conversión simple si no hay tasa configurada
+          // Fallback to simple conversion
           shippingAmountCents = Math.round(shippingUsd * 100);
         }
       }

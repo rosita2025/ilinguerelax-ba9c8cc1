@@ -170,7 +170,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const [manual, shopify, hotmart, digital, funnel, emailLog, products, access] = await Promise.all([
+    const [manual, shopify, hotmart, digital, funnel, emailLog, products, access, paidEvents, shipments] = await Promise.all([
       admin.from("manual_payments").select("*").order("created_at", { ascending: false }).limit(200),
       admin.from("shopify_sales").select("*").order("created_at", { ascending: false }).limit(200),
       admin.from("hotmart_purchases").select("*").order("created_at", { ascending: false }).limit(200),
@@ -179,7 +179,56 @@ Deno.serve(async (req) => {
       admin.from("email_send_log").select("*").order("created_at", { ascending: false }).limit(300),
       admin.from("digital_products").select("sku,name,bonus_name,bonus_drive_url,bonuses,active,drive_url,updated_at,is_physical").limit(500),
       admin.from("download_token_access").select("id,token_id,action,sku,ip,created_at").order("created_at", { ascending: false }).limit(300),
+      admin.from("order_events").select("order_number,customer_email,provider,method,amount,currency,metadata,created_at")
+        .eq("event", "payment_paid").order("created_at", { ascending: false }).limit(300),
+      admin.from("physical_shipments").select("*").order("created_at", { ascending: false }).limit(300),
     ]);
+
+    // Pedidos pagados por pasarela (Stripe, dLocal…) que no viven en
+    // manual_payments ni shopify_sales: se arman desde order_events.
+    const skipOrders = new Set<string>([
+      ...((manual.data ?? []) as { order_number: string | null }[])
+        .map((m) => String(m.order_number ?? "").toUpperCase()).filter(Boolean),
+      ...((shopify.data ?? []) as { shopify_order_id: string | null }[])
+        .map((s) => String(s.shopify_order_id ?? "").toUpperCase()).filter(Boolean),
+    ]);
+    const shipmentByOrder = new Map<string, Record<string, unknown>>(
+      ((shipments.data ?? []) as { order_number: string }[]).map((s) => [String(s.order_number).toUpperCase(), s as never]),
+    );
+    const seenGateway = new Set<string>();
+    const gateway = ((paidEvents.data ?? []) as {
+      order_number: string | null; customer_email: string | null; provider: string | null;
+      method: string | null; amount: number | null; currency: string | null;
+      metadata: { skus?: string[] } | null; created_at: string;
+    }[])
+      .filter((e) => {
+        const key = String(e.order_number ?? "").toUpperCase();
+        if (!key || skipOrders.has(key) || seenGateway.has(key)) return false;
+        seenGateway.add(key);
+        return true;
+      })
+      .map((e) => {
+        const ship = shipmentByOrder.get(String(e.order_number).toUpperCase()) as
+          | { tracking_number?: string; shipping_provider?: string; shipping_proof_url?: string; shipping_address?: unknown; customer_name?: string; status?: string }
+          | undefined;
+        return {
+          order_number: e.order_number,
+          created_at: e.created_at,
+          customer_email: e.customer_email,
+          customer_name: ship?.customer_name ?? null,
+          provider: e.provider,
+          method: e.method,
+          amount: e.amount,
+          currency: e.currency,
+          skus: Array.isArray(e.metadata?.skus) ? e.metadata!.skus : [],
+          tracking_number: ship?.tracking_number ?? null,
+          shipping_provider: ship?.shipping_provider ?? null,
+          shipping_proof_url: ship?.shipping_proof_url ?? null,
+          shipping_address: ship?.shipping_address ?? null,
+          status: ship?.status === "shipped" ? "shipped" : "paid",
+        };
+      });
+
 
     const accessRows = access.data ?? [];
     const tokenIds = [...new Set(accessRows.map((r: { token_id: string }) => r.token_id))];

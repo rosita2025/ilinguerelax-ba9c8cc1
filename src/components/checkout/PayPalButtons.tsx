@@ -26,16 +26,23 @@ async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
   const sdkCorrId = `sdk-${Date.now()}`;
   
   // Limpieza agresiva de scripts de PayPal previos para evitar conflictos
-  document.querySelectorAll('script[src*="paypal.com/sdk/js"]').forEach((s) => {
-    try { s.parentNode?.removeChild(s); } catch { s.remove(); }
-  });
-  window.paypal = undefined;
-  sdkPromise = null;
+  const cleanup = () => {
+    document.querySelectorAll('script[src*="paypal.com/sdk/js"]').forEach((s) => {
+      try { s.parentNode?.removeChild(s); } catch { s.remove(); }
+    });
+    window.paypal = undefined;
+    sdkPromise = null;
+  };
+  
+  if (!sdkPromise) cleanup();
   
   let lastError: Error | null = null;
   
   for (let i = 1; i <= attempts; i++) {
     try {
+      // Check if already loaded by another instance
+      if (window.paypal && loadedClientId && loadedCurrency === currency) return;
+
       const { data, error } = await invokeEdge<{ clientId?: string }>(
         "paypal-config",
         { 
@@ -51,13 +58,11 @@ async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
       
       const clientId = data.clientId as string;
       
+      // Double check window.paypal again before starting a new injection
       if (window.paypal && loadedClientId === clientId && loadedCurrency === currency) return;
       if (sdkPromise && loadedClientId === clientId && loadedCurrency === currency) return sdkPromise;
       
-      document.querySelectorAll('script[data-paypal-sdk="1"]').forEach((s) => {
-        try { s.parentNode?.removeChild(s); } catch { s.remove(); }
-      });
-      window.paypal = undefined;
+      cleanup();
       loadedClientId = clientId;
       loadedCurrency = currency;
       
@@ -185,7 +190,7 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
       headers: { "x-correlation-id": correlationId },
     }, { 
       attempts: MAX_ATTEMPTS,
-      onAttemptError: (info) => {
+      onAttemptError: (info: any) => {
         console.warn(`[paypal] ${fnName} attempt ${info.attempt} failed`, { 
           correlationId, 
           error: (info.error as Error)?.message 
@@ -212,10 +217,17 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
     let cancelled = false;
     setLoading(true);
     setErr(null);
+    let isMounted = true;
     (async () => {
       try {
         await loadPayPalSdk(currency);
-        if (cancelled || !ref.current || !window.paypal) return;
+        if (!isMounted || cancelled || !ref.current) return;
+        
+        // Final safety check for window.paypal
+        if (!window.paypal || !window.paypal.Buttons) {
+          throw new Error("SDK de PayPal cargado pero Buttons no disponible. Verifica bloqueadores de anuncios.");
+        }
+
         ref.current.innerHTML = "";
         window.paypal.Buttons({
           style: { layout: "vertical", color: "gold", shape: "pill", label: "paypal", height: 45 },
@@ -300,7 +312,10 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
         setLoading(false);
       }
     })();
-    return () => { cancelled = true; };
+    return () => { 
+      cancelled = true; 
+      isMounted = false;
+    };
   }, [amount, amountUsd, currency, description, buyerEmail, buyerName, buyerPhone, buyerCountry, skusKey, reloadKey, onApproved, onError]);
 
   const correlationId = correlationIdRef.current;

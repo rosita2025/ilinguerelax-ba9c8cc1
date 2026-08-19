@@ -514,7 +514,6 @@ const ProductSpanish5000 = () => {
                   </div>
 
                 </div>
-                </div>
               </div>
               <div className="mb-12 pb-8" />
             </div>

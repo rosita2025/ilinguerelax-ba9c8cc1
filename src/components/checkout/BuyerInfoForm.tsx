@@ -282,9 +282,17 @@ export function BuyerInfoForm() {
               onChange={(v) => setLocalPhone(v ?? "")}
               onBlur={() => updateGlobalBuyer({ phone: localPhone })}
               placeholder="999 999 999"
-              className="w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus-within:ring-2 focus-within:ring-primary/40"
+              className={cn(
+                "w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus-within:ring-2 transition-all",
+                showPhoneError 
+                  ? "border-destructive focus-within:ring-destructive/40" 
+                  : "focus-within:ring-primary/40"
+              )}
             />
           </div>
+          {showPhoneError && (
+            <p className="text-[11px] text-destructive mt-1">El teléfono es obligatorio para soporte/verificación.</p>
+          )}
         </label>
 
         {hasPhysicalItems && (

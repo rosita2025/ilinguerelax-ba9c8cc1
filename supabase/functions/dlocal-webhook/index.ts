@@ -20,6 +20,7 @@ import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { deliverLikeManual } from "../_shared/manualDelivery.ts";
 import { checkAmount, describeAmountCheck } from "../_shared/dlocalAmounts.ts";
 import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
+import { upsertPhysicalShipment } from "../_shared/physicalShipments.ts";
 
 const API_BASE = dlocalApiBase();
 

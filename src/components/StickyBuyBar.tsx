@@ -172,6 +172,8 @@ export const StickyBuyBar = ({
   // Publish the sticky bar's real height as a CSS variable so floating
   // buttons (WhatsApp, ScrollToTop) can position themselves safely above it
   // and never overlap — regardless of email form, product name length, etc.
+  // Note: We use z-70 for the bar and z-60 for floating buttons.
+  // The bottom position is handled via --sticky-bar-h + offset in those components.
   const barRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const el = barRef.current;

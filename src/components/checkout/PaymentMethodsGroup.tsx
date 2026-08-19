@@ -939,6 +939,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       
       if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { 
         setShowStripe(true); 
+        // Force fresh fetch on "Continuar" to handle stale sessions
+        useCheckoutPruebaStore.getState().setClientSecret(null);
         // Scroll to stripe anchor
         setTimeout(() => {
           stripeAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });

@@ -2316,7 +2316,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   <div className="rounded-lg bg-[#F0B90B]/10 p-3 text-center border border-[#F0B90B]/20">
                     <p className="text-xs text-[#b38a08] uppercase tracking-wider font-bold">{t.amountToPay}</p>
                     <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                      {(() => {
+                      {region.loading ? (
+                        <Skeleton className="h-8 w-32 mx-auto" />
+                      ) : (() => {
                         const pricing = {
                           priceUsd: currentUsdRef,
                           currencyCode: currency,

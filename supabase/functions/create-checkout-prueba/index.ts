@@ -191,8 +191,6 @@ Deno.serve(async (req) => {
       shipping_usd: String(shippingUsd),
     };
 
-    const forceUsd = body.isRestrictedRetry || isRestrictedCurrency(country);
-    const targetCurrency = forceUsd ? "usd" : currency;
 
     console.log(`[Stripe] Creating session. TargetCurrency: ${targetCurrency}, Total: ${totalCents}, Country: ${country}`);
 

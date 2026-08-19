@@ -2525,12 +2525,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         <button
           type="button"
           onClick={handleBuyNow}
-          disabled={!valid || !selected || mpLoading !== null}
+          disabled={!selected || mpLoading !== null}
           className={cn(
             "w-full mt-4 py-4 rounded-xl font-bold text-white text-base transition-colors",
             "bg-[hsl(142,72%,42%)] hover:bg-[hsl(142,72%,36%)]",
-            "disabled:opacity-50 disabled:cursor-not-allowed",
             "flex items-center justify-center gap-2",
+            !valid && "opacity-60 cursor-pointer",
           )}
         >
           {mpLoading ? (

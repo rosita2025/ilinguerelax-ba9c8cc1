@@ -95,6 +95,12 @@ const ProductSpanish3000VerbsBook = () => {
 
 
   const PRODUCT_SKU = "spanish-3000-verbs-book";
+  const pricing = useAdminPricing(PRODUCT_SKU);
+  const tier = useCountryTierRouting(PRODUCT_SKU, {
+    fallbackPriceGlobalUsd: PREORDER_PRICE,
+    fallbackPriceLatamUsd: PREORDER_PRICE,
+  });
+
   const handleAddToCart = async () => {
     navigate(`/checkouts/${PRODUCT_SKU}`);
   };
@@ -270,10 +276,9 @@ const ProductSpanish3000VerbsBook = () => {
 
                 <div className="flex items-baseline gap-3 mb-1 flex-wrap">
                   <span className="text-5xl md:text-6xl font-black text-white">
-                    ${PREORDER_PRICE}
+                    {tier.priceLabel}
                   </span>
-                  <span className="text-2xl text-slate-500 line-through">${RETAIL_PRICE}</span>
-                  <span className="text-cyan-300 font-bold">USD</span>
+                  <span className="text-2xl text-slate-500 line-through">{tier.originalLabel}</span>
                 </div>
 
                 <p className="text-sm text-slate-300 mb-3">
@@ -323,7 +328,7 @@ const ProductSpanish3000VerbsBook = () => {
                 ) : (
                   <ShoppingCart className="w-6 h-6 mr-2" />
                 )}
-                {`PRE-ORDER THE 3,000 VERBS BOOK — $${PREORDER_PRICE}`}
+                {`PRE-ORDER THE 3,000 VERBS BOOK — ${tier.priceLabel}`}
               </Button>
               <p className="text-xs text-center text-slate-400 mb-5">
                 Add the Verb Mastery to my collection · Secure checkout · Ships June 2026

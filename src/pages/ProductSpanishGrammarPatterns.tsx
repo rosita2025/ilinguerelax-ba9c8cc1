@@ -72,6 +72,12 @@ const ProductSpanishGrammarPatterns = () => {
 
 
   const PRODUCT_SKU = "spanish-relax-structural-spanish-grammar-a1-c1-book-physical-n9ct";
+  const pricing = useAdminPricing(PRODUCT_SKU);
+  const tier = useCountryTierRouting(PRODUCT_SKU, {
+    fallbackPriceGlobalUsd: PRICE,
+    fallbackPriceLatamUsd: PRICE,
+  });
+
   const handleAddToCart = async () => {
     navigate(`/checkouts/${PRODUCT_SKU}`);
   };
@@ -250,9 +256,9 @@ const ProductSpanishGrammarPatterns = () => {
 
                 <div className="flex items-baseline gap-3 mb-1 flex-wrap">
                   <span className="text-5xl md:text-6xl font-black text-white">
-                    ${PRICE}
+                    {tier.priceLabel}
                   </span>
-                  <span className="text-[#f4d782] font-bold">USD</span>
+                  {tier.originalLabel && <span className="text-[#f4d782] font-bold">{tier.originalLabel}</span>}
                 </div>
 
                 <p className="text-sm text-slate-300 mb-3">
@@ -300,7 +306,7 @@ const ProductSpanishGrammarPatterns = () => {
                 ) : (
                   <ShoppingCart className="w-6 h-6 mr-2" />
                 )}
-                {`ADD TO CART — $${PRICE}.00`}
+                {`ADD TO CART — ${tier.priceLabel}`}
               </Button>
               <p className="text-xs text-center text-slate-300 mb-5">
                 Secure checkout · Free shipping over ${FREE_SHIPPING_THRESHOLD} · Ships worldwide

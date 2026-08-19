@@ -238,14 +238,19 @@ const ProductDynamic = () => {
   // (`digital_products`) + la moneda local del visitante. El hero y el sticky
   // bar leen exactamente el mismo par (etiqueta, moneda) para que nunca haya
   // dos precios distintos en la misma página.
-  // isPEN ya declarado arriba
-  const displayPrice = (isPEN && product?.price_pen != null && Number(product.price_pen) > 0) 
-    ? Number(product.price_pen) 
-    : (local.amount || 0);
+  // Prioridad para Perú: monto manual en `local_prices.PEN` (admin) y sólo como
+  // respaldo la columna legacy `price_pen`. Los montos se leen tal cual (S/ 43 = 43),
+  // sin dividir ni convertir.
+  const penOverride = isPEN ? Number((localPrices as any)?.PEN ?? 0) : 0;
+  const penLegacy = isPEN && product?.price_pen != null ? Number(product.price_pen) : 0;
+  const penAmount = penOverride > 0 ? penOverride : penLegacy > 0 ? penLegacy : 0;
 
-  const displayFormatted = (isPEN && product?.price_pen != null && Number(product.price_pen) > 0)
-    ? formatCurrencyAmount(Number(product.price_pen), "PEN")
+  const displayPrice = penAmount > 0 ? penAmount : (local.amount || 0);
+
+  const displayFormatted = penAmount > 0
+    ? formatCurrencyAmount(penAmount, "PEN")
     : (local.formatted || "$0.00");
+
   const displayCurrencyCode = isPEN ? "PEN" : (local.currency || "USD");
   // Precio tachado (ANTES): manual del admin por moneda/región, con fallback automático.
   const ORIGINAL_MULTIPLIER = 2.5;

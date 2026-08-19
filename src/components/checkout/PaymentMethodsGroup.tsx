@@ -961,6 +961,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     setStripeLoading(false);
     setStripeFrameMounted(false);
     setStripeElapsed(0);
+    // Explicitly invalidate client secret to force fresh fetch
+    useCheckoutPruebaStore.getState().setClientSecret(null);
     setStripeRetryKey((k) => k + 1);
   }, []);
 

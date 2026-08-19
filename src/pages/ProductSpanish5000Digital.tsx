@@ -94,7 +94,7 @@ const ProductSpanish5000Digital = () => {
 
   const [isRedirecting, setIsRedirecting] = useState(false);
   const lockRef = useRef(false);
-  const { currency, countryCode, formatPrice } = useI18n();
+  const { currency, countryCode, formatPrice, setCurrency, setCountryCode } = useI18n();
   const ADMIN_SKU_SP5K = "5-000-spanish-words-with-english-pronunciation-digital";
   const PRODUCT_SKU = "5-000-spanish-words-with-english-pronunciation-digital";
   const TIENDA_PATH_SP5K = `/checkouts/${PRODUCT_SKU}`;

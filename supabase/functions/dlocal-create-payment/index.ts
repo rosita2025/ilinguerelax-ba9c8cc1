@@ -118,6 +118,15 @@ Deno.serve(async (req) => {
         email: body.payerEmail,
         document: opts.minimal ? undefined : body.payerDocument,
         phone: opts.minimal ? undefined : body.payerPhone,
+        // Dirección de envío: dLocal la acepta como parte del pagador y nos
+        // sirve para despachar libros físicos desde /admin/orders-physical.
+        address: opts.minimal || !body.payerAddress ? undefined : {
+          street: body.payerAddress,
+          city: body.payerCity,
+          state: body.payerState,
+          zip_code: body.payerZip,
+          country: body.country.toUpperCase(),
+        },
       },
     });
 

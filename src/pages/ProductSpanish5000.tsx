@@ -143,19 +143,38 @@ const ProductSpanish5000 = () => {
 
   // Configuración de precios dinámica basada en SKU
   const campaign = useMemo(() => {
-    // Si hay datos cargados del admin, usamos esos precios regionales
-    const basePrice = productPricing.priceGlobalUsd || 44;
-    const comparePrice = productPricing.compareAtPriceGlobalUsd || 59;
+    // Determine target tier for calculation
+    const isPen = currency === "PEN";
+    const isLatam = ["MXN", "COP", "ARS", "CLP", "BRL", "CRC", "DOP", "GTQ", "HNL", "NIO", "PYG", "UYU", "VES"].includes(currency);
+    const isEurope = ["EUR", "GBP", "CHF", "SEK", "NOK", "DKK", "PLN", "CZK"].includes(currency);
+    const isOceania = ["AUD", "NZD"].includes(currency);
+
+    // Get regional base price from admin
+    let basePrice = productPricing.priceGlobalUsd || 44;
+    if (isPen && productPricing.pricePen) {
+      // PEN special case
+      return {
+        price: formatPrice(44, { PEN: productPricing.pricePen }),
+        originalPrice: formatPrice(59, { PEN: productPricing.compareAtPricePen || productPricing.pricePen * 1.35 }),
+        currency: "PEN" as const,
+        discountPercentage: 25
+      };
+    }
+    
+    if (isLatam) basePrice = productPricing.priceLatamUsd || 44;
+    else if (isEurope || isOceania) basePrice = productPricing.priceGlobalUsd || 44;
+
+    const comparePrice = isLatam 
+      ? (productPricing.compareAtPriceLatamUsd || basePrice * 1.35)
+      : (productPricing.compareAtPriceGlobalUsd || basePrice * 1.35);
     
     return {
-      price: formatPrice(basePrice, productPricing.localUsdPrices),
-      originalPrice: formatPrice(comparePrice, productPricing.localCompareAtPrices),
-      currency: "USD" as const,
-      discountPercentage: productPricing.priceGlobalUsd && productPricing.compareAtPriceGlobalUsd
-        ? Math.round((1 - productPricing.priceGlobalUsd / productPricing.compareAtPriceGlobalUsd) * 100)
-        : 25
+      price: formatPrice(basePrice, null, productPricing.localUsdPrices),
+      originalPrice: formatPrice(comparePrice, null, productPricing.localCompareAtPrices),
+      currency: currency as any,
+      discountPercentage: Math.round((1 - basePrice / comparePrice) * 100)
     };
-  }, [formatPrice, productPricing]);
+  }, [formatPrice, productPricing, currency]);
 
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({
@@ -837,25 +856,26 @@ const ProductSpanish5000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar 
-        price={stickyPriceLabel} 
-        originalPrice={stickyOriginalLabel} 
-        currencyCode={stickyCurrency} 
-        productName="Book Physical & Digital — FREE Bonuses" 
+        sku={PRODUCT_SKU}
+        price={campaign.price} 
+        originalPrice={campaign.originalPrice} 
+        currencyCode={currency} 
+        productName={productPricing.name ?? "Book Physical & Digital — FREE Bonuses"} 
         onBuyClick={handleStickyBuy} 
-        ctaText={dynamicCtaText} 
+        ctaText={stickyCtaText} 
         isPhysical={true} 
         showReviews={true} 
-        rating={4.8} 
-        reviewCount={500} 
+        rating={productPricing.rating ?? 4.8} 
+        reviewCount={productPricing.reviewCount ?? 500} 
         lang="en" 
         calmMode 
         dismissible 
         isLoading={isCreatingDigitalCheckout} 
         disabled={isCreatingDigitalCheckout} 
-        sku={PRODUCT_SKU} 
         goesToInternalCheckout={true}
         usdValue={productPricing.priceGlobalUsd || 44}
         localUsdPrices={productPricing.localUsdPrices}
+        flag={productPricing.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
       />
 
       {/* Spacer for sticky bar */}

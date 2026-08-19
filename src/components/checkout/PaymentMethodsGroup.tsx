@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreditCard, Building2, Banknote, Loader2, Lock, Smartphone, Copy, Check, MessageCircle, Wallet } from "lucide-react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
@@ -332,7 +332,7 @@ const getStripeVisibleMethods = (language: string): Record<string, Omit<PaymentM
   },
 });
 
-export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null } = {}) {
+export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null } = {}) {
   const navigate = useNavigate();
   const { items, buyer, coupon, couponPercent, selectedMethod, setSelectedMethod } = useCheckoutPruebaStore();
   const region = useRegionTier();
@@ -340,11 +340,12 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   const isLatam = ["AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "PA", "PY", "PE", "PR", "UY"].includes(countryCode);
   const { language } = useI18n();
   const t = getCheckoutUI(language);
-  const { total, subtotal } = calcTotals(items, couponPercent, region.tier);
+  const totals = useMemo(() => calcTotals(items, couponPercent, region.tier), [items, couponPercent, region.tier]);
+  const { total, subtotal } = totals;
   const shippingCost = isLatam ? 9 : 8;
   const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : shippingCost) : 0;
   const grandTotal = total + shipping;
-  const totalUsd = grandTotal.toFixed(2);
+  const totalUsd = useMemo(() => grandTotal.toFixed(2), [grandTotal]);
   const penTotals = calcTotalsPen(items, couponPercent, countryCode);
   const overridesFor = useSkuOverridesResolver();
   const isRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(countryCode);
@@ -352,13 +353,13 @@ export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null }
   void local; // Silenciar advertencia si no se usa local.isUsd etc directamente
 
   // Replicating exactly the logic from OrderSummary.tsx
-  const localItemsSum = sumItemsLocal(
+  const localItemsSum = useMemo(() => sumItemsLocal(
     items.map((i) => ({ id: i.id, sku: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
     countryCode,
     overridesFor,
-  );
+  ), [items, countryCode, region.tier, overridesFor]);
   const localSubtotalAmount = localItemsSum.amount;
-  const localTotalAmount = (localSubtotalAmount * (1 - (couponPercent || 0) / 100)) + shipping;
+  const localTotalAmount = useMemo(() => (localSubtotalAmount * (1 - (couponPercent || 0) / 100)) + shipping, [localSubtotalAmount, couponPercent, shipping]);
   const currentUsdRef = localItemsSum.usdReference; // The unified USD base for this cart in this region
   
   const [isFallingBackToUsd, setIsFallingBackToUsd] = useState(false);

@@ -302,8 +302,18 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
 );
 
 export function calcTotals(items: PruebaItem[], couponPercent: number, tier: RegionTier = "global") {
-  const subtotal = items.reduce((sum, i) => sum + itemPrice(i, tier) * i.quantity, 0);
-  const discount = (subtotal * couponPercent) / 100;
-  const total = Math.max(0, subtotal - discount);
-  return { subtotal, discount, total };
+  try {
+    if (!Array.isArray(items)) return { subtotal: 0, discount: 0, total: 0 };
+    const subtotal = items.reduce((sum, i) => {
+      const price = itemPrice(i, tier) || 0;
+      return sum + price * (i.quantity || 1);
+    }, 0);
+    const safeCouponPercent = Math.max(0, Math.min(100, couponPercent || 0));
+    const discount = (subtotal * safeCouponPercent) / 100;
+    const total = Math.max(0, subtotal - discount);
+    return { subtotal, discount, total };
+  } catch (error) {
+    console.error("Error in calcTotals:", error);
+    return { subtotal: 0, discount: 0, total: 0 };
+  }
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Minus, Plus, Trash2, Tag, X, ChevronDown, ChevronUp, MapPin, ShoppingBag, Truck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,7 +40,8 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(!collapsible);
-  const { subtotal, discount, total } = calcTotals(items, couponPercent, region.tier);
+  const totals = useMemo(() => calcTotals(items, couponPercent, region.tier), [items, couponPercent, region.tier]);
+  const { subtotal, discount, total } = totals;
   
   // Lógica de costo de envío: Latam $9, Resto (USA/CAN/UK) $8 (o free > 50). 
   // Si es Asia no se permite pagar (se maneja en PaymentMethodsGroup, pero aquí mostramos costo estimado o aviso)
@@ -66,11 +67,11 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const penMode = penTotals !== null && !isGlobalGateway;
   const showLocalRef = !localTotal.loading; // Remove !penMode restriction to ensure USD ref always shows
   // Local totals honoring per-sku overrides from /admin/products/:sku
-  const localItemsSum = sumItemsLocal(
+  const localItemsSum = useMemo(() => sumItemsLocal(
     items.map((i) => ({ id: i.id, sku: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
     region.country || "",
     overridesFor,
-  );
+  ), [items, region.country, region.tier, overridesFor]);
   const localSubtotalAmount = localItemsSum.amount;
   const localTotalAmount = (localSubtotalAmount * (1 - (couponPercent || 0) / 100)) + shipping;
   const currentUsdRef = localItemsSum.usdReference;

@@ -333,7 +333,7 @@ const ProductSpanish5000 = () => {
               </div>
 
               {/* Buy Now CTA */}
-              <div className="w-full mx-auto p-4 md:p-5 mb-4 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 overflow-hidden">
+              <div className="w-full mx-auto p-4 md:p-5 mb-4 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 overflow-x-hidden">
                 <Button
                   type="button"
                   size="xl"

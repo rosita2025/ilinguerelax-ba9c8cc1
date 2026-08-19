@@ -280,7 +280,7 @@ const ProductSpanish5000Digital = () => {
               </p>
 
               {/* Price block */}
-              <div className="w-full mx-auto p-4 md:p-5 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 overflow-hidden">
+              <div className="w-full mx-auto p-4 md:p-5 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 overflow-x-hidden">
                 <div className="flex items-end gap-3 flex-wrap">
                   <span className="text-4xl md:text-5xl font-black text-foreground">{tier.priceLabel}</span>
                   {tier.isOnSale && (

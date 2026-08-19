@@ -252,7 +252,7 @@ Deno.serve(async (req) => {
           customerName: body.payerName,
           customerEmail: body.payerEmail,
           productName: description,
-          amount: usedUsdFallback ? calculatedUsd : localAmount,
+          amount: usedUsdFallback ? calculatedUsd : (localAmount ?? calculatedUsd),
           currency: usedUsdFallback ? "USD" : localCurrency,
           method: methodLabel,
           orderDate: new Date().toISOString(),

@@ -175,7 +175,7 @@ export function PayPalButtons({
                 body: { 
                   amount, 
                   currency, 
-                  amountUsd: Number(amountUsd.toFixed(2)), 
+                  amountUsd: amount, // amount here is already amountUsd.toFixed(2) from the calculation above 
                   description, 
                   buyerEmail, 
                   buyerName, // Added name to payload

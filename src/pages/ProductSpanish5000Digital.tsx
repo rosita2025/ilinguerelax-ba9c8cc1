@@ -286,7 +286,7 @@ const ProductSpanish5000Digital = () => {
                   {tier.isOnSale && (
                     <>
                       <span className="text-lg sm:text-xl text-muted-foreground line-through mb-1 opacity-70">{tier.originalLabel}</span>
-                      <span className="px-2 py-0.5 sm:py-1 rounded-md bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] sm:text-xs font-black shadow-sm">
+                      <span className="px-2.5 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] sm:text-xs font-black shadow-lg">
                         SAVE {tier.discountPercentage}%
                       </span>
                     </>

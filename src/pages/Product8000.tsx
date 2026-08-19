@@ -311,13 +311,14 @@ const Product8000 = () => {
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button variant="hero" size="xl" className="w-full text-lg py-6 shadow-2xl" onClick={handleBuyNow}>
                     <CreditCard className="w-6 h-6 mr-2" />
-                    ¡COMPRAR AHORA!
+                    ¡COMPRAR AHORA! — {tier.priceLabel}
                     <ArrowRight className="w-6 h-6 ml-2" />
                   </Button>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button 
                     variant="outline" 
+
                     size="xl" 
                     className="w-full text-lg py-6 border-2 border-primary/30 hover:bg-primary/5" 
                     onClick={handleAddToCart}

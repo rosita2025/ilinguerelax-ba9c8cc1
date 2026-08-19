@@ -1237,7 +1237,7 @@ const AdminProductEdit = () => {
                         </div>
 
                         <div className="relative">
-                          <Label className="text-[8px] absolute -top-2 left-1 bg-background px-0.5 text-muted-foreground font-bold z-10 uppercase">Antes (Tachado)</Label>
+                          <Label className="text-[8px] absolute -top-2 left-1 bg-background px-0.5 text-muted-foreground font-bold z-10">Precio Normal Tachado</Label>
                           <Input
                             type="text" 
                             inputMode="decimal"

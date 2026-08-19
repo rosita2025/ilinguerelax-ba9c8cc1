@@ -13,6 +13,7 @@ import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PinterestSave } from "@/components/PinterestSave";
 import { VerifiedReviews } from "@/components/VerifiedReviews";
 import { CartBadge } from "@/components/CartBadge";
+import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
 import { StockAlert } from "@/components/StockAlert";
 import { SocialProofPill } from "@/components/SocialProofPill";
 import { ProductTypeBadge } from "@/components/ProductTypeBadge";

@@ -23,8 +23,10 @@ export function isBuyerValid(buyer: {
   try {
     const nameValid = (buyer.fullName || "").trim().length >= 3;
     const emailValid = checkEmail(buyer.email || "").ok;
-    const phoneValid = (buyer.phone || "").trim().length >= 7; // Mínimo para ser un número real
-    
+    // El teléfono es opcional: solo se valida si el comprador escribió algo.
+    const phoneTyped = (buyer.phone || "").trim();
+    const phoneValid = phoneTyped.length === 0 || phoneTyped.length >= 7;
+
     const basicOk = nameValid && emailValid && phoneValid;
     
     if (!hasPhysicalItems) return basicOk;
@@ -119,7 +121,7 @@ export function BuyerInfoForm() {
   const nameInvalid = localName.trim().length < 3;
   const emailCheckResult = useMemo(() => checkEmail(localEmail), [localEmail]);
   const emailInvalid = !emailCheckResult.ok;
-  const phoneInvalid = localPhone.trim().length < 7;
+  const phoneInvalid = localPhone.trim().length > 0 && localPhone.trim().length < 7;
   
   const addressInvalid = hasPhysicalItems && localAddress.trim().length < 8;
   const cityInvalid = hasPhysicalItems && localCity.trim().length < 3;

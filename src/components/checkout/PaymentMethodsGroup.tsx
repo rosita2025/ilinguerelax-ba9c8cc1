@@ -2159,6 +2159,31 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               </div>
             )}
 
+            {m.id === "dlocal_card" && isSelected && (
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4">
+                <DlocalSmartFields
+                  country={country}
+                  currency={DLOCAL_CURRENCY_BY_COUNTRY[country] ?? "USD"}
+                  amount={(DLOCAL_CURRENCY_BY_COUNTRY[country] ?? "USD") === "USD"
+                    ? total
+                    : (local.currency === (DLOCAL_CURRENCY_BY_COUNTRY[country] ?? "USD") ? local.amount : total)}
+                  expectedTotalUsd={total}
+                  items={items.map((i) => ({ id: i.id, name: i.name, price: itemPrice(i, region.tier), quantity: i.quantity }))}
+                  couponPercent={couponPercent}
+                  couponCode={coupon ?? undefined}
+                  payerName={buyer.fullName}
+                  payerEmail={buyer.email}
+                  payerPhone={buyer.phone ?? undefined}
+                  language={language}
+                  onPaid={(orderId) => {
+                    trackPurchase(orderId, "mercadopago_transfer");
+                    navigate(`/checkouts/success?session_id=${encodeURIComponent(orderId)}&status=approved&external_reference=${encodeURIComponent(orderId)}`);
+                  }}
+                  onError={(message) => setMethodError({ method: "dlocal_card", message })}
+                />
+              </div>
+            )}
+
 
             {m.id === "paypal" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4">
@@ -2462,13 +2487,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
             {m.id === "paypal" && isSelected && (
-              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-3">
-                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
-                  <p className="text-xs text-neutral-500">{t.amountToPay}</p>
-                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-4 py-6 space-y-6">
+                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-4 text-center border border-neutral-200 dark:border-neutral-700">
+                  <p className="text-[10px] uppercase tracking-wider font-bold text-neutral-500 dark:text-neutral-400 mb-1">{t.amountToPay}</p>
+                  <p className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
                     USD ${totalUsd}
                   </p>
                 </div>
+                <div className="flex justify-center w-full px-2">
                 <PayPalButtons
                   amountUsd={currentUsdRef}
                   localCurrency={countryCode === "PE" ? "PEN" : currency}
@@ -2504,6 +2530,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     } catch { /* noop */ }
                   }}
                 />
+                </div>
 
                 <p className="text-[11px] text-center text-neutral-500">
                   {language === "en" ? "Secure checkout by PayPal." : language === "pt" ? "Checkout seguro pelo PayPal." : language === "fr" ? "Paiement sécurisé par PayPal." : "Pago seguro procesado por PayPal."}

@@ -360,11 +360,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   );
 
   const totals = useMemo(() => calcTotals(items, couponPercent, region.tier), [items, couponPercent, region.tier]);
-  const { total: subtotalAfterDiscount, subtotal: subtotalRaw } = totals;
+  const { total, subtotal } = totals;
   
   // Lógica de envío centralizada
-  const shippingUsd = items.some((i) => i.isPhysical) ? (subtotalRaw >= 50 ? 0 : shippingCostUSD) : 0;
-  const grandTotalUsd = subtotalAfterDiscount + shippingUsd;
+  const shippingUsd = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : shippingCostUSD) : 0;
+  const grandTotalUsd = total + shippingUsd;
   const totalUsd = useMemo(() => grandTotalUsd.toFixed(2), [grandTotalUsd]);
   
   const penTotals = calcTotalsPen(items, couponPercent, countryCode);

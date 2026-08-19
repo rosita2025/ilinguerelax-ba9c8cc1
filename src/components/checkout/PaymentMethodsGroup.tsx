@@ -534,6 +534,15 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       const country = (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2);
       const initiallyRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(country);
 
+      /**
+       * Refresca el PaymentIntent solicitando un nuevo clientSecret si el actual falla
+       * o si la conexión fue inestable.
+       */
+      const refreshPaymentIntent = async () => {
+        useCheckoutPruebaStore.getState().setClientSecret(null);
+        return fetchSecret();
+      };
+
       const fetchSecret = async (retryForRestricted = false) => {
         const pricing = {
           priceUsd: currentUsdRef,

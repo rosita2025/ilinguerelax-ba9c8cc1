@@ -213,7 +213,7 @@ const ProductSpanish5000Digital = () => {
 
       {/* Hero */}
       <section className="pt-4 pb-6 md:pt-8 md:pb-10">
-        <div className="container px-4 md:px-6 w-full max-w-full overflow-hidden">
+        <div className="container px-4 md:px-6 w-full max-w-full overflow-x-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             {/* Image */}
             <div className="relative">
@@ -267,7 +267,7 @@ const ProductSpanish5000Digital = () => {
               <LiveViewers minViewers={18} maxViewers={54} lang="en" />
               <PurchaseCounter />
 
-              <h1 className="text-xl sm:text-2xl md:text-5xl font-black leading-tight text-slate-900 break-words text-center md:text-left">
+              <h1 className="text-xl sm:text-2xl md:text-5xl font-black leading-tight text-slate-900 break-words text-center md:text-left overflow-x-hidden w-full max-w-full">
                 {pricing.name ?? (<>Spanish Mastery System: 5,000 Essential Words —{" "}
                   <span className="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
                     with English Pronunciation

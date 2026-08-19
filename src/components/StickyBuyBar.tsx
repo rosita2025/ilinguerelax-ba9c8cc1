@@ -172,6 +172,8 @@ export const StickyBuyBar = ({
   // Publish the sticky bar's real height as a CSS variable so floating
   // buttons (WhatsApp, ScrollToTop) can position themselves safely above it
   // and never overlap — regardless of email form, product name length, etc.
+  // Note: We use z-70 for the bar and z-60 for floating buttons.
+  // The bottom position is handled via --sticky-bar-h + offset in those components.
   const barRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const el = barRef.current;
@@ -320,17 +322,17 @@ export const StickyBuyBar = ({
           )}
           <span className="text-[11px] leading-none whitespace-nowrap">{price}</span>
         </button>
-        {isPhysical && (
+        {/* {isPhysical && (
           <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold shadow-md whitespace-nowrap animate-pulse">
             {lang === "en" ? "Only 12 books left" : "Solo 12 libros quedan"}
           </span>
-        )}
+        )} */}
       </div>
     );
   }
 
   return (
-    <div ref={barRef} className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t-2 border-primary/20 shadow-[0_-8px_30px_rgba(0,0,0,0.25)]">
+    <div ref={barRef} className="fixed bottom-0 left-0 right-0 z-[70] bg-background/95 backdrop-blur-sm border-t-2 border-primary/20 shadow-[0_-8px_30px_rgba(0,0,0,0.25)]">
       {dismissible && (
         <button
           type="button"

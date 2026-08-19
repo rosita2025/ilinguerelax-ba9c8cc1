@@ -28,8 +28,9 @@ export const Footer = () => {
       reviews: "Dejar Reseña",
       myOrder: "Mi Pedido",
       products: "Todos los Productos",
-      english: "Inglés",
+      english: "English",
       spanish: "Español",
+      peru: "Perú",
       other: "Otros Idiomas",
       rights: "Todos los derechos reservados",
       tagline: "Aprende idiomas sin estrés — con pronunciación real.",
@@ -56,6 +57,7 @@ export const Footer = () => {
       products: "All Products",
       english: "English",
       spanish: "Spanish",
+      peru: "Peru",
       other: "Other Languages",
       rights: "All Rights Reserved",
       tagline: "Learn languages stress-free — with real pronunciation.",
@@ -82,6 +84,7 @@ export const Footer = () => {
       products: "Tous les Produits",
       english: "Anglais",
       spanish: "Espagnol",
+      peru: "Pérou",
       other: "Autres Langues",
       rights: "Tous droits réservés",
       tagline: "Apprenez les langues sans stress — avec vraie prononciation.",
@@ -108,6 +111,7 @@ export const Footer = () => {
       products: "Todos os Produtos",
       english: "Inglês",
       spanish: "Espanhol",
+      peru: "Peru",
       other: "Outros Idiomas",
       rights: "Todos os direitos reservados",
       tagline: "Aprenda idiomas sem estresse — com pronúncia real.",
@@ -148,6 +152,7 @@ export const Footer = () => {
         { to: "/products", label: c.products },
         { to: "/aprender/ingles-espanol", label: c.english },
         { to: "/aprender/espanol-ingles", label: c.spanish },
+        { to: "/aprender/peru", label: c.peru },
         { to: "/aprender", label: c.other },
       ],
     },
@@ -174,7 +179,7 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="bg-foreground text-primary-foreground w-full max-w-full overflow-hidden">
+    <footer className="bg-foreground text-primary-foreground w-full max-w-full overflow-hidden pb-24 md:pb-8 pt-8 px-4 box-border">
       <div className="container px-4 md:px-6 py-14 w-full max-w-full overflow-hidden">
         {/* Brand row */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10 pb-8 border-b border-primary-foreground/10">

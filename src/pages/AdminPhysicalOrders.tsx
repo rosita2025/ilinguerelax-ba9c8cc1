@@ -169,19 +169,26 @@ const AdminPhysicalOrders = () => {
     
     setSaving(order.id);
     try {
-      const { error } = await adminInvoke("list-admin-orders", {
+      const { data, error } = await adminInvoke("list-admin-orders", {
         body: {
           adminKey,
           action: "update_tracking",
           orderId: order.order_ref || order.id,
           trackingNumber: tracking,
+          shippingProvider: provider,
           shipping_provider: provider,
           shippingProofUrl: proofUrl,
           source: order.source,
         },
       });
       if (error) throw error;
+      const emailInfo = (data as { email?: { sent?: boolean; error?: string; skipped?: string } } | null)?.email;
       toast.success("Seguimiento actualizado para " + (order.order_ref || order.id));
+      if (tracking) {
+        if (emailInfo?.sent) toast.success("Correo de seguimiento enviado al cliente");
+        else if (emailInfo?.skipped === "no_email") toast.warning("El pedido no tiene correo: no se notificó al cliente");
+        else toast.error("No se pudo enviar el correo al cliente: " + (emailInfo?.error || "error desconocido"));
+      }
       loadOrders(true);
     } catch (e) {
       toast.error("Error al guardar: " + (e as Error).message);
@@ -189,6 +196,29 @@ const AdminPhysicalOrders = () => {
       setSaving(null);
     }
   };
+
+  const resendTrackingEmail = async (order: PhysicalOrder) => {
+    setSaving(order.id);
+    try {
+      const { data, error } = await adminInvoke("list-admin-orders", {
+        body: {
+          adminKey,
+          action: "resend_tracking_email",
+          orderId: order.order_ref || order.id,
+          source: order.source,
+        },
+      });
+      if (error) throw error;
+      const res = data as { ok?: boolean; error?: string } | null;
+      if (res?.ok) toast.success("Correo reenviado a " + order.email);
+      else toast.error("No se pudo reenviar: " + (res?.error || "error desconocido"));
+    } catch (e) {
+      toast.error("Error al reenviar: " + (e as Error).message);
+    } finally {
+      setSaving(null);
+    }
+  };
+
 
   const getTrackingUrl = (provider: string, tracking: string) => {
     const p = provider.toLowerCase();
@@ -352,7 +382,17 @@ const AdminPhysicalOrders = () => {
                             <Save className="w-4 h-4" />
                           )}
                         </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={saving === order.id || !order.email}
+                          title="Reenviar correo de seguimiento al cliente"
+                          onClick={() => resendTrackingEmail(order)}
+                        >
+                          <Mail className="w-4 h-4" />
+                        </Button>
                       </div>
+
                     </div>
                   </div>
                 </div>

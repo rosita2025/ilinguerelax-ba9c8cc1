@@ -62,6 +62,21 @@ export async function upsertPhysicalShipment(params: {
         .from("physical_shipments")
         .insert({ ...payload, status: "pending" });
       if (insError) throw insError;
+
+      // Aviso previo (una sola vez): "tu digital ya está, el tracking va en camino".
+      if (email) {
+        try {
+          await sendShippingEmail(adminClient, {
+            kind: "pre_notice",
+            orderNumber,
+            email: String(email),
+            name: customerName ?? null,
+            once: true,
+          });
+        } catch (e) {
+          console.error("[physical-shipments] pre-notice failed:", e);
+        }
+      }
     }
 
     console.log("[physical-shipments] registered", { orderNumber, provider });
@@ -71,3 +86,4 @@ export async function upsertPhysicalShipment(params: {
     return false;
   }
 }
+

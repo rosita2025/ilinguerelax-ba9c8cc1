@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
       if (table === "physical_shipments") {
         // Los pedidos pagados por pasarela pueden no tener aún fila de envío
         // (pagos anteriores a esta función): la creamos al guardar el tracking.
-        patch.status = trackingNumber ? "shipped" : "pending";
+        patch.status = trackingCode ? "shipped" : "pending";
         const { data: existingShipment } = await admin
           .from("physical_shipments")
           .select("order_number")
@@ -149,12 +149,13 @@ Deno.serve(async (req) => {
       await admin.from("order_events").insert({
         order_number: String(orderId),
         event: "tracking_updated",
-        status: trackingNumber ? "shipped" : "pending",
+        status: trackingCode ? "shipped" : "pending",
         provider: source === "gateway" ? "gateway" : source,
-        reference: trackingNumber || null,
-        detail: [shippingProvider, trackingNumber].filter(Boolean).join(" · ").slice(0, 500) || null,
+        reference: trackingCode || null,
+        detail: [shippingProvider, trackingCode].filter(Boolean).join(" · ").slice(0, 500) || null,
         metadata: {
-          trackingNumber,
+          trackingNumber: trackingCode,
+          trackingUrl: trackingLink,
           shippingProvider,
           shippingProofUrl,
           source,
@@ -164,7 +165,7 @@ Deno.serve(async (req) => {
 
       // Notificación al cliente: envío nuevo o tracking actualizado.
       let emailResult: Record<string, unknown> = { sent: false, skipped: "no_tracking" };
-      if (trackingNumber) {
+      if (trackingCode && notifyCustomer !== false) {
         try {
           const selectCols = table === "manual_payments"
             ? "buyer_email, buyer_name"
@@ -178,17 +179,18 @@ Deno.serve(async (req) => {
             .maybeSingle();
 
           const email = orderData?.buyer_email || orderData?.customer_email || orderData?.email;
-          const name = orderData?.buyer_name || orderData?.customer_name || "Cliente";
+          const name = await resolveCustomerName(String(orderId));
 
           if (email) {
             emailResult = await sendShippingEmail(admin, {
-              kind: prevTracking && prevTracking !== String(trackingNumber).trim()
+              kind: prevTracking && prevTracking !== trackingCode
                 ? "tracking_updated"
                 : "tracking_new",
               orderNumber: String(orderId),
               email: String(email),
               name,
-              trackingNumber,
+              trackingNumber: trackingCode,
+              trackingUrl: trackingLink,
               shippingProvider,
             });
           } else {
@@ -199,6 +201,7 @@ Deno.serve(async (req) => {
           emailResult = { sent: false, error: String((emailError as Error)?.message ?? emailError) };
         }
       }
+
 
       return new Response(JSON.stringify({ ok: true, email: emailResult }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

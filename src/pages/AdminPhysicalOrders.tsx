@@ -116,6 +116,39 @@ const AdminPhysicalOrders = () => {
         });
       });
 
+      // Pedidos pagados con pasarela (Stripe, dLocal…) que incluyen algún SKU físico
+      const nameBySku = new Map<string, string>(
+        products.map((p: any) => [String(p.sku).toLowerCase(), p.name || p.sku])
+      );
+      ((data as any)?.gateway || []).forEach((r: any) => {
+        const skus: string[] = Array.isArray(r.skus) ? r.skus : [];
+        const physical = skus.filter((s) => physicalSkus.has(String(s).toLowerCase()));
+        if (physical.length === 0) return;
+
+        const addr = r.shipping_address && typeof r.shipping_address === "object"
+          ? [r.shipping_address.address, r.shipping_address.city, r.shipping_address.state, r.shipping_address.zip, r.shipping_address.country]
+              .filter(Boolean).join(", ")
+          : null;
+
+        merged.push({
+          id: String(r.order_number),
+          source: "gateway",
+          created_at: r.created_at,
+          order_ref: String(r.order_number),
+          customer: r.customer_name || "—",
+          email: r.customer_email || "—",
+          products: physical.map((s) => nameBySku.get(String(s).toLowerCase()) || s).join(", "),
+          items: physical.map((s) => ({ sku: s, name: nameBySku.get(String(s).toLowerCase()) || s })),
+          amount: `${r.currency || "USD"} ${Number(r.amount || 0).toFixed(2)}`,
+          status: r.status || "paid",
+          tracking_number: r.tracking_number,
+          shipping_provider: r.shipping_provider,
+          shipping_proof_url: r.shipping_proof_url,
+          shipping_address: addr,
+          payment_provider: r.provider || r.method || null,
+        });
+      });
+
       setOrders(merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
     } catch (e) {
       toast.error("Error al cargar pedidos: " + (e as Error).message);

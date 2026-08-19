@@ -61,7 +61,7 @@ export function PayPalButtons({
   const localSupported = providedLocal && PAYPAL_SUPPORTED.has(localCurrency!.toUpperCase());
   const useLocal = providedLocal && localSupported;
   const currency = useLocal ? localCurrency!.toUpperCase() : "USD";
-  const amount = Number(amountUsd.toFixed(2)); // Always use amountUsd which already includes shipping in PaymentMethodsGroup.tsx
+  const amount = Number(amountUsd.toFixed(2)); // Total exacto que incluye producto y envío
   const fallbackToUsd = providedLocal && !localSupported;
 
   useEffect(() => {

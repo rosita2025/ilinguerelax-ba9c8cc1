@@ -61,6 +61,11 @@ export interface DlocalSmartFieldsProps {
   payerName: string;
   payerEmail: string;
   payerPhone?: string;
+  /** Dirección de envío (solo se envía cuando hay productos físicos). */
+  payerAddress?: string;
+  payerCity?: string;
+  payerState?: string;
+  payerZip?: string;
   language?: string;
   onPaid: (orderId: string) => void;
   onError?: (message: string) => void;
@@ -68,7 +73,8 @@ export interface DlocalSmartFieldsProps {
 
 export function DlocalSmartFields(props: DlocalSmartFieldsProps) {
   const { country, currency, amount, expectedTotalUsd, items, couponPercent, couponCode,
-    payerName, payerEmail, payerPhone, language = "es", onPaid, onError } = props;
+    payerName, payerEmail, payerPhone, payerAddress, payerCity, payerState, payerZip,
+    language = "es", onPaid, onError } = props;
 
   const cardRef = useRef<HTMLDivElement | null>(null);
   const fieldRef = useRef<unknown>(null);

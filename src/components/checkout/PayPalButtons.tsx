@@ -157,7 +157,7 @@ export function PayPalButtons({
                 headers: { "x-correlation-id": correlationId }
               });
 
-              if (error || !data?.id) throw new Error(error?.message || "No se pudo crear la orden");
+              if (error || !data?.id) throw new Error(error ? (error as any).message : "No se pudo crear la orden");
               return data.id;
             } catch (e) {
               setErr((e as any)?.message || String(e));

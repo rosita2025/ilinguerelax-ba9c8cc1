@@ -137,22 +137,33 @@ export function sumItemsLocal(
   country: string,
   resolver: (idOrSku?: string | null) => { local_prices: LocalPriceOverrides; local_usd_prices: LocalPriceOverrides }
 ): { amount: number; currency: Currency; isUsd: boolean; usdReference: number } {
-  const currency = detectCurrency((country || "US").toUpperCase());
-  const rate = exchangeRates[currency] ?? 1;
-  let amount = 0;
-  let usdReference = 0;
-  for (const it of items) {
-    const { local_prices, local_usd_prices } = resolver(it.sku ?? it.id);
-    const override = local_prices && local_prices[currency];
-    const regionalUsd = local_usd_prices && local_usd_prices[currency];
+  try {
+    const currency = detectCurrency((country || "US").toUpperCase());
+    const rate = exchangeRates[currency] ?? 1;
+    let amount = 0;
+    let usdReference = 0;
     
-    const activeUsd = typeof regionalUsd === "number" && regionalUsd > 0 ? regionalUsd : it.usd;
-    const perUnit = typeof override === "number" && override > 0 ? override : activeUsd * rate;
+    if (!Array.isArray(items)) return { amount: 0, currency, isUsd: currency === "USD", usdReference: 0 };
     
-    amount += perUnit * (it.quantity || 1);
-    usdReference += activeUsd * (it.quantity || 1);
+    for (const it of items) {
+      if (!it) continue;
+      const { local_prices, local_usd_prices } = resolver(it.sku ?? it.id);
+      const override = local_prices && local_prices[currency];
+      const regionalUsd = local_usd_prices && local_usd_prices[currency];
+      
+      const itemUsd = typeof it.usd === "number" ? it.usd : 0;
+      const activeUsd = typeof regionalUsd === "number" && regionalUsd > 0 ? regionalUsd : itemUsd;
+      const perUnit = typeof override === "number" && override > 0 ? override : activeUsd * rate;
+      
+      const qty = typeof it.quantity === "number" ? it.quantity : 1;
+      amount += perUnit * qty;
+      usdReference += activeUsd * qty;
+    }
+    return { amount, currency, isUsd: currency === "USD", usdReference };
+  } catch (error) {
+    console.error("Error in sumItemsLocal:", error);
+    return { amount: 0, currency: "USD" as Currency, isUsd: true, usdReference: 0 };
   }
-  return { amount, currency, isUsd: currency === "USD", usdReference };
 }
 
 export function useCurrencyBreakdown(usdAmount: number, overrides?: LocalPriceOverrides, localUsdPrices?: LocalPriceOverrides) {

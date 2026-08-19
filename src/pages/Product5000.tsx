@@ -26,7 +26,7 @@ import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useNavigate } from "react-router-dom";
 import { toast as sonnerToast } from "sonner";
-import { detectCurrency, formatPrice } from "@/i18n";
+import { detectCurrency, formatPrice, useI18n } from "@/i18n";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {

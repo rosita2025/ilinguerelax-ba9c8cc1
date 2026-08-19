@@ -290,6 +290,15 @@ Deno.serve(async (req) => {
               localCurrency: usedUsdFallback ? "USD" : localCurrency,
               usdFallback: usedUsdFallback,
               expirationDays: EXPIRATION_DAYS,
+              customerName: body.payerName,
+              customerPhone: body.payerPhone ?? null,
+              shipping: {
+                address: body.payerAddress ?? null,
+                city: body.payerCity ?? null,
+                state: body.payerState ?? null,
+                zip: body.payerZip ?? null,
+                country: body.country.toUpperCase(),
+              },
             },
           }),
           sendInternalEmail({

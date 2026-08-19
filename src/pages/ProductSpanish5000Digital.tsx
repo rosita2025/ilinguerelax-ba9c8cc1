@@ -46,6 +46,7 @@ import verbsV2PreviewAsset from "@/assets/spanish-verbs-preview.png.asset.json";
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
 const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then(m => ({ default: m.LooxStyleReviews })));
+import { CustomerReviewsSlider } from "@/components/CustomerReviewsSlider";
 
 
 // Fallbacks (referenciales, el hook useCountryTierRouting manda)

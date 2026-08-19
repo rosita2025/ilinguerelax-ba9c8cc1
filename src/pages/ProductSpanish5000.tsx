@@ -821,21 +821,30 @@ const ProductSpanish5000 = () => {
             </div>
 
             {/* Digital-only alternative */}
-            <div className="mt-6 w-full max-w-full box-border rounded-2xl border border-border bg-muted/30 p-5 md:p-6 text-left">
-              <p className="text-base md:text-lg font-semibold text-foreground">
-                Prefer only the digital version? Get 5,000 Words Spanish Relax PDF
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                No shipping, instant access to the full PDF.
-              </p>
-              <button
-                type="button"
-                onClick={() => navigate("/products/5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7")}
-                className="mt-3 inline-flex items-center gap-2 text-primary font-semibold hover:underline underline-offset-4"
-              >
-                I want only digital <ArrowRight className="w-4 h-4" />
-              </button>
+            <div className="mt-6 w-full max-w-full box-border rounded-2xl border border-border bg-muted/30 p-5 md:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 text-center sm:text-left">
+              <img
+                src={productSpanish5000DigitalOnlyImage}
+                alt="5,000 Spanish Words with English Pronunciation — digital PDF version"
+                loading="lazy"
+                className="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-xl border border-border flex-shrink-0"
+              />
+              <div className="min-w-0">
+                <p className="text-base md:text-lg font-semibold text-foreground">
+                  Prefer only the digital version? Get 5,000 Words Spanish Relax PDF
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  No shipping, instant access to the full PDF.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => navigate("/products/5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7")}
+                  className="mt-3 inline-flex items-center gap-2 text-primary font-semibold hover:underline underline-offset-4"
+                >
+                  I want only digital <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
+
           </div>
         </div>
       </section>

@@ -33,6 +33,7 @@ import { saveDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
 import { extractEdgeErrorMessage, looksTechnical } from "@/lib/edgeError";
 import { getPaymentPayload } from "@/lib/paymentGatewayRouter";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
+import { useCheckoutTotal } from "@/hooks/useCheckoutTotal";
 
 
 type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";

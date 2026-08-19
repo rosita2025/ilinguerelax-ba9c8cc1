@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
     }
     
     const clientId = Deno.env.get("PAYPAL_CLIENT_ID");
-    const secret = Deno.env.get("PAYPAL_SECRET");
+    const secret = Deno.env.get("PAYPAL_SECRET") || Deno.env.get("PAYPAL_CLIENT_SECRET");
     
     if (!clientId || !secret) {
       console.error("[paypal-config] MISSING CREDENTIALS:", { hasClientId: !!clientId, hasSecret: !!secret });

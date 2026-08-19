@@ -99,9 +99,17 @@ export function PayPalButtons({
 
   if (configError) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700 flex items-start gap-2">
-        <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-        <p className="flex-1">{configError}</p>
+      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 space-y-3">
+        <div className="flex items-start gap-2">
+          <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
+            <p className="font-semibold">PayPal no está disponible temporalmente</p>
+            <p className="text-xs opacity-90 mt-1">Por favor, utiliza Tarjeta de Crédito/Débito u otro método de pago para completar tu pedido.</p>
+          </div>
+        </div>
+        <p className="text-[10px] font-mono opacity-50 border-t border-amber-200/50 pt-2">
+          Error: {configError}
+        </p>
       </div>
     );
   }
@@ -208,7 +216,11 @@ export function PayPalButtons({
         <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700 space-y-2">
           <div className="flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-            <p className="flex-1">{err}</p>
+            <div className="flex-1">
+              <p className="font-semibold">Error de PayPal</p>
+              <p>{err}</p>
+              <p className="mt-1 text-red-600/80">Si el problema persiste, intenta usar Tarjeta de Crédito/Débito.</p>
+            </div>
           </div>
           <div className="flex items-center gap-2 pt-1 border-t border-red-200 text-[11px] text-red-600/80">
             <span className="font-mono truncate">ID: {correlationId}</span>

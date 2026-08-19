@@ -32,7 +32,7 @@ function cleanString(value: unknown, max: number): string | undefined {
 
 async function getAccessToken(): Promise<string> {
   const id = Deno.env.get("PAYPAL_CLIENT_ID");
-  const secret = Deno.env.get("PAYPAL_SECRET");
+  const secret = Deno.env.get("PAYPAL_SECRET") || Deno.env.get("PAYPAL_CLIENT_SECRET");
   if (!id || !secret) throw new Error("PayPal credentials not configured");
   const res = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
     method: "POST",
@@ -79,14 +79,36 @@ Deno.serve(async (req) => {
         "PayPal-Request-Id": `cap-${correlationId}`,
       },
     });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      console.error(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "json_parse_error", status: res.status, ms: Date.now() - t0 }));
+      throw new Error(`Error al procesar respuesta de captura (${res.status})`);
+    }
+
     if (!res.ok) {
       console.error(JSON.stringify({
         corr: correlationId, trace: traceId, fn: "paypal-capture-order", phase: "paypal_error",
         status: res.status, error: data, orderId, ms: Date.now() - t0,
       }));
-      return new Response(JSON.stringify({ error: data, trace: traceId, correlationId }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId, "x-trace-id": traceId },
+
+      // Extraer mensaje de error legible
+      let errorMessage = "No se pudo completar el pago en PayPal";
+      if (data?.details?.[0]?.description) {
+        errorMessage = `PayPal: ${data.details[0].description}`;
+      } else if (data?.message) {
+        errorMessage = `PayPal: ${data.message}`;
+      }
+
+      return new Response(JSON.stringify({ 
+        error: errorMessage, 
+        details: data,
+        trace: traceId, 
+        correlationId 
+      }), {
+        status: res.status >= 400 && res.status < 500 ? res.status : 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId, "x-trace-id": traceId },
       });
     }
     const status = data.status; // COMPLETED expected

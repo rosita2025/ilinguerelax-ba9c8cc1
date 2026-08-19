@@ -391,7 +391,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const currentUsdRef = totalLocal / (exchangeRates[currency] || 1);
 
   const penBadge = (penTotals && !isGlobalGateway) ? formatPen(penTotals.total + shippingLocal) : null;
-  const isActuallyShowingLocal = !local.loading;
+  const isActuallyShowingLocal = !region.loading && !local.loading;
   
   // Badge principal: SIEMPRE en moneda local del país EXCEPTO en países restringidos (AR/HN) 
   // o cuando se usa un gateway global, donde se fuerza USD.
@@ -400,7 +400,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const usdSuffix = (isActuallyShowingLocal && !local.isUsd) 
     ? ` ≈ USD $${currentUsdRef.toFixed(2)}`
     : "";
-  const finalPriceLabel = `${priceBadge}${usdSuffix}`;
+  const finalPriceLabel = isActuallyShowingLocal ? `${priceBadge}${usdSuffix}` : "...";
   const localBadge = "";
 
 

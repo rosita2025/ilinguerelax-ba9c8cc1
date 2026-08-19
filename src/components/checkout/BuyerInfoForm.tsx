@@ -119,6 +119,7 @@ export function BuyerInfoForm() {
   const nameInvalid = localName.trim().length < 3;
   const emailCheckResult = useMemo(() => checkEmail(localEmail), [localEmail]);
   const emailInvalid = !emailCheckResult.ok;
+  const phoneInvalid = localPhone.trim().length < 7;
   
   const addressInvalid = hasPhysicalItems && localAddress.trim().length < 8;
   const cityInvalid = hasPhysicalItems && localCity.trim().length < 3;
@@ -128,11 +129,12 @@ export function BuyerInfoForm() {
   const valid = useMemo(() => isBuyerValid({
     fullName: localName,
     email: localEmail,
+    phone: localPhone,
     address: localAddress,
     city: localCity,
     zip: localZip,
     country: localCountry
-  }, hasPhysicalItems), [localName, localEmail, localAddress, localCity, localZip, localCountry, hasPhysicalItems]);
+  }, hasPhysicalItems), [localName, localEmail, localPhone, localAddress, localCity, localZip, localCountry, hasPhysicalItems]);
 
   useEffect(() => {
     const handler = () => {

@@ -2487,13 +2487,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
             {m.id === "paypal" && isSelected && (
-              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-3">
-                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-3 text-center">
-                  <p className="text-xs text-neutral-500 uppercase tracking-wider font-bold">{t.amountToPay}</p>
-                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-4 py-6 space-y-6">
+                <div className="rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-4 text-center border border-neutral-200 dark:border-neutral-700">
+                  <p className="text-[10px] uppercase tracking-wider font-bold text-neutral-500 dark:text-neutral-400 mb-1">{t.amountToPay}</p>
+                  <p className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
                     USD ${totalUsd}
                   </p>
                 </div>
+                <div className="flex justify-center w-full px-2">
                 <PayPalButtons
                   amountUsd={currentUsdRef}
                   localCurrency={countryCode === "PE" ? "PEN" : currency}

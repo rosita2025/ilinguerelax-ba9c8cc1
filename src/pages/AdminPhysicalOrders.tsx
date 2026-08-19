@@ -295,7 +295,14 @@ const AdminPhysicalOrders = () => {
                 <div className="bg-muted/30 rounded-lg p-3 text-sm border">
                   <p className="font-semibold mb-1">Productos:</p>
                   <p className="text-muted-foreground">{order.products}</p>
+                  {order.source === "gateway" && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      <span className="font-semibold text-foreground">Dirección de envío: </span>
+                      {order.shipping_address || "No registrada — contactar al cliente por email."}
+                    </p>
+                  )}
                 </div>
+
 
                 <div className="grid md:grid-cols-3 gap-4 items-end border-t pt-4">
                   <div className="space-y-2">

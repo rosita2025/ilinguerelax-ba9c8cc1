@@ -91,7 +91,8 @@ Deno.serve(async (req) => {
     const restricted = isRestrictedCurrency(body.country);
 
     // Prioritize local currency if supported, NOT restricted, and we have a valid amount.
-    const startCurrency = (!restricted && localAmount && localAmount > 0) ? localCurrency : "USD";
+    // However, if currency is USD, we must honor it.
+    const startCurrency = (localCurrency === "USD" || restricted || !localAmount || localAmount <= 0) ? "USD" : localCurrency;
     const startAmount = startCurrency === "USD" ? calculatedUsd : localAmount!;
 
 

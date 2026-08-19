@@ -142,12 +142,12 @@ const ProductSpanish5000 = () => {
 
 
   // Libro físico: cobro siempre se realiza en USD para internal checkout.
-  const campaign = {
+  const campaign = useMemo(() => ({
     price: formatPrice(44),
     originalPrice: formatPrice(59),
     currency: "USD" as const,
     discountPercentage: 25
-  };
+  }), [formatPrice]);
 
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({
@@ -270,6 +270,7 @@ const ProductSpanish5000 = () => {
                       height={1200}
                       fetchPriority="high"
                       decoding="async"
+                      loading="eager"
                     />
                   ) : (
                     <>
@@ -283,6 +284,7 @@ const ProductSpanish5000 = () => {
                         height={1200}
                         fetchPriority="high"
                         decoding="async"
+                        loading="eager"
                       />
                     </>
                   )}
@@ -308,6 +310,8 @@ const ProductSpanish5000 = () => {
                         src={img} 
                         alt={`Vista ${i + 1}`} 
                         className="w-full h-full object-cover" 
+                        loading="lazy"
+                        decoding="async"
                       />
                       {activeImage === img && (
                         <div className="absolute inset-0 bg-emerald-500/10 flex items-center justify-center">

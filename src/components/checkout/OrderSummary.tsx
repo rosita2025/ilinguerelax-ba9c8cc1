@@ -217,6 +217,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                     alt={item.name}
                     className="w-16 h-16 object-cover rounded-lg border"
                     loading="lazy"
+                    decoding="async"
                   />
                 </div>
                 <div className="flex-1 min-w-0">

@@ -126,12 +126,25 @@ export default function Checkout() {
   // en cuanto se abre /checkouts, para que al mostrar el iframe ya esté caliente
   // (evita el cold start de 1-3 s en la primera compra del día).
   useEffect(() => {
-    try { getStripe(); } catch { /* sandbox no configurado */ }
-    // OPTIONS preflight = warm-up gratis, sin efectos secundarios.
-    try {
-      const url = `https://opyitzdvvurdyyyzkwwv.supabase.co/functions/v1/create-checkout-prueba`;
-      fetch(url, { method: "OPTIONS", mode: "cors" }).catch(() => {});
-    } catch { /* ignore */ }
+    let warm = false;
+    const warmup = async () => {
+      if (warm) return;
+      warm = true;
+      try { getStripe(); } catch {}
+      try {
+        await fetch(`https://opyitzdvvurdyyyzkwwv.supabase.co/functions/v1/create-checkout-prueba`, { 
+          method: "OPTIONS", 
+          mode: "cors" 
+        });
+      } catch {}
+    };
+    
+    // Idle callback to avoid blocking the main thread
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(warmup);
+    } else {
+      setTimeout(warmup, 1000);
+    }
   }, []);
 
   // Recuperación de carrito estilo Shopify: /checkouts/:slug?r=<b64>
@@ -216,6 +229,17 @@ export default function Checkout() {
     const derivedFromPath = staticItem?.productPath?.replace(/^\/products\//, "") || null;
     const adminSku = staticItem?.adminSku ?? derivedFromPath ?? resolveCheckoutSlug(slug);
 
+    // Cache local for product data to avoid flashes and redundant loads
+    const cacheKey = `ilr_prod_cache_${adminSku}`;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const { item, upsells: up } = JSON.parse(cached);
+        setDbItem(item);
+        setAdminUpsells(up);
+        setLoadingDb(false);
+      } catch (e) {}
+    }
 
     const load = async () => {
       setLoadingDb(true);
@@ -343,7 +367,13 @@ export default function Checkout() {
         },
         localPrices: data.local_prices,
         localUsdPrices: data.local_usd_prices,
-      } as CatalogItem);
+      } as CatalogItem;
+
+      setDbItem(finalItem);
+      
+      // Persist to session cache
+      sessionStorage.setItem(cacheKey, JSON.stringify({ item: finalItem, upsells }));
+      
       setDbMissing(false);
       setLoadingDb(false);
     };

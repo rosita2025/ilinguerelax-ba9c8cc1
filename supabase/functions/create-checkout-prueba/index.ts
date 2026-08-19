@@ -219,14 +219,24 @@ Deno.serve(async (req) => {
   } catch (err) {
     console.error("create-checkout-prueba error:", err);
     const e = err as any;
+    
+    // Extraer detalles específicos de Stripe para diagnóstico
     const stripeCode = e?.code || e?.type || "unknown_error";
     const stripeParam = e?.param || "";
-    const reason = [e?.type, e?.code, stripeParam].filter(Boolean).join(":").slice(0, 80) || 
-                   (e?.message && e.message.length < 100 ? e.message : "gateway_error");
+    const stripeType = e?.type || "";
     
-    const message = e?.message && e.message.length < 200 && !e.message.includes("api.stripe.com")
-      ? e.message 
-      : "No se pudo iniciar el pago. Intenta nuevamente.";
+    // Mapeo de errores de moneda no soportada (ej. ARS en Stripe)
+    const isCurrencyError = stripeCode === "currency_not_supported" || 
+                           (e?.message && e.message.toLowerCase().includes("not supported"));
+
+    const reason = isCurrencyError ? "currency_restricted" : 
+                   ([stripeType, stripeCode, stripeParam].filter(Boolean).join(":").slice(0, 80) || "gateway_error");
+    
+    const message = isCurrencyError 
+      ? "Tu banco o región no admite pagos en moneda local. Intenta pagar en USD."
+      : (e?.message && e.message.length < 200 && !e.message.includes("api.stripe.com")
+          ? e.message 
+          : "No se pudo iniciar el pago. Intenta nuevamente.");
 
     return new Response(
       JSON.stringify({ 

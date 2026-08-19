@@ -108,11 +108,11 @@ const ProductSpanish5000Digital = () => {
     fallbackPriceTiendaUsd: 72.99,
     fallbackPricePen: 280,
   });
+  const localizedPrice = tier.priceLabel;
+  const localizedOriginal = tier.originalLabel;
   const currentPrice = tier.priceUsd;
   const pricingReady = tier.loaded;
   const { useTiendaOnly, useHotmartLatam, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen } = tier;
-  const localizedPrice = tier.priceLabel;
-  const localizedOriginal = tier.originalLabel;
   const flag = countryToFlag(countryCode);
 
   const pixelParams = useMemo(() => ({
@@ -159,7 +159,7 @@ const ProductSpanish5000Digital = () => {
     setIsRedirecting(true);
     
     // Always force internal checkout for this product if on US/Global tier
-    if (useTiendaOnly || true) {
+    if (useTiendaOnly) {
       trackHotmartEvent("InitiateCheckout", {
         content_name: "Spanish Mastery System - Digital Only",
         content_category: "Digital Book",

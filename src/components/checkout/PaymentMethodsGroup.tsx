@@ -2166,34 +2166,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   country={country}
                   currency={currency}
                   amount={totalLocal}
-                  expectedTotalUsd={totalUsd}
-                  items={items.map((i) => ({ id: i.id, name: i.name, price: itemPrice(i, region.tier), quantity: i.quantity }))}
-                  couponPercent={couponPercent}
-                  couponCode={coupon ?? undefined}
-                  payerName={buyer.fullName}
-                  payerEmail={buyer.email}
-                  payerPhone={buyer.phone ?? undefined}
-                  language={language}
-                  onPaid={(orderId) => {
-                    trackPurchase(orderId, "mercadopago_transfer");
-                    navigate(`/checkouts/success?session_id=${encodeURIComponent(orderId)}&status=approved&external_reference=${encodeURIComponent(orderId)}`);
-                  }}
-                  onError={(message) => setMethodError({ method: "dlocal_card", message })}
-                />
-              </div>
-            )}
-
-
-
-            {m.id === "dlocal_card" && isSelected && (
-              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4">
-                <DlocalSmartFields
-                  country={country}
-                  currency={DLOCAL_CURRENCY_BY_COUNTRY[country] ?? "USD"}
-                  amount={(DLOCAL_CURRENCY_BY_COUNTRY[country] ?? "USD") === "USD"
-                    ? total
-                    : (local.currency === (DLOCAL_CURRENCY_BY_COUNTRY[country] ?? "USD") ? local.amount : total)}
-                  expectedTotalUsd={total}
+                  expectedTotalUsd={Number(totalUsd)}
                   items={items.map((i) => ({ id: i.id, name: i.name, price: itemPrice(i, region.tier), quantity: i.quantity }))}
                   couponPercent={couponPercent}
                   couponCode={coupon ?? undefined}

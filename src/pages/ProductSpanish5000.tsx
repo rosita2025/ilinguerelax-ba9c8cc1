@@ -836,8 +836,27 @@ const ProductSpanish5000 = () => {
       </Suspense>
 
       {/* Sticky Buy Bar */}
-      
-      <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName="Book Physical & Digital — FREE Bonuses" onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={true} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible isLoading={isCreatingDigitalCheckout} disabled={isCreatingDigitalCheckout} sku={PRODUCT_SKU} goesToInternalCheckout={true} />
+      <StickyBuyBar 
+        price={stickyPriceLabel} 
+        originalPrice={stickyOriginalLabel} 
+        currencyCode={stickyCurrency} 
+        productName="Book Physical & Digital — FREE Bonuses" 
+        onBuyClick={handleStickyBuy} 
+        ctaText={dynamicCtaText} 
+        isPhysical={true} 
+        showReviews={true} 
+        rating={4.8} 
+        reviewCount={500} 
+        lang="en" 
+        calmMode 
+        dismissible 
+        isLoading={isCreatingDigitalCheckout} 
+        disabled={isCreatingDigitalCheckout} 
+        sku={PRODUCT_SKU} 
+        goesToInternalCheckout={true}
+        usdValue={productPricing.priceGlobalUsd || 44}
+        localUsdPrices={productPricing.localUsdPrices}
+      />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />

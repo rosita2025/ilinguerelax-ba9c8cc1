@@ -106,17 +106,36 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
     : regionUsdPrice * rate;
 
   // Precio "Antes" (Tachado)
-  // Prioridad: local_compare_at_prices > (Global compare USD * Rate)
+  // Prioridad:
+  // 1) local_compare_at_prices[moneda] (manual por moneda en el admin)
+  // 2) compare_at_price_pen (solo Perú)
+  // 3) compare_at_price_usd_* del tier de la región * tasa
+  // 4) Fallback automático: precio actual * ORIGINAL_MULTIPLIER
+  const ORIGINAL_MULTIPLIER = 2.5;
   const manualCompareFixed = pricing.localCompareAtPrices?.[currency];
   const globalCompareUsd = pricing.compareAtPriceGlobalUsd;
-  
-  // Si el usuario está en US, currency es USD, rate es 1. 
-  // manualCompareFixed vendrá de local_compare_at_prices['USD']
-  const finalCompareAmount = typeof manualCompareFixed === "number" && manualCompareFixed > 0
-    ? manualCompareFixed
-    : globalCompareUsd && globalCompareUsd > 0
-      ? globalCompareUsd * rate
-      : null;
+  const regionCompareUsd = isLatam
+    ? pricing.compareAtPriceLatamUsd
+    : isAnglosphereOrEurope
+      ? pricing.compareAtPriceGlobalUsd
+      : pricing.compareAtPriceTiendaUsd;
+
+  let finalCompareAmount: number | null = null;
+  if (typeof manualCompareFixed === "number" && manualCompareFixed > 0) {
+    finalCompareAmount = manualCompareFixed;
+  } else if (currency === "PEN" && pricing.compareAtPricePen && pricing.compareAtPricePen > 0) {
+    finalCompareAmount = pricing.compareAtPricePen;
+  } else if (regionCompareUsd && regionCompareUsd > 0) {
+    finalCompareAmount = regionCompareUsd * rate;
+  } else if (finalPriceAmount > 0) {
+    finalCompareAmount = finalPriceAmount * ORIGINAL_MULTIPLIER;
+  }
+
+  // Nunca mostrar un tachado menor o igual al precio actual
+  if (finalCompareAmount !== null && finalCompareAmount <= finalPriceAmount) {
+    finalCompareAmount = finalPriceAmount * ORIGINAL_MULTIPLIER;
+  }
+
 
   // 3. Flags y Etiquetas
   const isOnSale = !!(finalCompareAmount && finalCompareAmount > finalPriceAmount);

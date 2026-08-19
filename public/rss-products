@@ -5,13 +5,13 @@
     <link>https://ilinguerelax.com/products</link>
     <description>Libros digitales y físicos de iLingue Relax: vocabulario, pronunciación y fonética para aprender idiomas sin estrés.</description>
     <language>es</language>
-    <lastBuildDate>Wed, 19 Aug 2026 05:15:53 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 19 Aug 2026 17:23:21 GMT</lastBuildDate>
     <atom:link href="https://ilinguerelax.com/rss-productos.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Spanish Relax - 5,000 Words Physical</title>
       <link>https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical</link>
       <guid isPermaLink="true">https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical</guid>
-      <pubDate>Wed, 19 Aug 2026 05:15:53 GMT</pubDate>
+      <pubDate>Wed, 19 Aug 2026 17:23:21 GMT</pubDate>
       <description>With English Pronunciation</description>
       <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-spanish-words-with-english-pronunciation-physical/1787104011776-v88tl.webp" type="image/jpeg" length="0" />
       <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-spanish-words-with-english-pronunciation-physical/1787104011776-v88tl.webp" medium="image" />
@@ -19,9 +19,19 @@
     </item>
     <item>
       <title>2,000 Palabras Esenciales para Aprender Coreano | Hangul + Pronunciación para Hispanohablantes</title>
+      <link>https://ilinguerelax.com/products/2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca</link>
+      <guid isPermaLink="true">https://ilinguerelax.com/products/2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca</guid>
+      <pubDate>Wed, 19 Aug 2026 07:33:46 GMT</pubDate>
+      <description>Aprende las 2,000 palabras más importantes del idioma coreano con pronunciación adaptada para hispanohablantes, traducción al español y vocabulario organizado por categorías. 🎁 Todas las futuras actualizaciones serán gratuitas para los compradores.</description>
+      <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca/1787124640669-p7blc.webp" type="image/jpeg" length="0" />
+      <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca/1787124640669-p7blc.webp" medium="image" />
+      <media:thumbnail url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca/1787124640669-p7blc.webp" />
+    </item>
+    <item>
+      <title>2,000 Palabras Esenciales para Aprender Coreano | Hangul + Pronunciación para Hispanohablantes</title>
       <link>https://ilinguerelax.com/products/1-000-palabras-esenciales-para-aprender-coreano</link>
       <guid isPermaLink="true">https://ilinguerelax.com/products/1-000-palabras-esenciales-para-aprender-coreano</guid>
-      <pubDate>Wed, 19 Aug 2026 00:26:37 GMT</pubDate>
+      <pubDate>Wed, 19 Aug 2026 07:11:12 GMT</pubDate>
       <description>Aprende las 1,000 palabras más importantes del idioma coreano con pronunciación adaptada para hispanohablantes, traducción al español y vocabulario organizado por categorías. 🎁 Todas las futuras actualizaciones serán gratuitas para los compradores. La próxima actualización incluirá 2,000 palabras esenciales, sin costo adicional para quienes ya adquirieron el eBook.</description>
       <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/1-000-palabras-esenciales-para-aprender-coreano/1787099173608-164ux.webp" type="image/jpeg" length="0" />
       <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/1-000-palabras-esenciales-para-aprender-coreano/1787099173608-164ux.webp" medium="image" />

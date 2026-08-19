@@ -121,7 +121,9 @@ const ProductSpanish1000Verbs = () => {
                   <span className={`${tier.priceLabel.length > 7 ? 'text-3xl md:text-5xl' : 'text-5xl md:text-6xl'} font-black text-foreground`}>{tier.priceLabel}</span>
                   <span className={`${tier.priceLabel.length > 7 ? 'text-base md:text-2xl' : 'text-2xl'} text-muted-foreground line-through`}>{tier.originalLabel}</span>
                   <span className="text-sm md:text-base text-muted-foreground font-semibold">{tier.currencyCode}</span>
-                  <span className="px-3 py-1 md:px-4 md:py-2 rounded-full bg-gradient-to-r from-blue-500 to-emerald-500 text-white text-xs md:text-sm font-bold shadow-lg">SAVE 78%</span>
+                  {tier.discountPercentage > 0 && (
+                    <span className="px-3 py-1 md:px-4 md:py-2 rounded-full bg-gradient-to-r from-blue-500 to-emerald-500 text-white text-xs md:text-sm font-bold shadow-lg">SAVE {tier.discountPercentage}%</span>
+                  )}
                 </div>
 
                 <p className="text-sm text-muted-foreground">💳 One-time payment • No subscription • Lifetime access</p>

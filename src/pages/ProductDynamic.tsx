@@ -38,7 +38,13 @@ interface DBProduct {
   price_usd_latam: number | null;
   price_usd_tienda: number | null;
   price_pen: number | null;
+  compare_at_price_usd: number | null;
+  compare_at_price_usd_latam: number | null;
+  compare_at_price_usd_tienda: number | null;
+  compare_at_price_pen: number | null;
+  local_compare_at_prices: Record<string, number> | null;
   local_usd_prices: Record<string, number> | null;
+
   cover_image_url: string | null;
   gallery_images: string[] | null;
   is_upsell: boolean;
@@ -90,7 +96,7 @@ const ProductDynamic = () => {
       try {
         const result = await supabase
           .from("digital_products")
-          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, gallery_images, gallery_metadata, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries, rating, review_count, local_prices, local_usd_prices")
+          .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, compare_at_price_usd, compare_at_price_usd_latam, compare_at_price_usd_tienda, compare_at_price_pen, local_compare_at_prices, cover_image_url, gallery_images, gallery_metadata, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries, rating, review_count, local_prices, local_usd_prices")
           .eq("sku", slug)
           .maybeSingle();
         data = result.data;
@@ -241,7 +247,35 @@ const ProductDynamic = () => {
     ? formatCurrencyAmount(Number(product.price_pen), "PEN")
     : (local.formatted || "$0.00");
   const displayCurrencyCode = isPEN ? "PEN" : (local.currency || "USD");
-  const originalFormatted = formatCurrencyAmount(displayPrice * 2.5, displayCurrencyCode as Currency);
+  // Precio tachado (ANTES): manual del admin por moneda/región, con fallback automático.
+  const ORIGINAL_MULTIPLIER = 2.5;
+  const manualCompareLocal = (product as any)?.local_compare_at_prices?.[displayCurrencyCode];
+  const regionCompareUsd = product
+    ? (region.tier === "tienda" && (product as any).compare_at_price_usd_tienda != null
+        ? Number((product as any).compare_at_price_usd_tienda)
+        : region.tier === "latam" && (product as any).compare_at_price_usd_latam != null
+          ? Number((product as any).compare_at_price_usd_latam)
+          : (product as any).compare_at_price_usd != null
+            ? Number((product as any).compare_at_price_usd)
+            : null)
+    : null;
+  const compareRate = displayPrice > 0 && effectiveUsd > 0 ? displayPrice / effectiveUsd : 1;
+
+  let originalAmount: number | null = null;
+  if (typeof manualCompareLocal === "number" && manualCompareLocal > 0) {
+    originalAmount = manualCompareLocal;
+  } else if (isPEN && (product as any)?.compare_at_price_pen != null && Number((product as any).compare_at_price_pen) > 0) {
+    originalAmount = Number((product as any).compare_at_price_pen);
+  } else if (regionCompareUsd && regionCompareUsd > 0) {
+    originalAmount = regionCompareUsd * compareRate;
+  }
+  if (originalAmount === null || originalAmount <= displayPrice) {
+    originalAmount = displayPrice * ORIGINAL_MULTIPLIER;
+  }
+  const originalFormatted = formatCurrencyAmount(originalAmount, displayCurrencyCode as Currency);
+  const discountPercentage = originalAmount > displayPrice && originalAmount > 0
+    ? Math.round(((originalAmount - displayPrice) / originalAmount) * 100)
+    : 0;
   const reviewsCount = product.review_count != null ? Number(product.review_count) : 0;
   const reviewsRating = product.rating != null ? Number(product.rating) : 0;
 
@@ -390,6 +424,11 @@ const ProductDynamic = () => {
                       <span className="text-xl text-muted-foreground line-through opacity-70">
                         {originalFormatted}
                       </span>
+                      {discountPercentage > 0 && (
+                        <span className="px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-bold shadow-sm">
+                          -{discountPercentage}%
+                        </span>
+                      )}
                     </>
                   )}
                 </div>

@@ -442,20 +442,20 @@ const ProductSpanish5000 = () => {
         </div>
       </section>
 
-      {/* Digital Only Alternative */}
-      <section id="digital-only" className="py-14 md:py-20 scroll-mt-20">
+      {/* Physical & Digital Bundle Option */}
+      <section id="physical-bundle" className="py-14 md:py-20 scroll-mt-20">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-10">
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider border border-accent/20">
-                <Sparkles className="w-4 h-4" />
-                Another Option
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-bold uppercase tracking-wider border border-emerald-500/20">
+                <Truck className="w-4 h-4" />
+                Recommended Option
               </span>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-4 mb-3">
-                Just want the <span className="text-purple-600">Digital Book</span>?
+                Spanish Mastery System — <span className="text-purple-600">Physical & Digital Bundle</span>
               </h2>
               <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-                If you only want the digital book — no physical copy, no shipping — get instant access to the PDF + 3 free bonuses.
+                The ultimate learning experience: Luxury physical book delivered to your door + instant digital access + 3 FREE bonuses.
               </p>
             </div>
 
@@ -463,45 +463,43 @@ const ProductSpanish5000 = () => {
               <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center">
                 <div className="flex justify-center">
                   <img
-                    src={productSpanish5000DigitalOnlyImage}
-                    alt="Spanish Relax 5,000 Words Digital Only — 3 Bonuses Free"
+                    src={productSpanish5000BundleImage}
+                    alt="Spanish Mastery System — Physical & Digital Book Bundle"
                     className="w-full max-w-[260px] sm:max-w-[300px] md:max-w-none h-auto rounded-2xl shadow-lg"
                     loading="lazy"
                   />
                 </div>
                 <div className="space-y-5 text-center md:text-left">
                   <h3 className="text-2xl md:text-3xl font-bold text-foreground">
-                    Spanish Mastery System — Digital Only
+                    Spanish Mastery System — Physical & Digital Book
                   </h3>
                   <p className="text-muted-foreground leading-relaxed">
-                    Spanish with English pronunciation. Instant download, study on any device — <strong>everything included</strong>.
+                    Learn Spanish the way it actually sounds. Premium physical book + Instant PDF + <strong>all bonuses included</strong>.
                   </p>
                   <ul className="space-y-3 text-left">
                     {[
-                      "5,000 Words + Pronunciation (250 Pages) — Included",
+                      "Luxury physical book (ships internationally)",
+                      "Instant Digital PDF (5,000 words + pronunciation)",
                       "A1–C1 Grammar Guide (250 Pages) — Included",
                       "1,000 Essential Verbs + Pronunciation — Included",
                       "500 Practice Questions + Pronunciation — Included",
-                      "Structured Study Plan & Exercises — Included",
-                      "Instant PDF download · Lifetime access on any device",
+                      "Lifetime digital updates & instant access",
                     ].map(item => (
                       <li key={item} className="flex items-start gap-2.5 text-sm text-foreground">
-                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                         <span>{item}</span>
                       </li>
                     ))}
                   </ul>
                   <div className="flex items-baseline justify-center md:justify-start gap-3 pt-2 flex-wrap">
-                    <span className="text-4xl font-bold text-foreground">{digitalPriceLabel}</span>
-                    <span className="text-lg text-muted-foreground line-through">{digitalOriginalLabel}</span>
-                    <span className="text-xs font-bold text-accent bg-accent/10 px-2 py-1 rounded-full">SAVE {digitalDiscountPct}%</span>
+                    <span className="text-4xl font-bold text-foreground">{campaign.price}</span>
+                    <span className="text-lg text-muted-foreground line-through">{campaign.originalPrice}</span>
+                    <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-1 rounded-full">BEST VALUE</span>
                   </div>
-                  <Button asChild size="xl" variant="hero" className="w-full">
-                    <a href="/products/5-000-spanish-words-with-english-pronunciation-digital">
-                      <CreditCard className="w-5 h-5" />
-                      View Digital Version — {digitalPriceLabel}
-                      <ArrowRight className="w-5 h-5" />
-                    </a>
+                  <Button onClick={handleBuyNow} size="xl" className="w-full bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-500 hover:to-amber-500 text-slate-900 border-amber-500 font-bold shadow-lg">
+                    <ShoppingCart className="w-5 h-5" />
+                    ORDER PHYSICAL BOOK — {campaign.price}
+                    <ArrowRight className="w-5 h-5" />
                   </Button>
 
 
@@ -830,6 +828,7 @@ const ProductSpanish5000 = () => {
 
       {/* WhatsApp Support Button */}
       <WhatsAppButton url="https://wa.link/7sr20t" label="Need help?" />
+      </div>
     </main>;
 };
 export default ProductSpanish5000;

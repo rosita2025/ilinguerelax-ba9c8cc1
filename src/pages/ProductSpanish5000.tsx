@@ -202,11 +202,11 @@ const ProductSpanish5000 = () => {
   const stickyOriginalLabel = formatPrice(59);
   const stickyCurrency = "USD";
   const handleStickyBuy = async () => {
-    await handleBuyNow();
+    navigate('/checkout/5-000-spanish-words-with-english-pronunciation-physical');
   };
 
   const handleBuyNow = async () => {
-    navigate(`/checkouts/${PRODUCT_SKU}`);
+    navigate('/checkout/5-000-spanish-words-with-english-pronunciation-physical');
   };
 
   const handleViewDigital = () => {
@@ -392,12 +392,12 @@ const ProductSpanish5000 = () => {
                 <Button
                   type="button"
                   size="xl"
-                  onClick={handleBuyNow}
+                  onClick={() => navigate('/checkout/5-000-spanish-words-with-english-pronunciation-physical')}
                   className="w-full text-base sm:text-lg py-5 px-3 h-auto min-h-[56px] whitespace-normal touch-manipulation shadow-[0_8px_30px_rgba(234,179,8,0.45)] bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-500 hover:to-amber-500 text-slate-900 border border-amber-500 transition-all hover:scale-[1.02] active:scale-[0.99]"
                 >
                   <span className="flex items-center justify-center gap-2 font-black text-sm sm:text-lg">
                     <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
-                    BUY NOW · {formatPrice(44)}
+                    GET THE PHYSICAL + DIGITAL COMBO NOW · {formatPrice(44)}
                   </span>
                 </Button>
                 <p className="text-[11px] text-center text-muted-foreground mt-2">

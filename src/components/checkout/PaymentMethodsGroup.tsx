@@ -916,18 +916,38 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       toast({ title: t.selectMethod, variant: "destructive" });
       return;
     }
-    // Hotmart: guarda carrito abandonado y luego redirige (esperando máx 2s).
-    if (selected === "hotmart") { await redirectToHotmart(); return; }
-    // Cada método vuelve a capturar el carrito en segundo plano, así que aquí
-    // no esperamos: el clic en "Continuar" ya no paga la espera de la auditoría.
-    void captureAbandonedCheckout(selected, true);
-    if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { setShowStripe(true); return; }
-    if (selected === "dlocal_transfer") { await payDlocal("transfer"); return; }
-    if (selected === "dlocal_cash") { await payDlocal("cash"); return; }
-    if (selected === "dlocal_wallet") { await payDlocal("wallet"); return; }
-    if (selected === "transfer") { payMercado("transfer"); return; }
-    if (selected === "cash") { payMercado("cash"); return; }
-    // yape → user uses "Ya pagué" button in the manual panel
+
+    try {
+      // Hotmart: guarda carrito abandonado y luego redirige (esperando máx 2s).
+      if (selected === "hotmart") { await redirectToHotmart(); return; }
+      
+      // Cada método vuelve a capturar el carrito en segundo plano, así que aquí
+      // no esperamos: el clic en "Continuar" ya no paga la espera de la auditoría.
+      void captureAbandonedCheckout(selected, true);
+      
+      if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { 
+        setShowStripe(true); 
+        // Scroll to stripe anchor
+        setTimeout(() => {
+          stripeAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+        return; 
+      }
+      if (selected === "dlocal_transfer") { await payDlocal("transfer"); return; }
+      if (selected === "dlocal_cash") { await payDlocal("cash"); return; }
+      if (selected === "dlocal_wallet") { await payDlocal("wallet"); return; }
+      if (selected === "transfer") { await payMercado("transfer"); return; }
+      if (selected === "cash") { await payMercado("cash"); return; }
+      
+      // yape → user uses "Ya pagué" button in the manual panel
+    } catch (err) {
+      console.error("handleBuyNow error:", err);
+      toast({
+        title: t.errorPayment,
+        description: err instanceof Error ? err.message : "Ocurrió un error inesperado.",
+        variant: "destructive"
+      });
+    }
   };
 
   const retryStripe = useCallback(() => {

@@ -228,8 +228,8 @@ const ProductSpanish5000 = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-4 pb-6 md:pt-8 md:pb-10 w-full max-w-[100vw] overflow-x-hidden">
-        <div className="container px-3 sm:px-4 w-full max-w-full overflow-x-hidden">
+      <section className="pt-4 pb-6 md:pt-8 md:pb-10 w-full max-w-full overflow-x-hidden px-4 box-border">
+        <div className="container px-0 sm:px-4 w-full max-w-full overflow-x-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
             {/* Product Image */}
             <div className="relative">
@@ -284,7 +284,7 @@ const ProductSpanish5000 = () => {
               </div>
 
               <h1
-                className="text-xl sm:text-2xl md:text-4xl font-bold text-foreground mb-3 leading-tight break-words text-center md:text-left overflow-x-hidden w-full max-w-full"
+                className="text-xl sm:text-2xl md:text-4xl font-bold text-foreground mb-3 leading-tight break-words text-center md:text-left overflow-x-hidden w-full max-w-full px-1"
                 data-ab-experiment="spanish5000_headline_v1"
                 data-ab-variant={headlineVariant ?? "loading"}
               >
@@ -333,7 +333,7 @@ const ProductSpanish5000 = () => {
               </div>
 
               {/* Buy Now CTA */}
-              <div className="w-full mx-auto p-4 md:p-5 mb-4 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 overflow-x-hidden">
+              <div className="w-full mx-auto p-4 md:p-5 mb-4 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 overflow-hidden w-full max-w-full px-4 box-border">
                 <Button
                   type="button"
                   size="xl"
@@ -805,7 +805,7 @@ const ProductSpanish5000 = () => {
         icon: Truck,
       }, {
         question: "Is there a digital-only option?",
-        answer: "No. To protect our content and guarantee the best experience, we only sell the PHYSICAL Spanish Relax book — the digital PDF and 3 bonuses are included FREE with every physical order.",
+        answer: "Yes, we also offer a digital-only version of the Spanish Mastery System. However, most students prefer the physical bundle to have a real book to study from plus the digital access.",
         icon: BookOpen,
       }]} title="Bundle & Shipping FAQ" subtitle="Spanish Relax physical book + digital FREE + 3 bonuses · FREE worldwide shipping when you order 2 or more books (24–72h dispatch, 7–15 days delivery)" />
       </Suspense>

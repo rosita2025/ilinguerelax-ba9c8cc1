@@ -79,9 +79,10 @@ Deno.serve(async (req) => {
     
     const pricedItems = pricing.items;
     
-    // Server-side: ensure we add shipping if it's a physical product and subtotal < 50
+    // Server-side: ensure we add shipping if it's a physical product, no upsell, and subtotal < 50
     const hasPhysical = pricedItems.some(i => i.isPhysical);
-    const shippingUsd = hasPhysical ? (pricing.totalUsd >= 50 ? 0 : (tierForCountry(country) === "latam" ? 9 : 8)) : 0;
+    const hasUpsell = pricedItems.length > 1;
+    const shippingUsd = (hasPhysical && !hasUpsell) ? (pricing.totalUsd >= 50 ? 0 : (tierForCountry(country) === "latam" ? 9 : 8)) : 0;
     
     finalAmount = pricing.totalUsd + shippingUsd;
     finalCurrency = "USD";

@@ -39,10 +39,13 @@ export const useCheckoutTotal = (
 
     const discountLocal = (subtotalLocal * Math.max(0, Math.min(100, couponPercent || 0))) / 100;
     
-    // El envío es obligatorio $8.00 / $9.00 USD para productos físicos
-    // Gratis si el subtotal USD >= 50
-    const shippingUsd = items.some(i => i.isPhysical) 
-      ? (subtotalUSD >= 50 ? 0 : shippingCostUSD) 
+    // Lógica de Envío Crítica (Unificada con Upsell)
+    // - Si hay Upsell (items.length > 1), el envío es GRATIS ($0.00).
+    // - Si es venta normal (items.length == 1) y es físico, se cobra envío base.
+    const hasUpsell = items.length > 1;
+    const isPhysical = items.some(i => i.isPhysical);
+    const shippingUsd = (isPhysical && !hasUpsell)
+      ? (subtotalUSD >= 50 ? 0 : shippingCostUSD)
       : 0;
     
     const shippingLocal = shippingUsd * rate;

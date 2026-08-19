@@ -320,7 +320,9 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span>{t.shipping}</span>
             <span>
               {items.some(i => i.isPhysical) 
-                ? (shippingLocal === 0 ? t.freeShipping : formatLocalDirect(shippingLocal, country))
+                ? (shippingLocal === 0 
+                    ? (items.length > 1 ? t.freeShipping + " (Upsell)" : t.freeShipping) 
+                    : formatLocalDirect(shippingLocal, country))
                 : t.freeDigitalDelivery
               }
             </span>

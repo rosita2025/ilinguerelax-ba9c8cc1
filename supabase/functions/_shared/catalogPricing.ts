@@ -363,11 +363,12 @@ export async function localTotalFromPricing(
     subtotal += perUnit * (item.quantity || 1);
   }
   
-  // Shipping logic must mirror OrderSummary.tsx / PaymentMethodsGroup.tsx
+  // Shipping logic must mirror OrderSummary.tsx / PaymentMethodsGroup.tsx / useCheckoutTotal.ts
   const isPhysical = pricing.items.some(i => i.isPhysical);
+  const hasUpsell = pricing.items.length > 1;
   const isLatam = tierForCountry(code) === "latam";
   const shippingCost = isLatam ? 9 : 8;
-  const shippingUsd = isPhysical ? (pricing.totalUsd >= 50 ? 0 : shippingCost) : 0;
+  const shippingUsd = (isPhysical && !hasUpsell) ? (pricing.totalUsd >= 50 ? 0 : shippingCost) : 0;
 
   const shippingLocal = await localAmountFromUsd(shippingUsd, code) || (shippingUsd * rate);
 

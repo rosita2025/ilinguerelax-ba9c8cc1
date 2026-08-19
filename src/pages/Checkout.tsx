@@ -347,7 +347,7 @@ export default function Checkout() {
       const rowWithTienda = data as typeof data & { price_usd_tienda?: number | string | null };
       const priceTienda = rowWithTienda.price_usd_tienda != null && Number(rowWithTienda.price_usd_tienda) > 0 ? Number(rowWithTienda.price_usd_tienda) : null;
       const pricePen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : undefined;
-      setDbItem({
+      const finalItem = {
         id: staticItem?.id ?? data.sku,
         name: data.name,
         price: priceGlobal,

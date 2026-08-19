@@ -510,12 +510,12 @@ export default function Checkout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalogItem?.adminSku, catalogItem?.id]);
 
-  if (loadingDb && !catalogItem && !slugUnknown) {
-    // Silent background fetch — don't block UI with a loader
-  }
+  // Determine loading state: only block the UI on initial load if we don't have
+  // the main product yet. Once catalogItem is present, we keep the UI visible
+  // and receptive to user input, even if background syncs happen.
+  const isInitialLoading = loadingDb && !catalogItem && !slugUnknown;
 
-
-  if (loadingDb) {
+  if (isInitialLoading) {
     return (
       <div className="min-h-screen bg-secondary/30">
         <Helmet>

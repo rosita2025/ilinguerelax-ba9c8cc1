@@ -97,11 +97,8 @@ export function clearManualCountryOverride() {
 export function useRegionTier(): RegionInfo {
   const [state, setState] = useState<RegionInfo>(() => {
     if (typeof window !== "undefined") {
-      // Limpia overrides antiguos que quedaban persistidos para siempre y
-      // hacían que la IP nunca ganara (ej. un ?country=ES de un test viejo).
       try { localStorage.removeItem("ilr_country_override"); } catch { /* ignore */ }
 
-      // ?country=XX sigue funcionando pero SÓLO en esta carga (no se persiste).
       const params = new URLSearchParams(window.location.search);
       const urlOverride = params.get("country")?.toUpperCase();
       if (urlOverride) {
@@ -109,18 +106,32 @@ export function useRegionTier(): RegionInfo {
         return { tier: classify(urlOverride), country: urlOverride, loading: false };
       }
 
-      // Manual override (from CountryPicker) beats IP detection.
       const manual = getManualCountryOverride();
       if (manual) {
         try { localStorage.setItem("ilr_country", manual); } catch { /* ignore */ }
         return { tier: classify(manual), country: manual, loading: false };
       }
     }
-    // Prioridad: cache de detección por IP
     const cached = readCache();
     if (cached) return { tier: cached.tier, country: cached.country, loading: false };
     return { tier: "global", country: "", loading: true };
   });
+
+  // Re-sync if the manual override changes in localStorage (e.g. from another component)
+  useEffect(() => {
+    const sync = () => {
+      const manual = getManualCountryOverride();
+      if (manual && manual !== state.country) {
+        setState({ tier: classify(manual), country: manual, loading: false });
+      }
+    };
+    window.addEventListener("storage", sync);
+    window.addEventListener("country_changed", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("country_changed", sync);
+    };
+  }, [state.country]);
 
   useEffect(() => {
     if (!state.loading) return;

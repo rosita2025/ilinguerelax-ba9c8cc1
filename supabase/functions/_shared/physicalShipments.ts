@@ -35,20 +35,34 @@ export async function upsertPhysicalShipment(params: {
       ? Object.fromEntries(Object.entries(address).filter(([, v]) => v != null && String(v).trim() !== ""))
       : null;
 
-    const { error: upsertError } = await adminClient
+    const { data: existing } = await adminClient
       .from("physical_shipments")
-      .upsert(
-        {
-          order_number: orderNumber,
-          email: email ?? null,
-          customer_name: customerName ?? null,
-          provider,
-          shipping_address: cleanAddress && Object.keys(cleanAddress).length ? cleanAddress : null,
-          status: "pending",
-        },
-        { onConflict: "order_number", ignoreDuplicates: false },
-      );
-    if (upsertError) throw upsertError;
+      .select("order_number,shipping_address")
+      .eq("order_number", orderNumber)
+      .maybeSingle();
+
+    const payload: Record<string, unknown> = {
+      order_number: orderNumber,
+      email: email ?? null,
+      customer_name: customerName ?? null,
+      provider,
+    };
+    if (cleanAddress && Object.keys(cleanAddress).length) payload.shipping_address = cleanAddress;
+
+    if (existing) {
+      // No pisamos el estado de envío ni una dirección ya guardada.
+      if (!payload.shipping_address) delete payload.shipping_address;
+      const { error: updError } = await adminClient
+        .from("physical_shipments")
+        .update(payload)
+        .eq("order_number", orderNumber);
+      if (updError) throw updError;
+    } else {
+      const { error: insError } = await adminClient
+        .from("physical_shipments")
+        .insert({ ...payload, status: "pending" });
+      if (insError) throw insError;
+    }
 
     console.log("[physical-shipments] registered", { orderNumber, provider });
     return true;

@@ -649,6 +649,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     const totals = calcTotals(s.items, s.couponPercent, region.tier);
     redirectingRef.current = true;
     setMpLoading(paymentType);
+    setMethodError(null);
+    
     try {
       void captureAbandonedCheckout(`mercadopago_${paymentType}`, true);
       void supabase.from("email_contacts").upsert({
@@ -692,30 +694,38 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           paymentType,
         },
       }, { attempts: 3, baseDelayMs: 500 });
-      if (error || !data?.init_point) throw new Error((error as { message?: string } | null)?.message || t.mpError);
+
+      if (error || !data?.init_point) {
+        throw new Error((error as { message?: string } | null)?.message || t.mpError);
+      }
 
       window.location.assign(data.init_point);
     } catch (err) {
       redirectingRef.current = false;
       setMpLoading(null);
+      
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      
       try {
         const s3 = useCheckoutPruebaStore.getState();
         const totals = calcTotals(s3.items, s3.couponPercent, region.tier);
         trackPaymentError({
           provider: `mercadopago_${paymentType}`,
           skus: s3.items.map((i) => i.id),
-          reason: err instanceof Error ? err.message : String(err),
+          reason: errorMessage,
           value: totals.total,
-          currency: "USD", // Forzado a USD para Ads/Tracking
+          currency: "USD",
         });
       } catch { /* noop */ }
+
       setMethodError({
         method: paymentType === "transfer" ? "transfer" : "cash",
-        message: err instanceof Error ? err.message : t.tryAgain,
+        message: errorMessage,
       });
+
       toast({
         title: t.mpError,
-        description: err instanceof Error ? err.message : t.tryAgain,
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -835,7 +845,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         method: "hotmart",
         message:
           language === "en" ? "We couldn't open the Hotmart checkout. Please try again."
-          : language === "pt" ? "Não conseguimos abrir o checkout da Hotmart. Tente novamente."
+          : language === "pt" ? "Não conseguimos abrir o checkout da Hotmart. Tente nuevamente."
           : language === "fr" ? "Impossible d'ouvrir le paiement Hotmart. Réessaie."
           : "No pudimos abrir el pago con Hotmart. Inténtalo de nuevo.",
       });
@@ -843,17 +853,24 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     }
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
+    
+    setMpLoading("hotmart");
+    setMethodError(null);
     redirectingRef.current = true;
-    // Guarda el carrito abandonado ANTES de redirigir a Hotmart para no perder al cliente.
-    // Esperamos hasta 2s máx; si la red tarda más, redirigimos igual (la captura ya salió al servidor).
+
     try {
       await Promise.race([
         captureAbandonedCheckout("hotmart", true),
         new Promise((resolve) => setTimeout(resolve, 2000)),
       ]);
-    } catch { /* noop */ }
-    // Reemplaza la tienda por Hotmart en la misma pestaña (evita bloqueo de popups).
-    window.location.replace(url);
+      window.location.replace(url);
+    } catch (err) {
+      redirectingRef.current = false;
+      setMpLoading(null);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setMethodError({ method: "hotmart", message: errorMessage });
+      toast({ title: "Error Hotmart", description: errorMessage, variant: "destructive" });
+    }
   }, [hotmartCfg, region.country, valid, captureAbandonedCheckout, language, requestBuyerInfo]);
 
 
@@ -984,7 +1001,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       `Adjunto captura del pago. Gracias!`;
     const waUrl = `https://wa.me/12512724704?text=${encodeURIComponent(msg)}`;
 
-    // Guardar en base de datos para que Rosa lo vea en el admin
+    setMpLoading("yape");
+    setMethodError(null);
+
     try {
       await supabase.from("manual_payments").insert({
         order_number: orderNumber,
@@ -999,66 +1018,67 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         items: s.items.map((i) => ({ sku: i.id, name: i.name, quantity: i.quantity, price: i.price })),
         status: "pending",
       });
-    } catch (e) {
-      console.warn("[manual_payments] insert failed", e);
+
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "admin-manual-pending",
+          idempotencyKey: `manual-pending-${orderNumber}`,
+          templateData: {
+            orderNumber,
+            customerName: s.buyer.fullName.trim(),
+            customerEmail: s.buyer.email.trim().toLowerCase(),
+            customerPhone: s.buyer.phone ?? "",
+            customerCountry: (region.country || "").toUpperCase(),
+            productName: s.items.map((i) => i.name).join(" + "),
+            amount: penTotals ? penTotals.total : (local.loading || local.isUsd ? Number(totalUsd) : Number(totalLocal.toFixed(2))),
+            currency: penTotals ? "PEN" : (currency || "USD"),
+            method: "Yape/Plin",
+            orderDate: new Date().toISOString(),
+          },
+        },
+      }).catch((err) => console.warn("[admin-manual-pending] notify failed", err));
+
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "customer-manual-pending",
+          recipientEmail: s.buyer.email.trim().toLowerCase(),
+          idempotencyKey: `customer-manual-pending-${orderNumber}`,
+          templateData: {
+            orderNumber,
+            customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
+            productName: s.items.map((i) => i.name).join(" + "),
+            amount: penTotals ? penTotals.total : (local.loading || local.isUsd ? Number(totalUsd) : Number(totalLocal.toFixed(2))),
+            currency: penTotals ? "PEN" : (currency || "USD"),
+            amountUsd: Number(totalUsd),
+            method: "Yape/Plin",
+            orderDate: new Date().toISOString(),
+          },
+        },
+      }).catch((err) => console.warn("[customer-manual-pending] notify failed", err));
+
+      supabase.from("email_contacts").upsert({
+        email: s.buyer.email.trim().toLowerCase(),
+        name: s.buyer.fullName.trim(),
+        source: "checkout-prueba-1",
+        metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "yape_plin", orderNumber },
+      }, { onConflict: "email,source" }).then(() => {});
+
+      window.open(waUrl, "_blank", "noopener,noreferrer");
+      const q = new URLSearchParams({
+        order: orderNumber,
+        name: s.buyer.fullName.trim(),
+        email: s.buyer.email.trim(),
+        amount: amountText,
+        method: "Yape/Plin",
+        products: s.items.map((i) => `${i.name} x${i.quantity}`).join(" | "),
+      }).toString();
+      navigate(`/checkouts/pendiente-manual?${q}`);
+    } catch (err) {
+      setMpLoading(null);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setMethodError({ method: "yape", message: errorMessage });
+      toast({ title: "Error Yape/Plin", description: errorMessage, variant: "destructive" });
     }
-
-    // Notificar a Rosa (hola@ilinguerelax.com) con botón directo a WhatsApp del cliente
-    supabase.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "admin-manual-pending",
-        idempotencyKey: `manual-pending-${orderNumber}`,
-        templateData: {
-          orderNumber,
-          customerName: s.buyer.fullName.trim(),
-          customerEmail: s.buyer.email.trim().toLowerCase(),
-          customerPhone: s.buyer.phone ?? "",
-          customerCountry: (region.country || "").toUpperCase(),
-          productName: s.items.map((i) => i.name).join(" + "),
-          amount: penTotals ? penTotals.total : (local.loading || local.isUsd ? Number(totalUsd) : Number(totalLocal.toFixed(2))),
-          currency: penTotals ? "PEN" : (currency || "USD"),
-          method: "Yape/Plin",
-          orderDate: new Date().toISOString(),
-        },
-      },
-    }).catch((err) => console.warn("[admin-manual-pending] notify failed", err));
-
-    // Confirmación al cliente — para no perder la orden si se cierra la página o se apaga la batería
-    supabase.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "customer-manual-pending",
-        recipientEmail: s.buyer.email.trim().toLowerCase(),
-        idempotencyKey: `customer-manual-pending-${orderNumber}`,
-        templateData: {
-          orderNumber,
-          customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
-          productName: s.items.map((i) => i.name).join(" + "),
-          amount: penTotals ? penTotals.total : (local.loading || local.isUsd ? Number(totalUsd) : Number(totalLocal.toFixed(2))),
-          currency: penTotals ? "PEN" : (currency || "USD"),
-          amountUsd: Number(totalUsd),
-          method: "Yape/Plin",
-          orderDate: new Date().toISOString(),
-        },
-      },
-    }).catch((err) => console.warn("[customer-manual-pending] notify failed", err));
-
-    supabase.from("email_contacts").upsert({
-      email: s.buyer.email.trim().toLowerCase(),
-      name: s.buyer.fullName.trim(),
-      source: "checkout-prueba-1",
-      metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "yape_plin", orderNumber },
-    }, { onConflict: "email,source" }).then(() => {});
-
-    window.open(waUrl, "_blank", "noopener,noreferrer");
-    const q = new URLSearchParams({
-      order: orderNumber,
-      name: s.buyer.fullName.trim(),
-      email: s.buyer.email.trim(),
-      amount: amountText,
-      method: "Yape/Plin",
-      products: s.items.map((i) => `${i.name} x${i.quantity}`).join(" | "),
-    }).toString();
-    navigate(`/checkouts/pendiente-manual?${q}`);
   };
 
 
@@ -1096,6 +1116,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       `Adjunto captura del pago. Gracias!`;
     const waUrl = `https://wa.me/12512724704?text=${encodeURIComponent(msg)}`;
 
+    setMpLoading("binance");
+    setMethodError(null);
+
     try {
       await supabase.from("manual_payments").insert({
         order_number: orderNumber,
@@ -1110,67 +1133,70 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         items: s.items.map((i) => ({ sku: i.id, name: i.name, quantity: i.quantity, price: i.price })),
         status: "pending",
       });
-    } catch (e) {
-      console.warn("[manual_payments] binance insert failed", e);
+
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "admin-manual-pending",
+          idempotencyKey: `manual-pending-${orderNumber}`,
+          templateData: {
+            orderNumber,
+            customerName: s.buyer.fullName.trim(),
+            customerEmail: s.buyer.email.trim().toLowerCase(),
+            customerPhone: s.buyer.phone ?? "",
+            customerCountry: (region.country || "").toUpperCase(),
+            productName: s.items.map((i) => i.name).join(" + "),
+            amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+            currency: local.currency || "USD",
+            method: "Binance Pay",
+            orderDate: new Date().toISOString(),
+          },
+        },
+      }).catch((err) => console.warn("[admin-manual-pending] binance notify failed", err));
+
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "customer-manual-pending",
+          recipientEmail: s.buyer.email.trim().toLowerCase(),
+          idempotencyKey: `customer-manual-pending-${orderNumber}`,
+          templateData: {
+            orderNumber,
+            customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
+            productName: s.items.map((i) => i.name).join(" + "),
+            amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+            currency: local.currency || "USD",
+            amountUsd: Number(totalUsd),
+            method: "Binance Pay",
+            binancePayId: binanceCfg.pay_id,
+            binanceAddress: binanceCfg.address,
+            binanceNetwork: binanceCfg.network,
+            orderDate: new Date().toISOString(),
+          },
+        },
+      }).catch((err) => console.warn("[customer-manual-pending] binance notify failed", err));
+
+      supabase.from("email_contacts").upsert({
+        email: s.buyer.email.trim().toLowerCase(),
+        name: s.buyer.fullName.trim(),
+        source: "checkout-prueba-1",
+        metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "binance_pay", orderNumber },
+      }, { onConflict: "email,source" }).then(() => {});
+
+      window.open(waUrl, "_blank", "noopener,noreferrer");
+      const q = new URLSearchParams({
+        order: orderNumber,
+        name: s.buyer.fullName.trim(),
+        email: s.buyer.email.trim(),
+        amount: `${amountText} (USD $${totalUsd})`,
+        method: "Binance Pay",
+        products: s.items.map((i) => `${i.name} x${i.quantity}`).join(" | "),
+      }).toString();
+      navigate(`/checkouts/pendiente-manual?${q}`);
+    } catch (err) {
+      setMpLoading(null);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setMethodError({ method: "binance", message: errorMessage });
+      toast({ title: "Error Binance", description: errorMessage, variant: "destructive" });
     }
-
-    supabase.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "admin-manual-pending",
-        idempotencyKey: `manual-pending-${orderNumber}`,
-        templateData: {
-          orderNumber,
-          customerName: s.buyer.fullName.trim(),
-          customerEmail: s.buyer.email.trim().toLowerCase(),
-          customerPhone: s.buyer.phone ?? "",
-          customerCountry: (region.country || "").toUpperCase(),
-          productName: s.items.map((i) => i.name).join(" + "),
-          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
-          currency: local.currency || "USD",
-          method: "Binance Pay",
-          orderDate: new Date().toISOString(),
-        },
-      },
-    }).catch((err) => console.warn("[admin-manual-pending] binance notify failed", err));
-
-    supabase.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "customer-manual-pending",
-        recipientEmail: s.buyer.email.trim().toLowerCase(),
-        idempotencyKey: `customer-manual-pending-${orderNumber}`,
-        templateData: {
-          orderNumber,
-          customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
-          productName: s.items.map((i) => i.name).join(" + "),
-          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
-          currency: local.currency || "USD",
-          amountUsd: Number(totalUsd),
-          method: "Binance Pay",
-          binancePayId: binanceCfg.pay_id,
-          binanceAddress: binanceCfg.address,
-          binanceNetwork: binanceCfg.network,
-          orderDate: new Date().toISOString(),
-        },
-      },
-    }).catch((err) => console.warn("[customer-manual-pending] binance notify failed", err));
-
-    supabase.from("email_contacts").upsert({
-      email: s.buyer.email.trim().toLowerCase(),
-      name: s.buyer.fullName.trim(),
-      source: "checkout-prueba-1",
-      metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "binance_pay", orderNumber },
-    }, { onConflict: "email,source" }).then(() => {});
-
-    window.open(waUrl, "_blank", "noopener,noreferrer");
-    const q = new URLSearchParams({
-      order: orderNumber,
-      name: s.buyer.fullName.trim(),
-      email: s.buyer.email.trim(),
-      amount: `${amountText} (USD $${totalUsd})`,
-      method: "Binance Pay",
-      products: s.items.map((i) => `${i.name} x${i.quantity}`).join(" | "),
-    }).toString();
-    navigate(`/checkouts/pendiente-manual?${q}`);
   };
 
   const copyClabe = async () => {
@@ -1199,6 +1225,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       `Adjunto captura del pago. Gracias!`;
     const waUrl = `https://wa.me/12512724704?text=${encodeURIComponent(msg)}`;
 
+    setMpLoading("clabe");
+    setMethodError(null);
+
     try {
       await supabase.from("manual_payments").insert({
         order_number: orderNumber,
@@ -1213,67 +1242,70 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         items: s.items.map((i) => ({ sku: i.id, name: i.name, quantity: i.quantity, price: i.price })),
         status: "pending",
       });
-    } catch (e) {
-      console.warn("[manual_payments] clabe insert failed", e);
+
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "admin-manual-pending",
+          idempotencyKey: `manual-pending-${orderNumber}`,
+          templateData: {
+            orderNumber,
+            customerName: s.buyer.fullName.trim(),
+            customerEmail: s.buyer.email.trim().toLowerCase(),
+            customerPhone: s.buyer.phone ?? "",
+            customerCountry: (region.country || "MX").toUpperCase(),
+            productName: s.items.map((i) => i.name).join(" + "),
+            amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+            currency: local.currency || "MXN",
+            method: "SPEI / CLABE (México)",
+            orderDate: new Date().toISOString(),
+          },
+        },
+      }).catch((err) => console.warn("[admin-manual-pending] clabe notify failed", err));
+
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "customer-manual-pending",
+          recipientEmail: s.buyer.email.trim().toLowerCase(),
+          idempotencyKey: `customer-manual-pending-${orderNumber}`,
+          templateData: {
+            orderNumber,
+            customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
+            productName: s.items.map((i) => i.name).join(" + "),
+            amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+            currency: local.currency || "MXN",
+            amountUsd: Number(totalUsd),
+            method: "SPEI / CLABE (México)",
+            orderDate: new Date().toISOString(),
+            clabeNumber: CLABE_NUMBER,
+            clabeHolder: "Carmen Rosa Aliaga Domínguez",
+            clabeBank: "STP (SPEI)",
+          },
+        },
+      }).catch((err) => console.warn("[customer-manual-pending] clabe notify failed", err));
+
+      supabase.from("email_contacts").upsert({
+        email: s.buyer.email.trim().toLowerCase(),
+        name: s.buyer.fullName.trim(),
+        source: "checkout-prueba-1",
+        metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "clabe_mx", orderNumber },
+      }, { onConflict: "email,source" }).then(() => {});
+
+      window.open(waUrl, "_blank", "noopener,noreferrer");
+      const q = new URLSearchParams({
+        order: orderNumber,
+        name: s.buyer.fullName.trim(),
+        email: s.buyer.email.trim(),
+        amount: `${amountText} (USD $${totalUsd})`,
+        method: "SPEI / CLABE (México)",
+        products: s.items.map((i) => `${i.name} x${i.quantity}`).join(" | "),
+      }).toString();
+      navigate(`/checkouts/pendiente-manual?${q}`);
+    } catch (err) {
+      setMpLoading(null);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setMethodError({ method: "clabe", message: errorMessage });
+      toast({ title: "Error SPEI", description: errorMessage, variant: "destructive" });
     }
-
-    supabase.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "admin-manual-pending",
-        idempotencyKey: `manual-pending-${orderNumber}`,
-        templateData: {
-          orderNumber,
-          customerName: s.buyer.fullName.trim(),
-          customerEmail: s.buyer.email.trim().toLowerCase(),
-          customerPhone: s.buyer.phone ?? "",
-          customerCountry: (region.country || "MX").toUpperCase(),
-          productName: s.items.map((i) => i.name).join(" + "),
-          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
-          currency: local.currency || "MXN",
-          method: "SPEI / CLABE (México)",
-          orderDate: new Date().toISOString(),
-        },
-      },
-    }).catch((err) => console.warn("[admin-manual-pending] clabe notify failed", err));
-
-    supabase.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "customer-manual-pending",
-        recipientEmail: s.buyer.email.trim().toLowerCase(),
-        idempotencyKey: `customer-manual-pending-${orderNumber}`,
-        templateData: {
-          orderNumber,
-          customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
-          productName: s.items.map((i) => i.name).join(" + "),
-          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
-          currency: local.currency || "MXN",
-          amountUsd: Number(totalUsd),
-          method: "SPEI / CLABE (México)",
-          orderDate: new Date().toISOString(),
-          clabeNumber: CLABE_NUMBER,
-          clabeHolder: "Carmen Rosa Aliaga Domínguez",
-          clabeBank: "STP (SPEI)",
-        },
-      },
-    }).catch((err) => console.warn("[customer-manual-pending] clabe notify failed", err));
-
-    supabase.from("email_contacts").upsert({
-      email: s.buyer.email.trim().toLowerCase(),
-      name: s.buyer.fullName.trim(),
-      source: "checkout-prueba-1",
-      metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "clabe_mx", orderNumber },
-    }, { onConflict: "email,source" }).then(() => {});
-
-    window.open(waUrl, "_blank", "noopener,noreferrer");
-    const q = new URLSearchParams({
-      order: orderNumber,
-      name: s.buyer.fullName.trim(),
-      email: s.buyer.email.trim(),
-      amount: `${amountText} (USD $${totalUsd})`,
-      method: "SPEI / CLABE (México)",
-      products: s.items.map((i) => `${i.name} x${i.quantity}`).join(" | "),
-    }).toString();
-    navigate(`/checkouts/pendiente-manual?${q}`);
   };
 
 

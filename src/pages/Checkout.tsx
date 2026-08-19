@@ -660,197 +660,178 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden max-w-full">
-      {loadingDb && !catalogItem && (
-        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-5 lg:py-8 space-y-6">
-          <header className="flex items-center justify-between gap-4 py-4 border-b">
-            <Skeleton className="h-8 w-40" />
-            <Skeleton className="h-6 w-24" />
-          </header>
-          <div className="grid lg:grid-cols-[minmax(0,1fr)_400px] gap-8">
-            <div className="space-y-6">
-              <Card className="p-6 space-y-4">
-                <Skeleton className="h-6 w-48" />
-                <div className="grid gap-4">
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-10 w-full" />
-                </div>
-              </Card>
-              <Card className="p-6 space-y-4">
-                <Skeleton className="h-6 w-48" />
-                <div className="space-y-3">
-                  <Skeleton className="h-12 w-full" />
-                  <Skeleton className="h-12 w-full" />
-                  <Skeleton className="h-12 w-full" />
-                </div>
-              </Card>
-            </div>
-            <aside className="hidden lg:block space-y-6">
-              <Card className="p-6 space-y-4">
-                <Skeleton className="h-6 w-32" />
-                <div className="space-y-2">
-                  <Skeleton className="h-16 w-full" />
-                  <Skeleton className="h-16 w-full" />
-                </div>
-                <div className="pt-4 border-t space-y-2">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                </div>
-              </Card>
-            </aside>
-          </div>
-        </div>
-      )}
-
-      {catalogItem && (
-        <>
-          <Helmet>
-        <title>{`Checkout · iLingue Relax · ${isPeru ? "PE" : "GLOBAL"}`}</title>
-        <meta name="robots" content="noindex, nofollow" />
-        {/* Preconnect a los orígenes críticos del checkout para reducir de
-            2–7 s a ~1–2 s el tiempo de apertura del iframe de Stripe. */}
-        <link rel="preconnect" href="https://js.stripe.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://api.stripe.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://m.stripe.network" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://m.stripe.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://checkout.stripe.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://opyitzdvvurdyyyzkwwv.supabase.co" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://www.paypal.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://q.stripe.com" />
-        {/* Prefetch temprano del bundle de stripe.js para que ya esté en caché
-            cuando montemos EmbeddedCheckoutProvider. */}
-        <link rel="preload" as="script" href="https://js.stripe.com/v3" crossOrigin="anonymous" />
-      </Helmet>
-
-      
-
-      <header className="border-b bg-background/95 backdrop-blur sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-3 min-w-0">
-            {catalogItem?.productPath && (
-              <Link
-                to={catalogItem.productPath}
-                className="flex items-center gap-1 text-[11px] sm:text-xs text-muted-foreground hover:text-primary whitespace-nowrap"
-                aria-label={t.returnToProduct || "Volver al producto"}
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{t.returnToProduct || "Volver al producto"}</span>
-              </Link>
-            )}
-            <span
-              className="text-base sm:text-xl font-bold tracking-tight whitespace-nowrap"
-              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
-            >
-              iLingue <span className="text-primary">Relax</span>
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground whitespace-nowrap">
-            <Lock className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
-            <span className="hidden sm:inline font-medium">
-              {isPeru ? t.stripeSslMP : t.stripeSSL}
-            </span>
-            <span className="sm:hidden font-medium">SSL</span>
-          </div>
-
-
-        </div>
-      </header>
-
-
-
-
-
-
-
-      <MobileOrderSummarySticky slug={catalogItem?.id} />
-
-
-
-      <div className="max-w-6xl min-w-0 mx-auto px-3 sm:px-4 py-3 sm:py-5 lg:py-8 grid lg:grid-cols-[minmax(0,1fr)_400px] gap-5 lg:gap-8">
-        <div className="min-w-0 space-y-4">
-          {items.some(i => i.isPhysical) && items.some(i => !i.isPhysical) && (
-            <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 flex gap-3 items-start">
-              <Package className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-              <div className="text-sm text-amber-900 dark:text-amber-200">
-                <p className="font-bold">Pedido Mixto</p>
-                <p>Tu carrito contiene productos físicos y digitales. El acceso a los digitales es inmediato tras el pago, mientras que los físicos requieren datos de envío.</p>
+      <SectionErrorBoundary name="checkout-root">
+        {loadingDb && !catalogItem && (
+          <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-5 lg:py-8 space-y-6">
+            <header className="flex items-center justify-between gap-4 py-4 border-b">
+              <Skeleton className="h-8 w-40" />
+              <Skeleton className="h-6 w-24" />
+            </header>
+            <div className="grid lg:grid-cols-[minmax(0,1fr)_400px] gap-8">
+              <div className="space-y-6">
+                <Card className="p-6 space-y-4">
+                  <Skeleton className="h-6 w-48" />
+                  <div className="grid gap-4">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                </Card>
+                <Card className="p-6 space-y-4">
+                  <Skeleton className="h-6 w-48" />
+                  <div className="space-y-3">
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full" />
+                  </div>
+                </Card>
               </div>
-            </div>
-          )}
-          <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-900/30 rounded-xl p-3 flex gap-2.5 items-center mb-1">
-            <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-            <p className="text-[11px] sm:text-xs text-emerald-900 dark:text-emerald-100 font-medium leading-tight">
-              {t.verifiedReviewNotice}
-            </p>
-          </div>
-          <SectionErrorBoundary name="buyer-info">
-            <BuyerInfoForm />
-          </SectionErrorBoundary>
-
-          {catalogItem?.upsells?.length ? (
-            <SectionErrorBoundary name="upsell-panel" extra={{ slug: catalogItem?.id }}>
-              <UpsellPanel upsells={catalogItem.upsells} mainProductId={catalogItem.id} />
-            </SectionErrorBoundary>
-          ) : null}
-
-          <SectionErrorBoundary name="payment-methods">
-            <PaymentMethodsGroup parentSku={catalogItem?.adminSku ?? catalogItem?.id ?? slug ?? null} />
-          </SectionErrorBoundary>
-
-          <SectionErrorBoundary name="checkout-testimonials">
-            <CheckoutTestimonials />
-          </SectionErrorBoundary>
-
-
-          <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">
-            <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> {t.sslEncryption}
-            </span>
-            {isPeru && (
-              <>
-                <span>·</span>
-                <span className="flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> {t.mercadoPagoPeru}
-                </span>
-              </>
-            )}
-            <span>·</span>
-
-            <a
-              href="https://wa.me/112512724704"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 hover:text-primary"
-            >
-              <MessageCircle className="w-3.5 h-3.5" /> {t.whatsappSupport}
-            </a>
-          </div>
-        </div>
-
-        <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start space-y-6">
-          <SectionErrorBoundary name="order-summary-desktop" extra={{ slug: catalogItem?.id }}>
-            <OrderSummary mainProductId={catalogItem?.id} />
-          </SectionErrorBoundary>
-
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-4">
-              <Lock className="w-5 h-5 text-primary" />
-              <h3 className="font-bold text-lg">Checkout Seguro</h3>
-            </div>
-            
-            
-            
-            <div className="pt-6 border-t border-border/50">
-              <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wider">
-                Métodos de pago aceptados:
-              </p>
-              <PaymentLogos />
+              <aside className="hidden lg:block space-y-6">
+                <Card className="p-6 space-y-4">
+                  <Skeleton className="h-6 w-32" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-16 w-full" />
+                  </div>
+                  <div className="pt-4 border-t space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                  </div>
+                </Card>
+              </aside>
             </div>
           </div>
-        </aside>
-      </div>
+        )}
 
-        </>
-      )}
+        {catalogItem && (
+          <>
+            <Helmet>
+              <title>{`Checkout · iLingue Relax · ${isPeru ? "PE" : "GLOBAL"}`}</title>
+              <meta name="robots" content="noindex, nofollow" />
+              <link rel="preconnect" href="https://js.stripe.com" crossOrigin="anonymous" />
+              <link rel="preconnect" href="https://api.stripe.com" crossOrigin="anonymous" />
+              <link rel="preconnect" href="https://m.stripe.network" crossOrigin="anonymous" />
+              <link rel="preconnect" href="https://m.stripe.com" crossOrigin="anonymous" />
+              <link rel="preconnect" href="https://checkout.stripe.com" crossOrigin="anonymous" />
+              <link rel="preconnect" href="https://opyitzdvvurdyyyzkwwv.supabase.co" crossOrigin="anonymous" />
+              <link rel="preconnect" href="https://www.paypal.com" crossOrigin="anonymous" />
+              <link rel="dns-prefetch" href="https://q.stripe.com" />
+              <link rel="preload" as="script" href="https://js.stripe.com/v3" crossOrigin="anonymous" />
+            </Helmet>
+
+            <header className="border-b bg-background/95 backdrop-blur sticky top-0 z-30">
+              <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-3 min-w-0">
+                  {catalogItem?.productPath && (
+                    <Link
+                      to={catalogItem.productPath}
+                      className="flex items-center gap-1 text-[11px] sm:text-xs text-muted-foreground hover:text-primary whitespace-nowrap"
+                      aria-label={t.returnToProduct || "Volver al producto"}
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">{t.returnToProduct || "Volver al producto"}</span>
+                    </Link>
+                  )}
+                  <span
+                    className="text-base sm:text-xl font-bold tracking-tight whitespace-nowrap"
+                    style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+                  >
+                    iLingue <span className="text-primary">Relax</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground whitespace-nowrap">
+                  <Lock className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
+                  <span className="hidden sm:inline font-medium">
+                    {isPeru ? t.stripeSslMP : t.stripeSSL}
+                  </span>
+                  <span className="sm:hidden font-medium">SSL</span>
+                </div>
+              </div>
+            </header>
+
+            <MobileOrderSummarySticky slug={catalogItem?.id} />
+
+            <div className="max-w-6xl min-w-0 mx-auto px-3 sm:px-4 py-3 sm:py-5 lg:py-8 grid lg:grid-cols-[minmax(0,1fr)_400px] gap-5 lg:gap-8">
+              <div className="min-w-0 space-y-4">
+                {items.some(i => i.isPhysical) && items.some(i => !i.isPhysical) && (
+                  <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 flex gap-3 items-start">
+                    <Package className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                    <div className="text-sm text-amber-900 dark:text-amber-200">
+                      <p className="font-bold">Pedido Mixto</p>
+                      <p>Tu carrito contiene productos físicos y digitales. El acceso a los digitales es inmediato tras el pago, mientras que los físicos requieren datos de envío.</p>
+                    </div>
+                  </div>
+                )}
+                <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-900/30 rounded-xl p-3 flex gap-2.5 items-center mb-1">
+                  <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <p className="text-[11px] sm:text-xs text-emerald-900 dark:text-emerald-100 font-medium leading-tight">
+                    {t.verifiedReviewNotice}
+                  </p>
+                </div>
+                
+                <SectionErrorBoundary name="buyer-info">
+                  <BuyerInfoForm />
+                </SectionErrorBoundary>
+
+                {catalogItem?.upsells?.length ? (
+                  <SectionErrorBoundary name="upsell-panel" extra={{ slug: catalogItem?.id }}>
+                    <UpsellPanel upsells={catalogItem.upsells} mainProductId={catalogItem.id} />
+                  </SectionErrorBoundary>
+                ) : null}
+
+                <SectionErrorBoundary name="payment-methods">
+                  <PaymentMethodsGroup parentSku={catalogItem?.adminSku ?? catalogItem?.id ?? slug ?? null} />
+                </SectionErrorBoundary>
+
+                <SectionErrorBoundary name="checkout-testimonials">
+                  <CheckoutTestimonials />
+                </SectionErrorBoundary>
+
+                <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">
+                  <span className="flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> {t.sslEncryption}
+                  </span>
+                  {isPeru && (
+                    <>
+                      <span>·</span>
+                      <span className="flex items-center gap-1">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> {t.mercadoPagoPeru}
+                      </span>
+                    </>
+                  )}
+                  <span>·</span>
+                  <a
+                    href="https://wa.me/112512724704"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 hover:text-primary"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" /> {t.whatsappSupport}
+                  </a>
+                </div>
+              </div>
+
+              <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start space-y-6">
+                <SectionErrorBoundary name="order-summary-desktop" extra={{ slug: catalogItem?.id }}>
+                  <OrderSummary mainProductId={catalogItem?.id} />
+                </SectionErrorBoundary>
+
+                <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Lock className="w-5 h-5 text-primary" />
+                    <h3 className="font-bold text-lg">Checkout Seguro</h3>
+                  </div>
+                  <div className="pt-6 border-t border-border/50">
+                    <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wider">
+                      Métodos de pago aceptados:
+                    </p>
+                    <PaymentLogos />
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </>
+        )}
+      </SectionErrorBoundary>
     </div>
   );
 }

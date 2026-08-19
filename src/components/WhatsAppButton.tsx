@@ -12,11 +12,7 @@ export const WhatsAppButton = ({ url, label = "¿Dudas?" }: WhatsAppButtonProps)
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"
-      className="fixed right-4 z-40 group touch-manipulation"
-      style={{
-        // Sit safely above the sticky buy bar (whatever its current height).
-        bottom: "calc(var(--sticky-bar-h, 0px) + 110px + env(safe-area-inset-bottom, 0px))",
-      }}
+      className="fixed bottom-[110px] right-4 z-40 group touch-manipulation"
     >
       <div className="flex items-center gap-2 flex-row-reverse">
         <div className="w-11 h-11 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-[#25D366] hover:bg-[#20bd5a] shadow-xl ring-2 ring-white/40 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shrink-0 aspect-square">

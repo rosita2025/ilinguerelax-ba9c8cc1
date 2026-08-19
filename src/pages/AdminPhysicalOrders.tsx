@@ -277,7 +277,7 @@ const AdminPhysicalOrders = () => {
                         {order.tracking_number ? "ENVIADO" : order.status.toUpperCase()}
                       </Badge>
                       <Badge variant="outline" className="capitalize">
-                        {order.source}
+                        {order.source === "gateway" ? (order.payment_provider || "gateway") : order.source}
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">

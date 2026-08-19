@@ -2164,11 +2164,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4">
                 <DlocalSmartFields
                   country={country}
-                  currency={DLOCAL_CURRENCY_BY_COUNTRY[country] ?? "USD"}
-                  amount={(DLOCAL_CURRENCY_BY_COUNTRY[country] ?? "USD") === "USD"
-                    ? total
-                    : (local.currency === (DLOCAL_CURRENCY_BY_COUNTRY[country] ?? "USD") ? local.amount : total)}
-                  expectedTotalUsd={total}
+                  currency={currency}
+                  amount={totalLocal}
+                  expectedTotalUsd={totalUsd}
                   items={items.map((i) => ({ id: i.id, name: i.name, price: itemPrice(i, region.tier), quantity: i.quantity }))}
                   couponPercent={couponPercent}
                   couponCode={coupon ?? undefined}

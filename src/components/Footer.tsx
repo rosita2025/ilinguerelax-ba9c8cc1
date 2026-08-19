@@ -179,8 +179,8 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="bg-foreground text-primary-foreground w-full max-w-full overflow-hidden pb-24 md:pb-8 pt-8 px-4 box-border">
-      <div className="container px-4 md:px-6 py-14 w-full max-w-full overflow-hidden">
+    <footer className="w-full bg-[#111827] text-white py-10 px-4 box-border overflow-hidden pb-24 md:pb-10">
+      <div className="container px-4 md:px-6 py-10 w-full max-w-full overflow-hidden">
         {/* Brand row */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10 pb-8 border-b border-primary-foreground/10">
           <Link to="/" className="flex flex-col">
@@ -214,7 +214,7 @@ export const Footer = () => {
         </div>
 
         {/* Columns */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full max-w-full px-4 box-border">
           {columns.map((col) => (
             <div key={col.title}>
               <h3 className="text-sm font-bold tracking-wider mb-4 text-primary-foreground">

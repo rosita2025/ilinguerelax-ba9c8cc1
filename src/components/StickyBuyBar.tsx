@@ -320,11 +320,11 @@ export const StickyBuyBar = ({
           )}
           <span className="text-[11px] leading-none whitespace-nowrap">{price}</span>
         </button>
-        {isPhysical && (
+        {/* {isPhysical && (
           <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold shadow-md whitespace-nowrap animate-pulse">
             {lang === "en" ? "Only 12 books left" : "Solo 12 libros quedan"}
           </span>
-        )}
+        )} */}
       </div>
     );
   }

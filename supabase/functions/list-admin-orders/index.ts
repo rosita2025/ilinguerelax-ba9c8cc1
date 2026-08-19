@@ -25,10 +25,63 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    /** Busca el nombre real del cliente en las tablas del pedido. */
+    const resolveCustomerName = async (orderNumber: string): Promise<string | null> => {
+      const pick = (v: unknown) => {
+        const s = String(v ?? "").trim();
+        return s && s.toLowerCase() !== "cliente" ? s : null;
+      };
+      const { data: ship } = await admin
+        .from("physical_shipments").select("customer_name").eq("order_number", orderNumber).maybeSingle();
+      if (pick(ship?.customer_name)) return pick(ship?.customer_name);
+
+      const { data: manual } = await admin
+        .from("manual_payments").select("buyer_name").eq("order_number", orderNumber).maybeSingle();
+      if (pick(manual?.buyer_name)) return pick(manual?.buyer_name);
+
+      const { data: digital } = await admin
+        .from("digital_email_sends").select("customer_name").eq("order_id", orderNumber)
+        .order("created_at", { ascending: false }).limit(1).maybeSingle();
+      if (pick(digital?.customer_name)) return pick(digital?.customer_name);
+
+      const { data: events } = await admin
+        .from("order_events").select("metadata").eq("order_number", orderNumber)
+        .order("created_at", { ascending: false }).limit(20);
+      for (const ev of events ?? []) {
+        const m = (ev as { metadata?: Record<string, unknown> }).metadata ?? {};
+        const candidate = m.customer_name ?? m.name ?? m.buyer_name
+          ?? (m.buyer as Record<string, unknown> | undefined)?.name
+          ?? (m.shipping as Record<string, unknown> | undefined)?.name;
+        if (pick(candidate)) return pick(candidate);
+      }
+      return null;
+    };
+
     // Acción: Actualizar tracking
     if (action === "update_tracking" && orderId) {
       if (!trackingNumber && !shippingProvider && !shippingProofUrl) {
         throw new Error("Tracking number, provider, or proof URL is required");
+      }
+
+      // Validación en servidor: el número no puede ser una URL genérica.
+      let trackingCode: string | null = null;
+      let trackingLink: string | null = null;
+      if (trackingNumber) {
+        const norm = normalizeTracking(trackingNumber);
+        if (norm.error || !norm.code) {
+          return new Response(JSON.stringify({ ok: false, error: norm.error ?? "Número de seguimiento inválido." }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        if (!String(shippingProvider ?? "").trim()) {
+          return new Response(JSON.stringify({ ok: false, error: "Selecciona el transportista antes de guardar el seguimiento." }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        trackingCode = norm.code;
+        trackingLink = norm.url;
       }
 
       const table = source === "manual" ? "manual_payments" :
@@ -48,7 +101,7 @@ Deno.serve(async (req) => {
       const prevTracking = String((prevRow as { tracking_number?: string | null } | null)?.tracking_number ?? "").trim();
 
       const patch: Record<string, unknown> = {
-        tracking_number: trackingNumber || null,
+        tracking_number: trackingCode,
         shipping_provider: shippingProvider || null,
         shipping_proof_url: shippingProofUrl || null,
       };

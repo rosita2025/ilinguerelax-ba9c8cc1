@@ -43,7 +43,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const [expanded, setExpanded] = useState(!collapsible);
 
   const overridesFor = useSkuOverridesResolver();
-  const shippingCostUSD = isLatam ? 9 : 8; // Centralized: $9 LATAM, $8 Rest of World
+  const shippingCostUSD = 8; // Tarifa plana única: $8 USD para todo el mundo
 
   const { 
     subtotalLocal, 
@@ -63,7 +63,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
 
   const totals = useMemo(() => calcTotals(items, couponPercent, region.tier), [items, couponPercent, region.tier]);
   const { subtotal, discount, total } = totals;
-  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : shippingCostUSD) : 0;
+  const shipping = items.some((i) => i.isPhysical) ? shippingCostUSD : 0;
   const grandTotal = total + shipping;
 
   const penTotals = calcTotalsPen(items, couponPercent, country);
@@ -332,9 +332,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span>{t.shipping}</span>
             <span>
               {items.some(i => i.isPhysical) 
-                ? (shippingLocal === 0 
-                    ? (items.length > 1 ? t.freeShipping + " (Upsell)" : t.freeShipping) 
-                    : formatLocalDirect(shippingLocal, country))
+                ? formatLocalDirect(shippingLocal, country)
                 : t.freeDigitalDelivery
               }
             </span>

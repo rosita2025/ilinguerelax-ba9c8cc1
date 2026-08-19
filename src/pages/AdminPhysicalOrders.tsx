@@ -166,7 +166,29 @@ const AdminPhysicalOrders = () => {
       toast.error("Ingresa al menos un dato de seguimiento");
       return;
     }
-    
+
+    let trackingCode = tracking;
+    if (tracking) {
+      const norm = normalizeTracking(tracking);
+      if (norm.error || !norm.code) {
+        toast.error(norm.error ?? "Número de seguimiento inválido.");
+        return;
+      }
+      trackingCode = norm.code;
+      if (!provider.trim()) {
+        toast.error("Selecciona el transportista (no se envía 'Courier' genérico).");
+        return;
+      }
+      const ok = window.confirm(
+        `Se enviará el correo de seguimiento a ${order.email || "(sin correo)"}\n\n` +
+          `Pedido: ${order.order_ref || order.id}\n` +
+          `Cliente: ${order.customer_name || "(sin nombre)"}\n` +
+          `Transportista: ${provider}\n` +
+          `Tracking: ${trackingCode}\n\n¿Confirmas el envío?`,
+      );
+      if (!ok) return;
+    }
+
     setSaving(order.id);
     try {
       const { data, error } = await adminInvoke("list-admin-orders", {
@@ -174,7 +196,7 @@ const AdminPhysicalOrders = () => {
           adminKey,
           action: "update_tracking",
           orderId: order.order_ref || order.id,
-          trackingNumber: tracking,
+          trackingNumber: trackingCode,
           shippingProvider: provider,
           shipping_provider: provider,
           shippingProofUrl: proofUrl,
@@ -182,6 +204,11 @@ const AdminPhysicalOrders = () => {
         },
       });
       if (error) throw error;
+      const errMsg = (data as { ok?: boolean; error?: string } | null)?.error;
+      if (errMsg) {
+        toast.error(errMsg);
+        return;
+      }
       const emailInfo = (data as { email?: { sent?: boolean; error?: string; skipped?: string } } | null)?.email;
       toast.success("Seguimiento actualizado para " + (order.order_ref || order.id));
       if (tracking) {

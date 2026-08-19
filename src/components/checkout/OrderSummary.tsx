@@ -43,7 +43,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const [expanded, setExpanded] = useState(!collapsible);
 
   const overridesFor = useSkuOverridesResolver();
-  const shippingCostUSD = isLatam ? 9 : 8;
+  const shippingCostUSD = isLatam ? 9 : 8; // Centralized: $9 LATAM, $8 Rest of World
 
   const { 
     subtotalLocal, 

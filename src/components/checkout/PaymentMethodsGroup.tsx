@@ -342,7 +342,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const { language } = useI18n();
   const t = getCheckoutUI(language);
   const overridesFor = useSkuOverridesResolver();
-  const shippingCostUSD = isLatam ? 9 : 8;
+  const shippingCostUSD = isLatam ? 9 : 8; // Centralized: $9 LATAM, $8 Rest of World
 
   const { 
     subtotalLocal, 

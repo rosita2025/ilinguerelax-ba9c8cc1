@@ -186,7 +186,7 @@ export function PayPalButtons({
               });
 
               if (error || cap?.status !== "COMPLETED") {
-                throw new Error(error?.message || `Estado inesperado: ${cap?.status ?? "desconocido"}`);
+                throw new Error(error ? (error as any).message : `Estado inesperado: ${cap?.status ?? "desconocido"}`);
               }
               onApproved(data.orderID);
             } catch (e) {

@@ -228,8 +228,8 @@ const ProductSpanish5000 = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <div className="w-full max-w-[100vw] overflow-x-hidden px-2 box-border">
-      <section className="pt-4 pb-6 md:pt-8 md:pb-10 w-full max-w-full overflow-x-hidden px-4 box-border">
+      <div className="w-full max-w-full overflow-x-hidden px-0 sm:px-2 box-border">
+      <section className="pt-4 pb-6 md:pt-8 md:pb-10 w-full max-w-full overflow-x-hidden px-0 sm:px-4 box-border">
         <div className="container px-0 sm:px-4 w-full max-w-full overflow-x-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
             {/* Product Image */}
@@ -307,15 +307,15 @@ const ProductSpanish5000 = () => {
                 </p>
 
               {/* Benefits bullets — scannable above the fold */}
-                <ul className="space-y-1.5 mb-4">
+                <ul className="space-y-1.5 mb-4 px-1">
                   {[
                     "📦 Physical book shipped to your door (limited stock — no preorder)",
                     "📱 Digital PDF version included FREE — instant access",
                     "🎁 Only 3 bonuses left + lifetime updates",
                   ].map((b) => (
-                  <li key={b} className="flex items-start gap-2 text-sm md:text-base text-foreground">
-                    <Check className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <span>{b}</span>
+                  <li key={b} className="flex items-start gap-2 text-xs sm:text-base text-foreground leading-tight">
+                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <span className="break-words">{b}</span>
                   </li>
                 ))}
               </ul>
@@ -459,24 +459,24 @@ const ProductSpanish5000 = () => {
               </p>
             </div>
 
-            <div className="rounded-3xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-purple-500/5 to-accent/5 p-6 sm:p-8 md:p-10 shadow-card">
+            <div className="rounded-3xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-purple-500/5 to-accent/5 p-4 sm:p-8 md:p-10 shadow-card w-full max-w-full box-border overflow-hidden">
               <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center">
-                <div className="flex justify-center">
+                <div className="flex justify-center w-full overflow-hidden">
                   <img
                     src={productSpanish5000BundleImage}
                     alt="Spanish Mastery System — Physical & Digital Book Bundle"
-                    className="w-full max-w-[260px] sm:max-w-[300px] md:max-w-none h-auto rounded-2xl shadow-lg"
+                    className="w-full max-w-[240px] sm:max-w-[300px] md:max-w-none h-auto rounded-2xl shadow-lg"
                     loading="lazy"
                   />
                 </div>
-                <div className="space-y-5 text-center md:text-left">
-                  <h3 className="text-2xl md:text-3xl font-bold text-foreground">
+                <div className="space-y-5 text-center md:text-left w-full overflow-hidden">
+                  <h3 className="text-lg sm:text-2xl md:text-3xl font-bold text-foreground break-words leading-tight text-center md:text-left">
                     Spanish Mastery System — Physical & Digital Book
                   </h3>
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-xs sm:text-base text-muted-foreground leading-relaxed break-words">
                     Learn Spanish the way it actually sounds. Premium physical book + Instant PDF + <strong>all bonuses included</strong>.
                   </p>
-                  <ul className="space-y-3 text-left">
+                  <ul className="space-y-2 text-left px-1">
                     {[
                       "Luxury physical book (ships internationally)",
                       "Instant Digital PDF (5,000 words + pronunciation)",
@@ -485,9 +485,9 @@ const ProductSpanish5000 = () => {
                       "500 Practice Questions + Pronunciation — Included",
                       "Lifetime digital updates & instant access",
                     ].map(item => (
-                      <li key={item} className="flex items-start gap-2.5 text-sm text-foreground">
-                        <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                        <span>{item}</span>
+                      <li key={item} className="flex items-start gap-2 text-xs sm:text-base text-foreground leading-tight">
+                        <Check className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                        <span className="break-words">{item}</span>
                       </li>
                     ))}
                   </ul>

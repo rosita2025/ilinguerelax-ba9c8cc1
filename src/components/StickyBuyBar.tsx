@@ -341,7 +341,7 @@ export const StickyBuyBar = ({
           <X className="w-3.5 h-3.5" />
         </button>
       )}
-      <div className="container px-3 sm:px-4 py-2 lg:py-3">
+      <div className="container px-2 sm:px-4 py-2 lg:py-3 w-full max-w-full overflow-hidden">
         {/* Mobile & Tablet: Vertical Stack Layout */}
         <div className="flex lg:hidden flex-col gap-1.5">
           {/* Product name (mobile) */}

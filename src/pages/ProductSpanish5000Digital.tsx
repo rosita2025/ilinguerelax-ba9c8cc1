@@ -213,8 +213,8 @@ const ProductSpanish5000Digital = () => {
 
       {/* Hero */}
       <section className="pt-4 pb-6 md:pt-8 md:pb-10">
-        <div className="container px-4 md:px-6 w-full max-w-full overflow-hidden px-4 box-border">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center w-full max-w-full">
+        <div className="container px-0 sm:px-6 w-full max-w-full overflow-hidden box-border">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center w-full max-w-full overflow-hidden">
             {/* Image */}
             <div className="relative">
               <div className="flex justify-center mb-3">
@@ -279,20 +279,19 @@ const ProductSpanish5000Digital = () => {
                 <em>actually sounds</em>. No dictionaries, no stress — start speaking Spanish today.</>)}
               </p>
 
-              {/* Price block */}
-              <div className="w-full mx-auto p-4 md:p-5 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 overflow-hidden w-full max-w-full px-4 box-border">
-                <div className="flex items-end gap-3 flex-wrap">
-                  <span className="text-4xl md:text-5xl font-black text-foreground">{tier.priceLabel}</span>
+              <div className="w-full mx-auto p-3 sm:p-5 rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 overflow-hidden w-full max-w-full box-border">
+                <div className="flex items-end gap-2 sm:gap-3 flex-wrap">
+                  <span className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground">{tier.priceLabel}</span>
                   {tier.isOnSale && (
                     <>
-                      <span className="text-xl text-muted-foreground line-through mb-1 opacity-70">{tier.originalLabel}</span>
-                      <span className="px-2 py-1 rounded-md bg-red-500 text-white text-xs font-black shadow-sm">
+                      <span className="text-lg sm:text-xl text-muted-foreground line-through mb-1 opacity-70">{tier.originalLabel}</span>
+                      <span className="px-2 py-0.5 sm:py-1 rounded-md bg-red-500 text-white text-[10px] sm:text-xs font-black shadow-sm">
                         SAVE {tier.discountPercentage}%
                       </span>
                     </>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-[10px] sm:text-sm text-muted-foreground mt-1">
                   One-time payment · Instant Access · Secure Checkout
                 </p>
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-[1fr,auto] gap-4 items-center">

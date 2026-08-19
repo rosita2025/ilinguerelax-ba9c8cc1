@@ -241,7 +241,7 @@ Deno.serve(async (req) => {
           : "pre_notice",
         orderNumber: String(orderId),
         email: String(email),
-        name: orderData?.buyer_name || orderData?.customer_name || "Cliente",
+        name: await resolveCustomerName(String(orderId)),
         trackingNumber: tracking,
         shippingProvider: orderData?.shipping_provider || shippingProvider || null,
       });

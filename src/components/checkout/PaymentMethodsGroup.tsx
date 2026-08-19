@@ -457,7 +457,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const valid = isBuyerValid(buyer, hasPhysicalItems);
 
   const requestBuyerInfo = () => {
-    window.dispatchEvent(new CustomEvent("checkout:showBuyerErrors"));
+    window.dispatchEvent(new CustomEvent(BUYER_ERRORS_EVENT));
   };
 
   const stripePromise = (() => {
@@ -637,14 +637,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // every render forces Stripe to remount the iframe → blank/duplicated form.
   const stripeOptions = useMemo(() => ({ fetchClientSecret }), [fetchClientSecret]);
 
-  const requestBuyerInfo = () => {
-    window.dispatchEvent(new Event(BUYER_ERRORS_EVENT));
-    toast({
-      title: t.completeDataFirst,
-      description: t.completeDataFirstDesc,
-      variant: "destructive",
-    });
-  };
 
   const payMercado = async (paymentType: "cash" | "transfer") => {
     if (!valid) { requestBuyerInfo(); return; }

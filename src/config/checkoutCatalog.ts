@@ -226,6 +226,7 @@ export const CHECKOUT_SLUG_ALIASES: Record<string, string> = {
   spanish_grammar: "spanish-relax-structural-spanish-grammar-a1-c1-book-physical-n9ct",
   english_5000: "5-000-palabras-libro-fisico",
   english_8000: "8-000-palabras-libro-fisico",
+  spanish_3000_verbs: "spanish-3000-verbs-book", // Alias for future active SKU
 };
 
 export function resolveCheckoutSlug(slug: string | undefined): string {

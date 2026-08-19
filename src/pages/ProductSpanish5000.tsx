@@ -805,7 +805,7 @@ const ProductSpanish5000 = () => {
         icon: Truck,
       }, {
         question: "Is there a digital-only option?",
-        answer: "No. To protect our content and guarantee the best experience, we only sell the PHYSICAL Spanish Relax book — the digital PDF and 3 bonuses are included FREE with every physical order.",
+        answer: "Yes, we also offer a digital-only version of the Spanish Mastery System. However, most students prefer the physical bundle to have a real book to study from plus the digital access.",
         icon: BookOpen,
       }]} title="Bundle & Shipping FAQ" subtitle="Spanish Relax physical book + digital FREE + 3 bonuses · FREE worldwide shipping when you order 2 or more books (24–72h dispatch, 7–15 days delivery)" />
       </Suspense>

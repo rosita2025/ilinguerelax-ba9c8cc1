@@ -190,7 +190,7 @@ export function PayPalButtons({ amountUsd, description, buyerEmail, buyerName, b
       headers: { "x-correlation-id": correlationId },
     }, { 
       attempts: MAX_ATTEMPTS,
-      onAttemptError: (info: { attempt: number; error: Error | unknown }) => {
+      onAttemptError: (info: any) => {
         console.warn(`[paypal] ${fnName} attempt ${info.attempt} failed`, { 
           correlationId, 
           error: (info.error as Error)?.message 

@@ -2530,6 +2530,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     } catch { /* noop */ }
                   }}
                 />
+                </div>
 
                 <p className="text-[11px] text-center text-neutral-500">
                   {language === "en" ? "Secure checkout by PayPal." : language === "pt" ? "Checkout seguro pelo PayPal." : language === "fr" ? "Paiement sécurisé par PayPal." : "Pago seguro procesado por PayPal."}

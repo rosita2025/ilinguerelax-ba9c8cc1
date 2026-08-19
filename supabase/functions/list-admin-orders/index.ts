@@ -44,16 +44,45 @@ Deno.serve(async (req) => {
         shipping_provider: shippingProvider || null,
         shipping_proof_url: shippingProofUrl || null,
       };
+
       if (table === "physical_shipments") {
+        // Los pedidos pagados por pasarela pueden no tener aún fila de envío
+        // (pagos anteriores a esta función): la creamos al guardar el tracking.
         patch.status = trackingNumber ? "shipped" : "pending";
+        const { data: existingShipment } = await admin
+          .from("physical_shipments")
+          .select("order_number")
+          .eq("order_number", orderId)
+          .maybeSingle();
+        if (!existingShipment) {
+          const { data: ev } = await admin
+            .from("order_events")
+            .select("customer_email,provider")
+            .eq("order_number", orderId)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          patch.order_number = orderId;
+          patch.email = ev?.customer_email ?? null;
+          patch.provider = ev?.provider ?? "gateway";
+          const { error: insError } = await admin.from("physical_shipments").insert(patch);
+          if (insError) throw insError;
+        } else {
+          const { error: updError } = await admin
+            .from("physical_shipments")
+            .update(patch)
+            .eq("order_number", orderId);
+          if (updError) throw updError;
+        }
+      } else {
+        const { error: updateError } = await admin
+          .from(table)
+          .update(patch)
+          .eq(idField, orderId);
+
+        if (updateError) throw updateError;
       }
 
-      const { error: updateError } = await admin
-        .from(table)
-        .update(patch)
-        .eq(idField, orderId);
-
-      if (updateError) throw updateError;
 
       // Log event with more metadata
       await admin.from("order_events").insert({

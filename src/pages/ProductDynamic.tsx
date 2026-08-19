@@ -380,7 +380,10 @@ const ProductDynamic = () => {
               <div className="flex flex-col gap-1 mb-5">
                 <div className="flex items-baseline gap-3">
                   {region.loading || loading ? (
-                    <Skeleton className="h-10 w-32" />
+                    <div className="flex items-baseline gap-3">
+                      <Skeleton className="h-10 w-32" />
+                      <Skeleton className="h-6 w-20 opacity-50" />
+                    </div>
                   ) : (
                     <>
                       <span className="text-4xl font-black text-primary">{displayFormatted}</span>

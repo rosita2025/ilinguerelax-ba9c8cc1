@@ -44,6 +44,7 @@ export const useCheckoutTotal = (
     // - Si es venta normal (items.length == 1) y es físico, se cobra envío base.
     const hasUpsell = items.length > 1;
     const isPhysical = items.some(i => i.isPhysical);
+    // Digital products ALWAYS $0 shipping. Physical depends on Upsell.
     const shippingUsd = (isPhysical && !hasUpsell)
       ? (subtotalUSD >= 50 ? 0 : shippingCostUSD)
       : 0;

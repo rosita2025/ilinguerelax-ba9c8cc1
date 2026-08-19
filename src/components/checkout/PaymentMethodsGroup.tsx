@@ -2464,12 +2464,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
           ) : selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) ? (
             <><Lock className="w-4 h-4" /> {language === "en"
-              ? `Checkout Securely · USD $${totalUsd}`
+              ? `Checkout Securely · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`
               : language === "pt"
-                ? `Continuar para pagamento · USD $${totalUsd}`
+                ? `Continuar para pagamento · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`
                 : language === "fr"
-                  ? `Continuer vers le paiement · USD $${totalUsd}`
-                  : `Continuar de Pago · USD $${totalUsd}`}</>
+                  ? `Continuer vers le paiement · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`
+                  : `Continuar de Pago · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`}</>
           ) : (
             <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? `Checkout with Hotmart · USD $${totalUsd}` : `Pagar con Hotmart · USD $${totalUsd}`) : `${t.buyNow} · USD $${totalUsd}`}</>
           )}

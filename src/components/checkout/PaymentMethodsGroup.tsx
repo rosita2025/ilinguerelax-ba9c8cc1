@@ -965,6 +965,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   };
 
   const retryStripe = useCallback(() => {
+    console.log("[Stripe] Manual retry triggered");
     setStripeError(null);
     setStripeLoading(false);
     setStripeFrameMounted(false);
@@ -977,6 +978,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   useEffect(() => {
     const handleOnline = () => {
       if (stripeError && (stripeError.code === "network" || stripeError.code === "timeout")) {
+        console.log("[Stripe] Network back online, auto-retrying...");
         retryStripe();
       }
     };
@@ -2157,7 +2159,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                       </div>
                       {stripeError.retryable && (
                         <Button 
-                          onClick={stripeError.code === "currency_restricted" ? () => { setIsFallingBackToUsd(true); retryStripe(); } : retryStripe}
+                          onClick={() => {
+                            if (stripeError.code === "currency_restricted") {
+                              console.log("[Stripe] Falling back to USD due to currency restriction");
+                              setIsFallingBackToUsd(true);
+                            }
+                            retryStripe();
+                          }}
                           className="bg-red-600 hover:bg-red-700 text-white gap-2"
                         >
                           <RefreshCw className="h-4 w-4" />

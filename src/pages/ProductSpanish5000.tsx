@@ -856,23 +856,27 @@ const ProductSpanish5000 = () => {
 
       {/* Sticky Buy Bar */}
       <StickyBuyBar 
-        price={stickyPriceLabel} 
-        originalPrice={stickyOriginalLabel} 
-        currencyCode={stickyCurrency} 
-        productName="Book Physical & Digital — FREE Bonuses" 
+        sku={PRODUCT_SKU}
+        price={campaign.price} 
+        originalPrice={campaign.originalPrice} 
+        currencyCode={currency} 
+        productName={productPricing.name ?? "Book Physical & Digital — FREE Bonuses"} 
         onBuyClick={handleStickyBuy} 
-        ctaText={dynamicCtaText} 
+        ctaText={stickyCtaText} 
         isPhysical={true} 
         showReviews={true} 
-        rating={4.8} 
-        reviewCount={500} 
+        rating={productPricing.rating ?? 4.8} 
+        reviewCount={productPricing.reviewCount ?? 500} 
         lang="en" 
         calmMode 
         dismissible 
         isLoading={isCreatingDigitalCheckout} 
         disabled={isCreatingDigitalCheckout} 
-        sku={PRODUCT_SKU} 
         goesToInternalCheckout={true}
+        usdValue={productPricing.priceGlobalUsd || 44}
+        localUsdPrices={productPricing.localUsdPrices}
+        flag={productPricing.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
+      />
         usdValue={productPricing.priceGlobalUsd || 44}
         localUsdPrices={productPricing.localUsdPrices}
       />

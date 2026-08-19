@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
     
     // Convert shipping to local currency if needed
     let shippingAmountCents = 0;
-    if (shippingUsd > 0) {
+    if (shippingUsd > 0 && !hasUpsell) {
       if (currency === "usd") {
         shippingAmountCents = Math.round(shippingUsd * 100);
       } else {

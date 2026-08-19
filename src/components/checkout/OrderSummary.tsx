@@ -81,7 +81,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const showLocalRef = currency !== "USD";
 
   const localTotalLabel = formatLocalDirect(totalLocal, country);
-  const currentUsdRef = totalLocal / (exchangeRates[currency] || 1);
+  const currentUsdRef = totalUsd;
   const breakdown = useCurrencyBreakdown(totalLocal / (exchangeRates[currency] || 1), null, items[0]?.localUsdPrices);
 
 

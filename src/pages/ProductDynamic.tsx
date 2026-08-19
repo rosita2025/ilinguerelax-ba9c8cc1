@@ -401,10 +401,11 @@ const ProductDynamic = () => {
                     </>
                   )}
                 </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 shadow-sm">
+                {!region.loading && !loading && (
+                  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 shadow-sm w-fit">
                     {isPEN ? "Perú Directo" : local.currency === "USD" ? "Global USD" : `Local ${local.currency}`}
                   </span>
-                </div>
+                )}
               </div>
 
               <div className="grid grid-cols-3 gap-2 mb-6 text-xs">

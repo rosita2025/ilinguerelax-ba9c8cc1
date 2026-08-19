@@ -5,6 +5,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
+import { upsertPhysicalShipment } from "../_shared/physicalShipments.ts";
 
 // NOTE: We do NOT instantiate the Stripe SDK here. There is no STRIPE_SECRET_KEY
 // in this project; API keys are opaque gateway connection IDs. Webhook signature
@@ -387,6 +388,22 @@ async function handlePaidCheckoutSession(session: any, eventType: string) {
     ...coupon,
   });
 
+  await upsertPhysicalShipment({
+    adminClient,
+    orderNumber,
+    email: customerEmail,
+    customerName,
+    provider: "stripe",
+    address: {
+      address: session.customer_details?.address?.line1 || session.metadata?.ship_address,
+      city: session.customer_details?.address?.city || session.metadata?.ship_city,
+      state: session.customer_details?.address?.state || session.metadata?.ship_state,
+      zip: session.customer_details?.address?.postal_code || session.metadata?.ship_zip,
+      country: session.customer_details?.address?.country || session.metadata?.customer_country,
+    },
+    skus,
+  });
+
   return { delivered: true };
 }
 
@@ -455,6 +472,22 @@ async function handleSucceededPaymentIntent(paymentIntent: any, eventType: strin
     paymentKey,
     skus,
     ...coupon,
+  });
+
+  await upsertPhysicalShipment({
+    adminClient,
+    orderNumber,
+    email: customerEmail,
+    customerName,
+    provider: "stripe",
+    address: {
+      address: metadata.ship_address,
+      city: metadata.ship_city,
+      state: metadata.ship_state,
+      zip: metadata.ship_zip,
+      country: metadata.customer_country,
+    },
+    skus,
   });
 
   return { delivered: true };

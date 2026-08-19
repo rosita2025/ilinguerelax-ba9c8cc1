@@ -32,7 +32,7 @@ interface OrderItem {
 
 interface PhysicalOrder {
   id: string;
-  source: "manual" | "shopify";
+  source: "manual" | "shopify" | "gateway";
   created_at: string;
   order_ref: string;
   customer: string;
@@ -44,6 +44,8 @@ interface PhysicalOrder {
   tracking_number: string | null;
   shipping_provider: string | null;
   shipping_proof_url: string | null;
+  shipping_address?: string | null;
+  payment_provider?: string | null;
 }
 
 const AdminPhysicalOrders = () => {
@@ -111,6 +113,39 @@ const AdminPhysicalOrders = () => {
           tracking_number: r.tracking_number,
           shipping_provider: r.shipping_provider,
           shipping_proof_url: r.shipping_proof_url,
+        });
+      });
+
+      // Pedidos pagados con pasarela (Stripe, dLocal…) que incluyen algún SKU físico
+      const nameBySku = new Map<string, string>(
+        products.map((p: any) => [String(p.sku).toLowerCase(), p.name || p.sku])
+      );
+      ((data as any)?.gateway || []).forEach((r: any) => {
+        const skus: string[] = Array.isArray(r.skus) ? r.skus : [];
+        const physical = skus.filter((s) => physicalSkus.has(String(s).toLowerCase()));
+        if (physical.length === 0) return;
+
+        const addr = r.shipping_address && typeof r.shipping_address === "object"
+          ? [r.shipping_address.address, r.shipping_address.city, r.shipping_address.state, r.shipping_address.zip, r.shipping_address.country]
+              .filter(Boolean).join(", ")
+          : null;
+
+        merged.push({
+          id: String(r.order_number),
+          source: "gateway",
+          created_at: r.created_at,
+          order_ref: String(r.order_number),
+          customer: r.customer_name || "—",
+          email: r.customer_email || "—",
+          products: physical.map((s) => nameBySku.get(String(s).toLowerCase()) || s).join(", "),
+          items: physical.map((s) => ({ sku: s, name: nameBySku.get(String(s).toLowerCase()) || s })),
+          amount: `${r.currency || "USD"} ${Number(r.amount || 0).toFixed(2)}`,
+          status: r.status || "paid",
+          tracking_number: r.tracking_number,
+          shipping_provider: r.shipping_provider,
+          shipping_proof_url: r.shipping_proof_url,
+          shipping_address: addr,
+          payment_provider: r.provider || r.method || null,
         });
       });
 
@@ -242,7 +277,7 @@ const AdminPhysicalOrders = () => {
                         {order.tracking_number ? "ENVIADO" : order.status.toUpperCase()}
                       </Badge>
                       <Badge variant="outline" className="capitalize">
-                        {order.source}
+                        {order.source === "gateway" ? (order.payment_provider || "gateway") : order.source}
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -260,7 +295,14 @@ const AdminPhysicalOrders = () => {
                 <div className="bg-muted/30 rounded-lg p-3 text-sm border">
                   <p className="font-semibold mb-1">Productos:</p>
                   <p className="text-muted-foreground">{order.products}</p>
+                  {order.source === "gateway" && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      <span className="font-semibold text-foreground">Dirección de envío: </span>
+                      {order.shipping_address || "No registrada — contactar al cliente por email."}
+                    </p>
+                  )}
                 </div>
+
 
                 <div className="grid md:grid-cols-3 gap-4 items-end border-t pt-4">
                   <div className="space-y-2">

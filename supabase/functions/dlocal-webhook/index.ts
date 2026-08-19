@@ -20,6 +20,7 @@ import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { deliverLikeManual } from "../_shared/manualDelivery.ts";
 import { checkAmount, describeAmountCheck } from "../_shared/dlocalAmounts.ts";
 import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
+import { upsertPhysicalShipment } from "../_shared/physicalShipments.ts";
 
 const API_BASE = dlocalApiBase();
 
@@ -431,6 +432,18 @@ Deno.serve(async (req) => {
     } catch (e) {
       console.error("dLocal thank-you failed:", e);
     }
+
+    await upsertPhysicalShipment({
+      adminClient: supabase,
+      orderNumber,
+      email: customerEmail,
+      customerName,
+      provider: "dlocalgo",
+      address: { country: country ?? null },
+      skus,
+    });
+
+
 
     if (skus.length > 0) {
       // Una sola ruta de entrega. Usa `manual-material-<pedido>`, la misma llave

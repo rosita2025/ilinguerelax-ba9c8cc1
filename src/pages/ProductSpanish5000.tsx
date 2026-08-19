@@ -228,9 +228,9 @@ const ProductSpanish5000 = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-4 pb-6 md:pt-8 md:pb-10">
-        <div className="container px-4 md:px-6 w-full max-w-full overflow-x-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <section className="pt-4 pb-6 md:pt-8 md:pb-10 w-full max-w-[100vw] overflow-x-hidden">
+        <div className="container px-3 sm:px-4 w-full max-w-full overflow-x-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
             {/* Product Image */}
             <div className="relative">
               {/* Trustpilot-style badge — placed above product image, responsive 320/375/480+ */}

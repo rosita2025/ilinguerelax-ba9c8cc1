@@ -5,8 +5,18 @@
     <link>https://ilinguerelax.com/products</link>
     <description>Libros digitales y físicos de iLingue Relax: vocabulario, pronunciación y fonética para aprender idiomas sin estrés.</description>
     <language>es</language>
-    <lastBuildDate>Wed, 19 Aug 2026 00:26:37 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 19 Aug 2026 01:49:04 GMT</lastBuildDate>
     <atom:link href="https://ilinguerelax.com/rss-productos.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Spanish Relax - 5,000 Words Physical</title>
+      <link>https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical</link>
+      <guid isPermaLink="true">https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical</guid>
+      <pubDate>Wed, 19 Aug 2026 01:49:04 GMT</pubDate>
+      <description>With English Pronunciation</description>
+      <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-spanish-words-with-english-pronunciation-physical/1787104011776-v88tl.webp" type="image/jpeg" length="0" />
+      <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-spanish-words-with-english-pronunciation-physical/1787104011776-v88tl.webp" medium="image" />
+      <media:thumbnail url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-spanish-words-with-english-pronunciation-physical/1787104011776-v88tl.webp" />
+    </item>
     <item>
       <title>2,000 Palabras Esenciales para Aprender Coreano | Hangul + Pronunciación para Hispanohablantes</title>
       <link>https://ilinguerelax.com/products/1-000-palabras-esenciales-para-aprender-coreano</link>
@@ -86,16 +96,6 @@
       <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/structural-spanish-grammar-a1-c1-spanish-relax-by-ilingue-relax-aeej/1786644060805-sti98.webp" type="image/jpeg" length="0" />
       <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/structural-spanish-grammar-a1-c1-spanish-relax-by-ilingue-relax-aeej/1786644060805-sti98.webp" medium="image" />
       <media:thumbnail url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/structural-spanish-grammar-a1-c1-spanish-relax-by-ilingue-relax-aeej/1786644060805-sti98.webp" />
-    </item>
-    <item>
-      <title>Spanish Relax - 5,000 Words Physical</title>
-      <link>https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical</link>
-      <guid isPermaLink="true">https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical</guid>
-      <pubDate>Sun, 16 Aug 2026 22:01:38 GMT</pubDate>
-      <description>With English Pronunciation</description>
-      <enclosure url="https://ilinguerelax.com/images/product-spanish-5000-physical.webp" type="image/jpeg" length="0" />
-      <media:content url="https://ilinguerelax.com/images/product-spanish-5000-physical.webp" medium="image" />
-      <media:thumbnail url="https://ilinguerelax.com/images/product-spanish-5000-physical.webp" />
     </item>
     <item>
       <title>Inglés Relax - 5,000 Palabras Libro</title>

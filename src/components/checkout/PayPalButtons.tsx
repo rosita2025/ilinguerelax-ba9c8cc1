@@ -26,11 +26,15 @@ async function loadPayPalSdk(currency: string, attempts = 3): Promise<void> {
   const sdkCorrId = `sdk-${Date.now()}`;
   
   // Limpieza agresiva de scripts de PayPal previos para evitar conflictos
-  document.querySelectorAll('script[src*="paypal.com/sdk/js"]').forEach((s) => {
-    try { s.parentNode?.removeChild(s); } catch { s.remove(); }
-  });
-  window.paypal = undefined;
-  sdkPromise = null;
+  const cleanup = () => {
+    document.querySelectorAll('script[src*="paypal.com/sdk/js"]').forEach((s) => {
+      try { s.parentNode?.removeChild(s); } catch { s.remove(); }
+    });
+    window.paypal = undefined;
+    sdkPromise = null;
+  };
+  
+  if (!sdkPromise) cleanup();
   
   let lastError: Error | null = null;
   

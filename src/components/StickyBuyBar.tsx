@@ -576,17 +576,23 @@ export const StickyBuyBar = ({
             {/* Price */}
             <div className="text-right">
               <div className="flex items-baseline gap-2 whitespace-nowrap">
-                <span className="text-3xl font-black text-foreground">{price}</span>
-                {originalPrice && (
-                  <span className="text-base text-muted-foreground line-through opacity-70">{originalPrice}</span>
+                {isLoading ? (
+                  <div className="h-8 w-32 bg-foreground/10 animate-pulse rounded" />
+                ) : (
+                  <>
+                    <span className="text-3xl font-black text-foreground">{price}</span>
+                    {originalPrice && (
+                      <span className="text-base text-muted-foreground line-through opacity-70">{originalPrice}</span>
+                    )}
+                    {savingsLabel && (
+                      <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
+                        {lang === "en" ? `Save ${savingsLabel}` : `Ahorras ${savingsLabel}`}
+                      </span>
+                    )}
+                    {flagBadge}
+                    <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">{currencyCode}</span>
+                  </>
                 )}
-                {savingsLabel && (
-                  <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
-                    {lang === "en" ? `Save ${savingsLabel}` : `Ahorras ${savingsLabel}`}
-                  </span>
-                )}
-                {flagBadge}
-                <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">{currencyCode}</span>
               </div>
             </div>
 

@@ -232,7 +232,14 @@ export const CHECKOUT_SLUG_ALIASES: Record<string, string> = {
 export function resolveCheckoutSlug(slug: string | undefined): string {
   const raw = String(slug ?? "").trim();
   if (!raw) return raw;
-  return CHECKOUT_SLUG_ALIASES[raw] ?? CHECKOUT_SLUG_ALIASES[raw.toLowerCase()] ?? raw;
+  
+  // Normalizar: inglés_5000 -> inglés-5000, 5,000-palabras -> 5-000-palabras
+  const normalized = raw.toLowerCase().replace(/_/g, '-');
+  
+  return CHECKOUT_SLUG_ALIASES[raw] ?? 
+         CHECKOUT_SLUG_ALIASES[raw.toLowerCase()] ?? 
+         CHECKOUT_SLUG_ALIASES[normalized] ??
+         normalized;
 }
 
 export function getCatalogItem(slug: string | undefined): CatalogItem | null {

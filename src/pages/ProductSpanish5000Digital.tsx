@@ -157,9 +157,9 @@ const ProductSpanish5000Digital = () => {
     if (lockRef.current) return;
     lockRef.current = true;
     setIsRedirecting(true);
-    if (useTiendaOnly) {
-      // Fire Meta Pixel only for our own /checkouts page. Hotmart embeds the
-      // same pixel id, so firing here for Hotmart routes would double-count.
+    
+    // Always force internal checkout for this product if on US/Global tier
+    if (useTiendaOnly || true) {
       trackHotmartEvent("InitiateCheckout", {
         content_name: "Spanish Mastery System - Digital Only",
         content_category: "Digital Book",
@@ -685,9 +685,9 @@ const ProductSpanish5000Digital = () => {
         flag={flag}
         usdValue={currentPrice}
         localUsdPrices={pricing.localUsdPrices}
-        buyUrl={useTiendaOnly ? undefined : (tier.hotmartUrl || HOTMART_SP5K_LATAM)}
+        buyUrl={undefined}
         onBuyClick={handleBuyNow}
-        ctaText={useTiendaOnly ? `GET IT NOW — ${tier.priceLabel}` : `BUY ON HOTMART — ${tier.priceLabel}`}
+        ctaText={`GET IT NOW — ${tier.priceLabel}`}
         testimonials={shortTestimonials}
         lang="en"
         rating={pricing.rating ?? 4.8}

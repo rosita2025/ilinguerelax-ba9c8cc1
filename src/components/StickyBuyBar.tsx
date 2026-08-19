@@ -251,8 +251,8 @@ export const StickyBuyBar = ({
     }
     if (onBuyClick) {
       onBuyClick();
+      return; // Direct execution, do not open drawers or navigate elsewhere
     } else if (buyUrl) {
-      // assign() starts navigation synchronously in the same event tick.
       window.location.assign(buyUrl);
     }
   };

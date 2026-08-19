@@ -141,13 +141,21 @@ const ProductSpanish5000 = () => {
   }, [productPricing.coverImageUrl]);
 
 
-  // Libro físico: cobro siempre se realiza en USD para internal checkout.
-  const campaign = useMemo(() => ({
-    price: formatPrice(44),
-    originalPrice: formatPrice(59),
-    currency: "USD" as const,
-    discountPercentage: 25
-  }), [formatPrice]);
+  // Configuración de precios dinámica basada en SKU
+  const campaign = useMemo(() => {
+    // Si hay datos cargados del admin, usamos esos precios regionales
+    const basePrice = productPricing.priceGlobalUsd || 44;
+    const comparePrice = productPricing.compareAtPriceGlobalUsd || 59;
+    
+    return {
+      price: formatPrice(basePrice, productPricing.localUsdPrices),
+      originalPrice: formatPrice(comparePrice, productPricing.localCompareAtPrices),
+      currency: "USD" as const,
+      discountPercentage: productPricing.priceGlobalUsd && productPricing.compareAtPriceGlobalUsd
+        ? Math.round((1 - productPricing.priceGlobalUsd / productPricing.compareAtPriceGlobalUsd) * 100)
+        : 25
+    };
+  }, [formatPrice, productPricing]);
 
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({
@@ -175,7 +183,6 @@ const ProductSpanish5000 = () => {
   const checkoutLockRef = useRef(false);
 
   const addItem = useCartStore(state => state.addItem);
-  const setDrawerOpen = useCartStore(state => state.setDrawerOpen);
 
   // A/B test: main headline (50/50 split, persisted per browser)
   const headlineVariant = useAbTest(
@@ -198,9 +205,9 @@ const ProductSpanish5000 = () => {
   // Physical book — Stripe checkout with international shipping.
   const isPhysicalBundle = true;
   const dynamicCtaText = stickyCtaText;
-  const stickyPriceLabel = formatPrice(44);
-  const stickyOriginalLabel = formatPrice(59);
-  const stickyCurrency = "USD";
+  const stickyPriceLabel = campaign.price;
+  const stickyOriginalLabel = campaign.originalPrice;
+  const stickyCurrency = currency;
   const handleStickyBuy = async () => {
     navigate('/checkout/5-000-spanish-words-with-english-pronunciation-physical');
   };
@@ -829,8 +836,27 @@ const ProductSpanish5000 = () => {
       </Suspense>
 
       {/* Sticky Buy Bar */}
-      
-      <StickyBuyBar price={stickyPriceLabel} originalPrice={stickyOriginalLabel} currencyCode={stickyCurrency} productName="Book Physical & Digital — FREE Bonuses" onBuyClick={handleStickyBuy} ctaText={dynamicCtaText} isPhysical={true} showReviews={true} rating={4.8} reviewCount={500} lang="en" calmMode dismissible isLoading={isCreatingDigitalCheckout} disabled={isCreatingDigitalCheckout} sku={PRODUCT_SKU} goesToInternalCheckout={true} />
+      <StickyBuyBar 
+        price={stickyPriceLabel} 
+        originalPrice={stickyOriginalLabel} 
+        currencyCode={stickyCurrency} 
+        productName="Book Physical & Digital — FREE Bonuses" 
+        onBuyClick={handleStickyBuy} 
+        ctaText={dynamicCtaText} 
+        isPhysical={true} 
+        showReviews={true} 
+        rating={4.8} 
+        reviewCount={500} 
+        lang="en" 
+        calmMode 
+        dismissible 
+        isLoading={isCreatingDigitalCheckout} 
+        disabled={isCreatingDigitalCheckout} 
+        sku={PRODUCT_SKU} 
+        goesToInternalCheckout={true}
+        usdValue={productPricing.priceGlobalUsd || 44}
+        localUsdPrices={productPricing.localUsdPrices}
+      />
 
       {/* Spacer for sticky bar */}
       <div className="h-32 lg:h-16" />

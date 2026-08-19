@@ -474,6 +474,22 @@ async function handleSucceededPaymentIntent(paymentIntent: any, eventType: strin
     ...coupon,
   });
 
+  await upsertPhysicalShipment({
+    adminClient,
+    orderNumber,
+    email: customerEmail,
+    customerName,
+    provider: "stripe",
+    address: {
+      address: metadata.ship_address,
+      city: metadata.ship_city,
+      state: metadata.ship_state,
+      zip: metadata.ship_zip,
+      country: metadata.customer_country,
+    },
+    skus,
+  });
+
   return { delivered: true };
 }
 

@@ -2471,7 +2471,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   ? `Continuer vers le paiement · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`
                   : `Continuar de Pago · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`}</>
           ) : (
-            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? `Checkout with Hotmart · USD $${totalUsd}` : `Pagar con Hotmart · USD $${totalUsd}`) : `${t.buyNow} · USD $${totalUsd}`}</>
+            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? `Checkout with Hotmart · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}` : `Pagar con Hotmart · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`) : `${t.buyNow} · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`}</>
           )}
         </button>
       )}

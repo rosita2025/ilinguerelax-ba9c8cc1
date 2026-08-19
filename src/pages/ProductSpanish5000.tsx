@@ -228,6 +228,7 @@ const ProductSpanish5000 = () => {
       <Navbar />
 
       {/* Hero Section */}
+      <div className="w-full max-w-[100vw] overflow-x-hidden px-2 box-border">
       <section className="pt-4 pb-6 md:pt-8 md:pb-10 w-full max-w-full overflow-x-hidden px-4 box-border">
         <div className="container px-0 sm:px-4 w-full max-w-full overflow-x-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">

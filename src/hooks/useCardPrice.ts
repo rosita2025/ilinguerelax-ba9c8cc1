@@ -159,12 +159,12 @@ export function useCardPrice(): CardPriceFormatter {
 
     // Perú → PEN nativo desde admin.
     if (isPeru) {
-      const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
-      if (pen) return formatCurrencyAmount(pen, "PEN");
-      
-      // Fallback a override manual en local_prices si existe para PEN
+      // Prioridad: monto manual PEN del admin (local_prices) > columna legacy price_pen.
       const overridePen = row?.local_prices?.["PEN"];
       if (typeof overridePen === "number" && overridePen > 0) return formatCurrencyAmount(overridePen, "PEN");
+
+      const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
+      if (pen) return formatCurrencyAmount(pen, "PEN");
 
       // Si no hay PEN manual, convertimos el USD regional al PEN actual
       const tierUsdValForPen = tierUsd(row, fallbackUsd);
@@ -187,11 +187,11 @@ export function useCardPrice(): CardPriceFormatter {
     const override = row?.local_prices?.[displayCurrency];
 
     if (isPeru) {
-      const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
-      if (pen) return formatCurrencyAmount(pen * ORIGINAL_MULTIPLIER, "PEN");
-      
       const overridePen = row?.local_prices?.["PEN"];
       if (typeof overridePen === "number" && overridePen > 0) return formatCurrencyAmount(overridePen * ORIGINAL_MULTIPLIER, "PEN");
+
+      const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
+      if (pen) return formatCurrencyAmount(pen * ORIGINAL_MULTIPLIER, "PEN");
 
       const tierUsdValForPen = tierUsd(row, originalUsd / ORIGINAL_MULTIPLIER);
       return formatCurrencyAmount(tierUsdValForPen * ORIGINAL_MULTIPLIER * (exchangeRates["PEN"] ?? 3.75), "PEN");

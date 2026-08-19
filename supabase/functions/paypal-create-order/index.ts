@@ -151,12 +151,12 @@ Deno.serve(async (req) => {
             breakdown: {
               item_total: {
                 currency_code: currency,
-                value: (amount - (shippingUsd > 0 && !hasUpsell ? (amount * (shippingUsd / (pricing.totalUsd + shippingUsd))) : 0)).toFixed(2)
+                value: (amount - (shippingUsd > 0 && !hasUpsell ? (shippingUsd * (amount / (pricing.totalUsd + shippingUsd))) : 0)).toFixed(2)
               },
               ...(shippingUsd > 0 && !hasUpsell && {
                 shipping: {
                   currency_code: currency,
-                  value: (amount * (shippingUsd / (pricing.totalUsd + shippingUsd))).toFixed(2)
+                  value: (shippingUsd * (amount / (pricing.totalUsd + shippingUsd))).toFixed(2)
                 }
               })
             }

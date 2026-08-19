@@ -129,10 +129,12 @@ const BonusPreviewDialog = ({ triggerLabel = "See sample", title, subtitle, chil
 );
 
 const ProductSpanish5000 = () => {
+  const { formatPrice, currency } = useI18n();
+
   // Libro físico: cobro siempre se realiza en USD para internal checkout.
   const campaign = {
-    price: "$44.00",
-    originalPrice: "$59.00",
+    price: formatPrice(44),
+    originalPrice: formatPrice(59),
     currency: "USD" as const,
     discountPercentage: 25
   };
@@ -186,9 +188,9 @@ const ProductSpanish5000 = () => {
   // Physical book — Stripe checkout with international shipping.
   const isPhysicalBundle = true;
   const dynamicCtaText = stickyCtaText;
-  const stickyPriceLabel = campaign.price;
-  const stickyOriginalLabel = campaign.originalPrice;
-  const stickyCurrency = campaign.currency;
+  const stickyPriceLabel = formatPrice(44);
+  const stickyOriginalLabel = formatPrice(59);
+  const stickyCurrency = "USD";
   const handleStickyBuy = async () => {
     await handleBuyNow();
   };
@@ -202,7 +204,6 @@ const ProductSpanish5000 = () => {
     navigate("/products/5-000-spanish-words-with-english-pronunciation-digital");
   };
 
-  const { formatPrice, currency } = useI18n();
   const ADMIN_SKU_DIGITAL = "5-000-spanish-words-with-english-pronunciation-digital";
   const TIENDA_PATH_DIGITAL = "/checkouts/5000-spanish-words";
   
@@ -342,7 +343,7 @@ const ProductSpanish5000 = () => {
                 >
                   <span className="flex items-center justify-center gap-2 font-black text-sm sm:text-lg">
                     <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
-                    BUY NOW · {campaign.price}
+                    BUY NOW · {formatPrice(44)}
                   </span>
                 </Button>
                 <p className="text-[11px] text-center text-muted-foreground mt-2">

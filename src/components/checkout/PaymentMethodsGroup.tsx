@@ -340,28 +340,35 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const isLatam = ["AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "PA", "PY", "PE", "PR", "UY"].includes(countryCode);
   const { language } = useI18n();
   const t = getCheckoutUI(language);
+  const overridesFor = useSkuOverridesResolver();
+  const shippingCostUSD = isLatam ? 9 : 8;
+
+  const { 
+    subtotalLocal, 
+    discountLocal, 
+    shippingLocal, 
+    totalLocal, 
+    currency 
+  } = useCheckoutTotal(
+    items, 
+    couponPercent, 
+    region.tier, 
+    countryCode, 
+    shippingCostUSD, 
+    overridesFor
+  );
+
   const totals = useMemo(() => calcTotals(items, couponPercent, region.tier), [items, couponPercent, region.tier]);
   const { total, subtotal } = totals;
-  const shippingCost = isLatam ? 9 : 8;
-  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : shippingCost) : 0;
+  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : shippingCostUSD) : 0;
   const grandTotal = total + shipping;
   const totalUsd = useMemo(() => grandTotal.toFixed(2), [grandTotal]);
+  
   const penTotals = calcTotalsPen(items, couponPercent, countryCode);
-  const overridesFor = useSkuOverridesResolver();
   const isRestricted = RESTRICTED_CURRENCY_COUNTRIES.has(countryCode);
   const local = useLocalCurrency(total); // For overrides and loading state
-  void local; // Silenciar advertencia si no se usa local.isUsd etc directamente
+  void local;
 
-  // Replicating exactly the logic from OrderSummary.tsx
-  const localItemsSum = useMemo(() => sumItemsLocal(
-    items.map((i) => ({ id: i.id, sku: i.id, usd: itemPrice(i, region.tier), quantity: i.quantity || 1 })),
-    countryCode,
-    overridesFor,
-  ), [items, countryCode, region.tier, overridesFor]);
-  const localSubtotalAmount = localItemsSum.amount;
-  const localTotalAmount = useMemo(() => (localSubtotalAmount * (1 - (couponPercent || 0) / 100)) + shipping, [localSubtotalAmount, couponPercent, shipping]);
-  const currentUsdRef = localItemsSum.usdReference; // The unified USD base for this cart in this region
-  
   const [isFallingBackToUsd, setIsFallingBackToUsd] = useState(false);
 
   // Si el país tiene restricciones o se elige un método global,
@@ -378,9 +385,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   );
   
   const showUsdOnly = isFallingBackToUsd;
-  const localTotalLabel = formatLocalDirect(localTotalAmount, countryCode);
+  const localTotalLabel = formatLocalDirect(totalLocal, countryCode);
+  const currentUsdRef = totalLocal / (exchangeRates[currency] || 1);
 
-  const penBadge = (penTotals && !isGlobalGateway) ? formatPen(penTotals.total + shipping) : null;
+  const penBadge = (penTotals && !isGlobalGateway) ? formatPen(penTotals.total + shippingLocal) : null;
   const isActuallyShowingLocal = !local.loading;
   
   // Badge principal: SIEMPRE en moneda local del país EXCEPTO en países restringidos (AR/HN) 

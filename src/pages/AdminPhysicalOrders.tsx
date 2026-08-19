@@ -367,18 +367,24 @@ const AdminPhysicalOrders = () => {
                     <label className="text-xs font-bold uppercase text-muted-foreground flex items-center gap-1">
                       <Truck className="w-3 h-3" /> Transportista
                     </label>
-                    <Input 
-                      placeholder="Ej: Amazon, DHL..." 
+                    <Input
+                      placeholder="Elige o escribe: Amazon, DHL..."
+                      list={`carriers-${order.id}`}
                       defaultValue={order.shipping_provider || ""}
                       id={`provider-${order.id}`}
                     />
+                    <datalist id={`carriers-${order.id}`}>
+                      {SHIPPING_CARRIERS.map((c) => (
+                        <option key={c} value={c} />
+                      ))}
+                    </datalist>
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase text-muted-foreground flex items-center gap-1">
                       <ExternalLink className="w-3 h-3" /> Tracking
                     </label>
                     <Input 
-                      placeholder="ID o enlace..." 
+                      placeholder="Código real (no un enlace genérico)"
                       defaultValue={order.tracking_number || ""}
                       id={`tracking-${order.id}`}
                     />

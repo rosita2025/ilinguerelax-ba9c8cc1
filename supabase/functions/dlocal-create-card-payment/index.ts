@@ -26,6 +26,10 @@ const BodySchema = z.object({
   payerName: z.string().min(1).max(120),
   payerPhone: z.string().max(30).optional(),
   payerDocument: z.string().max(30).optional(),
+  payerAddress: z.string().max(160).optional(),
+  payerCity: z.string().max(80).optional(),
+  payerState: z.string().max(80).optional(),
+  payerZip: z.string().max(24).optional(),
   country: z.string().length(2),
   currency: z.string().length(3).default("USD"),
   // Ignorados: el importe se calcula en el servidor (catálogo + FX propio).

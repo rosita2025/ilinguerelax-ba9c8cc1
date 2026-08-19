@@ -152,7 +152,7 @@ const sendCapiEvent = (eventName: string, eventId: string, params: Record<string
   if (!CAPI_EVENTS.has(eventName)) return;
   if (typeof window === "undefined") return;
   // For EU users without consent, skip CAPI as well (no cookies/IP profiling).
-  if (!hasPixelConsent()) return;
+  if (!hasPixelConsent() || isInternalTraffic()) return;
   try {
     const { content_name, content_ids, content_type, value, currency, num_items } = params as Record<string, unknown>;
     void supabase.functions.invoke("meta-capi-event", {
@@ -396,7 +396,10 @@ export const useHotmartPixelPageView = () => {
       const eventId = generateEventId();
       window.fbq("track", "PageView", { eventID: eventId });
     }
-    logFunnelEvent("PageView", {});
+    // No logging for internal traffic to avoid polluting funnel stats
+    if (!isInternalTraffic()) {
+      logFunnelEvent("PageView", {});
+    }
   }, []);
 };
 

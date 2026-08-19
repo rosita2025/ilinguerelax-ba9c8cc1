@@ -4,7 +4,7 @@ import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { useCampaignPrice } from "@/hooks/useCampaignPrice";
+import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/i18n/I18nContext";
@@ -665,7 +665,8 @@ const Product8000 = () => {
         ctaText={"Comprar ahora"}
         onBuyClick={handleBuyNow}
         sku={PRODUCT_SKU}
-        usdValue={priceUsd}
+        usdValue={tier.priceUsd}
+        localUsdPrices={pricing.localUsdPrices}
       />
       
 

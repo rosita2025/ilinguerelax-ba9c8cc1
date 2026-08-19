@@ -21,6 +21,7 @@ interface I18nContextType {
   t: Translations;
   formatPrice: (priceInUSD: number, overrides?: any, localUsdPrices?: any) => string;
   countryCode: string;
+  setCountryCode: (code: string) => void;
   languageNames: typeof languageNames;
   languageFlags: typeof languageFlags;
 }

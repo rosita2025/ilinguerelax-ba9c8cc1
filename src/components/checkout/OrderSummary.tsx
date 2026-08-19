@@ -8,10 +8,11 @@ import { useRegionTier } from "@/hooks/useRegionTier";
 import { useLocalCurrency, formatLocalAmount, useSkuOverridesResolver, sumItemsLocal, formatLocalDirect, useCurrencyBreakdown } from "@/hooks/useLocalCurrency";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
-import { formatCurrencyAmount } from "@/i18n";
+import { formatCurrencyAmount, exchangeRates } from "@/i18n";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCheckoutTotal } from "@/hooks/useCheckoutTotal";
 
 
 

@@ -150,15 +150,39 @@ Deno.serve(async (req) => {
         },
       }),
     });
-    const data = await orderRes.json();
+    let data;
+    try {
+      data = await orderRes.json();
+    } catch (e) {
+      console.error(JSON.stringify({ corr: correlationId, trace: traceId, fn: "paypal-create-order", phase: "json_parse_error", status: orderRes.status, ms: Date.now() - t0 }));
+      throw new Error(`Error al procesar respuesta de PayPal (${orderRes.status})`);
+    }
+
     if (!orderRes.ok) {
       console.error(JSON.stringify({
         corr: correlationId, trace: traceId, fn: "paypal-create-order", phase: "paypal_error",
         status: orderRes.status, error: data, currency, amount,
         ms: Date.now() - t0,
       }));
-      return new Response(JSON.stringify({ error: data, trace: traceId, correlationId }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId, "x-trace-id": traceId },
+
+      // Extraer mensaje de error legible de PayPal
+      let errorMessage = "No se pudo crear la orden en PayPal";
+      if (data?.details?.[0]?.description) {
+        errorMessage = `PayPal: ${data.details[0].description}`;
+      } else if (data?.message) {
+        errorMessage = `PayPal: ${data.message}`;
+      } else if (orderRes.status === 401) {
+        errorMessage = "Error de autenticación con PayPal. Por favor, informa al administrador.";
+      }
+
+      return new Response(JSON.stringify({ 
+        error: errorMessage, 
+        details: data,
+        trace: traceId, 
+        correlationId 
+      }), {
+        status: orderRes.status >= 400 && orderRes.status < 500 ? orderRes.status : 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json", "x-correlation-id": correlationId, "x-trace-id": traceId },
       });
     }
     console.log(JSON.stringify({

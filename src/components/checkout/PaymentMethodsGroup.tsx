@@ -2465,7 +2465,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         </p>
       )}
 
-      {selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "paypal" && selected !== "dlocal_card" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
+      {selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "dlocal_card" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
         <button
           type="button"
           onClick={handleBuyNow}

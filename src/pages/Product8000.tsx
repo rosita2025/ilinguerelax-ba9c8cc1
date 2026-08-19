@@ -7,6 +7,7 @@ import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { useCampaignPrice } from "@/hooks/useCampaignPrice";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useNavigate } from "react-router-dom";
+import { useI18n } from "@/i18n/I18nContext";
 
 import SalesNotification from "@/components/SalesNotification";
 import { FAQ } from "@/components/FAQ";
@@ -142,6 +143,7 @@ const TIENDA_PATH_8000 = `/checkouts/${PRODUCT_SKU}`;
 const HOTMART_8000_LATAM = "https://pay.hotmart.com/U103990323W?checkoutMode=10";
 
 const Product8000 = () => {
+  const { currency, countryCode } = useI18n();
   const campaign = useCampaignPrice(20, 54);
   const navigate = useNavigate();
   const addItem = useCartStore((s) => s.addItem);
@@ -656,7 +658,7 @@ const Product8000 = () => {
         price={tier.priceLabel}
         originalPrice={tier.originalLabel}
         currencyCode={tier.currencyCode}
-        flag={tier.isPeru ? "🇵🇪" : undefined}
+        flag={tier.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
         rating={4.9}
         reviewCount={10000}
         ctaText={"Comprar ahora"}

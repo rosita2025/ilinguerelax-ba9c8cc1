@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Globe, Check } from "lucide-react";
-import { useRegionTier, setManualCountryOverride, clearManualCountryOverride } from "@/hooks/useRegionTier";
+import { useRegionTier, clearManualCountryOverride } from "@/hooks/useRegionTier";
+import { useI18n } from "@/i18n/I18nContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 

@@ -92,6 +92,7 @@ interface PruebaStore {
   coupon: string | null;
   couponPercent: number;
   buyer: BuyerInfo;
+  clientSecret: string | null;
   setBuyer: (patch: Partial<BuyerInfo>) => void;
   addItem: (item: Omit<PruebaItem, "quantity"> & { quantity?: number }, opts?: { silent?: boolean }) => void;
   /** Update price/name/image/regionPrices of items already in cart (keeps quantity). */
@@ -106,6 +107,7 @@ interface PruebaStore {
   pruneUnknown: (validIds: Set<string>) => number;
   selectedMethod: string | null;
   setSelectedMethod: (method: string | null) => void;
+  setClientSecret: (secret: string | null) => void;
   hasPhysicalItems: () => boolean;
 }
 

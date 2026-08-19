@@ -160,14 +160,14 @@ Deno.serve(async (req) => {
     const buildAttempts = async () => {
       const rest = [];
       if (body.payerPhone || body.payerDocument) {
-        rest.push({ label: `checkout ${localCurrency} mínimo`, payload: payloadFor(localAmount, localCurrency, { minimal: true }) });
-      }
-      const rail = await resolveRail();
-      if (rail) rest.push({ label: `rail ${rail}`, payload: { ...payloadFor(localAmount, localCurrency), payment_method_id: rail, payment_method_flow: "REDIRECT" } });
-      if (localCurrency !== "USD") {
-        rest.push({ label: "checkout USD", payload: payloadFor(calculatedUsd, "USD") });
-        rest.push({ label: "checkout USD mínimo", payload: payloadFor(calculatedUsd, "USD", { minimal: true }) });
-      }
+      rest.push({ label: `checkout ${localCurrency} mínimo`, payload: payloadFor(localAmount!, localCurrency, { minimal: true }) });
+    }
+    const rail = await resolveRail();
+    if (rail) rest.push({ label: `rail ${rail}`, payload: { ...payloadFor(localAmount!, localCurrency), payment_method_id: rail, payment_method_flow: "REDIRECT" } });
+    if (localCurrency !== "USD") {
+      rest.push({ label: "checkout USD", payload: payloadFor(calculatedUsd, "USD") });
+      rest.push({ label: "checkout USD mínimo", payload: payloadFor(calculatedUsd, "USD", { minimal: true }) });
+    }
       return rest;
     };
 

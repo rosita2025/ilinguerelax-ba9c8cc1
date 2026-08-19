@@ -207,6 +207,19 @@ export async function sendShippingEmail(
   const orderNumber = String(input.orderNumber ?? "").trim();
   if (!email || !orderNumber) return { sent: false, skipped: "missing_email_or_order" };
 
+  // Los correos con tracking exigen código y transportista válidos: nunca
+  // enviamos "Courier" ni una URL genérica como número de seguimiento.
+  if (input.kind === "tracking_new" || input.kind === "tracking_updated" || input.kind === "delivered") {
+    const norm = normalizeTracking(input.trackingNumber);
+    if (norm.error || !norm.code) {
+      return { sent: false, error: norm.error ?? "Falta el número de seguimiento." };
+    }
+    input = { ...input, trackingNumber: norm.code, trackingUrl: input.trackingUrl ?? norm.url };
+    if (!String(input.shippingProvider ?? "").trim()) {
+      return { sent: false, error: "Falta el transportista: elígelo antes de notificar al cliente." };
+    }
+  }
+
   const templateName = TEMPLATE_BY_KIND[input.kind];
   const messageId = `${templateName}-${orderNumber}`;
 

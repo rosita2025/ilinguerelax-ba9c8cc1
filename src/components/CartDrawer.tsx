@@ -341,7 +341,7 @@ export const CartDrawer = () => {
   return (
       <Sheet open={isDrawerOpen} onOpenChange={setDrawerOpen}>
       <SheetTrigger asChild>
-        <Button type="button" variant="outline" size="icon" className="relative">
+        <Button type="button" variant="outline" size="icon" className="relative hidden lg:inline-flex">
           <ShoppingCart className="h-5 w-5" />
           {totalItems > 0 &&
           <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-primary text-primary-foreground">
@@ -350,7 +350,7 @@ export const CartDrawer = () => {
           }
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full max-w-full sm:max-w-lg flex flex-col h-full z-[60]">
+      <SheetContent className="w-full max-w-full sm:max-w-lg flex flex-col h-full z-[100]">
         <SheetHeader className="flex-shrink-0">
           <SheetTitle>Shopping Cart</SheetTitle>
           <SheetDescription>

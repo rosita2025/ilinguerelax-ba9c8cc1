@@ -878,6 +878,8 @@ const ProductSpanish5000 = () => {
         price={campaign.price} 
         originalPrice={campaign.originalPrice} 
         currencyCode={currency} 
+        flag={productPricing.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
+
         productName={productPricing.name ?? "Book Physical & Digital — FREE Bonuses"} 
         onBuyClick={handleStickyBuy} 
         ctaText={stickyCtaText} 

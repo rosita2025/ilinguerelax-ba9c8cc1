@@ -151,7 +151,7 @@ const Product8000 = () => {
   const tier = useCountryTierRouting(ADMIN_SKU_8000, {
     tiendaPath: TIENDA_PATH_8000,
   });
-  const { priceUsd } = tier;
+  const { priceUsd, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen } = tier;
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(

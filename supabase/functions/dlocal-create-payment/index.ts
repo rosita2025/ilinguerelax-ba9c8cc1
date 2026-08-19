@@ -91,7 +91,8 @@ Deno.serve(async (req) => {
     const restricted = isRestrictedCurrency(body.country);
 
     // Prioritize local currency if supported, NOT restricted, and we have a valid amount.
-    const startCurrency = (!restricted && localAmount && localAmount > 0) ? localCurrency : "USD";
+    // However, if currency is USD, we must honor it.
+    const startCurrency = (localCurrency === "USD" || restricted || !localAmount || localAmount <= 0) ? "USD" : localCurrency;
     const startAmount = startCurrency === "USD" ? calculatedUsd : localAmount!;
 
 
@@ -159,14 +160,14 @@ Deno.serve(async (req) => {
     const buildAttempts = async () => {
       const rest = [];
       if (body.payerPhone || body.payerDocument) {
-        rest.push({ label: `checkout ${localCurrency} mínimo`, payload: payloadFor(localAmount, localCurrency, { minimal: true }) });
-      }
-      const rail = await resolveRail();
-      if (rail) rest.push({ label: `rail ${rail}`, payload: { ...payloadFor(localAmount, localCurrency), payment_method_id: rail, payment_method_flow: "REDIRECT" } });
-      if (localCurrency !== "USD") {
-        rest.push({ label: "checkout USD", payload: payloadFor(calculatedUsd, "USD") });
-        rest.push({ label: "checkout USD mínimo", payload: payloadFor(calculatedUsd, "USD", { minimal: true }) });
-      }
+      rest.push({ label: `checkout ${localCurrency} mínimo`, payload: payloadFor(localAmount!, localCurrency, { minimal: true }) });
+    }
+    const rail = await resolveRail();
+    if (rail) rest.push({ label: `rail ${rail}`, payload: { ...payloadFor(localAmount!, localCurrency), payment_method_id: rail, payment_method_flow: "REDIRECT" } });
+    if (localCurrency !== "USD") {
+      rest.push({ label: "checkout USD", payload: payloadFor(calculatedUsd, "USD") });
+      rest.push({ label: "checkout USD mínimo", payload: payloadFor(calculatedUsd, "USD", { minimal: true }) });
+    }
       return rest;
     };
 
@@ -251,7 +252,7 @@ Deno.serve(async (req) => {
           customerName: body.payerName,
           customerEmail: body.payerEmail,
           productName: description,
-          amount: usedUsdFallback ? calculatedUsd : localAmount,
+          amount: usedUsdFallback ? calculatedUsd : (localAmount ?? calculatedUsd),
           currency: usedUsdFallback ? "USD" : localCurrency,
           method: methodLabel,
           orderDate: new Date().toISOString(),
@@ -272,7 +273,7 @@ Deno.serve(async (req) => {
               country: body.country.toUpperCase(),
               skus,
               productName: description,
-              localAmount: usedUsdFallback ? calculatedUsd : localAmount,
+              localAmount: usedUsdFallback ? calculatedUsd : (localAmount ?? calculatedUsd),
               localCurrency: usedUsdFallback ? "USD" : localCurrency,
               usdFallback: usedUsdFallback,
               expirationDays: EXPIRATION_DAYS,

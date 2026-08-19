@@ -84,6 +84,8 @@ Deno.serve(async (req) => {
     }
 
     const discountMultiplier = 1 - pricing.couponPercent / 100;
+    const forceUsd = body.isRestrictedRetry || isRestrictedCurrency(country);
+    const targetCurrency = forceUsd ? "usd" : currency;
 
     // --- LÓGICA DE ENVÍO (Debe ser idéntica al Frontend) ---
     const isPhysical = pricing.items.some(i => i.isPhysical);
@@ -99,24 +101,39 @@ Deno.serve(async (req) => {
     // Convert shipping to local currency if needed
     let shippingAmountCents = 0;
     if (shippingUsd > 0 && !hasUpsell) {
-      if (currency === "usd") {
+      if (targetCurrency === "usd") {
         shippingAmountCents = Math.round(shippingUsd * 100);
       } else {
-        const shippingLocal = await localAmountFromUsd(shippingUsd, currency.toUpperCase());
+        const shippingLocal = await localAmountFromUsd(shippingUsd, targetCurrency.toUpperCase());
         if (shippingLocal) {
           shippingAmountCents = Math.round(shippingLocal * 100);
         } else {
-          // Fallback to simple conversion
           shippingAmountCents = Math.round(shippingUsd * 100);
         }
       }
     }
 
-    const line_items = pricing.items.map((item) => {
-      const unit_amount = Math.round(item.unitUsd * discountMultiplier * 100);
+    const line_items = await Promise.all(pricing.items.map(async (item) => {
+      let unit_amount;
+      if (targetCurrency === "usd") {
+        unit_amount = Math.round(item.unitUsd * discountMultiplier * 100);
+      } else {
+        // Obtenemos el precio unitario local con cupon
+        const rate = await localAmountFromUsd(1, targetCurrency.toUpperCase()) || 1;
+        const override = item.localPrices?.[targetCurrency.toUpperCase()];
+        const regionalUsd = item.localUsdPrices?.[targetCurrency.toUpperCase()];
+        const activeUsd = (typeof regionalUsd === "number" && regionalUsd > 0) ? regionalUsd : item.unitUsd;
+        
+        let localUnit = (typeof override === "number" && override > 0)
+          ? override
+          : activeUsd * rate;
+          
+        unit_amount = Math.round(localUnit * discountMultiplier * 100);
+      }
+      
       return {
         price_data: {
-          currency,
+          currency: targetCurrency,
           product_data: {
             name: item.name,
             ...(item.description && { description: item.description }),
@@ -126,13 +143,13 @@ Deno.serve(async (req) => {
         },
         quantity: item.quantity,
       };
-    });
+    }));
 
     // Agregar el costo de envío como un item de línea si existe
     if (shippingAmountCents > 0) {
       line_items.push({
         price_data: {
-          currency,
+          currency: targetCurrency,
           product_data: {
             name: country === "ES" || isLatam ? "Costo de Envío" : "Shipping Cost",
             description: "Standard Shipping",

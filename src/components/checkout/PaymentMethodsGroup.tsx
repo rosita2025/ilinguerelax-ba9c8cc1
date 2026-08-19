@@ -2459,5 +2459,5 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       )}
     </div>
   );
-}
+});
 

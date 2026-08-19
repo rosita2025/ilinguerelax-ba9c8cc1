@@ -441,82 +441,34 @@ const ProductSpanish5000 = () => {
         </div>
       </section>
 
-      {/* Physical & Digital Bundle Option */}
-      <section id="physical-bundle" className="py-14 md:py-20 scroll-mt-20">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-10">
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-bold uppercase tracking-wider border border-emerald-500/20">
-                <Truck className="w-4 h-4" />
-                Recommended Option
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-4 mb-3">
-                Spanish Mastery System — <span className="text-purple-600">Physical & Digital Bundle</span>
-              </h2>
-              <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-                The ultimate learning experience: Luxury physical book delivered to your door + instant digital access + 3 FREE bonuses.
-              </p>
+      {/* Digital Alternative Option */}
+      <section className="py-14 md:py-20 bg-slate-900 text-white overflow-hidden w-full max-w-full box-border">
+        <div className="container px-4 md:px-6 w-full max-w-full box-border">
+          <div className="max-w-2xl mx-auto text-center space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider border border-emerald-500/30">
+              <Download className="w-4 h-4" />
+              Digital-Only Version
             </div>
-
-            <div className="rounded-3xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-purple-500/5 to-accent/5 p-4 sm:p-8 md:p-10 shadow-card w-full max-w-full box-border overflow-hidden">
-              <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center">
-                <div className="flex justify-center w-full overflow-hidden">
-                  <img
-                    src={productSpanish5000BundleImage}
-                    alt="Spanish Mastery System — Physical & Digital Book Bundle"
-                    className="w-full max-w-[240px] sm:max-w-[300px] md:max-w-none h-auto rounded-2xl shadow-lg"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="space-y-5 text-center md:text-left w-full overflow-hidden">
-                  <h3 className="text-lg sm:text-2xl md:text-3xl font-bold text-foreground break-words leading-tight text-center md:text-left">
-                    Spanish Mastery System — Physical & Digital Book
-                  </h3>
-                  <p className="text-xs sm:text-base text-muted-foreground leading-relaxed break-words">
-                    Learn Spanish the way it actually sounds. Premium physical book + Instant PDF + <strong>all bonuses included</strong>.
-                  </p>
-                  <ul className="space-y-2 text-left px-1">
-                    {[
-                      "Luxury physical book (ships internationally)",
-                      "Instant Digital PDF (5,000 words + pronunciation)",
-                      "A1–C1 Grammar Guide (250 Pages) — Included",
-                      "1,000 Essential Verbs + Pronunciation — Included",
-                      "500 Practice Questions + Pronunciation — Included",
-                      "Lifetime digital updates & instant access",
-                    ].map(item => (
-                      <li key={item} className="flex items-start gap-2 text-xs sm:text-base text-foreground leading-tight">
-                        <Check className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                        <span className="break-words">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="flex items-baseline justify-center md:justify-start gap-3 pt-2 flex-wrap">
-                    <span className="text-4xl font-bold text-foreground">{campaign.price}</span>
-                    <span className="text-lg text-muted-foreground line-through">{campaign.originalPrice}</span>
-                    <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-1 rounded-full">BEST VALUE</span>
-                  </div>
-                  <div className="w-full px-1">
-                    <Button 
-                      onClick={handleBuyNow} 
-                      size="xl" 
-                      className="w-full max-w-full bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-500 hover:to-amber-500 text-slate-900 border-amber-500 font-bold shadow-lg text-xs sm:text-sm py-3 px-2 whitespace-normal text-center rounded-xl h-auto min-h-[50px]"
-                    >
-                      <ShoppingCart className="w-4 h-4 sm:w-5 h-5" />
-                      ORDER PHYSICAL BOOK — {campaign.price}
-                      <ArrowRight className="w-4 h-4 sm:w-5 h-5" />
-                    </Button>
-                  </div>
-
-
-                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground pt-1">
-                    <span className="flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> Secure checkout</span>
-                    <span className="flex items-center gap-1"><Download className="w-3.5 h-3.5" /> Instant access</span>
-                  </div>
-
-                </div>
-              </div>
-              <div className="mb-12 pb-8" />
+            <h2 className="text-3xl md:text-4xl font-black leading-tight break-words px-2">
+              Looking for a <span className="text-emerald-400">Digital-Only</span> version?
+            </h2>
+            <p className="text-slate-400 text-base md:text-lg leading-relaxed px-2">
+              Get instant access to the PDF version without waiting for international shipping. 
+              Study on your phone, tablet, or computer right away.
+            </p>
+            <div className="pt-4 px-2">
+              <Button 
+                onClick={handleViewDigital}
+                size="xl"
+                className="w-full max-w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black shadow-[0_8px_30px_rgba(16,185,129,0.3)] text-base sm:text-lg py-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] h-auto whitespace-normal"
+              >
+                View Digital Version — {formatPrice(72.99)}
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
             </div>
+            <p className="text-[11px] text-slate-500 uppercase tracking-widest font-bold">
+              Instant Delivery via Email · Secure Checkout
+            </p>
           </div>
         </div>
       </section>

@@ -598,22 +598,24 @@ const ProductSpanish5000Digital = () => {
           </div>
 
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-8 rounded-3xl bg-slate-900 text-white shadow-2xl relative overflow-hidden mb-12">
-            <div className="relative z-10 flex-1 text-center md:text-left">
+            <div className="relative z-10 flex-1 text-center md:text-left w-full max-w-full overflow-hidden px-2">
               <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
                 <Package className="w-5 h-5 text-emerald-400" />
-                <span className="text-xs font-black uppercase tracking-widest text-emerald-400">Limited Upgrade</span>
+                <span className="text-xs font-black uppercase tracking-widest text-emerald-400">Physical Edition Available</span>
               </div>
-              <h3 className="text-2xl font-black mb-2">Want the Hardcover edition?</h3>
-              <p className="text-slate-400 text-sm max-w-md mx-auto md:mx-0">
-                Get the physical book shipped to your door and receive the full Digital Mastery Kit (PDF, MP3s, Flashcards) 100% FREE.
+              <h3 className="text-2xl md:text-3xl font-black mb-2 break-words">Want the Physical Printed Book?</h3>
+              <p className="text-slate-400 text-sm md:text-base max-w-md mx-auto md:mx-0 break-words leading-relaxed">
+                Get the luxury physical book shipped to your door and receive the full Digital Mastery Kit (PDF, MP3s, Flashcards) 100% FREE.
               </p>
             </div>
-            <button
-              onClick={() => navigate("/products/5-000-spanish-words-with-english-pronunciation-physical")}
-              className="relative z-10 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-8 py-4 text-sm font-black text-white shadow-xl hover:bg-emerald-500 transition-all hover:scale-105 active:scale-95"
-            >
-              Upgrade to Physical + Digital Free — $44 USD
-            </button>
+            <div className="w-full md:w-auto px-2">
+              <Button
+                onClick={() => navigate("/products/5-000-spanish-words-with-english-pronunciation-physical")}
+                className="w-full relative z-10 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-8 py-6 text-base font-black text-white shadow-xl hover:bg-emerald-500 transition-all hover:scale-105 active:scale-95 h-auto whitespace-normal text-center"
+              >
+                Get Physical Book + Free Digital — {formatPrice(44.00)}
+              </Button>
+            </div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/10 blur-3xl -mr-32 -mt-32 rounded-full" />
           </div>
 

@@ -136,6 +136,15 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     try { localStorage.setItem(CURRENCY_STORAGE_KEY, curr); } catch { /* ignore */ }
   };
 
+  const setCountryCode = (code: string) => {
+    setCountryCodeState(code);
+    try { localStorage.setItem("ilr_country", code); } catch { /* ignore */ }
+    
+    // Also update currency automatically if it's not manually locked
+    const newCurrency = detectCurrency(code);
+    setCurrency(newCurrency);
+  };
+
   const t = translations[language];
 
   const formatPriceWithCurrency = (priceInUSD: number, overrides?: any, localUsdPrices?: any): string => {
@@ -150,6 +159,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     t,
     formatPrice: formatPriceWithCurrency,
     countryCode,
+    setCountryCode,
     languageNames,
     languageFlags,
   };

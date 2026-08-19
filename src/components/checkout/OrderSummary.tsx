@@ -50,6 +50,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
     discountLocal, 
     shippingLocal, 
     totalLocal, 
+    totalUsd,
     currency 
   } = useCheckoutTotal(
     items, 

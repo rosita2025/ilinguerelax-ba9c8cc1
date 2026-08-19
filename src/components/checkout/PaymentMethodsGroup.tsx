@@ -1216,6 +1216,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       `Adjunto captura del pago. Gracias!`;
     const waUrl = `https://wa.me/12512724704?text=${encodeURIComponent(msg)}`;
 
+    setMpLoading("clabe");
+    setMethodError(null);
+
     try {
       await supabase.from("manual_payments").insert({
         order_number: orderNumber,
@@ -1230,67 +1233,70 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         items: s.items.map((i) => ({ sku: i.id, name: i.name, quantity: i.quantity, price: i.price })),
         status: "pending",
       });
-    } catch (e) {
-      console.warn("[manual_payments] clabe insert failed", e);
+
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "admin-manual-pending",
+          idempotencyKey: `manual-pending-${orderNumber}`,
+          templateData: {
+            orderNumber,
+            customerName: s.buyer.fullName.trim(),
+            customerEmail: s.buyer.email.trim().toLowerCase(),
+            customerPhone: s.buyer.phone ?? "",
+            customerCountry: (region.country || "MX").toUpperCase(),
+            productName: s.items.map((i) => i.name).join(" + "),
+            amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+            currency: local.currency || "MXN",
+            method: "SPEI / CLABE (México)",
+            orderDate: new Date().toISOString(),
+          },
+        },
+      }).catch((err) => console.warn("[admin-manual-pending] clabe notify failed", err));
+
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "customer-manual-pending",
+          recipientEmail: s.buyer.email.trim().toLowerCase(),
+          idempotencyKey: `customer-manual-pending-${orderNumber}`,
+          templateData: {
+            orderNumber,
+            customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
+            productName: s.items.map((i) => i.name).join(" + "),
+            amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
+            currency: local.currency || "MXN",
+            amountUsd: Number(totalUsd),
+            method: "SPEI / CLABE (México)",
+            orderDate: new Date().toISOString(),
+            clabeNumber: CLABE_NUMBER,
+            clabeHolder: "Carmen Rosa Aliaga Domínguez",
+            clabeBank: "STP (SPEI)",
+          },
+        },
+      }).catch((err) => console.warn("[customer-manual-pending] clabe notify failed", err));
+
+      supabase.from("email_contacts").upsert({
+        email: s.buyer.email.trim().toLowerCase(),
+        name: s.buyer.fullName.trim(),
+        source: "checkout-prueba-1",
+        metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "clabe_mx", orderNumber },
+      }, { onConflict: "email,source" }).then(() => {});
+
+      window.open(waUrl, "_blank", "noopener,noreferrer");
+      const q = new URLSearchParams({
+        order: orderNumber,
+        name: s.buyer.fullName.trim(),
+        email: s.buyer.email.trim(),
+        amount: `${amountText} (USD $${totalUsd})`,
+        method: "SPEI / CLABE (México)",
+        products: s.items.map((i) => `${i.name} x${i.quantity}`).join(" | "),
+      }).toString();
+      navigate(`/checkouts/pendiente-manual?${q}`);
+    } catch (err) {
+      setMpLoading(null);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setMethodError({ method: "clabe", message: errorMessage });
+      toast({ title: "Error SPEI", description: errorMessage, variant: "destructive" });
     }
-
-    supabase.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "admin-manual-pending",
-        idempotencyKey: `manual-pending-${orderNumber}`,
-        templateData: {
-          orderNumber,
-          customerName: s.buyer.fullName.trim(),
-          customerEmail: s.buyer.email.trim().toLowerCase(),
-          customerPhone: s.buyer.phone ?? "",
-          customerCountry: (region.country || "MX").toUpperCase(),
-          productName: s.items.map((i) => i.name).join(" + "),
-          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
-          currency: local.currency || "MXN",
-          method: "SPEI / CLABE (México)",
-          orderDate: new Date().toISOString(),
-        },
-      },
-    }).catch((err) => console.warn("[admin-manual-pending] clabe notify failed", err));
-
-    supabase.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "customer-manual-pending",
-        recipientEmail: s.buyer.email.trim().toLowerCase(),
-        idempotencyKey: `customer-manual-pending-${orderNumber}`,
-        templateData: {
-          orderNumber,
-          customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
-          productName: s.items.map((i) => i.name).join(" + "),
-          amount: local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd),
-          currency: local.currency || "MXN",
-          amountUsd: Number(totalUsd),
-          method: "SPEI / CLABE (México)",
-          orderDate: new Date().toISOString(),
-          clabeNumber: CLABE_NUMBER,
-          clabeHolder: "Carmen Rosa Aliaga Domínguez",
-          clabeBank: "STP (SPEI)",
-        },
-      },
-    }).catch((err) => console.warn("[customer-manual-pending] clabe notify failed", err));
-
-    supabase.from("email_contacts").upsert({
-      email: s.buyer.email.trim().toLowerCase(),
-      name: s.buyer.fullName.trim(),
-      source: "checkout-prueba-1",
-      metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "clabe_mx", orderNumber },
-    }, { onConflict: "email,source" }).then(() => {});
-
-    window.open(waUrl, "_blank", "noopener,noreferrer");
-    const q = new URLSearchParams({
-      order: orderNumber,
-      name: s.buyer.fullName.trim(),
-      email: s.buyer.email.trim(),
-      amount: `${amountText} (USD $${totalUsd})`,
-      method: "SPEI / CLABE (México)",
-      products: s.items.map((i) => `${i.name} x${i.quantity}`).join(" | "),
-    }).toString();
-    navigate(`/checkouts/pendiente-manual?${q}`);
   };
 
 

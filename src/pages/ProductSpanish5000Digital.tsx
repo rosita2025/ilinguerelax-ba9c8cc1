@@ -9,7 +9,7 @@ import {
   Check, BookOpen, Sparkles, Brain, Download, Zap, Shield, ShoppingCart,
   Star, Eye, Globe, Smartphone, FileText, CreditCard, ArrowRight, Package, Lock, Headphones, Layers, FilePlus
 } from "lucide-react";
-import { GuaranteeSeal } from "@/components/SpanishMasteryBadges";
+
 
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { useTrackProductView, useScrollTimeTracking } from "@/hooks/useGoogleAnalytics";
@@ -306,7 +306,7 @@ const ProductSpanish5000Digital = () => {
                     <ShoppingCart className="w-5 h-5 mr-2" />
                     {isRedirecting ? "Redirecting to secure checkout…" : `GET THE FULL KIT — ${tier.priceLabel}`}
                   </Button>
-                  <GuaranteeSeal />
+                  
                 </div>
 
                 <Button

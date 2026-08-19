@@ -332,7 +332,7 @@ const getStripeVisibleMethods = (language: string): Record<string, Omit<PaymentM
   },
 });
 
-export function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null } = {}) {
+export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null } = {}) {
   const navigate = useNavigate();
   const { items, buyer, coupon, couponPercent, selectedMethod, setSelectedMethod } = useCheckoutPruebaStore();
   const region = useRegionTier();

@@ -146,26 +146,6 @@
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
-      <g:id>5-000-spanish-words-with-english-pronunciation-physical</g:id>
-      <g:title>Spanish Relax - 5,000 Words Physical</g:title>
-      <g:description>With English Pronunciation</g:description>
-      <g:link>https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical</g:link>
-      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-spanish-words-with-english-pronunciation-physical/1787104011776-v88tl.webp</g:image_link>
-      <g:condition>new</g:condition>
-      <g:availability>in stock</g:availability>
-      <g:price>34.99 USD</g:price>
-      <g:brand>iLingue Relax</g:brand>
-      <g:mpn>5-000-spanish-words-with-english-pronunciation-physical</g:mpn>
-      <g:identifier_exists>no</g:identifier_exists>
-      <g:adult>no</g:adult>
-      <g:content_language>en</g:content_language>
-      <g:target_country>US</g:target_country>
-      <g:google_product_category>Media &gt; Books</g:google_product_category>
-      <g:product_type>Books &gt; Languages &gt; Spanish</g:product_type>
-      <g:custom_label_0>Spanish</g:custom_label_0>
-      <g:custom_label_1>Physical</g:custom_label_1>
-    </item>
-    <item>
       <g:id>8-000-palabras-libro-fisico</g:id>
       <g:title>Inglés Relax - 8,000 Palabras Libro</g:title>
       <g:description>Libro físico + Digital GRATIS</g:description>
@@ -344,6 +324,26 @@
       <g:product_type>Digital Books &gt; Languages &gt; Spanish</g:product_type>
       <g:custom_label_0>Spanish</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
+    </item>
+    <item>
+      <g:id>5-000-spanish-words-with-english-pronunciation-physical</g:id>
+      <g:title>Spanish Relax - 5,000 Words Physical</g:title>
+      <g:description>With English Pronunciation</g:description>
+      <g:link>https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-physical</g:link>
+      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-spanish-words-with-english-pronunciation-physical/1787104011776-v88tl.webp</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in stock</g:availability>
+      <g:price>34.99 USD</g:price>
+      <g:brand>iLingue Relax</g:brand>
+      <g:mpn>5-000-spanish-words-with-english-pronunciation-physical</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:adult>no</g:adult>
+      <g:content_language>en</g:content_language>
+      <g:target_country>US</g:target_country>
+      <g:google_product_category>Media &gt; Books</g:google_product_category>
+      <g:product_type>Books &gt; Languages &gt; Spanish</g:product_type>
+      <g:custom_label_0>Spanish</g:custom_label_0>
+      <g:custom_label_1>Physical</g:custom_label_1>
     </item>
   </channel>
 </rss>

@@ -514,6 +514,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const s = useCheckoutPruebaStore.getState();
+    // Return early if we already have a secret in the store to avoid double fetching
+    if (s.clientSecret) return s.clientSecret;
+
     if (!isBuyerValid(s.buyer)) throw new Error(t.completeYourData);
     // No bloquea el checkout: la captura del carrito viaja en segundo plano.
     void captureAbandonedCheckout(selected || "stripe", true);
@@ -589,7 +592,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           
           throw new Error(msg);
         }
-        return data.clientSecret;
+        const secret = data.clientSecret;
+        // Store secret globally so retry logic can clear it
+        useCheckoutPruebaStore.getState().setClientSecret(secret);
+        return secret;
       };
 
       const clientSecret = await fetchSecret();
@@ -933,6 +939,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       
       if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { 
         setShowStripe(true); 
+        // Force fresh fetch on "Continuar" to handle stale sessions
+        useCheckoutPruebaStore.getState().setClientSecret(null);
         // Scroll to stripe anchor
         setTimeout(() => {
           stripeAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -961,8 +969,20 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     setStripeLoading(false);
     setStripeFrameMounted(false);
     setStripeElapsed(0);
+    // Explicitly invalidate client secret to force fresh fetch
+    useCheckoutPruebaStore.getState().setClientSecret(null);
     setStripeRetryKey((k) => k + 1);
   }, []);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      if (stripeError && (stripeError.code === "network" || stripeError.code === "timeout")) {
+        retryStripe();
+      }
+    };
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
+  }, [stripeError, retryStripe]);
 
   useEffect(() => {
     if (!(showStripe && selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected))) return;

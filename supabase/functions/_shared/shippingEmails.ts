@@ -18,6 +18,65 @@ const TEMPLATE_BY_KIND: Record<ShippingEmailKind, string> = {
   delivered: "shipping-delivered",
 };
 
+/** Parámetros de URL que suelen contener el código de rastreo. */
+const TRACKING_PARAMS = [
+  "shipmentid", "trackingnumber", "tracking_number", "trknbr", "tracknum",
+  "awb", "ptracking", "codigo", "code", "track", "tracking", "id", "n",
+];
+
+/**
+ * Normaliza lo que el operador escribió en el panel:
+ *  - si es un código, lo devuelve tal cual
+ *  - si es una URL con el código dentro, extrae el código y guarda el enlace
+ *  - si es una URL genérica sin código (ej. www.amazon.com/tracking) => error
+ */
+export function normalizeTracking(raw?: string | null): {
+  code: string | null;
+  url: string | null;
+  error?: string;
+} {
+  const value = String(raw ?? "").trim();
+  if (!value) return { code: null, url: null };
+
+  const looksUrl = /^https?:\/\//i.test(value) || /^www\./i.test(value) || /^[a-z0-9.-]+\.[a-z]{2,}\//i.test(value);
+  if (!looksUrl) {
+    const code = value.replace(/\s+/g, "");
+    if (!/[a-z0-9]/i.test(code) || code.replace(/[^a-z0-9]/gi, "").length < 6) {
+      return { code: null, url: null, error: "El número de seguimiento debe tener al menos 6 caracteres alfanuméricos." };
+    }
+    return { code, url: null };
+  }
+
+  const href = /^https?:\/\//i.test(value) ? value : `https://${value}`;
+  let parsed: URL;
+  try {
+    parsed = new URL(href);
+  } catch {
+    return { code: null, url: null, error: "El enlace de seguimiento no es válido." };
+  }
+
+  let code: string | null = null;
+  for (const [k, v] of parsed.searchParams.entries()) {
+    if (TRACKING_PARAMS.includes(k.toLowerCase()) && v.replace(/[^a-z0-9]/gi, "").length >= 6) {
+      code = v.trim();
+      break;
+    }
+  }
+  if (!code) {
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    const last = segments[segments.length - 1] ?? "";
+    if (/^[a-z0-9-]{8,}$/i.test(last) && /\d/.test(last)) code = last;
+  }
+  if (!code) {
+    return {
+      code: null,
+      url: null,
+      error: "Ese enlace no contiene un código de rastreo. Pega el número de seguimiento real (o el enlace completo que incluya el código).",
+    };
+  }
+  return { code, url: href };
+}
+
 export function buildTrackingUrl(provider?: string | null, tracking?: string | null): string | null {
   const t = String(tracking ?? "").trim();
   if (!t) return null;
@@ -30,6 +89,7 @@ export function buildTrackingUrl(provider?: string | null, tracking?: string | n
   if (p.includes("ups")) return `https://www.ups.com/track?tracknum=${encodeURIComponent(t)}`;
   if (p.includes("serpost")) return `https://www.serpost.com.pe/Cliente/ConsultaEnvio?pTracking=${encodeURIComponent(t)}`;
   if (p.includes("olva")) return `https://www.olvacourier.com/rastrea-tu-envio/?codigo=${encodeURIComponent(t)}`;
+  if (p.includes("correos") || p.includes("shalom") || p.includes("dpd")) return null;
   return null;
 }
 
@@ -39,6 +99,8 @@ interface BuildInput {
   name?: string | null;
   email: string;
   trackingNumber?: string | null;
+  /** Enlace directo de rastreo (si el operador pegó una URL con el código). */
+  trackingUrl?: string | null;
   shippingProvider?: string | null;
 }
 
@@ -47,20 +109,24 @@ function orderStatusUrl(orderNumber: string, email: string) {
 }
 
 export function buildShippingEmail(input: BuildInput): { subject: string; html: string } {
-  const name = escapeHtml((input.name || "").trim() || "Cliente");
+  const rawName = (input.name || "").trim();
+  const greeting = rawName ? `Hola ${escapeHtml(rawName)}` : "Hola";
   const order = escapeHtml(input.orderNumber);
   const statusUrl = orderStatusUrl(input.orderNumber, input.email);
-  const trackingUrl = buildTrackingUrl(input.shippingProvider, input.trackingNumber);
-  const carrier = escapeHtml((input.shippingProvider || "").trim() || "Courier");
+  const trackingUrl = (input.trackingUrl && String(input.trackingUrl).trim())
+    || buildTrackingUrl(input.shippingProvider, input.trackingNumber);
+  const carrierRaw = (input.shippingProvider || "").trim();
+  const carrier = escapeHtml(carrierRaw);
   const tracking = escapeHtml((input.trackingNumber || "").trim());
 
   const trackingBox = `
     <div style="background:${BRAND.soft};border:1px solid ${BRAND.border};padding:18px;border-radius:12px;margin:18px 0;">
       <p style="margin:0;font-size:13px;color:${BRAND.muted};">Número de seguimiento</p>
       <p style="margin:4px 0 14px;font-size:18px;font-weight:bold;color:${BRAND.text};word-break:break-all;">${tracking}</p>
-      <p style="margin:0;font-size:13px;color:${BRAND.muted};">Transportista</p>
-      <p style="margin:4px 0 0;font-size:15px;font-weight:bold;color:${BRAND.text};">${carrier}</p>
+      ${carrierRaw ? `<p style="margin:0;font-size:13px;color:${BRAND.muted};">Transportista</p>
+      <p style="margin:4px 0 0;font-size:15px;font-weight:bold;color:${BRAND.text};">${carrier}</p>` : ""}
     </div>`;
+
 
   if (input.kind === "pre_notice") {
     return {

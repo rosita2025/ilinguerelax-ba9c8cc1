@@ -131,10 +131,9 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span className="text-base font-bold leading-tight">
               {penMode ? formatPen(localTotalAmount) : localTotalLabel}
             </span>
-            {showLocalRef && (
+            {showLocalRef && !breakdown.isUsd && (
               <span className="text-[10px] font-normal text-muted-foreground leading-none">
                   ≈ USD ${currentUsdRef.toFixed(2)}
-
               </span>
             )}
           </span>
@@ -329,7 +328,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span>{t.total}</span>
             <div className="text-right">
               <div className="text-xl">{penMode ? formatPen(localTotalAmount) : showLocalRef ? localTotalLabel : formatCurrencyAmount(grandTotal, "USD")}</div>
-              {showLocalRef && (
+              {showLocalRef && !breakdown.isUsd && (
                 <div className="text-[11px] text-muted-foreground font-normal mt-0.5">
                   ≈ USD ${currentUsdRef.toFixed(2)}
                 </div>

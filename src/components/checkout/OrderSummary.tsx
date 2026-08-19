@@ -159,7 +159,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <div className="flex gap-2.5 items-start">
               <Truck className="w-4 h-4 text-destructive shrink-0 mt-0.5" aria-hidden="true" />
               <p className="text-xs text-destructive font-medium leading-snug">
-                <strong className="font-bold uppercase tracking-tight">{t.physical}.</strong> {language === "en" ? "Mandatory shipping address required to continue." : "Se solicita dirección de envío obligatoria para continuar."}
+                <strong className="font-bold uppercase tracking-tight">{t.physical}.</strong> {language === "en" ? "Mandatory: Name, Email, Phone and Shipping Address required." : "Obligatorio: Nombre, Email, Teléfono y Dirección de Envío."}
               </p>
             </div>
             <div className="text-[10px] space-y-1 pl-6 opacity-90 italic">
@@ -177,10 +177,15 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             </div>
           </div>
         ) : (
-          <div className="flex gap-2.5 items-start rounded-xl border border-primary/25 bg-primary/5 px-3 py-2.5 mb-2">
-            <Zap className="w-4 h-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
-            <p className="text-xs text-muted-foreground leading-snug">
-              <strong className="text-foreground font-semibold">{t.digital}.</strong> {language === "en" ? "Immediate access via email after payment." : "Recibirás el acceso inmediato por correo tras el pago."}
+          <div className="flex flex-col gap-2 rounded-xl border border-primary/25 bg-primary/5 px-3 py-2.5 mb-2">
+            <div className="flex gap-2.5 items-start">
+              <Zap className="w-4 h-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
+              <p className="text-xs text-muted-foreground leading-snug">
+                <strong className="text-foreground font-semibold">{t.digital}.</strong> {language === "en" ? "Mandatory: Name, Email and Phone required for access." : "Obligatorio: Nombre, Email y Teléfono para recibir acceso."}
+              </p>
+            </div>
+            <p className="text-[10px] pl-6 text-muted-foreground/80 italic">
+              {language === "en" ? "Immediate access via email after payment." : "Recibirás el acceso inmediato por correo tras el pago."}
             </p>
           </div>
         )}

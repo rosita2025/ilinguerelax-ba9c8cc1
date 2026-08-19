@@ -51,7 +51,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
     shippingLocal, 
     totalLocal, 
     currency 
-  } = require("@/hooks/useCheckoutTotal").useCheckoutTotal(
+  } = useCheckoutTotal(
     items, 
     couponPercent, 
     region.tier, 
@@ -59,6 +59,11 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
     shippingCostUSD, 
     overridesFor
   );
+
+  const totals = useMemo(() => calcTotals(items, couponPercent, region.tier), [items, couponPercent, region.tier]);
+  const { subtotal, discount, total } = totals;
+  const shipping = items.some((i) => i.isPhysical) ? (subtotal >= 50 ? 0 : shippingCostUSD) : 0;
+  const grandTotal = total + shipping;
 
   const penTotals = calcTotalsPen(items, couponPercent, country);
   const isGlobalGateway = selectedMethod && (
@@ -76,8 +81,9 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
   const showLocalRef = currency !== "USD";
 
   const localTotalLabel = formatLocalDirect(totalLocal, country);
-  const currentUsdRef = totalLocal / (require("@/i18n").exchangeRates[currency] || 1);
-  const breakdown = useCurrencyBreakdown(totalLocal / (require("@/i18n").exchangeRates[currency] || 1), null, items[0]?.localUsdPrices);
+  const currentUsdRef = totalLocal / (exchangeRates[currency] || 1);
+  const breakdown = useCurrencyBreakdown(totalLocal / (exchangeRates[currency] || 1), null, items[0]?.localUsdPrices);
+
 
 
 

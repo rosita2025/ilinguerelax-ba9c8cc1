@@ -129,7 +129,7 @@ const BonusPreviewDialog = ({ triggerLabel = "See sample", title, subtitle, chil
 );
 
 const ProductSpanish5000 = () => {
-  const { formatPrice, currency } = useI18n();
+  const { formatPrice, currency, countryCode } = useI18n();
   const PRODUCT_SKU = "5-000-spanish-words-with-english-pronunciation-physical";
   const productPricing = useAdminPricing(PRODUCT_SKU);
   const [activeImage, setActiveImage] = useState<string>("");
@@ -144,15 +144,18 @@ const ProductSpanish5000 = () => {
   // Configuración de precios dinámica basada en SKU
   const campaign = useMemo(() => {
     // Determine target tier for calculation
-    const isPen = currency === "PEN";
-    const isLatam = ["MXN", "COP", "ARS", "CLP", "BRL", "CRC", "DOP", "GTQ", "HNL", "NIO", "PYG", "UYU", "VES"].includes(currency);
-    const isEurope = ["EUR", "GBP", "CHF", "SEK", "NOK", "DKK", "PLN", "CZK"].includes(currency);
-    const isOceania = ["AUD", "NZD"].includes(currency);
+    const isPen = currency === "PEN" || countryCode === "PE";
+    const isLatam = ["MXN", "COP", "ARS", "CLP", "BRL", "CRC", "DOP", "GTQ", "HNL", "NIO", "PYG", "UYU", "VES"].includes(currency) || 
+                  ["MX", "CO", "AR", "CL", "BR", "EC", "BO", "PY", "UY", "CR", "PA", "GT", "HN", "SV", "DO", "PR"].includes(countryCode);
+    const isEurope = ["EUR", "GBP", "CHF", "SEK", "NOK", "DKK", "PLN", "CZK"].includes(currency) ||
+                    ["ES", "FR", "DE", "IT", "PT", "GB", "NL", "BE", "AT", "IE", "FI", "GR", "LU", "SK", "SI", "EE", "LV", "LT", "MT", "CY", "HR"].includes(countryCode);
+    const isOceania = ["AUD", "NZD"].includes(currency) || ["AU", "NZ"].includes(countryCode);
 
     // Get regional base price from admin
     let basePrice = productPricing.priceGlobalUsd || 44;
+    
+    // PEN special case
     if (isPen && productPricing.pricePen) {
-      // PEN special case
       return {
         price: formatPrice(44, { PEN: productPricing.pricePen }),
         originalPrice: formatPrice(59, { PEN: productPricing.compareAtPricePen || productPricing.pricePen * 1.35 }),
@@ -174,7 +177,7 @@ const ProductSpanish5000 = () => {
       currency: currency as any,
       discountPercentage: Math.round((1 - basePrice / comparePrice) * 100)
     };
-  }, [formatPrice, productPricing, currency]);
+  }, [formatPrice, productPricing, currency, countryCode]);
 
   // Meta Pixel ViewContent event - using Hotmart pixel only
   const pixelParams = useMemo(() => ({

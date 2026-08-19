@@ -682,7 +682,7 @@ const ProductSpanish5000Digital = () => {
         price={tier.priceLabel}
         originalPrice={tier.isOnSale ? (tier.originalLabel || undefined) : undefined}
         currencyCode={tier.currencyCode}
-        flag={flag}
+        flag={pricingReady ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
         usdValue={currentPrice}
         localUsdPrices={pricing.localUsdPrices}
         buyUrl={undefined}

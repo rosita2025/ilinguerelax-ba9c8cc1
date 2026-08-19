@@ -782,7 +782,9 @@ export default function Checkout() {
               {t.verifiedReviewNotice}
             </p>
           </div>
-          <BuyerInfoForm />
+          <SectionErrorBoundary name="buyer-info">
+            <BuyerInfoForm />
+          </SectionErrorBoundary>
 
           {catalogItem?.upsells?.length ? (
             <SectionErrorBoundary name="upsell-panel" extra={{ slug: catalogItem?.id }}>
@@ -790,9 +792,13 @@ export default function Checkout() {
             </SectionErrorBoundary>
           ) : null}
 
-          <PaymentMethodsGroup parentSku={catalogItem?.adminSku ?? catalogItem?.id ?? slug ?? null} />
+          <SectionErrorBoundary name="payment-methods">
+            <PaymentMethodsGroup parentSku={catalogItem?.adminSku ?? catalogItem?.id ?? slug ?? null} />
+          </SectionErrorBoundary>
 
-          <CheckoutTestimonials />
+          <SectionErrorBoundary name="checkout-testimonials">
+            <CheckoutTestimonials />
+          </SectionErrorBoundary>
 
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">

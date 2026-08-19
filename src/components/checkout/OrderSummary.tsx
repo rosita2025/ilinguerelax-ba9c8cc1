@@ -129,11 +129,19 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
           </span>
           <span className="text-right flex flex-col items-end">
             <span className="text-base font-bold leading-tight">
-              {penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel}
+              {region.loading ? (
+                <Skeleton className="h-5 w-20" />
+              ) : (
+                penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel
+              )}
             </span>
             {showLocalRef && !breakdown.isUsd && (
-              <span className="text-[10px] font-normal text-muted-foreground leading-none">
-                  ≈ USD ${currentUsdRef.toFixed(2)}
+              <span className="text-[10px] font-normal text-muted-foreground leading-none mt-1">
+                {region.loading ? (
+                  <Skeleton className="h-3 w-16" />
+                ) : (
+                  <>≈ USD ${currentUsdRef.toFixed(2)}</>
+                )}
               </span>
             )}
           </span>

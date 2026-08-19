@@ -38,11 +38,11 @@ export const ScrollToTop = ({ showAfter = 400 }: ScrollToTopProps) => {
           exit={{ opacity: 0, scale: 0.8, y: 20 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
           onClick={scrollToTop}
-          className="fixed left-4 z-[60] w-14 h-14 rounded-full bg-primary shadow-xl ring-2 ring-background hover:bg-primary/90 transition-colors flex items-center justify-center group touch-manipulation"
+          className="fixed right-4 z-40 w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-primary shadow-xl ring-2 ring-background hover:bg-primary/90 transition-colors flex items-center justify-center group touch-manipulation"
           style={{
             // Stay clear of the sticky buy bar and the WhatsApp button on the right,
             // stacking above whatever height the bar currently has.
-            bottom: "calc(var(--sticky-bar-h, 0px) + 112px + env(safe-area-inset-bottom, 0px))",
+            bottom: "calc(var(--sticky-bar-h, 0px) + 96px + env(safe-area-inset-bottom, 0px))",
           }}
           aria-label="Scroll to top"
         >

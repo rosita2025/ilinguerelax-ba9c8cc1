@@ -456,6 +456,9 @@ const ProductSpanish5000Digital = () => {
             </div>
           </div>
       </section>
+      
+      {/* Real Student Reviews & Screenshots Slider */}
+      <CustomerReviewsSlider />
 
       {/* Look Inside */}
       <section className="py-12 md:py-20 bg-muted/30 overflow-hidden">

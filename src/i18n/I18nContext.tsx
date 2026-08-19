@@ -81,7 +81,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       : (savedCurrency || "USD");
   const [language, setLanguageState] = useState<Language>(initialLang);
   const [currency, setCurrencyState] = useState<Currency>(initialCurrency);
-  const [countryCode, setCountryCode] = useState<string>(subCountry || savedCountry || "US");
+  const [countryCode, setCountryCodeState] = useState<string>(subCountry || savedCountry || "US");
 
   // Detect country in background WITHOUT blocking render
   useEffect(() => {

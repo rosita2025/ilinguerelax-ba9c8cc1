@@ -190,7 +190,7 @@ export function PayPalButtons({
               }
               onApproved(data.orderID);
             } catch (e) {
-              setErr((e as Error).message);
+              setErr((e as any)?.message || String(e));
               onError?.(e);
             } finally {
               setProcessing(null);

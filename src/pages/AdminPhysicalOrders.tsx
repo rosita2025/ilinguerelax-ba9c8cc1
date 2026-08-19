@@ -183,7 +183,7 @@ const AdminPhysicalOrders = () => {
       const ok = window.confirm(
         `Se enviará el correo de seguimiento a ${order.email || "(sin correo)"}\n\n` +
           `Pedido: ${order.order_ref || order.id}\n` +
-          `Cliente: ${order.customer_name || "(sin nombre)"}\n` +
+          `Cliente: ${order.customer || "(sin nombre)"}\n` +
           `Transportista: ${provider}\n` +
           `Tracking: ${trackingCode}\n\n¿Confirmas el envío?`,
       );

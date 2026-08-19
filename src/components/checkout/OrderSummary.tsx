@@ -314,7 +314,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <span>{t.shipping}</span>
             <span>
               {items.some(i => i.isPhysical) 
-                ? (shipping === 0 ? t.freeShipping : formatCurrencyAmount(shipping, "USD"))
+                ? (shippingLocal === 0 ? t.freeShipping : formatLocalDirect(shippingLocal, country))
                 : t.freeDigitalDelivery
               }
             </span>

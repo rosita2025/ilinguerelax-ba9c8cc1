@@ -38,20 +38,28 @@ export const useCheckoutTotal = (
     });
 
     const discountLocal = (subtotalLocal * Math.max(0, Math.min(100, couponPercent || 0))) / 100;
-    const shippingLocal = items.some(i => i.isPhysical) 
-      ? (subtotalUSD >= 50 ? 0 : shippingCostUSD * rate) 
+    
+    // El envío es gratis si el subtotal USD >= 50
+    const shippingUsd = items.some(i => i.isPhysical) 
+      ? (subtotalUSD >= 50 ? 0 : shippingCostUSD) 
       : 0;
-
+    
+    const shippingLocal = shippingUsd * rate;
     const totalLocal = Math.max(0, subtotalLocal - discountLocal + shippingLocal);
+
+    // Referencia USD real del total (para Gateways que no soportan moneda local)
+    const totalUsd = totalLocal / rate;
 
     return {
       subtotalLocal,
       discountLocal,
       shippingLocal,
       totalLocal,
+      totalUsd,
       currency
     };
   }, [items, couponPercent, tier, country, shippingCostUSD, resolver, currency, rate]);
 
   return totals;
 };
+

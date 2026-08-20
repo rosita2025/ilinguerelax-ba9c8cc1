@@ -151,7 +151,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
 
       <div
         className={cn(
-          "p-5 space-y-4",
+          "p-4 lg:p-5 space-y-3",
           collapsible && !expanded && "hidden lg:block",
           collapsible && expanded && "lg:max-h-none max-h-[calc(100vh-160px)] overflow-y-auto",
         )}
@@ -163,7 +163,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
         </h2>
 
         {items.some(i => i.isPhysical) ? (
-          <div className="flex flex-col gap-2 rounded-xl border border-destructive/25 bg-destructive/5 px-3 py-2.5 mb-2 ring-1 ring-destructive/20">
+          <div className="flex flex-col gap-1.5 rounded-xl border border-destructive/25 bg-destructive/5 px-3 py-2 mb-1 ring-1 ring-destructive/10">
             <div className="flex gap-2.5 items-start">
               <Truck className="w-4 h-4 text-destructive shrink-0 mt-0.5" aria-hidden="true" />
               <p className="text-xs text-destructive font-medium leading-snug">
@@ -185,7 +185,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-2 rounded-xl border border-primary/25 bg-primary/5 px-3 py-2.5 mb-2">
+          <div className="flex flex-col gap-1.5 rounded-xl border border-primary/25 bg-primary/5 px-3 py-2 mb-1">
             <div className="flex gap-2.5 items-start">
               <Zap className="w-4 h-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
               <p className="text-xs text-muted-foreground leading-snug">

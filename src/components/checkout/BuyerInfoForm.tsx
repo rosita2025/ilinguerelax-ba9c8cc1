@@ -175,7 +175,7 @@ export function BuyerInfoForm() {
       id={BUYER_FORM_ID}
       ref={containerRef}
       className={cn(
-        "rounded-xl border bg-background p-4 sm:p-5 space-y-3 transition-all",
+        "rounded-xl border bg-background p-3 sm:p-4 space-y-2 transition-all shadow-sm",
         showErrors && !valid && "border-destructive/60 ring-2 ring-destructive/20",
         shake && "animate-[shake_0.5s_ease-in-out]",
       )}
@@ -201,7 +201,7 @@ export function BuyerInfoForm() {
         ) : null}
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         <label className="block">
           <span className="text-xs font-medium text-muted-foreground">{t.fullName}</span>
           <div className="relative mt-1">
@@ -220,7 +220,7 @@ export function BuyerInfoForm() {
               placeholder={t.fullNamePlaceholder}
               aria-invalid={showNameError}
               className={cn(
-                "w-full pl-9 pr-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2",
+                "w-full pl-9 pr-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2",
                 showNameError
                   ? "border-destructive focus:ring-destructive/40"
                   : "focus:ring-primary/40",
@@ -255,7 +255,7 @@ export function BuyerInfoForm() {
               placeholder={t.emailPlaceholder}
               aria-invalid={showEmailError}
               className={cn(
-                "w-full pl-9 pr-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2",
+                "w-full pl-9 pr-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2",
                 showEmailError
                   ? "border-destructive focus:ring-destructive/40"
                   : "focus:ring-primary/40",
@@ -285,7 +285,7 @@ export function BuyerInfoForm() {
               onBlur={() => updateGlobalBuyer({ phone: localPhone })}
               placeholder="999 999 999"
               className={cn(
-                "w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus-within:ring-2 transition-all",
+                "w-full px-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus-within:ring-2 transition-all",
                 showPhoneError 
                   ? "border-destructive focus-within:ring-destructive/40" 
                   : "focus-within:ring-primary/40"
@@ -320,7 +320,7 @@ export function BuyerInfoForm() {
                   onBlur={() => updateGlobalBuyer({ address: localAddress })}
                   placeholder={t.addressPlaceholder}
                   className={cn(
-                    "w-full pl-9 pr-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2",
+                    "w-full pl-9 pr-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2",
                     showErrors && addressInvalid
                       ? "border-destructive focus:ring-destructive/40"
                       : "focus:ring-primary/40",
@@ -340,7 +340,7 @@ export function BuyerInfoForm() {
                   onChange={(e) => setLocalCity(e.target.value)}
                   onBlur={() => updateGlobalBuyer({ city: localCity })}
                   className={cn(
-                    "w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 mt-1",
+                    "w-full px-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2 mt-1",
                     showErrors && cityInvalid
                       ? "border-destructive focus:ring-destructive/40"
                       : "focus:ring-primary/40",
@@ -357,7 +357,7 @@ export function BuyerInfoForm() {
                   onChange={(e) => setLocalZip(e.target.value)}
                   onBlur={() => updateGlobalBuyer({ zip: localZip })}
                   className={cn(
-                    "w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 mt-1",
+                    "w-full px-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2 mt-1",
                     showErrors && zipInvalid
                       ? "border-destructive focus:ring-destructive/40"
                       : "focus:ring-primary/40",
@@ -374,7 +374,7 @@ export function BuyerInfoForm() {
                   value={localState}
                   onChange={(e) => setLocalState(e.target.value)}
                   onBlur={() => updateGlobalBuyer({ state: localState })}
-                  className="w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 mt-1"
+                  className="w-full px-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 mt-1"
                 />
               </label>
               <label className="block">
@@ -387,7 +387,7 @@ export function BuyerInfoForm() {
                     onChange={(e) => setLocalCountry(e.target.value)}
                     onBlur={() => updateGlobalBuyer({ country: localCountry })}
                     className={cn(
-                      "w-full pl-9 pr-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 appearance-none",
+                      "w-full pl-9 pr-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2 appearance-none",
                       showErrors && countryInvalid
                         ? "border-destructive focus:ring-destructive/40"
                         : "focus:ring-primary/40",

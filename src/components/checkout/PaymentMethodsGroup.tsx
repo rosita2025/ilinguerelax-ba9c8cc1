@@ -71,7 +71,7 @@ function LogoBadge({ src, alt, bg = "#ffffff" }: { src: string; alt: string; bg?
       className="inline-flex items-center justify-center h-4 w-7 rounded border border-neutral-200 dark:border-neutral-700 shrink-0"
       style={{ background: bg }}
     >
-      <img src={src} alt={alt} className="max-h-2.5 max-w-[20px] object-contain grayscale opacity-60" />
+      <img src={src} alt={alt} className="max-h-2.5 max-w-[20px] object-contain" />
     </span>
   );
 }
@@ -83,7 +83,7 @@ function GooglePayBadge() {
       role="img"
       aria-label="Google Pay"
     >
-      <span className="text-[8px] font-bold leading-none tracking-tight opacity-60 grayscale" aria-hidden="true">
+      <span className="text-[8px] font-bold leading-none tracking-tight text-blue-600" aria-hidden="true">
         GPay
       </span>
     </span>
@@ -107,7 +107,7 @@ function LinkBadge() {
 function BankBadge({ label, bg }: { label: string; bg: string; color?: string }) {
   return (
     <span className="inline-flex items-center gap-1 h-4 px-1 rounded border border-neutral-200 bg-neutral-50/50 text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-neutral-400 text-[8px] font-medium tracking-tight leading-none shrink-0">
-      <span className="w-1 h-1 rounded-full shrink-0 opacity-60" style={{ background: bg }} aria-hidden="true" />
+      <span className="w-1 h-1 rounded-full shrink-0" style={{ background: bg }} aria-hidden="true" />
       {label}
     </span>
   );

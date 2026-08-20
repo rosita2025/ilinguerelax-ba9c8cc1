@@ -154,8 +154,9 @@ const ProductDynamic = () => {
           : Number(product.price_usd || 0))
     : 0;
   
-  const localPrices = product ? (product as any).local_prices : null;
-  const localUsdPrices = product ? (product as any).local_usd_prices : null;
+  const localPrices = product ? product.local_prices : null;
+  const localUsdPrices = product ? product.local_usd_prices : null;
+
   const local = useLocalCurrency(effectiveUsd, localPrices, localUsdPrices);
 
   const vcFiredRef = useRef<string | null>(null);

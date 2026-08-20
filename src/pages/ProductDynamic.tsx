@@ -503,7 +503,7 @@ const ProductDynamic = () => {
           </section>
 
           {/* Look Inside Gallery */}
-          <section className="mt-6 py-4 bg-slate-900 rounded-[1.5rem] text-white overflow-hidden">
+          <section className="mt-4 py-3 bg-slate-900 rounded-[1.5rem] text-white overflow-hidden">
             <div className="px-4 md:px-8">
               <div className="text-center mb-6">
                 <h2 className="text-2xl md:text-3xl font-black mb-2 uppercase tracking-tight">Look Inside</h2>

@@ -231,10 +231,9 @@ const ProductDynamic = () => {
   const features = [
     `${product.name} + Pronunciation`,
     "Digital PDF Version",
-    "Complete Grammar Guide",
-    "Essential Verbs + English Pronunciation",
-    "Practice Questions + English Pronunciation",
+    "Study Planner (6 Months Layout)",
     "Digital Flashcards (Anki/Quizlet)",
+    "Spanish Proficiency Exam Pack",
     "Instant PDF download · Secure Payment",
     "7-Day Money-Back Guarantee"
   ];
@@ -249,11 +248,11 @@ const ProductDynamic = () => {
   const previewAssets = [
     { title: "Vocabulary", image: previewSpanishVocab },
     { title: "Grammar Guide", image: grammarPreviewAsset.url },
-    { title: "Daily Planner", image: plannerPreviewAsset.url },
-    { title: "Practice Exam", image: examPreviewAsset.url },
-    { title: "Essential Verbs", image: verbsV2PreviewAsset.url },
-    { title: "Questions", image: questionsPreviewAsset.url }
+    { title: "Study Planner (6 Months)", image: plannerPreviewAsset.url },
+    { title: "Spanish Exam Pack", image: examPreviewAsset.url },
+    { title: "Digital Flashcards", image: previewSpanishPhrases }
   ];
+
 
   const handleBuy = () => {
     trackHotmartEvent("InitiateCheckout", {

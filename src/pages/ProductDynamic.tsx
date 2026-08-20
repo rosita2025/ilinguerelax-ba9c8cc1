@@ -420,7 +420,7 @@ const ProductDynamic = () => {
 
               </p>
 
-              <div className="p-4 rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+              <div className="p-3 rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
                 <div className="flex items-end gap-2 mb-1">
                   <span className="text-3xl md:text-4xl font-black text-foreground">{displayFormatted}</span>
                   {discountPercentage > 0 && (

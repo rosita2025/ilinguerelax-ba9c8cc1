@@ -231,10 +231,9 @@ const ProductDynamic = () => {
   const features = [
     `${product.name} + Pronunciation`,
     "Digital PDF Version",
-    "Complete Grammar Guide",
-    "Essential Verbs + English Pronunciation",
-    "Practice Questions + English Pronunciation",
+    "Study Planner (6 Months Layout)",
     "Digital Flashcards (Anki/Quizlet)",
+    "Spanish Proficiency Exam Pack",
     "Instant PDF download · Secure Payment",
     "7-Day Money-Back Guarantee"
   ];
@@ -249,11 +248,18 @@ const ProductDynamic = () => {
   const previewAssets = [
     { title: "Vocabulary", image: previewSpanishVocab },
     { title: "Grammar Guide", image: grammarPreviewAsset.url },
-    { title: "Daily Planner", image: plannerPreviewAsset.url },
-    { title: "Practice Exam", image: examPreviewAsset.url },
-    { title: "Essential Verbs", image: verbsV2PreviewAsset.url },
-    { title: "Questions", image: questionsPreviewAsset.url }
-  ];
+    { title: "Study Planner (6 Months)", image: plannerPreviewAsset.url },
+    { title: "Spanish Exam Pack", image: examPreviewAsset.url },
+    { title: "Digital Flashcards", image: previewSpanishPhrases }
+  ].filter(asset => {
+    if (product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7") {
+      // For this specific product, only show the relevant assets mentioned by user
+      return ["Study Planner (6 Months)", "Spanish Exam Pack", "Digital Flashcards"].includes(asset.title);
+    }
+    return true;
+  });
+
+
 
   const handleBuy = () => {
     trackHotmartEvent("InitiateCheckout", {
@@ -377,7 +383,10 @@ const ProductDynamic = () => {
               </h1>
 
               <p className="text-lg text-muted-foreground leading-relaxed">
-                {product.description?.split('\n')[0] || "Master your target language with our professional PDF guide."}
+                {product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" 
+                  ? "Reach C1 fluency faster with our professional 5,000 words guide, 6-month study planner, and proficiency exams."
+                  : product.description?.split('\n')[0] || "Master your target language with our professional PDF guide."}
+
               </p>
 
               <div className="p-6 rounded-3xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
@@ -496,7 +505,7 @@ const ProductDynamic = () => {
             </div>
           </section>
           
-          {product.sku === "coreano-100-mapas-mentales" && <ResenasWhatsAppCoreano />}
+          {(product.sku === "coreano-100-mapas-mentales" || product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7") && <ResenasWhatsAppCoreano />}
 
           <Suspense fallback={<Skeleton className="h-96 w-full" />}>
             <LooxStyleReviews />
@@ -531,7 +540,13 @@ const ProductDynamic = () => {
         onBuyClick={handleBuy}
         usdValue={effectiveUsd}
         localUsdPrices={product.local_usd_prices}
+        testimonials={product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" ? [
+          "Sarah, USA: Exactly what I needed to stop translating in my head!",
+          "James, UK: The 6-month study planner is a game changer for me.",
+          "Elena, Canada: Clear pronunciation and very visual. Highly recommend."
+        ] : undefined}
       />
+
 
     </div>
   );

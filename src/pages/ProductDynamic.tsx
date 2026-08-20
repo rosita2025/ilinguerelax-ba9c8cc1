@@ -347,15 +347,15 @@ const ProductDynamic = () => {
       <main className="pt-0 pb-2">
         <div className="container px-4 sm:px-6">
           {/* Trust Pilot Badge */}
-          <div className="flex justify-center mb-2">
+          <div className="flex justify-center mb-1">
             <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-emerald-200 shadow-sm">
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-2.5 h-2.5 fill-emerald-500 text-emerald-500" strokeWidth={0} />
+                  <Star key={i} className="w-2 h-2 fill-emerald-500 text-emerald-500" strokeWidth={0} />
                 ))}
               </div>
-              <span className="text-[10px] font-bold text-slate-800">Excellent</span>
-              <span className="text-[10px] font-bold text-emerald-600">★ Trustpilot</span>
+              <span className="text-[9px] font-bold text-slate-800">Excellent</span>
+              <span className="text-[9px] font-bold text-emerald-600">★ Trustpilot</span>
             </div>
           </div>
 
@@ -399,14 +399,14 @@ const ProductDynamic = () => {
             </div>
 
             {/* Right Column: Copy & Pricing */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-emerald-500 text-emerald-500" />
+                    <Star key={i} className="w-3 h-3 fill-emerald-500 text-emerald-500" />
                   ))}
                 </div>
-                <span className="text-xs font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ reviews)</span>
+                <span className="text-[10px] font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ reviews)</span>
               </div>
 
               <h1 className="text-2xl md:text-4xl font-black leading-tight text-slate-900 tracking-tight">

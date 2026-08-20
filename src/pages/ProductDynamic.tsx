@@ -562,7 +562,7 @@ const ProductDynamic = () => {
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <Package className="w-32 h-32 -mr-8 -mt-8" />
                 </div>
-                <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left relative z-10">
+                <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left relative z-10">
                   <div className="w-16 h-16 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0 border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
                     <BookOpen className="w-10 h-10 text-emerald-400" />
                   </div>

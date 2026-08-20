@@ -572,7 +572,12 @@ const ProductDynamic = () => {
             <FAQ 
               title="FAQ" 
               subtitle="Quick Answers" 
-              items={[
+              items={product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" ? [
+                { question: "Delivery time?", answer: "Sent to your email within 5 minutes of purchase.", icon: Download },
+                { question: "What is the format?", answer: "High-quality Digital PDF (Official iLingue Relax Brand).", icon: FileText },
+                { question: "Payment methods?", answer: "Secure payments via Stripe, Credit/Debit Cards, and PayPal.", icon: CreditCard },
+                { question: "7-Day Guarantee?", answer: "Yes. (Note: A 50% partial refund applies if digital content has already been downloaded).", icon: Shield }
+              ] : [
                 { question: "Delivery?", answer: "Immediate via email.", icon: Download },
                 { question: "Format?", answer: "Digital PDF.", icon: FileText },
                 { question: "Guarantee?", answer: "7-day money-back.", icon: Shield }

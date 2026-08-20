@@ -376,7 +376,10 @@ const ProductDynamic = () => {
               </h1>
 
               <p className="text-lg text-muted-foreground leading-relaxed">
-                {product.description?.split('\n')[0] || "Master your target language with our professional PDF guide."}
+                {product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" 
+                  ? "Reach C1 fluency faster with our professional 5,000 words guide, 6-month study planner, and proficiency exams."
+                  : product.description?.split('\n')[0] || "Master your target language with our professional PDF guide."}
+
               </p>
 
               <div className="p-6 rounded-3xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">

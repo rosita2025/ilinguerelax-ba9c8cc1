@@ -455,7 +455,7 @@ const ProductDynamic = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
                   <Globe className="w-5 h-5 text-emerald-600" />
                   <div>

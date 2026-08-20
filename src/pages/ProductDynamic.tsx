@@ -344,8 +344,8 @@ const ProductDynamic = () => {
       
       <Navbar />
 
-      <main className="pt-1 pb-4">
-        <div className="container px-4 sm:px-4">
+      <main className="pt-0 pb-2">
+        <div className="container px-4 sm:px-6">
           {/* Trust Pilot Badge */}
           <div className="flex justify-center mb-2">
             <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-emerald-200 shadow-sm">

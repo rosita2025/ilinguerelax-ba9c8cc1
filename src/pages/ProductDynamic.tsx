@@ -328,24 +328,24 @@ const ProductDynamic = () => {
       
       <Navbar />
 
-      <main className="pt-2 pb-10">
-        <div className="container px-4 sm:px-6">
+      <main className="pt-1 pb-4">
+        <div className="container px-4 sm:px-4">
           {/* Trust Pilot Badge */}
-          <div className="flex justify-center mb-3">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white border border-emerald-200 shadow-sm">
+          <div className="flex justify-center mb-2">
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-emerald-200 shadow-sm">
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3 h-3 fill-emerald-500 text-emerald-500" strokeWidth={0} />
+                  <Star key={i} className="w-2.5 h-2.5 fill-emerald-500 text-emerald-500" strokeWidth={0} />
                 ))}
               </div>
-              <span className="text-xs font-bold text-slate-800">Excellent</span>
-              <span className="text-xs font-bold text-emerald-600">★ Trustpilot</span>
+              <span className="text-[10px] font-bold text-slate-800">Excellent</span>
+              <span className="text-[10px] font-bold text-emerald-600">★ Trustpilot</span>
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8 items-start">
+          <div className="grid lg:grid-cols-2 gap-4 items-start">
             {/* Left Column: Image Gallery */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="relative group bg-card border border-border rounded-3xl overflow-hidden shadow-hero">
                 <img
                   src={activeImage}
@@ -383,36 +383,36 @@ const ProductDynamic = () => {
             </div>
 
             {/* Right Column: Copy & Pricing */}
-            <div className="space-y-6">
+            <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-emerald-500 text-emerald-500" />
                   ))}
                 </div>
-                <span className="text-sm font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ reviews)</span>
+                <span className="text-xs font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ reviews)</span>
               </div>
 
-              <h1 className="text-3xl md:text-5xl font-black leading-tight text-slate-900">
+              <h1 className="text-2xl md:text-4xl font-black leading-tight text-slate-900 tracking-tight">
                 {product.name}
               </h1>
 
-              <p className="text-lg text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-snug">
                 {product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" 
                   ? "Reach C1 fluency faster with our professional 5,000 words guide, 6-month study planner, and proficiency exams."
                   : product.description?.split('\n')[0] || "Master your target language with our professional PDF guide."}
 
               </p>
 
-              <div className="p-6 rounded-3xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
-                <div className="flex items-end gap-3 mb-1">
-                  <span className="text-4xl md:text-5xl font-black text-foreground">{displayFormatted}</span>
+              <div className="p-4 rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+                <div className="flex items-end gap-2 mb-1">
+                  <span className="text-3xl md:text-4xl font-black text-foreground">{displayFormatted}</span>
                   {discountPercentage > 0 && (
                     <span className="text-xl text-muted-foreground line-through opacity-70 mb-1">{originalFormatted}</span>
                   )}
                 </div>
                 {discountPercentage > 0 && (
-                  <div className="inline-block px-2.5 py-1 rounded-full bg-red-500 text-white text-xs font-black mb-4">
+                  <div className="inline-block px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-black mb-3">
                     SAVE {discountPercentage}%
                   </div>
                 )}
@@ -420,7 +420,7 @@ const ProductDynamic = () => {
                 <Button 
                   onClick={handleBuy}
                   size="lg" 
-                  className="w-full h-16 text-xl font-black shadow-hero bg-emerald-600 hover:bg-emerald-700 text-white mb-4"
+                  className="w-full h-14 text-lg font-black shadow-hero bg-emerald-600 hover:bg-emerald-700 text-white mb-3"
                 >
                   GET IT NOW — {displayFormatted}
                 </Button>
@@ -433,25 +433,25 @@ const ProductDynamic = () => {
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" className="h-4" alt="" />
                     <PaymentLogos />
                   </div>
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500">
-                    <Shield className="w-3 h-3" /> SECURE CHECKOUT
+                  <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500">
+                    <Shield className="w-2.5 h-2.5" /> SECURE CHECKOUT
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                  <Globe className="w-6 h-6 text-emerald-600" />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <Globe className="w-5 h-5 text-emerald-600" />
                   <div>
-                    <div className="text-[10px] font-black uppercase text-slate-400">Availability</div>
-                    <div className="text-xs font-bold text-slate-700">Global Access</div>
+                    <div className="text-[9px] font-black uppercase text-slate-400">Availability</div>
+                    <div className="text-[11px] font-bold text-slate-700">Global Access</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                  <Smartphone className="w-6 h-6 text-emerald-600" />
+                <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <Smartphone className="w-5 h-5 text-emerald-600" />
                   <div>
-                    <div className="text-[10px] font-black uppercase text-slate-400">Format</div>
-                    <div className="text-xs font-bold text-slate-700">Digital PDF</div>
+                    <div className="text-[9px] font-black uppercase text-slate-400">Format</div>
+                    <div className="text-[11px] font-bold text-slate-700">Digital PDF</div>
                   </div>
                 </div>
               </div>
@@ -459,27 +459,27 @@ const ProductDynamic = () => {
           </div>
 
           {/* Features Section */}
-          <section className="mt-12 py-8 border-t border-slate-100">
-            <div className="grid lg:grid-cols-2 gap-16">
+          <section className="mt-6 py-4 border-t border-slate-100">
+            <div className="grid lg:grid-cols-2 gap-6">
               <div>
-                <h2 className="text-3xl md:text-4xl font-black mb-8">What's Inside the System</h2>
-                <div className="grid gap-4">
+                <h2 className="text-xl md:text-2xl font-black mb-4 uppercase tracking-tight">What's Inside</h2>
+                <div className="grid gap-2">
                   {features.map((f, i) => (
-                    <div key={i} className="flex items-start gap-3 p-4 rounded-2xl bg-white border border-slate-100 shadow-sm">
-                      <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                        <Check className="w-4 h-4 text-emerald-600" />
+                    <div key={i} className="flex items-start gap-2 p-2.5 rounded-xl bg-white border border-slate-100 shadow-sm">
+                      <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                        <Check className="w-3 h-3 text-emerald-600" />
                       </div>
-                      <span className="font-bold text-slate-700">{f}</span>
+                      <span className="text-xs font-bold text-slate-700">{f}</span>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="grid sm:grid-cols-2 gap-6">
+              <div className="grid sm:grid-cols-2 gap-3">
                 {benefits.map((b, i) => (
-                  <div key={i} className="p-6 rounded-3xl bg-slate-50 border border-slate-100">
-                    <b.icon className="w-8 h-8 text-primary mb-4" />
-                    <h3 className="font-black text-slate-900 mb-2">{b.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{b.description}</p>
+                  <div key={i} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                    <b.icon className="w-6 h-6 text-primary mb-2" />
+                    <h3 className="font-black text-slate-900 text-sm mb-1 uppercase tracking-tight">{b.title}</h3>
+                    <p className="text-[11px] text-muted-foreground leading-tight">{b.description}</p>
                   </div>
                 ))}
               </div>
@@ -487,18 +487,18 @@ const ProductDynamic = () => {
           </section>
 
           {/* Look Inside Gallery */}
-          <section className="mt-12 py-8 bg-slate-900 rounded-[3rem] text-white overflow-hidden">
-            <div className="px-6 md:px-12">
-              <div className="text-center mb-8">
-                <h2 className="text-4xl md:text-6xl font-black mb-4">Look Inside the PDF</h2>
-                <p className="text-slate-400 text-lg max-w-2xl mx-auto">See why thousands of students trust iLingue Relax to reach fluency faster.</p>
+          <section className="mt-6 py-4 bg-slate-900 rounded-[1.5rem] text-white overflow-hidden">
+            <div className="px-4 md:px-8">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl md:text-3xl font-black mb-2 uppercase tracking-tight">Look Inside</h2>
+                <p className="text-slate-400 text-xs max-w-2xl mx-auto">Visual guides to reach fluency faster.</p>
               </div>
               
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                 {previewAssets.map((asset, i) => (
                   <Dialog key={i}>
                     <DialogTrigger asChild>
-                      <button className="group relative aspect-[3/4] sm:aspect-[3/4] rounded-2xl overflow-hidden bg-slate-800 border border-white/10 transition-all hover:scale-[1.02] shadow-2xl">
+                      <button className="group relative aspect-[3/4] sm:aspect-[3/4] rounded-xl overflow-hidden bg-slate-800 border border-white/10 transition-all hover:scale-[1.02] shadow-2xl">
                         <img 
                           src={asset.image} 
                           className="w-full h-full object-contain sm:object-cover bg-white/5" 
@@ -529,7 +529,7 @@ const ProductDynamic = () => {
           </section>
           
           {(product.sku === "coreano-100-mapas-mentales" || product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7") && (
-            <div className="mb-16">
+            <div className="mb-4">
               <ResenasWhatsAppCoreano />
             </div>
           )}
@@ -539,24 +539,24 @@ const ProductDynamic = () => {
           </Suspense>
 
           {product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" && (
-            <div className="max-w-4xl mx-auto px-4 mb-20">
-              <div className="p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden relative group">
+            <div className="max-w-4xl mx-auto px-4 mb-8">
+              <div className="p-4 md:p-6 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden relative group">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <Package className="w-32 h-32 -mr-8 -mt-8" />
                 </div>
                 <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left relative z-10">
-                  <div className="w-20 h-20 rounded-2xl bg-emerald-500/20 flex items-center justify-center shrink-0 border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                  <div className="w-16 h-16 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0 border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
                     <BookOpen className="w-10 h-10 text-emerald-400" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl md:text-2xl font-black mb-2 text-emerald-400 uppercase tracking-tight">Would you like the physical book?</h3>
-                    <p className="text-slate-400 text-sm md:text-base leading-relaxed">
+                    <h3 className="text-lg md:text-xl font-black mb-1 text-emerald-400 uppercase tracking-tight">Physical Book?</h3>
+                    <p className="text-slate-400 text-xs md:text-sm leading-tight">
                       Get the premium printed edition of the 5,000 Spanish Words book shipped to your door. The perfect companion for your digital study.
                     </p>
                   </div>
                   <Button 
                     asChild
-                    className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black px-8 py-6 rounded-2xl transition-all shadow-[0_8px_25px_rgba(16,185,129,0.3)] hover:scale-105 active:scale-95 h-auto"
+                    className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black px-6 py-4 rounded-xl transition-all shadow-[0_8px_25px_rgba(16,185,129,0.3)] hover:scale-105 active:scale-95 h-auto text-sm"
                   >
                     <Link to="/products/5-000-spanish-words-with-english-pronunciation-physical">
                       GET THE PHYSICAL BOOK
@@ -568,14 +568,14 @@ const ProductDynamic = () => {
           )}
 
 
-          <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+          <Suspense fallback={<Skeleton className="h-48 w-full" />}>
             <FAQ 
-              title="Common Questions" 
-              subtitle={product.name}
+              title="FAQ" 
+              subtitle="Quick Answers" 
               items={[
-                { question: "How do I receive the product?", answer: "Immediately after purchase, you will receive an email with a secure link to download the PDF.", icon: Download },
-                { question: "Is it a physical book?", answer: "This is a digital PDF version optimized for mobile, tablets, and computers.", icon: FileText },
-                { question: "Do you offer a guarantee?", answer: "Yes, we offer a 7-day risk-free money-back guarantee.", icon: Shield }
+                { question: "Delivery?", answer: "Immediate via email.", icon: Download },
+                { question: "Format?", answer: "Digital PDF.", icon: FileText },
+                { question: "Guarantee?", answer: "7-day money-back.", icon: Shield }
               ]}
             />
           </Suspense>

@@ -533,7 +533,13 @@ const ProductDynamic = () => {
         onBuyClick={handleBuy}
         usdValue={effectiveUsd}
         localUsdPrices={product.local_usd_prices}
+        testimonials={product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" ? [
+          "Sarah, USA: Exactly what I needed to stop translating in my head!",
+          "James, UK: The 6-month study planner is a game changer for me.",
+          "Elena, Canada: Clear pronunciation and very visual. Highly recommend."
+        ] : undefined}
       />
+
 
     </div>
   );

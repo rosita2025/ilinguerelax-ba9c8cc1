@@ -558,7 +558,7 @@ const ProductDynamic = () => {
 
           {product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" && (
             <div className="max-w-4xl mx-auto px-4 mb-4">
-              <div className="p-4 md:p-6 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden relative group">
+              <div className="p-3 md:p-4 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden relative group">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <Package className="w-32 h-32 -mr-8 -mt-8" />
                 </div>

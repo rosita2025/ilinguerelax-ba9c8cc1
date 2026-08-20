@@ -475,7 +475,7 @@ const ProductDynamic = () => {
           </div>
 
           {/* Features Section */}
-          <section className="mt-6 py-4 border-t border-slate-100">
+          <section className="mt-4 py-3 border-t border-slate-100">
             <div className="grid lg:grid-cols-2 gap-6">
               <div>
                 <h2 className="text-xl md:text-2xl font-black mb-4 uppercase tracking-tight">What's Inside</h2>

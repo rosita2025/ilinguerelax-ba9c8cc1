@@ -326,26 +326,6 @@
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
-      <g:id>5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7</g:id>
-      <g:title>5000 words spanish relax with english pronunciation - Spanish Relax</g:title>
-      <g:description>Discover 5,000 essential Spanish words explained in simple English with phonetic pronunciation guides. 🚀 Perfect for beginners and intermediate learners who want to: ✅ Build strong vocabulary quickly ✅ Improve pronunciation with easy phonetics ✅ Practice anytime, anywhere (PDF format) ✅ Boost confidence in speaking Spanish This ebook is your all-in-one Spanish vocabulary toolkit. No boring dictionary, no stress — just practical words with clear phonetics to help you speak na</g:description>
-      <g:link>https://ilinguerelax.com/products/5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7</g:link>
-      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7/1787160877504-hsd48.webp</g:image_link>
-      <g:condition>new</g:condition>
-      <g:availability>in stock</g:availability>
-      <g:price>38.00 USD</g:price>
-      <g:brand>iLingue Relax</g:brand>
-      <g:mpn>5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7</g:mpn>
-      <g:identifier_exists>no</g:identifier_exists>
-      <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
-      <g:target_country>US</g:target_country>
-      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Inglés</g:product_type>
-      <g:custom_label_0>Inglés</g:custom_label_0>
-      <g:custom_label_1>Digital</g:custom_label_1>
-    </item>
-    <item>
       <g:id>2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca</g:id>
       <g:title>2,000 Palabras Esenciales para Aprender Coreano | Hangul + Pronunciación para Hispanohablantes</g:title>
       <g:description>Aprende las 2,000 palabras más importantes del idioma coreano con pronunciación adaptada para hispanohablantes, traducción al español y vocabulario organizado por categorías. 🎁 Todas las futuras actualizaciones serán gratuitas para los compradores.</g:description>
@@ -353,7 +333,7 @@
       <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca/1787124640669-p7blc.webp</g:image_link>
       <g:condition>new</g:condition>
       <g:availability>in stock</g:availability>
-      <g:price>13.00 USD</g:price>
+      <g:price>18.99 USD</g:price>
       <g:brand>iLingue Relax</g:brand>
       <g:mpn>2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
@@ -384,6 +364,26 @@
       <g:product_type>Libros &gt; Idiomas &gt; Español</g:product_type>
       <g:custom_label_0>Español</g:custom_label_0>
       <g:custom_label_1>Físico</g:custom_label_1>
+    </item>
+    <item>
+      <g:id>5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7</g:id>
+      <g:title>5000 words spanish relax with english pronunciation - Spanish Relax</g:title>
+      <g:description>Discover 5,000 essential Spanish words explained in simple English with phonetic pronunciation guides. 🚀 Perfect for beginners and intermediate learners who want to: ✅ Build strong vocabulary quickly ✅ Improve pronunciation with easy phonetics ✅ Practice anytime, anywhere (PDF format) ✅ Boost confidence in speaking Spanish This ebook is your all-in-one Spanish vocabulary toolkit. No boring dictionary, no stress — just practical words with clear phonetics to help you speak na</g:description>
+      <g:link>https://ilinguerelax.com/products/5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7</g:link>
+      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7/1787160877504-hsd48.webp</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in stock</g:availability>
+      <g:price>38.00 USD</g:price>
+      <g:brand>iLingue Relax</g:brand>
+      <g:mpn>5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:adult>no</g:adult>
+      <g:content_language>es</g:content_language>
+      <g:target_country>US</g:target_country>
+      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
+      <g:product_type>Libros Digitales &gt; Idiomas &gt; Español</g:product_type>
+      <g:custom_label_0>Español</g:custom_label_0>
+      <g:custom_label_1>Digital</g:custom_label_1>
     </item>
   </channel>
 </rss>

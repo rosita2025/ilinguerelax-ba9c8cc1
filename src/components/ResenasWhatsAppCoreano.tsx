@@ -14,24 +14,24 @@ import r3 from "@/assets/resena-mapas-korea-3.webp.asset.json";
 const resenas = [
   {
     src: (r1 as any).url || r1,
-    contacto: "Comprador Verificado",
+    contacto: "Verified Buyer",
     telefono: "+54 9 11 **** 8822",
     pais: "Argentina 🇦🇷",
-    resumen: "Exactamente fue rápido envío digital sin demoras. El listado de palabras es increíblemente visual."
+    resumen: "It was exactly as described, fast digital delivery without delays. The word list is incredibly visual."
   },
   {
     src: (r2 as any).url || r2,
-    contacto: "Compradora Verificada",
+    contacto: "Verified Buyer",
     telefono: "+591 7 **** 4433",
     pais: "Bolivia 🇧🇴",
-    resumen: "Excelente material. La atención de Rosa y Crady fue muy amable y el acceso fue inmediato."
+    resumen: "Excellent material. The attention from Rosa and Crady was very kind and access was immediate."
   },
   {
     src: (r3 as any).url || r3,
-    contacto: "Estudiante Verificada",
+    contacto: "Verified Student",
     telefono: "+52 55 **** 9012",
-    pais: "México 🇲🇽",
-    resumen: "Muy recomendado. La guía visual facilita mucho el aprendizaje de este idioma tan complejo."
+    pais: "Mexico 🇲🇽",
+    resumen: "Highly recommended. The visual guide makes learning this complex language much easier."
   }
 ];
 
@@ -45,22 +45,22 @@ export const ResenasWhatsAppCoreano = () => {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 text-green-700 dark:text-green-400 text-sm font-bold mb-3">
-              <MessageCircle className="w-4 h-4" /> Reseñas reales por WhatsApp
+              <MessageCircle className="w-4 h-4" /> Real WhatsApp reviews
             </div>
             <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 text-balance">
-              Lo que dicen nuestras <span className="text-gradient">compradoras verificadas</span>
+              What our <span className="text-gradient">verified buyers</span> are saying
             </h2>
             <div className="flex items-center justify-center gap-1 mb-2">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
               ))}
-              <span className="ml-2 text-sm font-semibold text-foreground">5.0/5.0 · Reseñas verificadas</span>
+              <span className="ml-2 text-sm font-semibold text-foreground">5.0/5.0 · Verified reviews</span>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto text-pretty text-sm md:text-base">
-              Conversaciones auténticas atendidas por <strong>Supervisora Rosa</strong> y <strong>Asistente Crady</strong>. Desliza para ver más.
+              Authentic conversations attended by <strong>Supervisor Rosa</strong> and <strong>Assistant Crady</strong>. Slide to see more.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 mt-3 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1"><ShieldCheck className="w-4 h-4 text-primary" /> Datos personales protegidos</span>
+              <span className="inline-flex items-center gap-1"><ShieldCheck className="w-4 h-4 text-primary" /> Personal data protected</span>
             </div>
           </div>
 
@@ -86,7 +86,7 @@ export const ResenasWhatsAppCoreano = () => {
                     <div className="relative bg-black aspect-[9/16] w-full">
                       <img
                         src={r.src}
-                        alt={`Reseña real WhatsApp · ${r.contacto} · ${r.pais}`}
+                        alt={`Real WhatsApp review · ${r.contacto} · ${r.pais}`}
                         loading="lazy"
                         decoding="async"
                         className="w-full h-full object-contain pointer-events-none select-none"
@@ -111,10 +111,10 @@ export const ResenasWhatsAppCoreano = () => {
                         </div>
                         <div className="flex flex-col items-end gap-0.5">
                           <span className="inline-flex items-center gap-1 text-green-600 dark:text-green-400 text-[10px] font-bold uppercase tracking-wider">
-                            <MessageCircle className="w-3 h-3" /> WhatsApp verificado
+                            <MessageCircle className="w-3 h-3" /> WhatsApp verified
                           </span>
                           <span className="text-[9px] text-muted-foreground italic leading-none">
-                            Supervisora Rosa & Asistente Crady
+                            Supervisor Rosa & Assistant Crady
                           </span>
                         </div>
 
@@ -127,14 +127,14 @@ export const ResenasWhatsAppCoreano = () => {
 
             <button
               type="button"
-              aria-label="Anterior"
+              aria-label="Previous"
               className="resenas-prev absolute left-0 md:-left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white dark:bg-card border border-border shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               type="button"
-              aria-label="Siguiente"
+              aria-label="Next"
               className="resenas-next absolute right-0 md:-right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white dark:bg-card border border-border shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
             >
               <ChevronRight className="w-5 h-5" />
@@ -142,7 +142,7 @@ export const ResenasWhatsAppCoreano = () => {
           </div>
 
           <p className="text-center text-xs text-muted-foreground mt-4 max-w-xl mx-auto">
-            Por privacidad, ocultamos nombres y números de las compradoras. Capturas reales verificadas.
+            For privacy, we hide buyer names and numbers. Real verified screenshots.
           </p>
         </div>
       </div>

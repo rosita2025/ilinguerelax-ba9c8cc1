@@ -244,7 +244,7 @@ const TestimonialsContent = memo(function TestimonialsContent() {
           <button
             type="button"
             onClick={prev}
-            aria-label="Anterior"
+            aria-label="Previous"
             className="p-1 rounded-full hover:bg-muted transition"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -252,7 +252,7 @@ const TestimonialsContent = memo(function TestimonialsContent() {
           <button
             type="button"
             onClick={next}
-            aria-label="Siguiente"
+            aria-label="Next"
             className="p-1 rounded-full hover:bg-muted transition"
           >
             <ChevronRight className="w-4 h-4" />
@@ -302,7 +302,7 @@ const TestimonialsContent = memo(function TestimonialsContent() {
           <button
             key={i}
             type="button"
-            aria-label={`Ir al testimonio ${i + 1}`}
+            aria-label={`Go to testimonial ${i + 1}`}
             onClick={() => setIdx(i)}
             className={`h-1.5 rounded-full transition-all ${
               i === idx ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/30"

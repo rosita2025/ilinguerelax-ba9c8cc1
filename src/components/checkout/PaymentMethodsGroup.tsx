@@ -179,13 +179,13 @@ const getStripeVisibleMethods = (language: string): Record<string, Omit<PaymentM
   stripe_google_pay: {
     icon: Smartphone,
     title: "Google Pay",
-    sub: language === "en" ? "Pay with your Google account from Android or Chrome." : "Paga con tu cuenta Google desde Android o Chrome.",
+    sub: "Pay with your Google account from Android or Chrome.",
     badges: [{ label: "G Pay", bg: "#ffffff", color: "#1F2937" }],
   },
   stripe_oxxo: {
     icon: Banknote,
     title: "OXXO",
-    sub: language === "en" ? "Pay at OXXO stores (Mexico) through Stripe's secure form." : "Paga en tiendas OXXO (México) dentro del formulario seguro de Stripe.",
+    sub: "Pay at OXXO stores (Mexico) through Stripe's secure form.",
     badges: [{ label: "OXXO", bg: "#E31E24", color: "#ffffff" }],
   },
   stripe_boleto: {

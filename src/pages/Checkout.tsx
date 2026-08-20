@@ -198,7 +198,7 @@ export default function Checkout() {
       params.delete("r");
       const clean = window.location.pathname + (params.toString() ? `?${params}` : "");
       window.history.replaceState(null, "", clean);
-      toast.success("Recuperamos tu carrito ✨");
+      toast.success("Cart recovered ✨");
     } catch { /* payload inválido, ignora */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -519,15 +519,15 @@ export default function Checkout() {
     return (
       <div className="min-h-screen bg-secondary/30">
         <Helmet>
-          <title>Cargando Pago... | iLingue Relax</title>
+          <title>Loading Checkout... | iLingue Relax</title>
         </Helmet>
-        <header className="sticky top-0 z-30 w-full bg-background/80 backdrop-blur-md border-b border-border/50 h-[44px] sm:h-[52px]">
+        <header className="sticky top-0 z-30 w-full bg-background/80 backdrop-blur-md border-b border-border/50 h-[44px] sm:h-[48px]">
           <div className="max-w-6xl mx-auto h-full px-4 flex items-center">
             <Skeleton className="h-6 w-32" />
           </div>
         </header>
-        <div className="max-w-6xl mx-auto px-4 py-6 md:py-10">
-          <div className="grid lg:grid-cols-[1fr_380px] gap-8 items-start">
+        <div className="max-w-6xl mx-auto px-4 py-3 md:py-6">
+          <div className="grid lg:grid-cols-[1fr_380px] gap-5 items-start">
             <div className="space-y-6">
               <Card className="p-6">
                 <div className="space-y-4">
@@ -569,15 +569,15 @@ export default function Checkout() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-6">
         <div className="max-w-md text-center space-y-4">
-          <h1 className="text-2xl font-bold">Producto no encontrado</h1>
+          <h1 className="text-2xl font-bold">Product not found</h1>
           <p className="text-muted-foreground">
-            El producto <code className="px-1.5 py-0.5 rounded bg-muted">{slug}</code> no está activo en el catálogo.
+            The product <code className="px-1.5 py-0.5 rounded bg-muted">{slug}</code> is not active in the catalog.
           </p>
           <p className="text-xs text-muted-foreground">
-            Verifica que exista en <code>/admin/products</code> y que esté marcado como <strong>activo</strong>. El SKU del admin debe coincidir con la URL <code>/checkouts/&lt;sku&gt;</code>.
+            Verify it exists in <code>/admin/products</code> and is marked as <strong>active</strong>. The admin SKU must match the URL <code>/checkouts/&lt;sku&gt;</code>.
           </p>
           <Link to="/products" className="inline-block px-4 py-2 bg-primary text-primary-foreground rounded-md font-medium">
-            Ver todos los productos
+            View all products
           </Link>
         </div>
       </div>
@@ -603,17 +603,17 @@ export default function Checkout() {
         <div className="flex-1 flex items-center justify-center p-4 text-center">
           <Card className="max-w-md w-full p-8 space-y-6">
             <div className="space-y-2">
-              <h1 className="text-2xl font-bold">Producto no encontrado</h1>
+              <h1 className="text-2xl font-bold">Product not found</h1>
               <p className="text-muted-foreground">
-                El producto con el identificador <code className="bg-muted px-1 rounded">{slug}</code> no existe o no está disponible en este momento.
+                The product with ID <code className="bg-muted px-1 rounded">{slug}</code> does not exist or is unavailable.
               </p>
             </div>
             <div className="flex flex-col gap-2">
               <Button asChild>
-                <Link to="/">Volver a la tienda</Link>
+                <Link to="/">Back to shop</Link>
               </Button>
               <Button variant="ghost" onClick={() => window.location.reload()}>
-                Reintentar conexión
+                Retry connection
               </Button>
             </div>
           </Card>
@@ -639,17 +639,17 @@ export default function Checkout() {
         <div className="flex-1 flex items-center justify-center p-4 text-center">
           <Card className="max-w-md w-full p-8 space-y-6">
             <div className="space-y-2">
-              <h1 className="text-2xl font-bold">Producto no encontrado</h1>
+              <h1 className="text-2xl font-bold">Product not found</h1>
               <p className="text-muted-foreground">
-                El producto con el identificador <code className="bg-muted px-1 rounded">{slug}</code> no existe o no está disponible en este momento.
+                The product with ID <code className="bg-muted px-1 rounded">{slug}</code> does not exist or is unavailable.
               </p>
             </div>
             <div className="flex flex-col gap-2">
               <Button asChild>
-                <Link to="/">Volver a la tienda</Link>
+                <Link to="/">Back to shop</Link>
               </Button>
               <Button variant="ghost" onClick={() => window.location.reload()}>
-                Reintentar conexión
+                Retry connection
               </Button>
             </div>
           </Card>
@@ -667,7 +667,7 @@ export default function Checkout() {
               <Skeleton className="h-8 w-40" />
               <Skeleton className="h-6 w-24" />
             </header>
-            <div className="grid lg:grid-cols-[minmax(0,1fr)_400px] gap-8">
+            <div className="grid lg:grid-cols-[minmax(0,1fr)_400px] gap-5">
               <div className="space-y-6">
                 <Card className="p-6 space-y-4">
                   <Skeleton className="h-6 w-48" />
@@ -719,7 +719,7 @@ export default function Checkout() {
             </Helmet>
 
             <header className="border-b bg-background/95 backdrop-blur sticky top-0 z-30">
-              <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2">
+              <div className="max-w-6xl mx-auto px-3 sm:px-4 py-1.5 sm:py-2 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-3 min-w-0">
                   {catalogItem?.productPath && (
                     <Link
@@ -756,8 +756,8 @@ export default function Checkout() {
                   <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 flex gap-3 items-start">
                     <Package className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                     <div className="text-sm text-amber-900 dark:text-amber-200">
-                      <p className="font-bold">Pedido Mixto</p>
-                      <p>Tu carrito contiene productos físicos y digitales. El acceso a los digitales es inmediato tras el pago, mientras que los físicos requieren datos de envío.</p>
+                      <p className="font-bold">Mixed Order</p>
+                      <p>Your cart contains physical and digital products. Digital access is instant after payment, while physical items require shipping details.</p>
                     </div>
                   </div>
                 )}

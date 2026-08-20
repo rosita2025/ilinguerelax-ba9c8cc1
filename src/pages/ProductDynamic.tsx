@@ -481,7 +481,7 @@ const ProductDynamic = () => {
                 <h2 className="text-lg md:text-xl font-black mb-3 uppercase tracking-tight">What's Inside</h2>
                 <div className="grid gap-2">
                   {features.map((f, i) => (
-                    <div key={i} className="flex items-start gap-2 p-2.5 rounded-xl bg-white border border-slate-100 shadow-sm">
+                    <div key={i} className="flex items-start gap-2 p-2 rounded-xl bg-white border border-slate-100 shadow-sm">
                       <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
                         <Check className="w-3 h-3 text-emerald-600" />
                       </div>

@@ -109,11 +109,12 @@ const isInternalTraffic = (): boolean => {
 // La atribución se guarda 28 días (ventana estándar de Meta) para que el
 // usuario que llegó por un anuncio siga siendo medido hasta la compra.
 // ---------------------------------------------------------------------------
-const META_ATTR_KEY = "ilr_meta_paid_until";
-const META_WINDOW_MS = 28 * 24 * 60 * 60 * 1000;
+const AD_ATTR_KEY = "ilr_ad_paid_until";
+const AD_WINDOW_MS = 28 * 24 * 60 * 60 * 1000;
 const META_SOURCES = new Set(["facebook", "fb", "instagram", "ig", "meta", "facebook_ads", "instagram_ads", "meta_ads", "an", "audience_network", "messenger"]);
+const TIKTOK_SOURCES = new Set(["tiktok", "tiktok_ads", "tt"]);
 
-const isMetaPaidTraffic = (): boolean => {
+const isAdPaidTraffic = (): boolean => {
   if (typeof window === "undefined") return false;
   try {
     const params = new URLSearchParams(window.location.search);
@@ -121,35 +122,40 @@ const isMetaPaidTraffic = (): boolean => {
     const medium = (params.get("utm_medium") || "").toLowerCase().trim();
 
     const hasFbclid = !!params.get("fbclid");
+    const hasTtclid = !!params.get("ttclid");
     const isMetaSource = META_SOURCES.has(src) || (src.includes("facebook") || src.includes("instagram") || src.includes("meta"));
+    const isTiktokSource = TIKTOK_SOURCES.has(src) || src.includes("tiktok");
     const isPaidMedium = /cpc|ppc|paid|ads?$/.test(medium);
 
-    // Cookie _fbc: la crea el propio Pixel cuando hubo un clic en anuncio.
+    // Cookie _fbc o _ttp: las crean los Pixel cuando hubo un clic en anuncio.
     const hasFbc = document.cookie.includes("_fbc=");
+    const hasTtp = document.cookie.includes("_ttp=");
 
-    if (hasFbclid || hasFbc || (isMetaSource && (isPaidMedium || hasFbclid || !medium))) {
-      localStorage.setItem(META_ATTR_KEY, String(Date.now() + META_WINDOW_MS));
+    if (hasFbclid || hasTtclid || hasFbc || hasTtp || ((isMetaSource || isTiktokSource) && (isPaidMedium || hasFbclid || hasTtclid || !medium))) {
+      localStorage.setItem(AD_ATTR_KEY, String(Date.now() + AD_WINDOW_MS));
       return true;
     }
 
-    const until = Number(localStorage.getItem(META_ATTR_KEY) || "0");
+    const until = Number(localStorage.getItem(AD_ATTR_KEY) || "0");
     return Number.isFinite(until) && until > Date.now();
   } catch {
     return false;
   }
 };
 
+
 const hasPixelConsent = (): boolean => {
   if (typeof window === "undefined") return false;
   // Tráfico interno (admin / pruebas / lovable) NUNCA envía eventos al Pixel.
   if (isInternalTraffic()) return false; 
-  // Solo se reportan eventos si el usuario llegó por un anuncio de Meta (Paid Traffic).
+  // Solo se reportan eventos si el usuario llegó por un anuncio de Meta o TikTok (Paid Traffic).
   // El tráfico orgánico, directo o de otras fuentes no se reporta para no ensuciar el ROAS.
-  if (!isMetaPaidTraffic()) return false; 
+  if (!isAdPaidTraffic()) return false; 
   
   if (!isEuUser()) return true; // non-EU: implicit consent
   try { return localStorage.getItem("ilr_cookie_consent") === "accepted"; } catch { return false; }
 };
+
 
 
 
@@ -395,7 +401,7 @@ export const trackHotmartEvent = (
     : generateEventId();
   if (typeof window !== "undefined" && hasPixelConsent()) {
     if (window.fbq) window.fbq("track", eventName, { ...pixelParams, eventID: eventId });
-    if (window.ttq && (eventName === "AddToCart" || eventName === "InitiateCheckout" || eventName === "CompleteRegistration")) {
+    if (window.ttq && (eventName === "AddToCart" || eventName === "InitiateCheckout" || eventName === "CompleteRegistration" || eventName === "Purchase")) {
       window.ttq.track(eventName, {
         content_id: pixelParams.content_ids?.[0] || pixelParams.product_id,
         content_type: "product",
@@ -404,6 +410,7 @@ export const trackHotmartEvent = (
         currency: "USD"
       });
     }
+
   }
   sendCapiEvent(eventName, eventId, pixelParams, typeof userEmail === "string" ? userEmail : undefined);
   if (!__skipFunnelLog) logFunnelEvent(eventName, pixelParams);

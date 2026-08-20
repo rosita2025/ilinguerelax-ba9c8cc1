@@ -492,7 +492,7 @@ const ProductDynamic = () => {
               </div>
               <div className="grid sm:grid-cols-2 gap-2">
                 {benefits.map((b, i) => (
-                  <div key={i} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                  <div key={i} className="p-3 rounded-xl bg-slate-50 border border-slate-100">
                     <b.icon className="w-6 h-6 text-primary mb-2" />
                     <h3 className="font-black text-slate-900 text-sm mb-1 uppercase tracking-tight">{b.title}</h3>
                     <p className="text-[11px] text-muted-foreground leading-tight">{b.description}</p>

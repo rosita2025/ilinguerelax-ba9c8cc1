@@ -459,27 +459,27 @@ const ProductDynamic = () => {
           </div>
 
           {/* Features Section */}
-          <section className="mt-8 py-6 border-t border-slate-100">
-            <div className="grid lg:grid-cols-2 gap-8">
+          <section className="mt-6 py-4 border-t border-slate-100">
+            <div className="grid lg:grid-cols-2 gap-6">
               <div>
-                <h2 className="text-2xl md:text-3xl font-black mb-4">What's Inside</h2>
+                <h2 className="text-xl md:text-2xl font-black mb-4 uppercase tracking-tight">What's Inside</h2>
                 <div className="grid gap-2">
                   {features.map((f, i) => (
-                    <div key={i} className="flex items-start gap-2 p-3 rounded-xl bg-white border border-slate-100 shadow-sm">
+                    <div key={i} className="flex items-start gap-2 p-2.5 rounded-xl bg-white border border-slate-100 shadow-sm">
                       <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
                         <Check className="w-3 h-3 text-emerald-600" />
                       </div>
-                      <span className="text-sm font-bold text-slate-700">{f}</span>
+                      <span className="text-xs font-bold text-slate-700">{f}</span>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-3">
                 {benefits.map((b, i) => (
-                  <div key={i} className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                  <div key={i} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
                     <b.icon className="w-6 h-6 text-primary mb-2" />
-                    <h3 className="font-black text-slate-900 mb-2">{b.title}</h3>
-                    <p className="text-xs text-muted-foreground leading-snug">{b.description}</p>
+                    <h3 className="font-black text-slate-900 text-sm mb-1 uppercase tracking-tight">{b.title}</h3>
+                    <p className="text-[11px] text-muted-foreground leading-tight">{b.description}</p>
                   </div>
                 ))}
               </div>
@@ -487,14 +487,14 @@ const ProductDynamic = () => {
           </section>
 
           {/* Look Inside Gallery */}
-          <section className="mt-8 py-6 bg-slate-900 rounded-[2rem] text-white overflow-hidden">
+          <section className="mt-6 py-4 bg-slate-900 rounded-[1.5rem] text-white overflow-hidden">
             <div className="px-4 md:px-8">
               <div className="text-center mb-6">
-                <h2 className="text-3xl md:text-4xl font-black mb-2">Look Inside the PDF</h2>
-                <p className="text-slate-400 text-sm max-w-2xl mx-auto">See why students trust iLingue Relax to reach fluency faster.</p>
+                <h2 className="text-2xl md:text-3xl font-black mb-2 uppercase tracking-tight">Look Inside</h2>
+                <p className="text-slate-400 text-xs max-w-2xl mx-auto">Visual guides to reach fluency faster.</p>
               </div>
               
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                 {previewAssets.map((asset, i) => (
                   <Dialog key={i}>
                     <DialogTrigger asChild>
@@ -529,7 +529,7 @@ const ProductDynamic = () => {
           </section>
           
           {(product.sku === "coreano-100-mapas-mentales" || product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7") && (
-            <div className="mb-8">
+            <div className="mb-4">
               <ResenasWhatsAppCoreano />
             </div>
           )}
@@ -539,7 +539,7 @@ const ProductDynamic = () => {
           </Suspense>
 
           {product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" && (
-            <div className="max-w-4xl mx-auto px-4 mb-10">
+            <div className="max-w-4xl mx-auto px-4 mb-8">
               <div className="p-4 md:p-6 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden relative group">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <Package className="w-32 h-32 -mr-8 -mt-8" />
@@ -549,8 +549,8 @@ const ProductDynamic = () => {
                     <BookOpen className="w-10 h-10 text-emerald-400" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg md:text-xl font-black mb-1 text-emerald-400 uppercase tracking-tight">Would you like the physical book?</h3>
-                    <p className="text-slate-400 text-xs md:text-sm leading-relaxed">
+                    <h3 className="text-lg md:text-xl font-black mb-1 text-emerald-400 uppercase tracking-tight">Physical Book?</h3>
+                    <p className="text-slate-400 text-xs md:text-sm leading-tight">
                       Get the premium printed edition of the 5,000 Spanish Words book shipped to your door. The perfect companion for your digital study.
                     </p>
                   </div>
@@ -568,14 +568,14 @@ const ProductDynamic = () => {
           )}
 
 
-          <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+          <Suspense fallback={<Skeleton className="h-48 w-full" />}>
             <FAQ 
-              title="Common Questions" 
-              subtitle={product.name}
+              title="FAQ" 
+              subtitle="Quick Answers" 
               items={[
-                { question: "How do I receive the product?", answer: "Immediately after purchase, you will receive an email with a secure link to download the PDF.", icon: Download },
-                { question: "Is it a physical book?", answer: "This is a digital PDF version optimized for mobile, tablets, and computers.", icon: FileText },
-                { question: "Do you offer a guarantee?", answer: "Yes, we offer a 7-day risk-free money-back guarantee.", icon: Shield }
+                { question: "Delivery?", answer: "Immediate via email.", icon: Download },
+                { question: "Format?", answer: "Digital PDF.", icon: FileText },
+                { question: "Guarantee?", answer: "7-day money-back.", icon: Shield }
               ]}
             />
           </Suspense>

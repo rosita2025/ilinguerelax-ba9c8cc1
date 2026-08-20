@@ -43,6 +43,7 @@ const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
 const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then(m => ({ default: m.LooxStyleReviews })));
 
+
 interface DBProduct {
   id: string;
   sku: string;

@@ -574,7 +574,7 @@ const ProductDynamic = () => {
                   </div>
                   <Button 
                     asChild
-                    className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black px-6 py-4 rounded-xl transition-all shadow-[0_8px_25px_rgba(16,185,129,0.3)] hover:scale-105 active:scale-95 h-auto text-sm"
+                    className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black px-4 py-3 rounded-xl transition-all shadow-[0_8px_25px_rgba(16,185,129,0.3)] hover:scale-105 active:scale-95 h-auto text-[13px]"
                   >
                     <Link to="/products/5-000-spanish-words-with-english-pronunciation-physical">
                       GET THE PHYSICAL BOOK

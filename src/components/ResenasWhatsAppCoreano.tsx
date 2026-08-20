@@ -17,7 +17,7 @@ const resenas = [
     contacto: "Verified Buyer",
     telefono: "+54 9 11 **** 8822",
     pais: "Argentina 🇦🇷",
-    resumen: "It was exactly as described, fast digital delivery without delays. The word list is incredibly visual."
+    resumen: "It was exactly as described, fast digital delivery without delays. The word list and mental maps are incredibly visual."
   },
   {
     src: (r2 as any).url || r2,

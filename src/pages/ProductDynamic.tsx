@@ -409,7 +409,7 @@ const ProductDynamic = () => {
                 <span className="text-[10px] font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ reviews)</span>
               </div>
 
-              <h1 className="text-2xl md:text-4xl font-black leading-tight text-slate-900 tracking-tight">
+              <h1 className="text-xl md:text-3xl font-black leading-tight text-slate-900 tracking-tight">
                 {product.name}
               </h1>
 

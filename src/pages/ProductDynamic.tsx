@@ -170,7 +170,7 @@ const ProductDynamic = () => {
       currency: "USD",
       product_id: product.sku,
     });
-  }, [product?.sku, effectiveUsd]);
+  }, [product?.sku, effectiveUsd, trackHotmartEvent]);
 
   if (notFound) return <Navigate to="/404" replace />;
   

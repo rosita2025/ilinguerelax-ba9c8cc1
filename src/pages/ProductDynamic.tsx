@@ -271,9 +271,10 @@ const ProductDynamic = () => {
       name: product.name,
       price: effectiveUsd,
       regionPrices: {
-        latam: (product as any).price_usd_latam || product.price_usd,
+        latam: product.price_usd_latam || product.price_usd,
         global: product.price_usd,
-        tienda: (product as any).price_usd_tienda || product.price_usd
+        tienda: product.price_usd_tienda || product.price_usd
+
 
       },
       pricePen: (product as any).price_pen || undefined,

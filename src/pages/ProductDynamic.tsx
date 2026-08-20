@@ -319,13 +319,20 @@ const ProductDynamic = () => {
                 <img
                   src={activeImage}
                   alt={product.name}
-                  className="w-full aspect-square object-cover"
+                  className="w-full aspect-square object-cover transition-all duration-300"
+                  loading="eager"
                 />
-                <PinterestSave overlay media={activeImage} url={canonical} />
+                <PinterestSave 
+                  overlay 
+                  media={activeImage} 
+                  url={canonical}
+                  description={`${product.name} — ${product.description || "PDF con pronunciación · iLingue Relax"}`}
+                />
                 <div className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black shadow-lg">
                   <Download className="w-4 h-4" /> DIGITAL PDF — INSTANT ACCESS
                 </div>
               </div>
+
 
               {product.gallery_images && product.gallery_images.length > 0 && (
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">

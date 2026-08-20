@@ -41,6 +41,9 @@ import verbsV2PreviewAsset from "@/assets/spanish-verbs-preview.png.asset.json";
 import vocabTable1Asset from "@/assets/previews/vocab-table-preview-1.png.asset.json";
 import vocabTable2Asset from "@/assets/previews/vocab-table-preview-2.png.asset.json";
 import plannerTableAsset from "@/assets/previews/study-planner-preview-table.png.asset.json";
+import koreanCoverAsset from "@/assets/previews/korean-2000-cover.asset.json";
+import koreanTableAsset from "@/assets/previews/korean-2000-table.asset.json";
+import koreanIndexAsset from "@/assets/previews/korean-2000-index.asset.json";
 
 
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
@@ -257,10 +260,14 @@ const ProductDynamic = () => {
     { title: "Digital Flashcards", image: previewSpanishPhrases },
     { title: "Vocabulary Table 1", image: vocabTable1Asset.url },
     { title: "Vocabulary Table 2", image: vocabTable2Asset.url },
-    { title: "Study Planner Table", image: plannerTableAsset.url }
+    { title: "Study Planner Table", image: plannerTableAsset.url },
+    { title: "Korean Cover", image: koreanCoverAsset.url },
+    { title: "Korean Index", image: koreanIndexAsset.url },
+    { title: "Korean Vocabulary Table", image: koreanTableAsset.url }
   ].filter(asset => {
+    const KOREAN_SKU = "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca";
+    
     if (product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7") {
-      // For this specific product, only show the relevant assets mentioned by user
       return [
         "Study Planner (6 Months)", 
         "Spanish Exam Pack", 
@@ -270,6 +277,15 @@ const ProductDynamic = () => {
         "Study Planner Table"
       ].includes(asset.title);
     }
+    
+    if (product.sku === KOREAN_SKU) {
+      return [
+        "Korean Cover",
+        "Korean Index",
+        "Korean Vocabulary Table"
+      ].includes(asset.title);
+    }
+    
     return true;
   });
 
@@ -528,7 +544,9 @@ const ProductDynamic = () => {
             </div>
           </section>
           
-          {(product.sku === "coreano-100-mapas-mentales" || product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7") && (
+          {(product.sku === "coreano-100-mapas-mentales" || 
+            product.sku === "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca" ||
+            product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7") && (
             <div className="mb-4">
               <ResenasWhatsAppCoreano />
             </div>

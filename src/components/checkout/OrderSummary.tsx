@@ -97,7 +97,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
       setCouponError(t.invalidCoupon);
     } else {
       setCouponInput("");
-      toast.success(language === "en" ? "Coupon applied!" : "¡Cupón aplicado!");
+      toast.success("Coupon applied!");
     }
   };
 
@@ -167,7 +167,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <div className="flex gap-2.5 items-start">
               <Truck className="w-4 h-4 text-destructive shrink-0 mt-0.5" aria-hidden="true" />
               <p className="text-xs text-destructive font-medium leading-snug">
-                <strong className="font-bold uppercase tracking-tight">{t.physical}.</strong> {language === "en" ? "Mandatory: Name, Email, Phone and Shipping Address required." : "Obligatorio: Nombre, Email, Teléfono y Dirección de Envío."}
+                <strong className="font-bold uppercase tracking-tight">{t.physical}.</strong> Required: Name, Email, Phone and Shipping Address required.
               </p>
             </div>
             <div className="text-[10px] space-y-1 pl-6 opacity-90 italic">
@@ -189,11 +189,11 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <div className="flex gap-2.5 items-start">
               <Zap className="w-4 h-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
               <p className="text-xs text-muted-foreground leading-snug">
-                <strong className="text-foreground font-semibold">{t.digital}.</strong> {language === "en" ? "Mandatory: Name, Email and Phone required for access." : "Obligatorio: Nombre, Email y Teléfono para recibir acceso."}
+                <strong className="text-foreground font-semibold">{t.digital}.</strong> Required: Name, Email and Phone required for access.
               </p>
             </div>
             <p className="text-[10px] pl-6 text-muted-foreground/80 italic">
-              {language === "en" ? "Immediate access via email after payment." : "Recibirás el acceso inmediato por correo tras el pago."}
+              Immediate access via email after payment.
             </p>
           </div>
         )}

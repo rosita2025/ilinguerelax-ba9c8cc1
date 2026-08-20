@@ -86,8 +86,8 @@ const FLAG: Record<string, string> = {
   de: "🇩🇪", it: "🇮🇹", ja: "🇯🇵", nl: "🇳🇱",
 };
 const LANG: Record<string, string> = {
-  es: "Español", en: "Inglés", fr: "Francés", pt: "Portugués", ko: "Coreano",
-  de: "Alemán", it: "Italiano", ja: "Japonés", nl: "Neerlandés",
+  es: "Spanish", en: "English", fr: "French", pt: "Portuguese", ko: "Korean",
+  de: "German", it: "Italian", ja: "Japanese", nl: "Dutch",
 };
 
 const ProductDynamic = () => {
@@ -314,7 +314,7 @@ const ProductDynamic = () => {
     <div className="min-h-screen bg-background">
       <SEO
         title={product.name}
-        description={product.description || `${product.name} PDF. Descarga digital inmediata.`}
+        description={product.description || `${product.name} PDF. Instant digital download.`}
         canonicalUrl={canonical}
         image={cover}
         type="product"
@@ -328,10 +328,10 @@ const ProductDynamic = () => {
       
       <Navbar />
 
-      <main className="pt-4 pb-20">
+      <main className="pt-2 pb-10">
         <div className="container px-4 sm:px-6">
           {/* Trust Pilot Badge */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-3">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white border border-emerald-200 shadow-sm">
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
@@ -343,7 +343,7 @@ const ProductDynamic = () => {
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
+          <div className="grid lg:grid-cols-2 gap-8 items-start">
             {/* Left Column: Image Gallery */}
             <div className="space-y-6">
               <div className="relative group bg-card border border-border rounded-3xl overflow-hidden shadow-hero">
@@ -459,7 +459,7 @@ const ProductDynamic = () => {
           </div>
 
           {/* Features Section */}
-          <section className="mt-24 py-16 border-t border-slate-100">
+          <section className="mt-12 py-8 border-t border-slate-100">
             <div className="grid lg:grid-cols-2 gap-16">
               <div>
                 <h2 className="text-3xl md:text-4xl font-black mb-8">What's Inside the System</h2>
@@ -487,9 +487,9 @@ const ProductDynamic = () => {
           </section>
 
           {/* Look Inside Gallery */}
-          <section className="mt-24 py-16 bg-slate-900 rounded-[3rem] text-white overflow-hidden">
+          <section className="mt-12 py-8 bg-slate-900 rounded-[3rem] text-white overflow-hidden">
             <div className="px-6 md:px-12">
-              <div className="text-center mb-16">
+              <div className="text-center mb-8">
                 <h2 className="text-4xl md:text-6xl font-black mb-4">Look Inside the PDF</h2>
                 <p className="text-slate-400 text-lg max-w-2xl mx-auto">See why thousands of students trust iLingue Relax to reach fluency faster.</p>
               </div>

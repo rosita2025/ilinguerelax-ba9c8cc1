@@ -505,8 +505,8 @@ const ProductDynamic = () => {
           {/* Look Inside Gallery */}
           <section className="mt-4 py-3 bg-slate-900 rounded-[1.5rem] text-white overflow-hidden">
             <div className="px-4 md:px-8">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl md:text-3xl font-black mb-2 uppercase tracking-tight">Look Inside</h2>
+              <div className="text-center mb-4">
+                <h2 className="text-xl md:text-2xl font-black mb-1 uppercase tracking-tight">Look Inside</h2>
                 <p className="text-slate-400 text-xs max-w-2xl mx-auto">Visual guides to reach fluency faster.</p>
               </div>
               

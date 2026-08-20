@@ -328,24 +328,24 @@ const ProductDynamic = () => {
       
       <Navbar />
 
-      <main className="pt-2 pb-10">
-        <div className="container px-4 sm:px-6">
+      <main className="pt-2 pb-6">
+        <div className="container px-4 sm:px-5">
           {/* Trust Pilot Badge */}
-          <div className="flex justify-center mb-3">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white border border-emerald-200 shadow-sm">
+          <div className="flex justify-center mb-2">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white border border-emerald-200 shadow-sm">
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3 h-3 fill-emerald-500 text-emerald-500" strokeWidth={0} />
+                  <Star key={i} className="w-2.5 h-2.5 fill-emerald-500 text-emerald-500" strokeWidth={0} />
                 ))}
               </div>
-              <span className="text-xs font-bold text-slate-800">Excellent</span>
-              <span className="text-xs font-bold text-emerald-600">★ Trustpilot</span>
+              <span className="text-[10px] font-bold text-slate-800">Excellent</span>
+              <span className="text-[10px] font-bold text-emerald-600">★ Trustpilot</span>
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8 items-start">
+          <div className="grid lg:grid-cols-2 gap-6 items-start">
             {/* Left Column: Image Gallery */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="relative group bg-card border border-border rounded-3xl overflow-hidden shadow-hero">
                 <img
                   src={activeImage}
@@ -383,7 +383,7 @@ const ProductDynamic = () => {
             </div>
 
             {/* Right Column: Copy & Pricing */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
@@ -393,20 +393,20 @@ const ProductDynamic = () => {
                 <span className="text-sm font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ reviews)</span>
               </div>
 
-              <h1 className="text-3xl md:text-5xl font-black leading-tight text-slate-900">
+              <h1 className="text-2xl md:text-4xl font-black leading-tight text-slate-900 tracking-tight">
                 {product.name}
               </h1>
 
-              <p className="text-lg text-muted-foreground leading-relaxed">
+              <p className="text-base text-muted-foreground leading-snug">
                 {product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" 
                   ? "Reach C1 fluency faster with our professional 5,000 words guide, 6-month study planner, and proficiency exams."
                   : product.description?.split('\n')[0] || "Master your target language with our professional PDF guide."}
 
               </p>
 
-              <div className="p-6 rounded-3xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
-                <div className="flex items-end gap-3 mb-1">
-                  <span className="text-4xl md:text-5xl font-black text-foreground">{displayFormatted}</span>
+              <div className="p-4 rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+                <div className="flex items-end gap-2 mb-1">
+                  <span className="text-3xl md:text-4xl font-black text-foreground">{displayFormatted}</span>
                   {discountPercentage > 0 && (
                     <span className="text-xl text-muted-foreground line-through opacity-70 mb-1">{originalFormatted}</span>
                   )}

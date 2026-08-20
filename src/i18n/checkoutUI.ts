@@ -233,13 +233,13 @@ const es: CheckoutUIStrings = {
 };
 
 const en: CheckoutUIStrings = {
-  verifiedReviewNotice: "Verified reviews: ⭐⭐⭐⭐⭐ 5.0/5.0. Exactly fast digital delivery without delays.",
+  verifiedReviewNotice: "Verified Reviews: ⭐⭐⭐⭐⭐ 5.0/5.0. Immediate digital delivery and high quality.",
   securePayment: "Secure payment",
   stripeSSL: "Stripe SSL · Secure payment",
   stripeSslMP: "Stripe SSL · Mercado Pago",
 
   yourDetails: "Your details",
-  yourDetailsHint: "Access will be sent by email. For physical books, address is mandatory.",
+  yourDetailsHint: "Access will be sent to your email. Shipping address required for physical books.",
   ready: "Ready",
   required: "Required",
   fullName: "Full Name *",
@@ -248,7 +248,7 @@ const en: CheckoutUIStrings = {
   email: "Email *",
   emailPlaceholder: "your@email.com",
   emailError: "Please enter a valid email.",
-  emailHint: "This is where we'll send your digital access.",
+  emailHint: "Your digital access will be sent here immediately.",
   whatsappOptional: "WhatsApp (optional)",
   shippingAddress: "Shipping Address",
   addressPlaceholder: "Street, number, apartment...",
@@ -258,8 +258,8 @@ const en: CheckoutUIStrings = {
   shippingCountry: "Shipping Country",
   selectCountry: "Select country",
   shipping: "Shipping",
-  shippingNoticeLatam: "LATAM Shipping (Peru, Colombia, Mexico, Argentina, etc.): $9 USD (5-7 days). Preparation: 7-10 days.",
-  shippingNoticeGlobal: "USA/CAN/UK Shipping: 3-5 days. Preparation: 5-7 days.",
+  shippingNoticeLatam: "LATAM Shipping: $9 USD (5-7 business days).",
+  shippingNoticeGlobal: "USA/CAN/UK Shipping: $8 USD (3-5 business days).",
   shippingNoticeAsia: "Asia & Oceania: Currently unavailable (coming soon).",
   freeDigitalDelivery: "Free (Digital Delivery)",
   digitalAlternativeSuggest: "Consider purchasing the digital version available worldwide.",
@@ -273,8 +273,8 @@ const en: CheckoutUIStrings = {
   cardPayment: "Card payment",
   cardTitlePeru: "Card, Apple Pay or Link",
   cardTitleGlobal: "Debit or Credit Card",
-  cardSubtitlePeru: (lb) => `Visa · Mastercard · Amex · Apple Pay · Link · Charged in your local currency${lb}`,
-  cardSubtitleGlobal: (curr, lb) => `Debit or Credit · Apple Pay · Google Pay · Link · Pay in ${curr}${lb}`,
+  cardSubtitlePeru: (lb) => `Visa · Mastercard · Amex · Apple Pay · Link${lb}`,
+  cardSubtitleGlobal: (curr, lb) => `Credit or Debit Card · Apple Pay · Google Pay · Link · Charged in ${curr}${lb}`,
   autoActivatesByCountry: "Automatically enabled for your country",
   ssl256: "SSL 256-bit",
   stripeVerified: "Stripe verified",
@@ -298,7 +298,7 @@ const en: CheckoutUIStrings = {
 
   redirecting: "Redirecting…",
   buyNow: "Buy now",
-  enableMethods: "👆 Complete your info to enable payment methods.",
+  enableMethods: "👆 Please complete your details to enable payment methods.",
 
   sendPaymentTo: "Send payment to",
   amountToPay: "Amount to pay",

@@ -71,7 +71,7 @@ function LogoBadge({ src, alt, bg = "#ffffff" }: { src: string; alt: string; bg?
       className="inline-flex items-center justify-center h-4 w-7 rounded border border-neutral-200 dark:border-neutral-700 shrink-0"
       style={{ background: bg }}
     >
-      <img src={src} alt={alt} className="max-h-2.5 max-w-[20px] object-contain grayscale opacity-60" />
+      <img src={src} alt={alt} className="max-h-2.5 max-w-[20px] object-contain" />
     </span>
   );
 }
@@ -83,7 +83,7 @@ function GooglePayBadge() {
       role="img"
       aria-label="Google Pay"
     >
-      <span className="text-[8px] font-bold leading-none tracking-tight opacity-60 grayscale" aria-hidden="true">
+      <span className="text-[8px] font-bold leading-none tracking-tight text-blue-600" aria-hidden="true">
         GPay
       </span>
     </span>
@@ -107,7 +107,7 @@ function LinkBadge() {
 function BankBadge({ label, bg }: { label: string; bg: string; color?: string }) {
   return (
     <span className="inline-flex items-center gap-1 h-4 px-1 rounded border border-neutral-200 bg-neutral-50/50 text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-neutral-400 text-[8px] font-medium tracking-tight leading-none shrink-0">
-      <span className="w-1 h-1 rounded-full shrink-0 opacity-60" style={{ background: bg }} aria-hidden="true" />
+      <span className="w-1 h-1 rounded-full shrink-0" style={{ background: bg }} aria-hidden="true" />
       {label}
     </span>
   );
@@ -1608,7 +1608,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
       badges: dlocalBadges(country, "transfer", 6).length
         ? dlocalBadges(country, "transfer", 6)
-        : [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }],
+        : [{ label: "Transfer", bg: "#0F766E", color: "#ffffff" }],
     },
     {
       id: "dlocal_cash",
@@ -1627,7 +1627,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
       badges: dlocalBadges(country, "cash", 6).length
         ? dlocalBadges(country, "cash", 6)
-        : [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }],
+        : [{ label: "Cash", bg: "#F5A623", color: "#1F2937" }],
     },
     {
       id: "dlocal_wallet",
@@ -1690,7 +1690,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         : `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 clic`,
 
 
-      badge: hotmartPriceLabel,
+      badge: isPeru ? hotmartPriceLabel : `USD $${totalUsd}`,
       badges: hotmartBadges,
 
     },
@@ -1989,10 +1989,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           <div
             data-method-row={m.id}
             className={cn(
-              "rounded-lg border overflow-hidden transition-colors scroll-mt-24",
+              "rounded-xl border-2 overflow-hidden transition-all scroll-mt-24",
               isSelected
-                ? "border-neutral-400 bg-neutral-100 dark:bg-neutral-800/60"
-                : "border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900/40",
+                ? "border-primary bg-primary/5 shadow-sm"
+                : "border-neutral-200 bg-background hover:border-primary/40 dark:border-neutral-700",
             )}
           >
             <button
@@ -2015,8 +2015,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 <div className={cn(
                   "rounded-lg flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9",
                   isSelected
-                    ? "bg-neutral-700 text-white"
-                    : "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200",
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
                 )}>
                   {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Icon className="w-5 h-5" />}
                 </div>
@@ -2117,7 +2117,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               <div className={cn(
                 "w-4 h-4 rounded-full border-2 shrink-0 transition-colors",
                 isSelected
-                  ? "border-neutral-700 bg-neutral-700"
+                  ? "border-primary bg-primary"
                   : "border-neutral-300 dark:border-neutral-600",
               )} />
             </button>

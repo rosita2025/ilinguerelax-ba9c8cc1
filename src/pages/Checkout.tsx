@@ -526,9 +526,9 @@ export default function Checkout() {
             <Skeleton className="h-6 w-32" />
           </div>
         </header>
-        <div className="max-w-6xl mx-auto px-4 py-3 md:py-6">
-          <div className="grid lg:grid-cols-[1fr_380px] gap-5 items-start">
-            <div className="space-y-6">
+        <div className="max-w-6xl mx-auto px-4 py-2 sm:py-4">
+          <div className="grid lg:grid-cols-[1fr_380px] gap-4 lg:gap-6 items-start">
+            <div className="space-y-4 lg:space-y-6">
               <Card className="p-6">
                 <div className="space-y-4">
                   <Skeleton className="h-8 w-48" />
@@ -547,7 +547,7 @@ export default function Checkout() {
                 </div>
               </Card>
             </div>
-            <div className="space-y-6">
+            <div className="space-y-4 lg:space-y-6">
               <Card className="p-6">
                 <div className="space-y-4">
                   <Skeleton className="h-6 w-32" />
@@ -750,8 +750,8 @@ export default function Checkout() {
 
             <MobileOrderSummarySticky slug={catalogItem?.id} />
 
-            <div className="max-w-6xl min-w-0 mx-auto px-3 sm:px-4 py-3 sm:py-5 lg:py-8 grid lg:grid-cols-[minmax(0,1fr)_400px] gap-5 lg:gap-8">
-              <div className="min-w-0 space-y-4">
+            <div className="max-w-6xl min-w-0 mx-auto px-3 sm:px-4 py-2 sm:py-4 lg:py-6 grid lg:grid-cols-[minmax(0,1fr)_400px] gap-4 lg:gap-6">
+              <div className="min-w-0 space-y-3 sm:space-y-4">
                 {items.some(i => i.isPhysical) && items.some(i => !i.isPhysical) && (
                   <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 flex gap-3 items-start">
                     <Package className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />

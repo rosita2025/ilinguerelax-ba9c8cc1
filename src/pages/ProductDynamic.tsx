@@ -498,12 +498,19 @@ const ProductDynamic = () => {
                 {previewAssets.map((asset, i) => (
                   <Dialog key={i}>
                     <DialogTrigger asChild>
-                      <button className="group relative aspect-[3/4] rounded-2xl overflow-hidden bg-slate-800 border border-white/10 transition-all hover:scale-[1.02]">
-                        <img src={asset.image} className="w-full h-full object-cover" alt={asset.title} />
+                      <button className="group relative aspect-[3/4] sm:aspect-[3/4] rounded-2xl overflow-hidden bg-slate-800 border border-white/10 transition-all hover:scale-[1.02] shadow-2xl">
+                        <img 
+                          src={asset.image} 
+                          className="w-full h-full object-contain sm:object-cover bg-white/5" 
+                          alt={asset.title} 
+                          loading="lazy"
+                        />
                         <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <Eye className="w-10 h-10 text-white" />
                         </div>
-                        <div className="absolute bottom-4 left-4 font-black text-sm uppercase tracking-widest">{asset.title}</div>
+                        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-slate-900/90 to-transparent">
+                          <div className="font-black text-[10px] sm:text-xs uppercase tracking-widest text-white/90 truncate">{asset.title}</div>
+                        </div>
                       </button>
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl p-0 overflow-hidden bg-white">
@@ -516,6 +523,7 @@ const ProductDynamic = () => {
                     </DialogContent>
                   </Dialog>
                 ))}
+
               </div>
             </div>
           </section>

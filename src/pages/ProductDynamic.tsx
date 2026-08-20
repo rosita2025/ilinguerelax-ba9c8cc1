@@ -444,7 +444,7 @@ const ProductDynamic = () => {
                 <StockAlert count={7} className="mt-2 w-full justify-center" />
 
 
-                <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+                <div className="flex items-center justify-between pt-3 border-t border-slate-200">
                   <div className="flex items-center gap-4 grayscale opacity-60">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" className="h-4" alt="" />
                     <PaymentLogos />

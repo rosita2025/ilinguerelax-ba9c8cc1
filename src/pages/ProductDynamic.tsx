@@ -490,7 +490,7 @@ const ProductDynamic = () => {
                   ))}
                 </div>
               </div>
-              <div className="grid sm:grid-cols-2 gap-3">
+              <div className="grid sm:grid-cols-2 gap-2">
                 {benefits.map((b, i) => (
                   <div key={i} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
                     <b.icon className="w-6 h-6 text-primary mb-2" />

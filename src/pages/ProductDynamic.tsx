@@ -251,7 +251,14 @@ const ProductDynamic = () => {
     { title: "Study Planner (6 Months)", image: plannerPreviewAsset.url },
     { title: "Spanish Exam Pack", image: examPreviewAsset.url },
     { title: "Digital Flashcards", image: previewSpanishPhrases }
-  ];
+  ].filter(asset => {
+    if (product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7") {
+      // For this specific product, only show the relevant assets mentioned by user
+      return ["Study Planner (6 Months)", "Spanish Exam Pack", "Digital Flashcards"].includes(asset.title);
+    }
+    return true;
+  });
+
 
 
   const handleBuy = () => {

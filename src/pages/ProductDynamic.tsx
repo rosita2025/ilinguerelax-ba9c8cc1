@@ -328,11 +328,11 @@ const ProductDynamic = () => {
       
       <Navbar />
 
-      <main className="pt-2 pb-6">
-        <div className="container px-4 sm:px-5">
+      <main className="pt-1 pb-4">
+        <div className="container px-4 sm:px-4">
           {/* Trust Pilot Badge */}
           <div className="flex justify-center mb-2">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white border border-emerald-200 shadow-sm">
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-emerald-200 shadow-sm">
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-2.5 h-2.5 fill-emerald-500 text-emerald-500" strokeWidth={0} />
@@ -343,7 +343,7 @@ const ProductDynamic = () => {
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-6 items-start">
+          <div className="grid lg:grid-cols-2 gap-4 items-start">
             {/* Left Column: Image Gallery */}
             <div className="space-y-4">
               <div className="relative group bg-card border border-border rounded-3xl overflow-hidden shadow-hero">
@@ -383,21 +383,21 @@ const ProductDynamic = () => {
             </div>
 
             {/* Right Column: Copy & Pricing */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-emerald-500 text-emerald-500" />
                   ))}
                 </div>
-                <span className="text-sm font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ reviews)</span>
+                <span className="text-xs font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ reviews)</span>
               </div>
 
               <h1 className="text-2xl md:text-4xl font-black leading-tight text-slate-900 tracking-tight">
                 {product.name}
               </h1>
 
-              <p className="text-base text-muted-foreground leading-snug">
+              <p className="text-sm text-muted-foreground leading-snug">
                 {product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" 
                   ? "Reach C1 fluency faster with our professional 5,000 words guide, 6-month study planner, and proficiency exams."
                   : product.description?.split('\n')[0] || "Master your target language with our professional PDF guide."}
@@ -433,8 +433,8 @@ const ProductDynamic = () => {
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" className="h-4" alt="" />
                     <PaymentLogos />
                   </div>
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500">
-                    <Shield className="w-3 h-3" /> SECURE CHECKOUT
+                  <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500">
+                    <Shield className="w-2.5 h-2.5" /> SECURE CHECKOUT
                   </div>
                 </div>
               </div>

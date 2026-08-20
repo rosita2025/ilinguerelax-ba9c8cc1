@@ -310,10 +310,36 @@ const ProductDynamic = () => {
         .map((n) => (typeof n === "string" ? n.trim() : ""))
         .filter((n) => n.length > 0)
     : [];
-  const canonical = `https://ilinguerelax.com/products/${product.sku}`;
+  const features = [
+    `${product.target_language === 'en' ? '5,000 Spanish Words' : product.target_language === 'ko' ? '2,000 Coreano' : product.name} + Pronunciation`,
+    "Digital PDF Version",
+    "Complete Grammar Guide",
+    "Essential Verbs + English Pronunciation",
+    "Practice Questions + English Pronunciation",
+    "Digital Flashcards (Anki/Quizlet)",
+    "Instant PDF download · Secure Payment",
+    "Progressive Learning Path",
+    "7-Day Money-Back Guarantee"
+  ];
+
+  const benefits = [
+    { icon: Headphones, title: "Future Audio & App Access", description: "FREE Bonus: Get the native pronunciation MP3s and iLingue Relax App access as soon as they launch." },
+    { icon: Layers, title: "Digital Flashcards", description: "Ready-to-use decks for Anki/Quizlet to memorize vocabulary 3x faster." },
+    { icon: Zap, title: "Learn Anywhere", description: "Study on your phone, tablet, or computer. Your vocabulary is always with you." },
+    { icon: FilePlus, title: "Quick Conversations", description: "A high-impact miniguide for the most common 100 conversations." },
+  ];
+
+  const previewAssets = [
+    { title: "Vocabulary", image: previewSpanishVocab },
+    { title: "Grammar Guide", image: grammarPreviewAsset.url },
+    { title: "Daily Planner", image: plannerPreviewAsset.url },
+    { title: "Practice Exam", image: examPreviewAsset.url },
+    { title: "Essential Verbs", image: verbsV2PreviewAsset.url },
+    { title: "Questions", image: questionsPreviewAsset.url }
+  ];
 
   return (
-    <>
+    <div className="min-h-screen bg-background">
       <SEO
         title={product.name}
         description={product.description || `${product.name} en PDF con pronunciación. Descarga digital inmediata en iLingue Relax.`}
@@ -328,6 +354,7 @@ const ProductDynamic = () => {
         isPhysical={false}
         keywords={product.gallery_metadata?.keywords || `${product.name}, ${product.name} pdf, aprender ${product.target_language === 'en' ? 'inglés' : product.target_language === 'ko' ? 'coreano' : 'idiomas'}, ebook idiomas, iLingue Relax, curso de idiomas online, libros de idiomas con pronunciación`}
       />
+
       <Navbar />
       <main className="min-h-dvh bg-background pt-4 pb-16">
         {!product.active && (

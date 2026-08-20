@@ -20,13 +20,6 @@ const resenas = [
     resumen: "It was exactly as described, fast digital delivery without delays. The word list and mental maps are incredibly visual."
   },
   {
-    src: (r2 as any).url || r2,
-    contacto: "Verified Buyer",
-    telefono: "+591 7 **** 4433",
-    pais: "Bolivia 🇧🇴",
-    resumen: "Excellent material. The attention from Rosa and Crady was very kind and access was immediate."
-  },
-  {
     src: (r3 as any).url || r3,
     contacto: "Verified Student",
     telefono: "+52 55 **** 9012",

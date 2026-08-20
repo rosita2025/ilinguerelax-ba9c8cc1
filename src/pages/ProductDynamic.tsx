@@ -547,7 +547,7 @@ const ProductDynamic = () => {
           {(product.sku === "coreano-100-mapas-mentales" || 
             product.sku === "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca" ||
             product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7") && (
-            <div className="mb-4">
+            <div className="mb-2">
               <ResenasWhatsAppCoreano />
             </div>
           )}

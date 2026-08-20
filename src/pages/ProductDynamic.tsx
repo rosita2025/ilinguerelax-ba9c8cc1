@@ -463,7 +463,7 @@ const ProductDynamic = () => {
                     <div className="text-[11px] font-bold text-slate-700">Global Access</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
                   <Smartphone className="w-5 h-5 text-emerald-600" />
                   <div>
                     <div className="text-[9px] font-black uppercase text-slate-400">Format</div>

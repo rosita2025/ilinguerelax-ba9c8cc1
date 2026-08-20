@@ -203,7 +203,12 @@ const ProductDynamic = () => {
   
   const ORIGINAL_MULTIPLIER = 2.5;
   const manualCompareLocal = (product as any)?.local_compare_at_prices?.[displayCurrencyCode];
-  const regionCompareUsd = region.tier === "tienda" ? product.compare_at_price_usd_tienda : region.tier === "latam" ? product.compare_at_price_usd_latam : product.compare_at_price_usd;
+  const regionCompareUsd = region.tier === "tienda" 
+    ? (product as any).compare_at_price_usd_tienda 
+    : region.tier === "latam" 
+      ? (product as any).compare_at_price_usd_latam 
+      : product.compare_at_price_usd;
+
   const compareRate = displayPrice > 0 && effectiveUsd > 0 ? displayPrice / effectiveUsd : 1;
 
   let originalAmount: number | null = null;

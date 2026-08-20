@@ -40,7 +40,9 @@ const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })
 const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then(m => ({ default: m.LooxStyleReviews })));
 
 
+import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 

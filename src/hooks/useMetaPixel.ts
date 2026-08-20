@@ -148,13 +148,14 @@ const hasPixelConsent = (): boolean => {
   if (typeof window === "undefined") return false;
   // Tráfico interno (admin / pruebas / lovable) NUNCA envía eventos al Pixel.
   if (isInternalTraffic()) return false; 
-  // Solo se reportan eventos si el usuario llegó por un anuncio de Meta (Paid Traffic).
+  // Solo se reportan eventos si el usuario llegó por un anuncio de Meta o TikTok (Paid Traffic).
   // El tráfico orgánico, directo o de otras fuentes no se reporta para no ensuciar el ROAS.
-  if (!isMetaPaidTraffic()) return false; 
+  if (!isAdPaidTraffic()) return false; 
   
   if (!isEuUser()) return true; // non-EU: implicit consent
   try { return localStorage.getItem("ilr_cookie_consent") === "accepted"; } catch { return false; }
 };
+
 
 
 

@@ -38,6 +38,10 @@ import grammarPreviewAsset from "@/assets/previews/spanish-grammar-preview.png.a
 import verbsPreviewAsset from "@/assets/previews/spanish-verbs-preview.png.asset.json";
 import questionsPreviewAsset from "@/assets/previews/spanish-questions-preview.png.asset.json";
 import verbsV2PreviewAsset from "@/assets/spanish-verbs-preview.png.asset.json";
+import vocabTable1Asset from "@/assets/previews/vocab-table-preview-1.png.asset.json";
+import vocabTable2Asset from "@/assets/previews/vocab-table-preview-2.png.asset.json";
+import plannerTableAsset from "@/assets/previews/study-planner-preview-table.png.asset.json";
+
 
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
@@ -250,14 +254,25 @@ const ProductDynamic = () => {
     { title: "Grammar Guide", image: grammarPreviewAsset.url },
     { title: "Study Planner (6 Months)", image: plannerPreviewAsset.url },
     { title: "Spanish Exam Pack", image: examPreviewAsset.url },
-    { title: "Digital Flashcards", image: previewSpanishPhrases }
+    { title: "Digital Flashcards", image: previewSpanishPhrases },
+    { title: "Vocabulary Table 1", image: vocabTable1Asset.url },
+    { title: "Vocabulary Table 2", image: vocabTable2Asset.url },
+    { title: "Study Planner Table", image: plannerTableAsset.url }
   ].filter(asset => {
     if (product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7") {
       // For this specific product, only show the relevant assets mentioned by user
-      return ["Study Planner (6 Months)", "Spanish Exam Pack", "Digital Flashcards"].includes(asset.title);
+      return [
+        "Study Planner (6 Months)", 
+        "Spanish Exam Pack", 
+        "Digital Flashcards",
+        "Vocabulary Table 1",
+        "Vocabulary Table 2",
+        "Study Planner Table"
+      ].includes(asset.title);
     }
     return true;
   });
+
 
 
 

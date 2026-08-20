@@ -529,7 +529,7 @@ const ProductDynamic = () => {
         productName={product.name}
         onBuyClick={handleBuy}
         usdValue={effectiveUsd}
-        localUsdPrices={(product as any).local_usd_prices}
+        localUsdPrices={product.local_usd_prices}
       />
 
     </div>

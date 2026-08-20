@@ -528,7 +528,34 @@ const ProductDynamic = () => {
             </div>
           </section>
           
-          {(product.sku === "coreano-100-mapas-mentales" || product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7") && <ResenasWhatsAppCoreano />}
+          {(product.sku === "coreano-100-mapas-mentales" || product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7") && (
+            <div className="space-y-12 mb-16">
+              <div className="max-w-4xl mx-auto px-4">
+                <div className="p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl">
+                  <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                    <div className="w-20 h-20 rounded-2xl bg-emerald-500/20 flex items-center justify-center shrink-0 border border-emerald-500/30">
+                      <BookOpen className="w-10 h-10 text-emerald-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl md:text-2xl font-black mb-2 text-emerald-400 uppercase tracking-tight">Would you like the physical book?</h3>
+                      <p className="text-slate-400 text-sm md:text-base leading-relaxed">
+                        Get the premium printed edition of the 5,000 Spanish Words book shipped to your door.
+                      </p>
+                    </div>
+                    <Button 
+                      asChild
+                      className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black px-8 py-6 rounded-2xl transition-all shadow-lg hover:scale-105"
+                    >
+                      <Link to="/products/5-000-spanish-words-with-english-pronunciation-physical">
+                        GET THE PHYSICAL BOOK
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              <ResenasWhatsAppCoreano />
+            </div>
+          )}
 
           <Suspense fallback={<Skeleton className="h-96 w-full" />}>
             <LooxStyleReviews />

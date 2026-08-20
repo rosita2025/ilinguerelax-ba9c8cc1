@@ -878,13 +878,22 @@ const ProductSpanish5000 = () => {
                 <p className="mt-1 text-sm text-muted-foreground">
                   No shipping, instant access to the full PDF.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => navigate("/products/5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7")}
-                  className="mt-3 inline-flex items-center gap-2 text-primary font-semibold hover:underline underline-offset-4"
-                >
-                  I want only digital <ArrowRight className="w-4 h-4" />
-                </button>
+                <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-4">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/products/5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7")}
+                    className="inline-flex items-center gap-2 text-primary font-semibold hover:underline underline-offset-4"
+                  >
+                    I want only digital <ArrowRight className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/products/5-000-spanish-words-with-english-pronunciation-physical")}
+                    className="inline-flex items-center gap-2 text-emerald-600 font-semibold hover:underline underline-offset-4"
+                  >
+                    I want the physical book <BookOpen className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
 

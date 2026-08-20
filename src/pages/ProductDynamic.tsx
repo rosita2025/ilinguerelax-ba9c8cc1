@@ -203,7 +203,7 @@ const ProductDynamic = () => {
   const displayCurrencyCode = isPEN ? "PEN" : (local.currency || "USD");
   
   const ORIGINAL_MULTIPLIER = 2.5;
-  const manualCompareLocal = (product as any)?.local_compare_at_prices?.[displayCurrencyCode];
+  const manualCompareLocal = product.local_compare_at_prices?.[displayCurrencyCode];
   const regionCompareUsd = region.tier === "tienda" 
     ? product.compare_at_price_usd_tienda 
     : region.tier === "latam" 

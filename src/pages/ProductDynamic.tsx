@@ -38,6 +38,10 @@ import grammarPreviewAsset from "@/assets/previews/spanish-grammar-preview.png.a
 import verbsPreviewAsset from "@/assets/previews/spanish-verbs-preview.png.asset.json";
 import questionsPreviewAsset from "@/assets/previews/spanish-questions-preview.png.asset.json";
 import verbsV2PreviewAsset from "@/assets/spanish-verbs-preview.png.asset.json";
+import vocabTable1Asset from "@/assets/previews/vocab-table-preview-1.png.asset.json";
+import vocabTable2Asset from "@/assets/previews/vocab-table-preview-2.png.asset.json";
+import plannerTableAsset from "@/assets/previews/study-planner-preview-table.png.asset.json";
+
 
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));

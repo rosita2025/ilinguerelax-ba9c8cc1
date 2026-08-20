@@ -6,6 +6,11 @@ import { convertToUSD, type Currency } from "@/i18n";
 declare global {
   interface Window {
     fbq: (...args: unknown[]) => void;
+    ttq: {
+      track: (event: string, params?: Record<string, unknown>) => void;
+      page: () => void;
+      load: (id: string) => void;
+    };
   }
 }
 
@@ -19,6 +24,7 @@ interface ViewContentParams {
 }
 
 const HOTMART_PIXEL_ID = "24959578143733255";
+const TIKTOK_PIXEL_ID = "DA38RORC77UFIU51BH10";
 
 // Generate unique event ID for deduplication
 const generateEventId = (): string => {
@@ -149,7 +155,7 @@ const hasPixelConsent = (): boolean => {
 
 // Fire-and-forget Conversions API call (deduped via event_id with browser Pixel)
 const sendCapiEvent = (eventName: string, eventId: string, params: Record<string, unknown>, email?: string) => {
-  if (!CAPI_EVENTS.has(eventName)) return;
+  if (!CAPI_EVENTS.has(eventName) && eventName !== "ViewContent" && eventName !== "AddToCart" && eventName !== "InitiateCheckout") return;
   if (typeof window === "undefined") return;
   // For EU users without consent, skip CAPI as well (no cookies/IP profiling).
   if (!hasPixelConsent() || isInternalTraffic()) return;
@@ -339,8 +345,15 @@ export const useHotmartPixel = (params: ViewContentParams) => {
       normalizedParams.value = Number(Number(normalizedParams.value).toFixed(2));
     }
 
-    if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
-      window.fbq("track", "ViewContent", { ...normalizedParams, eventID: eventId });
+    if (typeof window !== "undefined" && hasPixelConsent()) {
+      if (window.fbq) window.fbq("track", "ViewContent", { ...normalizedParams, eventID: eventId });
+      if (window.ttq) window.ttq.track("ViewContent", { 
+        content_id: normalizedParams.content_ids?.[0],
+        content_type: "product",
+        content_name: normalizedParams.content_name,
+        value: normalizedParams.value,
+        currency: "USD"
+      });
     }
     sendCapiEvent("ViewContent", eventId, normalizedParams as unknown as Record<string, unknown>);
     logFunnelEvent("ViewContent", normalizedParams as unknown as Record<string, unknown>);
@@ -380,8 +393,17 @@ export const trackHotmartEvent = (
   const eventId = eventName === "Purchase" && orderId
     ? `Purchase_${orderId}`
     : generateEventId();
-  if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
-    window.fbq("track", eventName, { ...pixelParams, eventID: eventId });
+  if (typeof window !== "undefined" && hasPixelConsent()) {
+    if (window.fbq) window.fbq("track", eventName, { ...pixelParams, eventID: eventId });
+    if (window.ttq && (eventName === "AddToCart" || eventName === "InitiateCheckout" || eventName === "CompleteRegistration")) {
+      window.ttq.track(eventName, {
+        content_id: pixelParams.content_ids?.[0] || pixelParams.product_id,
+        content_type: "product",
+        content_name: pixelParams.content_name,
+        value: pixelParams.value,
+        currency: "USD"
+      });
+    }
   }
   sendCapiEvent(eventName, eventId, pixelParams, typeof userEmail === "string" ? userEmail : undefined);
   if (!__skipFunnelLog) logFunnelEvent(eventName, pixelParams);

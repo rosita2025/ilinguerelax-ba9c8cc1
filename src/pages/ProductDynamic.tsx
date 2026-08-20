@@ -387,7 +387,7 @@ const ProductDynamic = () => {
                     <button
                       key={i}
                       onClick={() => setActiveImage(img)}
-                      className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
+                      className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
                         activeImage === img ? "border-primary scale-95" : "border-transparent opacity-70"
                       }`}
                     >

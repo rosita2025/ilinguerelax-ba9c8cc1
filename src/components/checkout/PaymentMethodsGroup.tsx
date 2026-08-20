@@ -1608,7 +1608,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
       badges: dlocalBadges(country, "transfer", 6).length
         ? dlocalBadges(country, "transfer", 6)
-        : [{ label: "Transferencia", bg: "#0F766E", color: "#ffffff" }],
+        : [{ label: "Transfer", bg: "#0F766E", color: "#ffffff" }],
     },
     {
       id: "dlocal_cash",
@@ -1627,7 +1627,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
       badges: dlocalBadges(country, "cash", 6).length
         ? dlocalBadges(country, "cash", 6)
-        : [{ label: "Efectivo", bg: "#F5A623", color: "#1F2937" }],
+        : [{ label: "Cash", bg: "#F5A623", color: "#1F2937" }],
     },
     {
       id: "dlocal_wallet",
@@ -1690,7 +1690,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         : `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 clic`,
 
 
-      badge: hotmartPriceLabel,
+      badge: isPeru ? hotmartPriceLabel : `USD $${totalUsd}`,
       badges: hotmartBadges,
 
     },

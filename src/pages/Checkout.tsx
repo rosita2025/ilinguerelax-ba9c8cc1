@@ -526,9 +526,9 @@ export default function Checkout() {
             <Skeleton className="h-6 w-32" />
           </div>
         </header>
-        <div className="max-w-6xl mx-auto px-4 py-3 md:py-6">
-          <div className="grid lg:grid-cols-[1fr_380px] gap-5 items-start">
-            <div className="space-y-6">
+        <div className="max-w-6xl mx-auto px-4 py-2 sm:py-4">
+          <div className="grid lg:grid-cols-[1fr_380px] gap-4 lg:gap-6 items-start">
+            <div className="space-y-4 lg:space-y-6">
               <Card className="p-6">
                 <div className="space-y-4">
                   <Skeleton className="h-8 w-48" />
@@ -547,7 +547,7 @@ export default function Checkout() {
                 </div>
               </Card>
             </div>
-            <div className="space-y-6">
+            <div className="space-y-4 lg:space-y-6">
               <Card className="p-6">
                 <div className="space-y-4">
                   <Skeleton className="h-6 w-32" />

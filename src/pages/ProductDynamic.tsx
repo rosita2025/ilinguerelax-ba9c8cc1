@@ -341,7 +341,7 @@ const ProductDynamic = () => {
 
               {product.gallery_images && product.gallery_images.length > 0 && (
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                  {[cover, ...product.gallery_images].slice(0, 5).map((img, i) => (
+                  {[cover, ...(product.gallery_images || [])].slice(0, 5).map((img, i) => (
                     <button
                       key={i}
                       onClick={() => setActiveImage(img)}

@@ -1989,10 +1989,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           <div
             data-method-row={m.id}
             className={cn(
-              "rounded-lg border overflow-hidden transition-colors scroll-mt-24",
+              "rounded-xl border-2 overflow-hidden transition-all scroll-mt-24",
               isSelected
-                ? "border-neutral-400 bg-neutral-100 dark:bg-neutral-800/60"
-                : "border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900/40",
+                ? "border-primary bg-primary/5 shadow-sm"
+                : "border-neutral-200 bg-background hover:border-primary/40 dark:border-neutral-700",
             )}
           >
             <button
@@ -2015,8 +2015,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 <div className={cn(
                   "rounded-lg flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9",
                   isSelected
-                    ? "bg-neutral-700 text-white"
-                    : "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200",
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
                 )}>
                   {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Icon className="w-5 h-5" />}
                 </div>
@@ -2117,7 +2117,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               <div className={cn(
                 "w-4 h-4 rounded-full border-2 shrink-0 transition-colors",
                 isSelected
-                  ? "border-neutral-700 bg-neutral-700"
+                  ? "border-primary bg-primary"
                   : "border-neutral-300 dark:border-neutral-600",
               )} />
             </button>

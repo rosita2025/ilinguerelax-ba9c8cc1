@@ -81,6 +81,25 @@ export const StickyBuyBar = ({
   const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
 
   useEffect(() => {
+    // Track TikTok ViewContent when the bar is shown
+    try {
+      const currency = detectCurrency((flag ? currencyCode : "US").toUpperCase());
+      const regionalUsd = localUsdPrices && localUsdPrices[currency];
+      const finalUsdValue = typeof regionalUsd === "number" && regionalUsd > 0 
+        ? regionalUsd 
+        : (usdValue || parseFloat(String(price).replace(/[^\d.,]/g, "").replace(",", ".")));
+
+      trackHotmartEvent("ViewContent", {
+        content_ids: sku ? [sku] : undefined,
+        content_name: productName,
+        content_type: "product",
+        value: finalUsdValue || undefined,
+        currency: "USD",
+        product_id: sku,
+        __skipFunnelLog: true // Don't spam funnel logs for sticky bar views
+      });
+    } catch {}
+
     if (!testimonials || testimonials.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentTestimonialIndex((prev) => (prev + 1) % testimonials.length);

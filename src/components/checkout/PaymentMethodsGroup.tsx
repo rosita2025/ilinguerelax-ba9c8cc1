@@ -2008,7 +2008,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 isSelected
                   ? "bg-neutral-200/60 dark:bg-neutral-800"
                   : "hover:bg-neutral-100 dark:hover:bg-neutral-800/60",
-                !valid && "opacity-50 grayscale cursor-pointer hover:bg-transparent hover:grayscale-0",
+                !valid && "cursor-pointer",
               )}
             >
               {m.id !== "hotmart" && (
@@ -2509,7 +2509,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             "w-full mt-4 py-4 rounded-xl font-bold text-white text-base transition-colors",
             "bg-[hsl(142,72%,42%)] hover:bg-[hsl(142,72%,36%)]",
             "flex items-center justify-center gap-2",
-            !valid && "opacity-60 cursor-pointer",
+            !valid && "cursor-pointer",
           )}
         >
           {mpLoading ? (

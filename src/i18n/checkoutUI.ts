@@ -186,7 +186,7 @@ const es: CheckoutUIStrings = {
 
   redirecting: "Redirigiendo…",
   buyNow: "Comprar ahora",
-  enableMethods: "👆 Completa tu nombre y correo arriba para habilitar los métodos de pago.",
+  enableMethods: "Completa tus datos arriba para confirmar tu pedido.",
 
   sendPaymentTo: "Envía el pago a",
   amountToPay: "Monto a pagar",
@@ -298,7 +298,7 @@ const en: CheckoutUIStrings = {
 
   redirecting: "Redirecting…",
   buyNow: "Buy now",
-  enableMethods: "👆 Please complete your details to enable payment methods.",
+  enableMethods: "Complete your details above to confirm your order.",
 
   sendPaymentTo: "Send payment to",
   amountToPay: "Amount to pay",

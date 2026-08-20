@@ -486,9 +486,12 @@ const ProductDynamic = () => {
             </div>
           </section>
           
+          {product.sku === "coreano-100-mapas-mentales" && <ResenasWhatsAppCoreano />}
+
           <Suspense fallback={<Skeleton className="h-96 w-full" />}>
             <LooxStyleReviews />
           </Suspense>
+
 
           <Suspense fallback={<Skeleton className="h-64 w-full" />}>
             <FAQ 

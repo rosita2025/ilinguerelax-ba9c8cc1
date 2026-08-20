@@ -395,7 +395,7 @@ export const trackHotmartEvent = (
     : generateEventId();
   if (typeof window !== "undefined" && hasPixelConsent()) {
     if (window.fbq) window.fbq("track", eventName, { ...pixelParams, eventID: eventId });
-    if (window.ttq && (eventName === "AddToCart" || eventName === "InitiateCheckout" || eventName === "CompleteRegistration")) {
+    if (window.ttq && (eventName === "AddToCart" || eventName === "InitiateCheckout" || eventName === "CompleteRegistration" || eventName === "Purchase")) {
       window.ttq.track(eventName, {
         content_id: pixelParams.content_ids?.[0] || pixelParams.product_id,
         content_type: "product",
@@ -404,6 +404,7 @@ export const trackHotmartEvent = (
         currency: "USD"
       });
     }
+
   }
   sendCapiEvent(eventName, eventId, pixelParams, typeof userEmail === "string" ? userEmail : undefined);
   if (!__skipFunnelLog) logFunnelEvent(eventName, pixelParams);

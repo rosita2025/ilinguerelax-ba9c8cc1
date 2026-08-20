@@ -436,7 +436,7 @@ const ProductDynamic = () => {
                 <Button 
                   onClick={handleBuy}
                   size="lg" 
-                  className="w-full h-14 text-lg font-black shadow-hero bg-emerald-600 hover:bg-emerald-700 text-white mb-3"
+                  className="w-full h-12 text-base font-black shadow-hero bg-emerald-600 hover:bg-emerald-700 text-white mb-2"
                 >
                   GET IT NOW — {displayFormatted}
                 </Button>

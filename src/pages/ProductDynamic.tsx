@@ -552,9 +552,11 @@ const ProductDynamic = () => {
             </div>
           )}
 
-          <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-            <LooxStyleReviews />
-          </Suspense>
+          {product.sku !== "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca" && (
+            <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+              <LooxStyleReviews />
+            </Suspense>
+          )}
 
           {product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" && (
             <div className="max-w-4xl mx-auto px-4 mb-4">

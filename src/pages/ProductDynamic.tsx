@@ -512,8 +512,6 @@ const ProductDynamic = () => {
                           <div className="font-black text-[10px] sm:text-xs uppercase tracking-widest text-white/90 truncate">{asset.title}</div>
                         </div>
                       </button>
-
-                      </button>
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl p-0 overflow-hidden bg-white">
                       <DialogHeader className="p-4 bg-slate-900 text-white">
@@ -525,6 +523,7 @@ const ProductDynamic = () => {
                     </DialogContent>
                   </Dialog>
                 ))}
+
               </div>
             </div>
           </section>

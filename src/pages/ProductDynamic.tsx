@@ -344,18 +344,18 @@ const ProductDynamic = () => {
       
       <Navbar />
 
-      <main className="pt-1 pb-4">
-        <div className="container px-4 sm:px-4">
+      <main className="pt-0 pb-2">
+        <div className="container px-4 sm:px-6">
           {/* Trust Pilot Badge */}
-          <div className="flex justify-center mb-2">
+          <div className="flex justify-center mb-1">
             <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-emerald-200 shadow-sm">
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-2.5 h-2.5 fill-emerald-500 text-emerald-500" strokeWidth={0} />
+                  <Star key={i} className="w-2 h-2 fill-emerald-500 text-emerald-500" strokeWidth={0} />
                 ))}
               </div>
-              <span className="text-[10px] font-bold text-slate-800">Excellent</span>
-              <span className="text-[10px] font-bold text-emerald-600">★ Trustpilot</span>
+              <span className="text-[9px] font-bold text-slate-800">Excellent</span>
+              <span className="text-[9px] font-bold text-emerald-600">★ Trustpilot</span>
             </div>
           </div>
 
@@ -387,7 +387,7 @@ const ProductDynamic = () => {
                     <button
                       key={i}
                       onClick={() => setActiveImage(img)}
-                      className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
+                      className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
                         activeImage === img ? "border-primary scale-95" : "border-transparent opacity-70"
                       }`}
                     >
@@ -399,17 +399,17 @@ const ProductDynamic = () => {
             </div>
 
             {/* Right Column: Copy & Pricing */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-emerald-500 text-emerald-500" />
+                    <Star key={i} className="w-3 h-3 fill-emerald-500 text-emerald-500" />
                   ))}
                 </div>
-                <span className="text-xs font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ reviews)</span>
+                <span className="text-[10px] font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ reviews)</span>
               </div>
 
-              <h1 className="text-2xl md:text-4xl font-black leading-tight text-slate-900 tracking-tight">
+              <h1 className="text-xl md:text-3xl font-black leading-tight text-slate-900 tracking-tight">
                 {product.name}
               </h1>
 
@@ -420,7 +420,7 @@ const ProductDynamic = () => {
 
               </p>
 
-              <div className="p-4 rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+              <div className="p-3 rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
                 <div className="flex items-end gap-2 mb-1">
                   <span className="text-3xl md:text-4xl font-black text-foreground">{displayFormatted}</span>
                   {discountPercentage > 0 && (
@@ -436,7 +436,7 @@ const ProductDynamic = () => {
                 <Button 
                   onClick={handleBuy}
                   size="lg" 
-                  className="w-full h-14 text-lg font-black shadow-hero bg-emerald-600 hover:bg-emerald-700 text-white mb-3"
+                  className="w-full h-12 text-base font-black shadow-hero bg-emerald-600 hover:bg-emerald-700 text-white mb-2"
                 >
                   GET IT NOW — {displayFormatted}
                 </Button>
@@ -444,7 +444,7 @@ const ProductDynamic = () => {
                 <StockAlert count={7} className="mt-2 w-full justify-center" />
 
 
-                <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+                <div className="flex items-center justify-between pt-3 border-t border-slate-200">
                   <div className="flex items-center gap-4 grayscale opacity-60">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" className="h-4" alt="" />
                     <PaymentLogos />
@@ -455,15 +455,15 @@ const ProductDynamic = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
                   <Globe className="w-5 h-5 text-emerald-600" />
                   <div>
                     <div className="text-[9px] font-black uppercase text-slate-400">Availability</div>
                     <div className="text-[11px] font-bold text-slate-700">Global Access</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
                   <Smartphone className="w-5 h-5 text-emerald-600" />
                   <div>
                     <div className="text-[9px] font-black uppercase text-slate-400">Format</div>
@@ -475,13 +475,13 @@ const ProductDynamic = () => {
           </div>
 
           {/* Features Section */}
-          <section className="mt-6 py-4 border-t border-slate-100">
+          <section className="mt-4 py-3 border-t border-slate-100">
             <div className="grid lg:grid-cols-2 gap-6">
               <div>
-                <h2 className="text-xl md:text-2xl font-black mb-4 uppercase tracking-tight">What's Inside</h2>
+                <h2 className="text-lg md:text-xl font-black mb-3 uppercase tracking-tight">What's Inside</h2>
                 <div className="grid gap-2">
                   {features.map((f, i) => (
-                    <div key={i} className="flex items-start gap-2 p-2.5 rounded-xl bg-white border border-slate-100 shadow-sm">
+                    <div key={i} className="flex items-start gap-2 p-2 rounded-xl bg-white border border-slate-100 shadow-sm">
                       <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
                         <Check className="w-3 h-3 text-emerald-600" />
                       </div>
@@ -490,9 +490,9 @@ const ProductDynamic = () => {
                   ))}
                 </div>
               </div>
-              <div className="grid sm:grid-cols-2 gap-3">
+              <div className="grid sm:grid-cols-2 gap-2">
                 {benefits.map((b, i) => (
-                  <div key={i} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                  <div key={i} className="p-3 rounded-xl bg-slate-50 border border-slate-100">
                     <b.icon className="w-6 h-6 text-primary mb-2" />
                     <h3 className="font-black text-slate-900 text-sm mb-1 uppercase tracking-tight">{b.title}</h3>
                     <p className="text-[11px] text-muted-foreground leading-tight">{b.description}</p>
@@ -503,10 +503,10 @@ const ProductDynamic = () => {
           </section>
 
           {/* Look Inside Gallery */}
-          <section className="mt-6 py-4 bg-slate-900 rounded-[1.5rem] text-white overflow-hidden">
+          <section className="mt-4 py-3 bg-slate-900 rounded-[1.5rem] text-white overflow-hidden">
             <div className="px-4 md:px-8">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl md:text-3xl font-black mb-2 uppercase tracking-tight">Look Inside</h2>
+              <div className="text-center mb-4">
+                <h2 className="text-xl md:text-2xl font-black mb-1 uppercase tracking-tight">Look Inside</h2>
                 <p className="text-slate-400 text-xs max-w-2xl mx-auto">Visual guides to reach fluency faster.</p>
               </div>
               
@@ -547,7 +547,7 @@ const ProductDynamic = () => {
           {(product.sku === "coreano-100-mapas-mentales" || 
             product.sku === "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca" ||
             product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7") && (
-            <div className="mb-4">
+            <div className="mb-2">
               <ResenasWhatsAppCoreano />
             </div>
           )}
@@ -557,12 +557,12 @@ const ProductDynamic = () => {
           </Suspense>
 
           {product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" && (
-            <div className="max-w-4xl mx-auto px-4 mb-8">
-              <div className="p-4 md:p-6 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden relative group">
+            <div className="max-w-4xl mx-auto px-4 mb-4">
+              <div className="p-3 md:p-4 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden relative group">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <Package className="w-32 h-32 -mr-8 -mt-8" />
                 </div>
-                <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left relative z-10">
+                <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left relative z-10">
                   <div className="w-16 h-16 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0 border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
                     <BookOpen className="w-10 h-10 text-emerald-400" />
                   </div>
@@ -574,7 +574,7 @@ const ProductDynamic = () => {
                   </div>
                   <Button 
                     asChild
-                    className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black px-6 py-4 rounded-xl transition-all shadow-[0_8px_25px_rgba(16,185,129,0.3)] hover:scale-105 active:scale-95 h-auto text-sm"
+                    className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black px-4 py-3 rounded-xl transition-all shadow-[0_8px_25px_rgba(16,185,129,0.3)] hover:scale-105 active:scale-95 h-auto text-[13px]"
                   >
                     <Link to="/products/5-000-spanish-words-with-english-pronunciation-physical">
                       GET THE PHYSICAL BOOK

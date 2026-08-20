@@ -876,20 +876,23 @@ const ProductSpanish5000 = () => {
                   Prefer only the digital version? Get 5,000 Words Spanish Relax PDF
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  No shipping, instant access to the full PDF.
+                  No shipping, instant access to the full digital PDF bundle.
                 </p>
                 <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-4">
                   <button
                     type="button"
                     onClick={() => navigate("/products/5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7")}
-                    className="inline-flex items-center gap-2 text-primary font-semibold hover:underline underline-offset-4"
+                    className="inline-flex items-center gap-2 text-primary font-bold hover:underline underline-offset-4"
                   >
                     I want only digital <ArrowRight className="w-4 h-4" />
                   </button>
                   <button
                     type="button"
-                    onClick={() => navigate("/products/5-000-spanish-words-with-english-pronunciation-physical")}
-                    className="inline-flex items-center gap-2 text-emerald-600 font-semibold hover:underline underline-offset-4"
+                    onClick={() => {
+                      const el = document.querySelector('[data-bundle-selector]') || document.querySelector('h1');
+                      el?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="inline-flex items-center gap-2 text-emerald-600 font-bold hover:underline underline-offset-4"
                   >
                     I want the physical book <BookOpen className="w-4 h-4" />
                   </button>

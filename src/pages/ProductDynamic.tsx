@@ -1,13 +1,15 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo, lazy, Suspense } from "react";
 import { useParams, Link, Navigate, useNavigate } from "react-router-dom";
-import { Check, ArrowLeft, Download, Shield, Zap, Sparkles, HelpCircle, Lock, Star } from "lucide-react";
+import { 
+  Check, ArrowLeft, Download, Shield, Zap, Sparkles, HelpCircle, Lock, Star, 
+  Eye, Globe, Smartphone, FileText, CreditCard, ArrowRight, Package, Headphones, Layers, FilePlus, BookOpen, Brain 
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PinterestSave } from "@/components/PinterestSave";
@@ -17,11 +19,26 @@ import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
 import { StockAlert } from "@/components/StockAlert";
 import { SocialProofPill } from "@/components/SocialProofPill";
 import { ProductTypeBadge } from "@/components/ProductTypeBadge";
-import { FAQ } from "@/components/FAQ";
-import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { useI18n } from "@/i18n/I18nContext";
 import { formatCurrencyAmount, type Currency } from "@/i18n";
 import { Skeleton } from "@/components/ui/skeleton";
+import { motion, AnimatePresence } from "framer-motion";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+
+// Assets for Preview Section
+import previewSpanishVocab from "@/assets/preview-spanish-vocab.png";
+import previewSpanishPhrases from "@/assets/preview-spanish-phrases.webp";
+import plannerPreviewAsset from "@/assets/previews/spanish-daily-planner-preview.png.asset.json";
+import examPreviewAsset from "@/assets/previews/spanish-exam-preview.png.asset.json";
+import grammarPreviewAsset from "@/assets/previews/spanish-grammar-preview.png.asset.json";
+import verbsPreviewAsset from "@/assets/previews/spanish-verbs-preview.png.asset.json";
+import questionsPreviewAsset from "@/assets/previews/spanish-questions-preview.png.asset.json";
+import verbsV2PreviewAsset from "@/assets/spanish-verbs-preview.png.asset.json";
+
+const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
+const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
+const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then(m => ({ default: m.LooxStyleReviews })));
+
 
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useRegionTier } from "@/hooks/useRegionTier";

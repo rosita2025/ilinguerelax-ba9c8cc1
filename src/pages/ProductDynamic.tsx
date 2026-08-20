@@ -263,6 +263,7 @@ const ProductDynamic = () => {
       currency: "USD",
       num_items: 1,
     });
+
     
     addItem({
       id: product.sku,

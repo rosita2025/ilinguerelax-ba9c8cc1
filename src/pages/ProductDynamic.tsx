@@ -214,7 +214,7 @@ const ProductDynamic = () => {
 
   let originalAmount: number | null = null;
   if (typeof manualCompareLocal === "number" && manualCompareLocal > 0) originalAmount = manualCompareLocal;
-  else if (isPEN && (product as any).compare_at_price_pen != null && Number((product as any).compare_at_price_pen) > 0) originalAmount = Number((product as any).compare_at_price_pen);
+  else if (isPEN && product.compare_at_price_pen != null && Number(product.compare_at_price_pen) > 0) originalAmount = Number(product.compare_at_price_pen);
   else if (regionCompareUsd && regionCompareUsd > 0) originalAmount = Number(regionCompareUsd) * compareRate;
   
   if (originalAmount === null || originalAmount <= displayPrice) originalAmount = displayPrice * ORIGINAL_MULTIPLIER;

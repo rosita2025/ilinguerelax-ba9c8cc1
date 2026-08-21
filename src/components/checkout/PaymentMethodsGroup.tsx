@@ -2006,6 +2006,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             data-method-row={m.id}
             className={cn(
               "rounded-xl border-2 overflow-hidden transition-all scroll-mt-24",
+              !valid && "opacity-60",
               isSelected
                 ? "border-primary bg-primary/5 shadow-sm"
                 : "border-neutral-200 bg-background hover:border-primary/40 dark:border-neutral-700",

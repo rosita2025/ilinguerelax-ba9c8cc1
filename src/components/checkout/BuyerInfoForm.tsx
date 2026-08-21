@@ -84,7 +84,7 @@ export function BuyerInfoForm() {
   useEffect(() => {
     setLocalName(buyer.fullName || "");
     setLocalEmail(buyer.email || "");
-    setLocalPhone(buyer.phone || "");
+    setLocalPhone(safePhone(buyer.phone));
     setLocalAddress(buyer.address || "");
     setLocalCity(buyer.city || "");
     setLocalZip(buyer.zip || "");
@@ -287,6 +287,7 @@ export function BuyerInfoForm() {
           </span>
           <div className="mt-1 phone-input-wrap">
             <PhoneInput
+              key={`phone-${region.loading ? "pending" : region.country || "PE"}`}
               flags={flags}
               international
               defaultCountry={(region.country as any) || "PE"}

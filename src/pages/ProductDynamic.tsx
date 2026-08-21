@@ -100,7 +100,7 @@ const ProductDynamic = () => {
   const [notFound, setNotFound] = useState(false);
   const [activeImage, setActiveImage] = useState<string>("");
   
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
 
@@ -623,7 +623,16 @@ const ProductDynamic = () => {
         rating={reviewsRating}
         reviewCount={reviewsCount}
         productName={product.name}
-        ctaText={`I WANT IT NOW — ${displayFormatted}`}
+        lang={language === "es" ? "es" : "en"}
+        ctaText={
+          language === "es"
+            ? `LO QUIERO AHORA — ${displayFormatted}`
+            : language === "pt"
+              ? `QUERO AGORA — ${displayFormatted}`
+              : language === "fr"
+                ? `JE LE VEUX — ${displayFormatted}`
+                : `I WANT IT NOW — ${displayFormatted}`
+        }
         onBuyClick={handleBuy}
         usdValue={effectiveUsd}
         localUsdPrices={product.local_usd_prices}

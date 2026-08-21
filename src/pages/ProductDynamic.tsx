@@ -104,6 +104,24 @@ const ProductDynamic = () => {
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
 
+  // Precarga el paquete de JS del checkout en segundo plano, mientras el
+  // visitante todavía está leyendo esta página. Antes ese código (Checkout +
+  // PaymentMethodsGroup, ~160KB de fuente + Stripe) recién empezaba a
+  // descargarse DESPUÉS del clic en "comprar", lo cual se sentía como una
+  // pantalla en blanco de 3-5 segundos justo en el momento más crítico.
+  // Usamos requestIdleCallback (con fallback a setTimeout) para no competir
+  // con la carga inicial de la propia página del producto.
+  useEffect(() => {
+    const prefetch = () => { import("@/pages/Checkout"); };
+    const w = window as typeof window & { requestIdleCallback?: (cb: () => void) => number };
+    if (typeof w.requestIdleCallback === "function") {
+      const id = w.requestIdleCallback(prefetch);
+      return () => { /* no cleanup needed, prefetch is harmless if it fires */ };
+    }
+    const timeoutId = window.setTimeout(prefetch, 2000);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
   useEffect(() => {
     if (!slug) return;
     let cancelled = false;

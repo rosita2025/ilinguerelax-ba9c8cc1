@@ -100,7 +100,7 @@ const ProductDynamic = () => {
   const [notFound, setNotFound] = useState(false);
   const [activeImage, setActiveImage] = useState<string>("");
   
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
 

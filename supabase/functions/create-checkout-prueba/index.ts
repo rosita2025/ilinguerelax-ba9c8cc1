@@ -17,8 +17,9 @@ const ItemSchema = z.object({
   name: z.string().max(200).optional(),
   price: z.number().optional(),
   quantity: z.number().int().min(1).max(50),
-  image: z.string().max(500).optional(),
-  description: z.string().max(500).optional(),
+  // Se ignoran en el servidor: se truncan en vez de rechazar el pedido.
+  image: z.string().transform((v) => v.slice(0, 2000)).optional(),
+  description: z.string().transform((v) => v.slice(0, 2000)).optional(),
 });
 
 const BodySchema = z.object({

@@ -230,7 +230,11 @@ const ProductDynamic = () => {
   if (originalAmount === null || originalAmount <= displayPrice) originalAmount = displayPrice * ORIGINAL_MULTIPLIER;
   
   const originalFormatted = formatCurrencyAmount(originalAmount, displayCurrencyCode as Currency);
-  const discountPercentage = Math.round(((originalAmount - displayPrice) / originalAmount) * 100);
+  // Cap the displayed discount: anything above ~45% looks like an inflated "before" price.
+  const discountPercentage = Math.min(
+    MAX_DISPLAY_DISCOUNT,
+    Math.round(((originalAmount - displayPrice) / originalAmount) * 100)
+  );
   
   const reviewsCount = product.review_count || 0;
   const reviewsRating = product.rating || 0;

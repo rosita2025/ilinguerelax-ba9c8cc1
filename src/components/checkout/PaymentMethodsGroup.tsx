@@ -491,9 +491,18 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   useEffect(() => {
     if (prevSig.current !== cartSignature) {
       prevSig.current = cartSignature;
-      if (selected === "card") setShowStripe(false);
+      // El PaymentIntent guardado corresponde al total anterior: al agregar o
+      // quitar un upsell hay que descartarlo para que Stripe cobre el nuevo total.
+      useCheckoutPruebaStore.getState().setClientSecret(null);
+      setShowStripe(false);
+      setStripeRetryKey((k) => k + 1);
     }
-  }, [cartSignature, selected]);
+  }, [cartSignature]);
+
+  // Precios siempre frescos para el callback de Stripe (evita closures stale
+  // que enviaban el monto sin el upsell recién agregado).
+  const pricingRef = useRef({ currentUsdRef, localTotalLabel, totalLocal, currency });
+  pricingRef.current = { currentUsdRef, localTotalLabel, totalLocal, currency };
 
   const captureAbandonedCheckout = useCallback(async (paymentMethod?: string, force = false) => {
     const s = useCheckoutPruebaStore.getState();

@@ -1,4 +1,4 @@
-import { useState, useMemo, Suspense } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
@@ -194,6 +194,20 @@ const Product5000 = () => {
   });
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  
+  // Precarga el paquete de JS del checkout en segundo plano (mismo fix que
+  // en ProductDynamic.tsx) para evitar la pantalla en blanco de 3-5s al
+  // tocar "comprar".
+  useEffect(() => {
+    const prefetch = () => { import("@/pages/Checkout"); };
+    const w = window as typeof window & { requestIdleCallback?: (cb: () => void) => number };
+    if (typeof w.requestIdleCallback === "function") {
+      w.requestIdleCallback(prefetch);
+      return;
+    }
+    const timeoutId = window.setTimeout(prefetch, 2000);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
   
   const { isPeru, priceUsd: priceUSD, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen, country } = tier;
   const isLatam = false; // Internal checkout for everyone

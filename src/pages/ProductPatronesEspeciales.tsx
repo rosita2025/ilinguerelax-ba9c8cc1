@@ -85,6 +85,20 @@ const ProductPatronesEspeciales = () => {
   const { t, currency, countryCode } = useI18n();
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  
+  // Precarga el paquete de JS del checkout en segundo plano (mismo fix que
+  // en ProductDynamic.tsx) para evitar la pantalla en blanco de 3-5s al
+  // tocar "comprar".
+  useEffect(() => {
+    const prefetch = () => { import("@/pages/Checkout"); };
+    const w = window as typeof window & { requestIdleCallback?: (cb: () => void) => number };
+    if (typeof w.requestIdleCallback === "function") {
+      w.requestIdleCallback(prefetch);
+      return;
+    }
+    const timeoutId = window.setTimeout(prefetch, 2000);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
   const ADMIN_SKU = "patrones-especiales-alfabeto-combinaciones-secretas-ingles";
   const pricingAdmin = useAdminPricing(ADMIN_SKU);
   const tier = useCountryTierRouting(ADMIN_SKU, {
@@ -344,7 +358,7 @@ const ProductPatronesEspeciales = () => {
                   <span className="text-3xl sm:text-4xl md:text-6xl font-black text-foreground leading-none">{tier.priceLabel}</span>
                   <span className="text-lg sm:text-xl md:text-2xl text-muted-foreground line-through opacity-70">{tier.originalLabel}</span>
                   <span className="px-2.5 py-1 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs sm:text-sm font-bold shadow-lg whitespace-nowrap">
-                    AHORRA 75%
+                    AHORRA 35%
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground">

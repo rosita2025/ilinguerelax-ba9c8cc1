@@ -623,6 +623,7 @@ const ProductDynamic = () => {
         rating={reviewsRating}
         reviewCount={reviewsCount}
         productName={product.name}
+        ctaText={`I WANT IT NOW — ${displayFormatted}`}
         onBuyClick={handleBuy}
         usdValue={effectiveUsd}
         localUsdPrices={product.local_usd_prices}

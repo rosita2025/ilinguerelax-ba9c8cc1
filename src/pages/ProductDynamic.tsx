@@ -209,7 +209,9 @@ const ProductDynamic = () => {
   const displayFormatted = penAmount > 0 ? formatCurrencyAmount(penAmount, "PEN") : (local.formatted || "$0.00");
   const displayCurrencyCode = isPEN ? "PEN" : (local.currency || "USD");
   
-  const ORIGINAL_MULTIPLIER = 2.5;
+  // ~35% fallback discount: "too good" discounts (60-90%) read as an inflated original price and hurt trust.
+  const ORIGINAL_MULTIPLIER = 1.54;
+  const MAX_DISPLAY_DISCOUNT = 45;
   const manualCompareLocal = product.local_compare_at_prices?.[displayCurrencyCode];
   const regionCompareUsd = region.tier === "tienda" 
     ? product.compare_at_price_usd_tienda 

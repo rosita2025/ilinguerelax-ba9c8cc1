@@ -54,10 +54,20 @@ export function BuyerInfoForm() {
   const t = getCheckoutUI(language);
   const hasPhysicalItems = items.some(i => i.isPhysical);
 
+  // Un teléfono guardado de una sesión anterior (localStorage, recuperación
+  // de carrito) a veces no viene en formato E.164 (con "+"). Si se lo pasamos
+  // así a PhoneInput, puede mostrar dígitos que no corresponden a la bandera
+  // del país recién detectado. Mejor tratarlo como vacío y dejar que el
+  // selector arranque limpio con el país real.
+  const safePhone = (raw?: string) => {
+    const v = (raw || "").trim();
+    return v.startsWith("+") ? v : "";
+  };
+
   // Local state to prevent infinite loops and laggy typing
   const [localName, setLocalName] = useState(buyer.fullName || "");
   const [localEmail, setLocalEmail] = useState(buyer.email || "");
-  const [localPhone, setLocalPhone] = useState(buyer.phone || "");
+  const [localPhone, setLocalPhone] = useState(safePhone(buyer.phone));
   const [localAddress, setLocalAddress] = useState(buyer.address || "");
   const [localCity, setLocalCity] = useState(buyer.city || "");
   const [localZip, setLocalZip] = useState(buyer.zip || "");
@@ -74,7 +84,7 @@ export function BuyerInfoForm() {
   useEffect(() => {
     setLocalName(buyer.fullName || "");
     setLocalEmail(buyer.email || "");
-    setLocalPhone(buyer.phone || "");
+    setLocalPhone(safePhone(buyer.phone));
     setLocalAddress(buyer.address || "");
     setLocalCity(buyer.city || "");
     setLocalZip(buyer.zip || "");
@@ -277,6 +287,7 @@ export function BuyerInfoForm() {
           </span>
           <div className="mt-1 phone-input-wrap">
             <PhoneInput
+              key={`phone-${region.loading ? "pending" : region.country || "PE"}`}
               flags={flags}
               international
               defaultCountry={(region.country as any) || "PE"}

@@ -765,10 +765,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     const coverage = validateDlocalMethod(ctry, dlMethod);
     if (!coverage.ok) {
       setSelected(null);
-      setMethodError({ method: dlMethod, message: coverage.reason || "Método no disponible en tu país." });
+      setMethodError({ method: dlMethod, message: coverage.reason || (language === "en" ? "Method not available in your country." : "Método no disponible en tu país.") });
       toast({
-        title: "Método no disponible",
-        description: coverage.reason || "Elige otro método de pago para tu país.",
+        title: language === "en" ? "Method not available" : "Método no disponible",
+        description: coverage.reason || (language === "en" ? "Choose another payment method for your country." : "Elige otro método de pago para tu país."),
         variant: "destructive",
       });
       return;
@@ -1952,6 +1952,22 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         </div>
       )}
 
+      {!isFree && !isInvalidZero && !valid && (
+        <div className="mb-3 px-3 py-2.5 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800">
+          <p className="text-xs font-semibold text-amber-900 dark:text-amber-100 text-center">
+            {language === "en"
+              ? "👆 Complete your name and email above to choose a payment method."
+              : language === "pt"
+              ? "👆 Complete seu nome e e-mail acima para escolher uma forma de pagamento."
+              : language === "fr"
+              ? "👆 Complétez votre nom et e-mail ci-dessus pour choisir un moyen de paiement."
+              : "👆 Completa tu nombre y correo arriba para elegir un método de pago."}
+          </p>
+        </div>
+      )}
+
+
+
 
       {!isFree && !isInvalidZero && methods.map((m, idx) => {
         const primaryCardTitle = isPeru ? t.cardTitlePeru : t.cardTitleGlobal;
@@ -1990,6 +2006,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             data-method-row={m.id}
             className={cn(
               "rounded-xl border-2 overflow-hidden transition-all scroll-mt-24",
+              !valid && "opacity-60",
               isSelected
                 ? "border-primary bg-primary/5 shadow-sm"
                 : "border-neutral-200 bg-background hover:border-primary/40 dark:border-neutral-700",

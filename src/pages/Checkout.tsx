@@ -832,7 +832,10 @@ export default function Checkout() {
                 </div>
               </aside>
             </div>
+
+            <StickyPayCTA />
           </>
+
         )}
       </SectionErrorBoundary>
     </div>

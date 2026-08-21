@@ -11,6 +11,7 @@ import { SectionErrorBoundary } from "@/components/SectionErrorBoundary";
 
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
+import { StickyPayCTA } from "@/components/checkout/StickyPayCTA";
 import { UpsellPanel } from "@/components/checkout/UpsellPanel";
 
 import { CheckoutTestimonials } from "@/components/checkout/CheckoutTestimonials";
@@ -750,7 +751,7 @@ export default function Checkout() {
 
             <MobileOrderSummarySticky slug={catalogItem?.id} />
 
-            <div className="max-w-6xl min-w-0 mx-auto px-3 sm:px-4 py-2 sm:py-4 lg:py-6 grid lg:grid-cols-[minmax(0,1fr)_400px] gap-4 lg:gap-6">
+            <div className="max-w-6xl min-w-0 mx-auto px-3 sm:px-4 py-2 sm:py-4 lg:py-6 pb-24 lg:pb-6 grid lg:grid-cols-[minmax(0,1fr)_400px] gap-4 lg:gap-6">
               <div className="min-w-0 space-y-3 sm:space-y-4">
                 {items.some(i => i.isPhysical) && items.some(i => !i.isPhysical) && (
                   <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 flex gap-3 items-start">
@@ -778,9 +779,12 @@ export default function Checkout() {
                   </SectionErrorBoundary>
                 ) : null}
 
-                <SectionErrorBoundary name="payment-methods">
-                  <PaymentMethodsGroup parentSku={catalogItem?.adminSku ?? catalogItem?.id ?? slug ?? null} />
-                </SectionErrorBoundary>
+                <div id="payment-methods-section">
+                  <SectionErrorBoundary name="payment-methods">
+                    <PaymentMethodsGroup parentSku={catalogItem?.adminSku ?? catalogItem?.id ?? slug ?? null} />
+                  </SectionErrorBoundary>
+                </div>
+
 
                 <SectionErrorBoundary name="checkout-testimonials">
                   <CheckoutTestimonials />
@@ -829,7 +833,10 @@ export default function Checkout() {
                 </div>
               </aside>
             </div>
+
+            <StickyPayCTA />
           </>
+
         )}
       </SectionErrorBoundary>
     </div>

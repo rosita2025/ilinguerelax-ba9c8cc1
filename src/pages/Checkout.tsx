@@ -778,9 +778,12 @@ export default function Checkout() {
                   </SectionErrorBoundary>
                 ) : null}
 
-                <SectionErrorBoundary name="payment-methods">
-                  <PaymentMethodsGroup parentSku={catalogItem?.adminSku ?? catalogItem?.id ?? slug ?? null} />
-                </SectionErrorBoundary>
+                <div id="payment-methods-section">
+                  <SectionErrorBoundary name="payment-methods">
+                    <PaymentMethodsGroup parentSku={catalogItem?.adminSku ?? catalogItem?.id ?? slug ?? null} />
+                  </SectionErrorBoundary>
+                </div>
+
 
                 <SectionErrorBoundary name="checkout-testimonials">
                   <CheckoutTestimonials />

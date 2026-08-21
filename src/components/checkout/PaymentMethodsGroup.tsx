@@ -765,10 +765,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     const coverage = validateDlocalMethod(ctry, dlMethod);
     if (!coverage.ok) {
       setSelected(null);
-      setMethodError({ method: dlMethod, message: coverage.reason || "Método no disponible en tu país." });
+      setMethodError({ method: dlMethod, message: coverage.reason || (language === "en" ? "Method not available in your country." : "Método no disponible en tu país.") });
       toast({
-        title: "Método no disponible",
-        description: coverage.reason || "Elige otro método de pago para tu país.",
+        title: language === "en" ? "Method not available" : "Método no disponible",
+        description: coverage.reason || (language === "en" ? "Choose another payment method for your country." : "Elige otro método de pago para tu país."),
         variant: "destructive",
       });
       return;

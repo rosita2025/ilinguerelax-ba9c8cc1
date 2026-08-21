@@ -770,7 +770,9 @@ export default function Checkout() {
                 </div>
                 
                 <SectionErrorBoundary name="buyer-info">
-                  <BuyerInfoForm />
+                  <div id="buyer-info-section">
+                    <BuyerInfoForm />
+                  </div>
                 </SectionErrorBoundary>
 
                 {catalogItem?.upsells?.length ? (

@@ -912,7 +912,15 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
   const handleSelect = (m: Method) => {
-    if (!valid) { requestBuyerInfo(); return; }
+    // No usar el `valid` capturado en el render: si el comprador acaba de
+    // escribir su email y toca un método de pago de inmediato, el blur que
+    // guarda el dato y el click pueden llegar en el mismo ciclo de React,
+    // y este closure todavía vería el valor viejo ("inválido"), dejando la
+    // tarjeta de método como congelada/gris sin razón aparente. Leer el
+    // estado más reciente directo del store evita esa carrera.
+    const freshBuyer = useCheckoutPruebaStore.getState().buyer;
+    const freshValid = isBuyerValid(freshBuyer, hasPhysicalItems);
+    if (!freshValid) { requestBuyerInfo(); return; }
     if (isDlocalMethodId(m)) {
       const v = validateDlocalMethod(country, m);
       if (!v.ok) {
@@ -939,7 +947,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
   const handleBuyNow = async () => {
-    if (!valid) { requestBuyerInfo(); return; }
+    // Misma corrección que en handleSelect: leer el estado más reciente
+    // directo del store, no el `valid` capturado en el render.
+    const freshBuyer = useCheckoutPruebaStore.getState().buyer;
+    const freshValid = isBuyerValid(freshBuyer, hasPhysicalItems);
+    if (!freshValid) { requestBuyerInfo(); return; }
     
     // Validar Asia para productos físicos
     const isAsia = ["CN", "JP", "KR", "IN", "SG", "MY", "TH", "VN", "PH", "ID"].includes(countryCode);

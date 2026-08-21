@@ -553,12 +553,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       };
 
       const fetchSecret = async (retryForRestricted = false) => {
+        const live = pricingRef.current;
         const pricing = {
-          priceUsd: currentUsdRef,
-          currencyCode: currency,
-          priceLabel: localTotalLabel,
-          exchangeRate: totalLocal / currentUsdRef,
-          finalPriceAmount: totalLocal,
+          priceUsd: live.currentUsdRef,
+          currencyCode: live.currency,
+          priceLabel: live.localTotalLabel,
+          exchangeRate: live.currentUsdRef > 0 ? live.totalLocal / live.currentUsdRef : 1,
+          finalPriceAmount: live.totalLocal,
         };
 
         const payload = getPaymentPayload(

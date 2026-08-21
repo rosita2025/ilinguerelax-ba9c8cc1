@@ -209,7 +209,9 @@ const ProductDynamic = () => {
   const displayFormatted = penAmount > 0 ? formatCurrencyAmount(penAmount, "PEN") : (local.formatted || "$0.00");
   const displayCurrencyCode = isPEN ? "PEN" : (local.currency || "USD");
   
-  const ORIGINAL_MULTIPLIER = 2.5;
+  // ~35% fallback discount: "too good" discounts (60-90%) read as an inflated original price and hurt trust.
+  const ORIGINAL_MULTIPLIER = 1.54;
+  const MAX_DISPLAY_DISCOUNT = 45;
   const manualCompareLocal = product.local_compare_at_prices?.[displayCurrencyCode];
   const regionCompareUsd = region.tier === "tienda" 
     ? product.compare_at_price_usd_tienda 
@@ -228,7 +230,11 @@ const ProductDynamic = () => {
   if (originalAmount === null || originalAmount <= displayPrice) originalAmount = displayPrice * ORIGINAL_MULTIPLIER;
   
   const originalFormatted = formatCurrencyAmount(originalAmount, displayCurrencyCode as Currency);
-  const discountPercentage = Math.round(((originalAmount - displayPrice) / originalAmount) * 100);
+  // Cap the displayed discount: anything above ~45% looks like an inflated "before" price.
+  const discountPercentage = Math.min(
+    MAX_DISPLAY_DISCOUNT,
+    Math.round(((originalAmount - displayPrice) / originalAmount) * 100)
+  );
   
   const reviewsCount = product.review_count || 0;
   const reviewsRating = product.rating || 0;
@@ -595,7 +601,7 @@ const ProductDynamic = () => {
                 { question: "Delivery time?", answer: "Sent to your email within 5 minutes of purchase.", icon: Download },
                 { question: "What is the format?", answer: "High-quality Digital PDF (Official iLingue Relax Brand).", icon: FileText },
                 { question: "Payment methods?", answer: "Secure payments via Stripe, Credit/Debit Cards, and PayPal.", icon: CreditCard },
-                { question: "7-Day Guarantee?", answer: "Yes. (Note: A 50% partial refund applies if digital content has already been downloaded).", icon: Shield }
+                { question: "7-Day Guarantee?", answer: "Yes — full refund within 7 days if you haven't downloaded the files yet, or 50% back if you already have.", icon: Shield }
               ] : [
                 { question: "Delivery?", answer: "Immediate via email.", icon: Download },
                 { question: "Format?", answer: "Digital PDF.", icon: FileText },

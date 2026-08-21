@@ -1,4 +1,4 @@
-import { useState, useMemo, Suspense } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
@@ -194,6 +194,20 @@ const Product5000 = () => {
   });
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  
+  // Precarga el paquete de JS del checkout en segundo plano (mismo fix que
+  // en ProductDynamic.tsx) para evitar la pantalla en blanco de 3-5s al
+  // tocar "comprar".
+  useEffect(() => {
+    const prefetch = () => { import("@/pages/Checkout"); };
+    const w = window as typeof window & { requestIdleCallback?: (cb: () => void) => number };
+    if (typeof w.requestIdleCallback === "function") {
+      w.requestIdleCallback(prefetch);
+      return;
+    }
+    const timeoutId = window.setTimeout(prefetch, 2000);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
   
   const { isPeru, priceUsd: priceUSD, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen, country } = tier;
   const isLatam = false; // Internal checkout for everyone
@@ -758,7 +772,7 @@ const Product5000 = () => {
         subtitle="Top-Rated Curso Digital con Pronunciación ES"
         price={safePriceLabel}
         originalPrice={pricing5000Ready ? displayOriginalPrice : undefined}
-        discountLabel="AHORRA 89%"
+        discountLabel="AHORRA 35%"
         rating={4.8}
         reviewsCount="800+"
         badges={[
@@ -767,7 +781,7 @@ const Product5000 = () => {
           "Descarga inmediata",
           "2 Bonus GRATIS",
         ]}
-        ctaText={"COMPRAR AHORA"}
+        ctaText={"LO QUIERO"}
         onBuy={handleBuy}
         socialProof="María y 12,000+ personas más ya lo compraron"
         noteText="NOTA: Quedan pocas plazas a este precio. ¡No esperes!"
@@ -910,7 +924,7 @@ const Product5000 = () => {
         rating={4.8}
         reviewCount={800}
         showReviews={true}
-        ctaText={"Comprar ahora"}
+        ctaText={"LO QUIERO"}
         onBuyClick={handleBuy}
       />
 

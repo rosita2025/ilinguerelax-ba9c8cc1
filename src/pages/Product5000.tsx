@@ -772,7 +772,7 @@ const Product5000 = () => {
         subtitle="Top-Rated Curso Digital con Pronunciación ES"
         price={safePriceLabel}
         originalPrice={pricing5000Ready ? displayOriginalPrice : undefined}
-        discountLabel="AHORRA 89%"
+        discountLabel="AHORRA 35%"
         rating={4.8}
         reviewsCount="800+"
         badges={[
@@ -781,7 +781,7 @@ const Product5000 = () => {
           "Descarga inmediata",
           "2 Bonus GRATIS",
         ]}
-        ctaText={"COMPRAR AHORA"}
+        ctaText={"LO QUIERO"}
         onBuy={handleBuy}
         socialProof="María y 12,000+ personas más ya lo compraron"
         noteText="NOTA: Quedan pocas plazas a este precio. ¡No esperes!"
@@ -924,7 +924,7 @@ const Product5000 = () => {
         rating={4.8}
         reviewCount={800}
         showReviews={true}
-        ctaText={"Comprar ahora"}
+        ctaText={"LO QUIERO"}
         onBuyClick={handleBuy}
       />
 

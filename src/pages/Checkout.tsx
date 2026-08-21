@@ -11,6 +11,7 @@ import { SectionErrorBoundary } from "@/components/SectionErrorBoundary";
 
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
+import { StickyPayCTA } from "@/components/checkout/StickyPayCTA";
 import { UpsellPanel } from "@/components/checkout/UpsellPanel";
 
 import { CheckoutTestimonials } from "@/components/checkout/CheckoutTestimonials";

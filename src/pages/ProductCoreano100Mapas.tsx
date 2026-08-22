@@ -76,7 +76,7 @@ const ProductCoreano100Mapas = () => {
 
   const handleBuy = () => {
     if (!pricingReady) return;
-    trackHotmartEvent("InitiateCheckout", {
+    trackHotmartEvent("AddToCart", {
       content_name: "+100 Mapas Mentales de Coreano",
       content_category: "Digital Book",
       content_ids: ["coreano-100-mapas"],

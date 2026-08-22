@@ -72,7 +72,7 @@ const Product500Preguntas = () => {
 
   const handleBuy = () => {
     if (!pricingReady) return;
-    trackHotmartEvent("InitiateCheckout", {
+    trackHotmartEvent("AddToCart", {
       content_name: "Inglés Relax - 500 Preguntas en Inglés",
       content_category: "Digital Book",
       content_ids: ["product-500-preguntas"],

@@ -79,7 +79,7 @@ const Product1000Verbos = () => {
 
   const handleBuy = () => {
     if (!pricingReady) return;
-    trackHotmartEvent("InitiateCheckout", {
+    trackHotmartEvent("AddToCart", {
       content_name: "Inglés Relax - 1,000 Verbos Esenciales",
       content_category: "Digital Book",
       content_ids: ["product-1000-verbos"],

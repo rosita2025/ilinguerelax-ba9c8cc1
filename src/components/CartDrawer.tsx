@@ -262,7 +262,7 @@ export const CartDrawer = () => {
         content_type: "product",
         num_items: totalItems,
         value: subtotalPrice,
-        currency: items[0]?.price.currencyCode || "USD",
+        currency: "USD", // Forzado a USD para Ads (Facebook/Instagram)
       });
     } catch (e) {
       console.error("Pixel InitiateCheckout error:", e);

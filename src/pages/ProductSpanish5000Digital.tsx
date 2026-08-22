@@ -161,7 +161,7 @@ const ProductSpanish5000Digital = () => {
     
     // Always force internal checkout for this product if on US/Global tier
     if (useTiendaOnly) {
-      trackHotmartEvent("InitiateCheckout", {
+      trackHotmartEvent("AddToCart", {
         content_name: "Spanish Mastery System - Digital Only",
         content_category: "Digital Book",
         content_ids: ["product-spanish-5000-digital"],

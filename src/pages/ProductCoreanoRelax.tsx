@@ -92,7 +92,7 @@ const ProductCoreanoRelax = () => {
   const displayFlag = isPeru ? "🇵🇪" : useHotmartLatam ? "🌎" : "🌍";
 
   const trackInitiate = () =>
-    trackHotmartEvent("InitiateCheckout", {
+    trackHotmartEvent("AddToCart", {
       content_name: "Coreano Sin Complicaciones - 1,000 Palabras Esenciales",
       content_category: "Digital Book",
       content_ids: ["product-coreano-1000-palabras"],

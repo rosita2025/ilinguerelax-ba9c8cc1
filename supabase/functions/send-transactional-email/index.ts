@@ -149,6 +149,28 @@ Deno.serve(async (req) => {
         { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+    // Public callers: strict recipient validation + templateData allowlist.
+    // Only fields the manual-pending templates actually use may pass through,
+    // coerced to bounded primitives (react-email escapes strings in JSX).
+    if (typeof recipientEmail !== 'string' || recipientEmail.length > 254 ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipientEmail)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid recipientEmail' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    const PUBLIC_TEMPLATE_KEYS = new Set([
+      'orderNumber', 'customerName', 'customerEmail', 'customerPhone',
+      'customerCountry', 'productName', 'amount', 'currency', 'method', 'orderDate',
+    ])
+    const sanitized: Record<string, unknown> = {}
+    for (const key of Object.keys(templateData)) {
+      if (!PUBLIC_TEMPLATE_KEYS.has(key)) continue
+      const value = templateData[key]
+      if (typeof value === 'string') sanitized[key] = value.slice(0, 300)
+      else if (typeof value === 'number' && Number.isFinite(value)) sanitized[key] = value
+    }
+    templateData = sanitized
   }
 
 

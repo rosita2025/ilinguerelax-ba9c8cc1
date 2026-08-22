@@ -166,7 +166,8 @@ export async function assertAdminCsrf(
     adminLog(fn, "info", "cors.preflight", reqContext(req));
     return null;
   }
-  if (method === "GET" || method === "HEAD") return null;
+  // NOTE: GET/HEAD are NOT exempt — read-only admin endpoints leak data too.
+  // They must pass the same origin + CSRF + 2FA checks as mutations.
 
   const origin = req.headers.get("origin");
   const referer = req.headers.get("referer");

@@ -1,8 +1,19 @@
-const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
+import {
+  assertAdminCsrf,
+  adminCorsHeaders,
+  withAdminLogging,
+} from "../_shared/adminCsrf.ts";
 
-Deno.serve(async (req) => {
+const corsHeaders = adminCorsHeaders;
+
+Deno.serve(withAdminLogging("list-payment-methods", async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // Admin-only: lists Stripe account configuration. Requires origin allowlist
+  // + x-admin-csrf + valid 2FA session (or service-role bearer server-side).
+  const blocked = await assertAdminCsrf(req);
+  if (blocked) return blocked;
 
   try {
     const url = new URL(req.url);
@@ -45,4 +56,4 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-});
+}));

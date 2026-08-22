@@ -6,6 +6,7 @@ import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useLocalOverrides } from "@/lib/livePrices";
 import { formatCurrencyAmount } from "@/i18n";
 import { useRegionTier } from "@/hooks/useRegionTier";
+import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import type { UpsellItem } from "@/config/checkoutCatalog";
 
 interface Props {
@@ -186,6 +187,19 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
                     image: u.image,
                     description: u.description,
                     quantity: 1,
+                  });
+                  // Antes no se avisaba a Facebook Ads cuando alguien
+                  // agregaba un upsell — el algoritmo no tenía esa señal
+                  // intermedia. Siempre en USD, como el resto del pixel.
+                  // Al vivir en este componente compartido, cubre todos los
+                  // productos (y los nuevos) sin tocarlos uno por uno.
+                  trackHotmartEvent("AddToCart", {
+                    content_name: u.name,
+                    content_ids: [u.id],
+                    content_type: "product",
+                    value: shownPrice,
+                    currency: "USD",
+                    num_items: 1,
                   });
                 }
               }}

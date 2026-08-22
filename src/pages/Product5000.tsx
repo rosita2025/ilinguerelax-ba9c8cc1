@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, Suspense } from "react";
+import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
@@ -274,8 +274,12 @@ const Product5000 = () => {
     });
   };
 
+  // Protección contra doble-toque (ver mismo fix en ProductDynamic.tsx).
+  const buyClickedRef = useRef(false);
   const handleBuy = async () => {
     if (!pricing5000Ready) return;
+    if (buyClickedRef.current) return;
+    buyClickedRef.current = true;
     trackHotmartEvent("InitiateCheckout", {
       content_name: "Inglés Relax - 5,000 Palabras",
       content_category: "Digital Book",

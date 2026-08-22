@@ -1,8 +1,19 @@
 import { useRef, useState } from "react";
 import { Upload, Loader2, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { adminInvoke } from "@/lib/adminInvoke";
 import { useToast } from "@/hooks/use-toast";
+
+// Encode a Blob as base64 for the admin-upload edge function.
+async function blobToBase64(blob: Blob): Promise<string> {
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
 
 interface Props {
   value: string | string[];
@@ -95,12 +106,22 @@ export default function ProductImageUploader({
       const slugRaw = (sku || "producto").replace(/[^a-z0-9-]/gi, "-").toLowerCase().replace(/-+/g, "-").replace(/^-|-$/g, "");
       const slug = slugRaw || "producto";
       const path = `${slug}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
-      const { error } = await supabase.storage
-        .from("product-images")
-        .upload(path, blob, { contentType: blob.type || `image/${ext}`, upsert: false });
-      if (error) throw error;
-      const { data } = supabase.storage.from("product-images").getPublicUrl(path);
-      
+      // Upload through the admin-gated edge function (service role). The
+      // product-images bucket no longer allows direct public writes.
+      const dataBase64 = await blobToBase64(blob);
+      const { data, error } = await adminInvoke<{ publicUrl: string }>(
+        "admin-upload-product-image",
+        {
+          body: {
+            path,
+            contentType: blob.type || `image/${ext}`,
+            dataBase64,
+          },
+        },
+      );
+      if (error) throw new Error(error.message || "Error al subir");
+      if (!data?.publicUrl) throw new Error("Respuesta inválida del servidor");
+
       if (multiple) {
         onChange([...values, data.publicUrl]);
       } else {

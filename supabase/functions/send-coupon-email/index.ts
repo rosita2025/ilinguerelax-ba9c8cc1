@@ -33,6 +33,11 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { email, couponCode, discount, lang = "es" }: CouponEmailRequest = await req.json();
 
+    // Strip HTML-significant characters: these values are interpolated into
+    // subject lines and HTML bodies (prevents HTML injection into inboxes).
+    const safeDiscount = String(discount ?? "").replace(/[<>&"'`]/g, "").slice(0, 20);
+    const safeCouponCode = String(couponCode ?? "").replace(/[^A-Za-z0-9-]/g, "").slice(0, 40);
+
     // Validate email
     if (!email || !email.includes("@")) {
       return new Response(

@@ -20,6 +20,17 @@ interface ContactEmailRequest {
   message: string;
 }
 
+// Escape user-controlled text before interpolating into HTML emails
+// (prevents HTML/formatting injection into the admin inbox).
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -33,6 +44,22 @@ const handler = async (req: Request): Promise<Response> => {
     if (!name || !email || !message) {
       return new Response(
         JSON.stringify({ error: "Nombre, email y mensaje son requeridos" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    // Length limits + basic email shape (defense in depth; client also validates)
+    if (
+      typeof name !== "string" || name.length > 100 ||
+      typeof email !== "string" || email.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+      (subject && (typeof subject !== "string" || subject.length > 200)) ||
+      typeof message !== "string" || message.length > 2000
+    ) {
+      return new Response(
+        JSON.stringify({ error: "Entrada inválida" }),
         {
           status: 400,
           headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -61,11 +88,11 @@ const handler = async (req: Request): Promise<Response> => {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2563eb;">Nuevo mensaje de contacto</h2>
           <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p><strong>Nombre:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            ${subject ? `<p><strong>Asunto:</strong> ${subject}</p>` : ''}
+            <p><strong>Nombre:</strong> ${escapeHtml(name)}</p>
+            <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+            ${subject ? `<p><strong>Asunto:</strong> ${escapeHtml(subject)}</p>` : ''}
             <p><strong>Mensaje:</strong></p>
-            <p style="white-space: pre-wrap;">${message}</p>
+            <p style="white-space: pre-wrap;">${escapeHtml(message)}</p>
           </div>
           <p style="color: #6b7280; font-size: 12px;">
             Este mensaje fue enviado desde el formulario de contacto de ilinguerelax.com
@@ -110,7 +137,7 @@ const handler = async (req: Request): Promise<Response> => {
                   <tr>
                     <td style="padding: 40px 30px;">
                       <h2 style="margin: 0 0 20px; color: #1e293b; font-size: 24px; font-weight: 600;">
-                        ¡Hola ${name}! 👋
+                        ¡Hola ${escapeHtml(name)}! 👋
                       </h2>
                       
                       <p style="margin: 0 0 25px; color: #475569; font-size: 16px; line-height: 1.6;">
@@ -123,7 +150,7 @@ const handler = async (req: Request): Promise<Response> => {
                           📝 Tu mensaje:
                         </p>
                         <p style="margin: 0; color: #334155; font-size: 15px; line-height: 1.7; white-space: pre-wrap; font-style: italic;">
-                          "${message}"
+                          "${escapeHtml(message)}"
                         </p>
                       </div>
                       

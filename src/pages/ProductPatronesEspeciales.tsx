@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
@@ -131,8 +131,12 @@ const ProductPatronesEspeciales = () => {
     navigate(TIENDA_CHECKOUT_PATH);
   };
 
+  // Protección contra doble-toque (ver mismo fix en ProductDynamic.tsx).
+  const buyClickedRef = useRef(false);
   const handleBuy = () => {
     if (!pricingReady) return;
+    if (buyClickedRef.current) return;
+    buyClickedRef.current = true;
     trackHotmartEvent("InitiateCheckout", {
       content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
       content_category: "Digital Book",

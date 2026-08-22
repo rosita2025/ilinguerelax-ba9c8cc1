@@ -537,7 +537,7 @@ const Product5000 = () => {
                     transition={{ repeat: Infinity, duration: 2 }}
                     className="flex-shrink-0 px-2 py-0.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-[10px] sm:text-[11px] font-black tracking-wide shadow-md whitespace-nowrap"
                   >
-                    AHORRA 89%
+                    AHORRA 35%
                   </motion.span>
                 </div>
 
@@ -608,7 +608,7 @@ const Product5000 = () => {
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                     <ShoppingCart className="w-6 h-6 mr-2" />
-                    COMPRAR AHORA
+                    LO QUIERO
                     <ArrowRight className="w-6 h-6 ml-2" />
                   </button>
                 </Button>

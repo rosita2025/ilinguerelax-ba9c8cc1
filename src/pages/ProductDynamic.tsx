@@ -185,6 +185,14 @@ const ProductDynamic = () => {
   const local = useLocalCurrency(effectiveUsd, localPrices, localUsdPrices);
 
   const vcFiredRef = useRef<string | null>(null);
+  // Protección contra doble-toque: en móvil es muy común tocar el botón 2
+  // veces por accidente (el dedo no se levanta a tiempo entre toques). Sin
+  // esto, cada toque navega a /checkouts/:sku, y cada carga de esa página
+  // dispara su propio InitiateCheckout — 2 toques reales pueden verse como
+  // "evento duplicado" en el pixel aunque el código de tracking esté bien.
+  // IMPORTANTE: este hook debe vivir ANTES de los early returns de
+  // notFound/loading (si no, React crashea con "Rendered more hooks").
+  const buyClickedRef = useRef(false);
   useEffect(() => {
     if (!product || vcFiredRef.current === product.sku) return;
     vcFiredRef.current = product.sku;

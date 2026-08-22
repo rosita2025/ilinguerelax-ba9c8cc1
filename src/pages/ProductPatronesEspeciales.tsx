@@ -155,9 +155,17 @@ const ProductPatronesEspeciales = () => {
     if (!pricingReady) return;
     if (buyClickedRef.current) return;
     buyClickedRef.current = true;
-    // InitiateCheckout lo dispara Checkout.tsx al cargar /checkouts/:slug
-    // (una sola vez con guard initiatedRef). No dispararlo aquí — antes
-    // se duplicaba el evento.
+    // AddToCart aquí — InitiateCheckout lo dispara Checkout.tsx al cargar
+    // /checkouts/:slug (una sola vez con guard initiatedRef).
+    trackHotmartEvent("AddToCart", {
+      content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
+      content_category: "Digital Book",
+      content_ids: [ADMIN_SKU],
+      content_type: "product",
+      value: PRICE_USD,
+      currency: "USD",
+      num_items: 1,
+    });
     goToTienda();
   };
 

@@ -127,7 +127,25 @@ const ProductPatronesEspeciales = () => {
 
   const goToTienda = () => {
     if (!pricingReady) return;
-    handleAddToCart();
+    // No llama a handleAddToCart() — ese dispara AddToCart del pixel, y si
+    // el usuario llegó aquí vía StickyBuyBar, esa barra ya disparó AddToCart.
+    // Llamar addItem() directo evita el duplicado. El botón "Agregar al
+    // carrito" (no sticky) sí usa handleAddToCart() y dispara AddToCart.
+    addItem({
+      id: "patrones-ingles",
+      name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés (PDF)",
+      price: PRICE_USD,
+      regionPrices: {
+        latam: LATAM_USD,
+        global: GLOBAL_USD,
+        tienda: TIENDA_USD
+      },
+      pricePen: pricingAdmin.pricePen ?? undefined,
+      localUsdPrices: pricingAdmin.localUsdPrices ?? undefined,
+      image: productImage,
+      description: "Alfabeto y combinaciones secretas de sonidos en inglés",
+      quantity: 1,
+    });
     navigate(TIENDA_CHECKOUT_PATH);
   };
 
@@ -137,10 +155,12 @@ const ProductPatronesEspeciales = () => {
     if (!pricingReady) return;
     if (buyClickedRef.current) return;
     buyClickedRef.current = true;
-    trackHotmartEvent("InitiateCheckout", {
+    // AddToCart aquí — InitiateCheckout lo dispara Checkout.tsx al cargar
+    // /checkouts/:slug (una sola vez con guard initiatedRef).
+    trackHotmartEvent("AddToCart", {
       content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
       content_category: "Digital Book",
-      content_ids: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
+      content_ids: [ADMIN_SKU],
       content_type: "product",
       value: PRICE_USD,
       currency: "USD",

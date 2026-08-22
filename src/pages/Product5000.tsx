@@ -259,20 +259,6 @@ const Product5000 = () => {
   const prevBonusImage = () => {
     setCurrentBonusIndex((prev) => (prev - 1 + bonuses.length) % bonuses.length);
   };
-  // Fires Meta Pixel InitiateCheckout — only invoked when we navigate to our
-  // own /checkouts page. Hotmart routes skip this: Hotmart embeds the same
-  // pixel id (24959578143733255) and would double-count the event.
-  const handleBuyClick = () => {
-    trackHotmartEvent("InitiateCheckout", {
-      content_name: "Inglés Relax - 5,000 Palabras",
-      content_category: "Digital Book",
-      content_ids: ["product-5000"],
-      content_type: "product",
-      value: priceUSD,
-      currency: "USD",
-      num_items: 1,
-    });
-  };
 
   // Protección contra doble-toque (ver mismo fix en ProductDynamic.tsx).
   const buyClickedRef = useRef(false);
@@ -280,7 +266,10 @@ const Product5000 = () => {
     if (!pricing5000Ready) return;
     if (buyClickedRef.current) return;
     buyClickedRef.current = true;
-    trackHotmartEvent("InitiateCheckout", {
+    // AddToCart aquí (no InitiateCheckout — ese lo dispara Checkout.tsx al
+    // cargar /checkouts/:sku, una sola vez con guard initiatedRef). Antes
+    // se disparaba InitiateCheckout aquí también, duplicando el evento.
+    trackHotmartEvent("AddToCart", {
       content_name: "Inglés Relax - 5,000 Palabras",
       content_category: "Digital Book",
       content_ids: ["product-5000"],

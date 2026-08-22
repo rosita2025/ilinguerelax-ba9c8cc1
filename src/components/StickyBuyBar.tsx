@@ -237,8 +237,8 @@ export const StickyBuyBar = ({
     // 24959578143733255 embedded in its checkout and firing here would
     // duplicate the event.
     const goesToInternalCheckout = (() => {
+      if (onBuyClick) return false; // onBuyClick handler fires its own AddToCart
       if (forceInternal) return true;
-      if (onBuyClick) return true; // internal handlers always land on our checkout store
       if (isPhysical) return true; // physical products on this site use internal checkout
       if (!buyUrl) return false;
       try {

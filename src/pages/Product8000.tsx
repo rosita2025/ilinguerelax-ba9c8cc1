@@ -169,7 +169,7 @@ const Product8000 = () => {
 
   // Handle Buy Now — 4-tier routing (Perú/VE-CU-NI/Global → tienda interna · LATAM → Hotmart)
   const handleBuyNow = () => {
-    trackHotmartEvent("InitiateCheckout", {
+    trackHotmartEvent("AddToCart", {
       content_name: "Inglés Relax - 8,000 Palabras Digital",
       content_category: "Digital Book",
       content_ids: ["product-8000"],

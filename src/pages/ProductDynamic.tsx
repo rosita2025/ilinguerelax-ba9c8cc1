@@ -325,7 +325,10 @@ const ProductDynamic = () => {
   const handleBuy = () => {
     if (buyClickedRef.current) return;
     buyClickedRef.current = true;
-    trackHotmartEvent("InitiateCheckout", {
+    // AddToCart aquí (no InitiateCheckout — ese lo dispara Checkout.tsx al
+    // cargar /checkouts/:sku, una sola vez con guard initiatedRef). Antes
+    // se disparaba InitiateCheckout aquí también, duplicando el evento.
+    trackHotmartEvent("AddToCart", {
       content_name: product.name,
       content_category: "Digital Book",
       content_ids: [product.sku],

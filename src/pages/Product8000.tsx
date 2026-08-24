@@ -138,7 +138,8 @@ const benefits = [
 
 
 const ADMIN_SKU_8000 = "8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa";
-const PRODUCT_SKU = "8-000-palabras-libro-fisico";
+// Página digital → checkout con el SKU DIGITAL (antes apuntaba al libro físico).
+const PRODUCT_SKU = ADMIN_SKU_8000;
 const TIENDA_PATH_8000 = `/checkouts/${PRODUCT_SKU}`;
 const HOTMART_8000_LATAM = "https://pay.hotmart.com/U103990323W?checkoutMode=10";
 

@@ -185,7 +185,9 @@ const Product5000 = () => {
   const [currentBonusIndex, setCurrentBonusIndex] = useState(0);
   const { currency, countryCode } = useI18n();
   const ADMIN_SKU_5000 = "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa";
-  const PRODUCT_SKU = "5-000-palabras-libro-fisico";
+  // Digital product page → must checkout the DIGITAL sku (antes apuntaba por
+  // error al libro físico, lo que confundía a los compradores desde ads).
+  const PRODUCT_SKU = ADMIN_SKU_5000;
   const TIENDA_CHECKOUT_5000 = `/checkouts/${PRODUCT_SKU}`;
   const HOTMART_5000_LATAM = "https://pay.hotmart.com/O100578526P?checkoutMode=10&bid=1779846934153";
   const pricing5000 = useAdminPricing(ADMIN_SKU_5000);

@@ -62,6 +62,7 @@ export default function Checkout() {
   const removeItem = useCheckoutPruebaStore((s) => s.removeItem);
   const syncItem = useCheckoutPruebaStore((s) => s.syncItem);
   const updateQty = useCheckoutPruebaStore((s) => s.updateQuantity);
+  const pruneUnknown = useCheckoutPruebaStore((s) => s.pruneUnknown);
   const setBuyer = useCheckoutPruebaStore((s) => s.setBuyer);
   const items = useCheckoutPruebaStore((s) => s.items);
   const region = useRegionTier();
@@ -291,11 +292,17 @@ export default function Checkout() {
   // when the admin edits the catalog and pushes an update — without dropping items or state.
   useEffect(() => {
     if (!catalogItem) return;
-    // NOTE: previously we pruned the cart to only the main product + declared
-    // upsells. That broke multi-product checkout (adding Patrones + Coreano
-    // and paying both together). Now we preserve every line the user added
-    // and only ensure the main product of THIS /checkouts/:slug URL exists.
-    const existing = items.find((i) => i.id === catalogItem.id);
+    // Cada /checkouts/:slug corresponde a un solo producto principal. Conserva
+    // únicamente ese producto y sus upsells disponibles para impedir que un
+    // artículo físico o un SKU legacy de una visita anterior reaparezca aquí.
+    const validIds = new Set([
+      catalogItem.id,
+      ...(catalogItem.upsells?.map((upsell) => upsell.id) ?? []),
+    ]);
+    pruneUnknown(validIds);
+
+    const freshItems = useCheckoutPruebaStore.getState().items;
+    const existing = freshItems.find((i) => i.id === catalogItem.id);
     if (!existing) {
       addItem({ ...catalogItem, quantity: 1 }, { silent: true });
     } else {
@@ -317,6 +324,7 @@ export default function Checkout() {
     catalogItem?.image,
     catalogItem?.name,
     upsellsFingerprint,
+    pruneUnknown,
   ]);
 
   // Safety net: the main product cannot be removed from the checkout. If the

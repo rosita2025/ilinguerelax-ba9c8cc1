@@ -197,6 +197,7 @@ const Product5000 = () => {
   });
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
+  const clearCheckout = useCheckoutPruebaStore((s) => s.clear);
   
   // Precarga el paquete de JS del checkout en segundo plano (mismo fix que
   // en ProductDynamic.tsx) para evitar la pantalla en blanco de 3-5s al
@@ -282,8 +283,13 @@ const Product5000 = () => {
       num_items: 1,
     });
     
+    // Este checkout es de un solo producto principal. Limpiamos cualquier
+    // artículo persistido de una visita anterior (incluido el libro físico)
+    // y usamos el SKU canónico para que Checkout no vuelva a agregarlo como
+    // una segunda línea distinta.
+    clearCheckout();
     addItem({
-      id: "5000-palabras-ingles",
+      id: PRODUCT_SKU,
       name: "Inglés Relax · 5,000 Palabras (Digital PDF)",
       price: priceUSD,
       regionPrices: { 

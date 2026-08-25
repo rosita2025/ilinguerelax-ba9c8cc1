@@ -2089,14 +2089,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 </div>
                 {isPrimaryCard ? (
                   <div className="mt-1 flex items-center gap-1 flex-wrap">
-                    {primaryCardBadges.map((badge) => {
-                      if (badge.label === "Visa") return <LogoBadge key={badge.label} src={visaLogo} alt="Visa" />;
-                      if (badge.label === "Mastercard") return <LogoBadge key={badge.label} src={mastercardLogo} alt="Mastercard" />;
-                      if (badge.label === "Apple Pay") return <LogoBadge key={badge.label} src={applePayLogo} alt="Apple Pay" bg="#000000" />;
-                      if (badge.label === "Google Pay") return <GooglePayBadge key={badge.label} />;
-                      if (badge.label === "Link") return <LinkBadge key={badge.label} />;
-                      return <BankBadge key={badge.label} {...badge} />;
-                    })}
+                    {primaryCardBadges.map(renderMethodBadge)}
                   </div>
                 ) : null}
 
@@ -2117,14 +2110,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 ) : m.id === "hotmart" ? (
                   <div className="mt-1.5">
                     <div className="flex items-center gap-1 flex-wrap">
-                      {(m.badges ?? []).map((badge) => <BankBadge key={badge.label} {...badge} />)}
+                      {(m.badges ?? []).map(renderMethodBadge)}
                     </div>
                     <div className="mt-1 text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400">{m.sub}</div>
                   </div>
 
                 ) : m.badges?.length ? (
                   <div className="mt-1 flex items-center gap-1 flex-wrap">
-                    {m.badges.map((badge) => <BankBadge key={badge.label} {...badge} />)}
+                    {m.badges.map(renderMethodBadge)}
 
                   </div>
                 ) : m.id === "transfer" ? (

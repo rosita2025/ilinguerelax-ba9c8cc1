@@ -197,7 +197,7 @@ export function BuyerInfoForm() {
             {t.yourDetails}
           </h2>
           <p className="text-xs text-muted-foreground">
-            {t.yourDetailsHint}
+            {hasPhysicalItems ? t.physicalDetailsHint : t.yourDetailsHint}
           </p>
         </div>
         {valid ? (

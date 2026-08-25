@@ -12,6 +12,7 @@ export interface CheckoutUIStrings {
   // BuyerInfoForm
   yourDetails: string;
   yourDetailsHint: string;
+  physicalDetailsHint: string;
   ready: string;
   required: string;
   fullName: string;
@@ -127,7 +128,8 @@ const es: CheckoutUIStrings = {
   stripeSslMP: "Stripe SSL · Mercado Pago",
 
   yourDetails: "Tus datos",
-  yourDetailsHint: "Tu acceso se enviará por email. Para libros físicos, la dirección es obligatoria.",
+  yourDetailsHint: "Producto digital: lo recibirás rápidamente por email después del pago. No requiere envío ni dirección.",
+  physicalDetailsHint: "Libro físico: completa tu dirección para coordinar el envío.",
   ready: "Listo",
   required: "Requerido",
   fullName: "Nombre completo *",
@@ -239,7 +241,8 @@ const en: CheckoutUIStrings = {
   stripeSslMP: "Stripe SSL · Mercado Pago",
 
   yourDetails: "Your details",
-  yourDetailsHint: "Access will be sent to your email. Shipping address required for physical books.",
+  yourDetailsHint: "Digital product: it will be delivered quickly by email after payment. No shipping address is needed.",
+  physicalDetailsHint: "Physical book: enter your shipping address for delivery.",
   ready: "Ready",
   required: "Required",
   fullName: "Full Name *",
@@ -351,7 +354,8 @@ const pt: CheckoutUIStrings = {
   stripeSslMP: "Stripe SSL · Mercado Pago",
 
   yourDetails: "Seus dados",
-  yourDetailsHint: "Seu acesso será enviado por e-mail. Para livros físicos, o endereço é obrigatório.",
+  yourDetailsHint: "Produto digital: você o receberá rapidamente por e-mail após o pagamento. Não requer envio nem endereço.",
+  physicalDetailsHint: "Livro físico: preencha seu endereço para o envio.",
   ready: "Pronto",
   required: "Obrigatório",
   fullName: "Nome completo *",
@@ -463,7 +467,8 @@ const fr: CheckoutUIStrings = {
   stripeSslMP: "Stripe SSL · Mercado Pago",
 
   yourDetails: "Vos coordonnées",
-  yourDetailsHint: "Votre accès sera envoyé par e-mail. Pour les livres physiques, l'adresse est obligatoire.",
+  yourDetailsHint: "Produit numérique : vous le recevrez rapidement par e-mail après le paiement. Aucune adresse de livraison requise.",
+  physicalDetailsHint: "Livre physique : renseignez votre adresse pour la livraison.",
   ready: "Prêt",
   required: "Requis",
   fullName: "Nom complet *",

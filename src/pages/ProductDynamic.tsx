@@ -1,3 +1,4 @@
+import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
 import { useEffect, useState, useRef, useMemo, lazy, Suspense } from "react";
 import { useParams, Link, Navigate, useNavigate } from "react-router-dom";
 import { 
@@ -112,7 +113,7 @@ const ProductDynamic = () => {
   // Usamos requestIdleCallback (con fallback a setTimeout) para no competir
   // con la carga inicial de la propia página del producto.
   useEffect(() => {
-    const prefetch = () => { import("@/pages/Checkout"); };
+    const prefetch = () => { import("@/pages/Checkout"); prefetchCheckoutProduct(slug); };
     const w = window as typeof window & { requestIdleCallback?: (cb: () => void) => number };
     if (typeof w.requestIdleCallback === "function") {
       const id = w.requestIdleCallback(prefetch);

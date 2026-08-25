@@ -24,6 +24,7 @@ import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { getCatalogItem, resolveCheckoutSlug, CHECKOUT_CATALOG, type CatalogItem } from "@/config/checkoutCatalog";
+import { readCheckoutCache, loadCheckoutProduct } from "@/lib/checkoutProductCache";
 import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
@@ -230,151 +231,39 @@ export default function Checkout() {
     const derivedFromPath = staticItem?.productPath?.replace(/^\/products\//, "") || null;
     const adminSku = staticItem?.adminSku ?? derivedFromPath ?? resolveCheckoutSlug(slug);
 
-    // Cache local for product data to avoid flashes and redundant loads
-    const cacheKey = `ilr_prod_cache_${adminSku}`;
-    const cached = sessionStorage.getItem(cacheKey);
-    if (cached) {
-      try {
-        const { item, upsells: up } = JSON.parse(cached);
-        setDbItem(item);
-        setAdminUpsells(up);
-        setLoadingDb(false);
-      } catch (e) {}
+    // Instant paint from cache (localStorage + sessionStorage, 15 min TTL) so
+    // ads traffic never sees a skeleton while the fresh data loads behind it.
+    const cached = readCheckoutCache(adminSku);
+    if (cached?.item) {
+      setDbItem(cached.item);
+      setAdminUpsells(cached.upsells ?? null);
+      setLoadingDb(false);
     }
 
     const load = async () => {
-      setLoadingDb(true);
-      const cb = Date.now();
+      if (!cached?.item) setLoadingDb(true);
 
-      // Run product + upsells queries in parallel to shave ~50% off the wait.
-      const [{ data, error }, { data: upRows }] = await Promise.all([
-        (async () => {
-          try {
-            return await supabase
-              .from("digital_products")
-              .select("sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at, is_physical, local_prices, local_usd_prices")
-              .eq("sku", adminSku)
-              .eq("active", true)
-              .maybeSingle();
-          } catch {
-            return { data: null, error: new Error("catalog offline") };
-          }
-        })(),
-        (async () => {
-          try {
-            return await supabase
-              .from("product_upsells")
-              .select("upsell_sku, discount_pct, sort_order")
-              .eq("product_sku", adminSku)
-              .order("sort_order", { ascending: true });
-          } catch {
-            return { data: [] };
-          }
-        })(),
-      ]);
-
+      const { item, upsells, missing } = await loadCheckoutProduct(adminSku);
       if (cancelled) return;
 
-
-
-      let upsells: CatalogItem["upsells"] | null = null;
-      if (upRows && upRows.length) {
-        const skus = upRows.map((u) => u.upsell_sku);
-        let upProducts: Array<{
-          sku: string;
-          name: string;
-          description: string | null;
-          price_usd: number;
-          price_pen: number | null;
-          cover_image_url: string | null;
-        }> = [];
-        try {
-          const result = await supabase
-            .from("digital_products")
-            .select("sku, name, description, price_usd, price_pen, cover_image_url")
-            .in("sku", skus)
-            .eq("active", true);
-          upProducts = (result.data ?? []) as typeof upProducts;
-        } catch {
-          upProducts = [];
-        }
-        const bySku = new Map((upProducts ?? []).map((p) => [p.sku, p]));
-        upsells = upRows
-          .map((u) => {
-            const p = bySku.get(u.upsell_sku);
-            if (!p) return null;
-            const original = Number(p.price_usd);
-            const discountPct = Number(u.discount_pct) || 0;
-            const price = Math.round(original * (1 - discountPct / 100) * 100) / 100;
-            const rawPen = p.price_pen != null ? Number(p.price_pen) : null;
-            const pricePen = rawPen != null && rawPen > 0
-              ? Math.round(rawPen * (1 - discountPct / 100) * 100) / 100
-              : undefined;
-            const bust = `?v=${cb}`;
-            return {
-              id: p.sku,
-              name: p.name,
-              price,
-              pricePen,
-              originalPrice: u.discount_pct ? original : undefined,
-              image: (p.cover_image_url || "/placeholder.svg") + (p.cover_image_url ? bust : ""),
-              description: p.description || undefined,
-              badge: u.discount_pct ? `-${u.discount_pct}%` : undefined,
-            };
-          })
-          .filter(Boolean) as CatalogItem["upsells"];
-      } else {
-        // Empty array = "admin cleared all upsells for this SKU"
-        upsells = [];
-      }
-
-      if (cancelled) return;
       setAdminUpsells(upsells);
 
-      if (error || !data) {
-        if (error) {
-          console.error("Checkout data error:", error);
-          toast.error("Error de conexión con el catálogo. Usando versión de respaldo.");
-        }
-        // No DB row → rely on static catalog if any, otherwise mark missing.
+      if (missing || !item) {
         setDbMissing(!staticItem);
         setLoadingDb(false);
         return;
       }
 
-      const imgBust = data.cover_image_url ? `?v=${cb}` : "";
-      const priceGlobal = Number(data.price_usd);
-      const priceLatam = data.price_usd_latam != null ? Number(data.price_usd_latam) : null;
-      const rowWithTienda = data as typeof data & { price_usd_tienda?: number | string | null };
-      const priceTienda = rowWithTienda.price_usd_tienda != null && Number(rowWithTienda.price_usd_tienda) > 0 ? Number(rowWithTienda.price_usd_tienda) : null;
-      const pricePen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : undefined;
-      const finalItem = {
-        id: staticItem?.id ?? data.sku,
-        name: data.name,
-        price: priceGlobal,
-        image: (data.cover_image_url || "/placeholder.svg") + imgBust,
-        description: data.description || undefined,
-        productPath: staticItem?.productPath ?? `/products/${data.sku}`,
-        adminSku: data.sku,
-        upsells: upsells ?? undefined,
-        isPhysical: Boolean(data.is_physical),
-        ...(pricePen != null && { pricePen }),
-        // Always emit regionPrices so any region resolves to a valid price,
-        // even for brand-new admin products that only have price_usd set.
+      setDbItem({
+        ...item,
+        id: staticItem?.id ?? item.id,
+        productPath: staticItem?.productPath ?? item.productPath,
         regionPrices: {
-          latam: priceLatam ?? staticItem?.regionPrices?.latam ?? priceGlobal,
-          global: priceGlobal,
-          tienda: priceTienda ?? staticItem?.regionPrices?.tienda ?? priceLatam ?? priceGlobal,
+          latam: item.regionPrices?.latam ?? staticItem?.regionPrices?.latam ?? item.price,
+          global: item.regionPrices?.global ?? item.price,
+          tienda: item.regionPrices?.tienda ?? staticItem?.regionPrices?.tienda ?? item.price,
         },
-        localPrices: data.local_prices,
-        localUsdPrices: data.local_usd_prices,
-      } as CatalogItem;
-
-      setDbItem(finalItem);
-      
-      // Persist to session cache
-      sessionStorage.setItem(cacheKey, JSON.stringify({ item: finalItem, upsells }));
-      
+      });
       setDbMissing(false);
       setLoadingDb(false);
     };

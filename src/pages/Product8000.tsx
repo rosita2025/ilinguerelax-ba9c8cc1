@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
+import { useEffect, useMemo } from "react";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
@@ -153,6 +154,20 @@ const Product8000 = () => {
     tiendaPath: TIENDA_PATH_8000,
   });
   const { priceUsd, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen } = tier;
+
+  // Precarga el bundle del checkout + los datos del producto mientras el
+  // visitante lee, para que "comprar" abra el checkout ya pintado.
+  useEffect(() => {
+    const prefetch = () => { import("@/pages/Checkout"); prefetchCheckoutProduct(ADMIN_SKU_8000); };
+    const w = window as typeof window & { requestIdleCallback?: (cb: () => void) => number };
+    if (typeof w.requestIdleCallback === "function") {
+      w.requestIdleCallback(prefetch);
+      return;
+    }
+    const timeoutId = window.setTimeout(prefetch, 2000);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(

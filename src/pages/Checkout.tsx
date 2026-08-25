@@ -24,6 +24,7 @@ import { useRegionTier } from "@/hooks/useRegionTier";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { getCatalogItem, resolveCheckoutSlug, CHECKOUT_CATALOG, type CatalogItem } from "@/config/checkoutCatalog";
+import { readCheckoutCache, loadCheckoutProduct } from "@/lib/checkoutProductCache";
 import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";

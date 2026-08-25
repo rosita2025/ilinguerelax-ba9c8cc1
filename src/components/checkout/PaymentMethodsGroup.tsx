@@ -1477,7 +1477,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       { label: "OXXO", bg: "#E31E24", color: "#ffffff" },
       { label: "SPEI", bg: "#0F766E", color: "#ffffff" },
       { label: "Mercado Pago", bg: "#00A6E0", color: "#00263A" },
-      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
     ],
     AR: [
       { label: "Cupón de Pago", bg: "#E4002B", color: "#ffffff" },
@@ -1499,30 +1500,36 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     PE: [
       { label: "PagoEfectivo", bg: "#EC0928", color: "#ffffff" },
       { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
-      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
     ],
     CL: [
       { label: "Sencillito", bg: "#111827", color: "#00C08B" },
       { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
-      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
     ],
     PT: [
       { label: "Multibanco", bg: "#1F4E79", color: "#ffffff" },
       { label: "MB WAY", bg: "#00A3E0", color: "#001B2D" },
-      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
     ],
     GB: [
       { label: "Direct Debit", bg: "#111827", color: "#ffffff" },
-      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
     ],
     EC: [
       { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
-      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
     ],
     UY: [
       { label: "Redpagos", bg: "#E4002B", color: "#ffffff" },
       { label: "Abitab", bg: "#F5A623", color: "#1F2937" },
-      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
     ],
   };
   const SEPA_COUNTRIES = ["ES", "FR", "DE", "IT", "NL", "BE", "AT", "IE", "FI", "GR", "LU", "SK", "SI", "EE", "LV", "LT", "CY", "MT"];
@@ -1530,11 +1537,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     ?? (SEPA_COUNTRIES.includes(country)
       ? [
           { label: "SEPA", bg: "#003399", color: "#ffffff" },
-          { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+          { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
           { label: "PayPal", bg: "#003087", color: "#ffffff" },
         ]
       : [
-          { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+          { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
           { label: "PayPal", bg: "#003087", color: "#ffffff" },
         ]);
 

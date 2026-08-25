@@ -104,6 +104,26 @@ function LinkBadge() {
   );
 }
 
+/**
+ * Antes, solo la fila principal de tarjeta (Stripe) mostraba los logos
+ * reales de Visa/Mastercard/Apple Pay/Google Pay/Link — el resto de las
+ * filas (Hotmart, transferencias, etc.) siempre usaban una pastilla de
+ * texto genérico ("Visa/MC" en gris plano), incluso en los mismos países.
+ * Esto se veía visiblemente menos profesional en Latinoamérica que en
+ * EE.UU./Europa. Esta función centraliza el criterio: si la etiqueta es una
+ * marca con logo real disponible, se usa el logo; si es un método local sin
+ * logo (OXXO, SPEI, PIX, Yape...) se usa la pastilla de color, que ahí sí
+ * es la mejor opción (esas marcas no tienen un logo monocromo estándar).
+ */
+function renderMethodBadge(badge: MethodBadge) {
+  if (badge.label === "Visa") return <LogoBadge key={badge.label} src={visaLogo} alt="Visa" />;
+  if (badge.label === "Mastercard") return <LogoBadge key={badge.label} src={mastercardLogo} alt="Mastercard" />;
+  if (badge.label === "Apple Pay") return <LogoBadge key={badge.label} src={applePayLogo} alt="Apple Pay" bg="#000000" />;
+  if (badge.label === "Google Pay") return <GooglePayBadge key={badge.label} />;
+  if (badge.label === "Link") return <LinkBadge key={badge.label} />;
+  return <BankBadge key={badge.label} {...badge} />;
+}
+
 function BankBadge({ label, bg }: { label: string; bg: string; color?: string }) {
   return (
     <span className="inline-flex items-center gap-1 h-4 px-1 rounded border border-neutral-200 bg-neutral-50/50 text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-neutral-400 text-[8px] font-medium tracking-tight leading-none shrink-0">

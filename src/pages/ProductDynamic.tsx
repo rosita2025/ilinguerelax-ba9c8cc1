@@ -1,3 +1,4 @@
+import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
 import { useEffect, useState, useRef, useMemo, lazy, Suspense } from "react";
 import { useParams, Link, Navigate, useNavigate } from "react-router-dom";
 import { 

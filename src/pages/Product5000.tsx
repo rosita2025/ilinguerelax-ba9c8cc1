@@ -1,3 +1,4 @@
+import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -201,7 +202,7 @@ const Product5000 = () => {
   // en ProductDynamic.tsx) para evitar la pantalla en blanco de 3-5s al
   // tocar "comprar".
   useEffect(() => {
-    const prefetch = () => { import("@/pages/Checkout"); };
+    const prefetch = () => { import("@/pages/Checkout"); prefetchCheckoutProduct(ADMIN_SKU_5000); };
     const w = window as typeof window & { requestIdleCallback?: (cb: () => void) => number };
     if (typeof w.requestIdleCallback === "function") {
       w.requestIdleCallback(prefetch);

@@ -104,6 +104,26 @@ function LinkBadge() {
   );
 }
 
+/**
+ * Antes, solo la fila principal de tarjeta (Stripe) mostraba los logos
+ * reales de Visa/Mastercard/Apple Pay/Google Pay/Link — el resto de las
+ * filas (Hotmart, transferencias, etc.) siempre usaban una pastilla de
+ * texto genérico ("Visa/MC" en gris plano), incluso en los mismos países.
+ * Esto se veía visiblemente menos profesional en Latinoamérica que en
+ * EE.UU./Europa. Esta función centraliza el criterio: si la etiqueta es una
+ * marca con logo real disponible, se usa el logo; si es un método local sin
+ * logo (OXXO, SPEI, PIX, Yape...) se usa la pastilla de color, que ahí sí
+ * es la mejor opción (esas marcas no tienen un logo monocromo estándar).
+ */
+function renderMethodBadge(badge: MethodBadge) {
+  if (badge.label === "Visa") return <LogoBadge key={badge.label} src={visaLogo} alt="Visa" />;
+  if (badge.label === "Mastercard") return <LogoBadge key={badge.label} src={mastercardLogo} alt="Mastercard" />;
+  if (badge.label === "Apple Pay") return <LogoBadge key={badge.label} src={applePayLogo} alt="Apple Pay" bg="#000000" />;
+  if (badge.label === "Google Pay") return <GooglePayBadge key={badge.label} />;
+  if (badge.label === "Link") return <LinkBadge key={badge.label} />;
+  return <BankBadge key={badge.label} {...badge} />;
+}
+
 function BankBadge({ label, bg }: { label: string; bg: string; color?: string }) {
   return (
     <span className="inline-flex items-center gap-1 h-4 px-1 rounded border border-neutral-200 bg-neutral-50/50 text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-neutral-400 text-[8px] font-medium tracking-tight leading-none shrink-0">
@@ -1477,7 +1497,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       { label: "OXXO", bg: "#E31E24", color: "#ffffff" },
       { label: "SPEI", bg: "#0F766E", color: "#ffffff" },
       { label: "Mercado Pago", bg: "#00A6E0", color: "#00263A" },
-      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
     ],
     AR: [
       { label: "Cupón de Pago", bg: "#E4002B", color: "#ffffff" },
@@ -1499,30 +1520,36 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     PE: [
       { label: "PagoEfectivo", bg: "#EC0928", color: "#ffffff" },
       { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
-      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
     ],
     CL: [
       { label: "Sencillito", bg: "#111827", color: "#00C08B" },
       { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
-      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
     ],
     PT: [
       { label: "Multibanco", bg: "#1F4E79", color: "#ffffff" },
       { label: "MB WAY", bg: "#00A3E0", color: "#001B2D" },
-      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
     ],
     GB: [
       { label: "Direct Debit", bg: "#111827", color: "#ffffff" },
-      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
     ],
     EC: [
       { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
-      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
     ],
     UY: [
       { label: "Redpagos", bg: "#E4002B", color: "#ffffff" },
       { label: "Abitab", bg: "#F5A623", color: "#1F2937" },
-      { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+      { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
     ],
   };
   const SEPA_COUNTRIES = ["ES", "FR", "DE", "IT", "NL", "BE", "AT", "IE", "FI", "GR", "LU", "SK", "SI", "EE", "LV", "LT", "CY", "MT"];
@@ -1530,11 +1557,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     ?? (SEPA_COUNTRIES.includes(country)
       ? [
           { label: "SEPA", bg: "#003399", color: "#ffffff" },
-          { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+          { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
           { label: "PayPal", bg: "#003087", color: "#ffffff" },
         ]
       : [
-          { label: "Visa/MC", bg: "#ffffff", color: "#1F2937" },
+          { label: "Visa", bg: "#ffffff", color: "#1F2937" },
+      { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
           { label: "PayPal", bg: "#003087", color: "#ffffff" },
         ]);
 
@@ -2080,14 +2109,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 </div>
                 {isPrimaryCard ? (
                   <div className="mt-1 flex items-center gap-1 flex-wrap">
-                    {primaryCardBadges.map((badge) => {
-                      if (badge.label === "Visa") return <LogoBadge key={badge.label} src={visaLogo} alt="Visa" />;
-                      if (badge.label === "Mastercard") return <LogoBadge key={badge.label} src={mastercardLogo} alt="Mastercard" />;
-                      if (badge.label === "Apple Pay") return <LogoBadge key={badge.label} src={applePayLogo} alt="Apple Pay" bg="#000000" />;
-                      if (badge.label === "Google Pay") return <GooglePayBadge key={badge.label} />;
-                      if (badge.label === "Link") return <LinkBadge key={badge.label} />;
-                      return <BankBadge key={badge.label} {...badge} />;
-                    })}
+                    {primaryCardBadges.map(renderMethodBadge)}
                   </div>
                 ) : null}
 
@@ -2108,14 +2130,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 ) : m.id === "hotmart" ? (
                   <div className="mt-1.5">
                     <div className="flex items-center gap-1 flex-wrap">
-                      {(m.badges ?? []).map((badge) => <BankBadge key={badge.label} {...badge} />)}
+                      {(m.badges ?? []).map(renderMethodBadge)}
                     </div>
                     <div className="mt-1 text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400">{m.sub}</div>
                   </div>
 
                 ) : m.badges?.length ? (
                   <div className="mt-1 flex items-center gap-1 flex-wrap">
-                    {m.badges.map((badge) => <BankBadge key={badge.label} {...badge} />)}
+                    {m.badges.map(renderMethodBadge)}
 
                   </div>
                 ) : m.id === "transfer" ? (

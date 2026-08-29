@@ -220,7 +220,7 @@ Deno.serve(async (req) => {
             city: x.city,
             email: x.email,
             status,
-            reminders: cart?.emails_sent ?? 0,
+            reminders: openCarts.get(key) ?? 0,
           };
         })
         .sort((a, b) => b.count - a.count)

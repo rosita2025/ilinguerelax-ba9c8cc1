@@ -854,7 +854,7 @@ serve(async (req) => {
     const abandonedReturning = abandonedTotal - abandonedNew;
     const recoveredEmails = new Set(
       abandonedRows
-        .filter((c) => c.converted === true || c.is_completed === true)
+        .filter((c) => c.converted === true)
         .map((c) => String(c.customer_email || "").trim().toLowerCase())
         .filter(Boolean),
     );

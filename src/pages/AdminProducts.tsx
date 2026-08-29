@@ -18,6 +18,11 @@ interface Product {
   target_language: string;
   price_usd: number;
   price_pen: number | null;
+  /** Precios manuales exactos por moneda (ej. { PEN: 60.71 }), configurados
+   *  en la pantalla de "Configuración de Precios Regionales". Cuando existe
+   *  un valor para PEN aquí, es el precio REAL que ve el cliente — tiene
+   *  prioridad sobre la columna `price_pen`, que puede quedar desactualizada. */
+  local_prices?: Record<string, number> | null;
   drive_url: string | null;
   is_upsell: boolean;
   active: boolean;
@@ -34,6 +39,19 @@ const FLAGS: Record<string, string> = {
   es: "🇪🇸", en: "🇬🇧", fr: "🇫🇷", pt: "🇵🇹", ko: "🇰🇷",
   de: "🇩🇪", it: "🇮🇹", ja: "🇯🇵", nl: "🇳🇱",
 };
+
+/**
+ * Precio en soles que REALMENTE ve el cliente para este producto — el mismo
+ * criterio que ya usa la ficha de producto y el checkout: el monto manual
+ * exacto (`local_prices.PEN`) tiene prioridad; `price_pen` es solo un
+ * respaldo legado que puede quedar desactualizado tras editar el precio
+ * regional.
+ */
+function effectivePen(p: Pick<Product, "price_pen" | "local_prices">): number | null {
+  const manual = p.local_prices?.["PEN"];
+  if (typeof manual === "number" && manual > 0) return manual;
+  return p.price_pen != null && Number(p.price_pen) > 0 ? Number(p.price_pen) : null;
+}
 
 const AdminProducts = () => {
   const { adminKey } = useAdminKey();
@@ -306,8 +324,8 @@ const AdminProducts = () => {
                     )}
                     <div className="flex items-baseline gap-2 mb-3">
                       <span className="text-lg font-bold text-primary">${Number(p.price_usd).toFixed(2)}</span>
-                      {p.price_pen != null && (
-                        <span className="text-xs text-muted-foreground">S/ {Number(p.price_pen).toFixed(2)}</span>
+                      {effectivePen(p) != null && (
+                        <span className="text-xs text-muted-foreground">S/ {effectivePen(p)!.toFixed(2)}</span>
                       )}
                       {!p.drive_url && (
                         <span className="ml-auto text-[10px] text-red-500">Sin Drive</span>
@@ -384,7 +402,7 @@ const AdminProducts = () => {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="font-semibold">${Number(p.price_usd).toFixed(2)}</div>
-                      {p.price_pen != null && <div className="text-xs text-muted-foreground">S/ {Number(p.price_pen).toFixed(2)}</div>}
+                      {effectivePen(p) != null && <div className="text-xs text-muted-foreground">S/ {effectivePen(p)!.toFixed(2)}</div>}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {p.drive_url ? (

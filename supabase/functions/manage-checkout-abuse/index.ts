@@ -166,33 +166,48 @@ Deno.serve(async (req) => {
       }
 
 
-      // Cruce con carritos abandonados para saber si ese correo compró o no.
-      const emails = [...new Set([...byIp.values()].map((x) => x.email).filter(Boolean) as string[])];
-      const cartByEmail = new Map<string, { converted: boolean; is_completed: boolean; emails_sent: number | null }>();
+      // Cruce REAL con compras (entregas digitales, pagos aprobados, Shopify,
+      // pagos manuales verificados y carritos ya convertidos). Antes se leía
+      // solo la tabla legacy `abandoned_carts`, por lo que clientes que SÍ
+      // compraron aparecían como "abandonó el carrito" (y recibían correos de
+      // recuperación → los marcaban como spam).
+      const emails = [...new Set([...byIp.values()].map((x) => (x.email || "").toLowerCase()).filter(Boolean))];
+      const purchased = await getPurchasedEmails(admin, emails);
+      // Auto-corrección: si compró, su carrito abierto queda como convertido
+      // para que ninguna secuencia de abandono le vuelva a escribir.
+      if (purchased.size) void markCartsConverted(admin, [...purchased]);
+
+      const openCarts = new Map<string, number>();
       if (emails.length) {
         const { data: carts } = await admin
-          .from("abandoned_carts")
-          .select("customer_email, converted, is_completed, emails_sent")
-          .in("customer_email", emails);
-        for (const c of (carts || []) as { customer_email: string; converted: boolean | null; is_completed: boolean | null; emails_sent: number | null }[]) {
-          const key = (c.customer_email || "").toLowerCase();
-          const prev = cartByEmail.get(key);
-          cartByEmail.set(key, {
-            converted: Boolean(c.converted) || Boolean(prev?.converted),
-            is_completed: Boolean(c.is_completed) || Boolean(prev?.is_completed),
-            emails_sent: c.emails_sent ?? prev?.emails_sent ?? 0,
-          });
+          .from("persistent_carts")
+          .select("email, converted")
+          .in("email", emails)
+          .eq("converted", false);
+        for (const c of (carts || []) as { email: string }[]) {
+          openCarts.set((c.email || "").toLowerCase(), 0);
+        }
+        const { data: sends } = await admin
+          .from("cart_reminder_sends")
+          .select("email")
+          .in("email", emails);
+        for (const s of (sends || []) as { email: string }[]) {
+          const k = (s.email || "").toLowerCase();
+          if (openCarts.has(k)) openCarts.set(k, (openCarts.get(k) || 0) + 1);
         }
       }
 
       const top = [...byIp.values()]
         .map((x) => {
-          const cart = x.email ? cartByEmail.get(x.email) : undefined;
-          const status: "purchased" | "abandoned" | "browsing" | "anonymous" = cart
-            ? (cart.converted || cart.is_completed ? "purchased" : "abandoned")
-            : x.email
-              ? "browsing"
-              : "anonymous";
+          const key = (x.email || "").toLowerCase();
+          const status: "purchased" | "abandoned" | "browsing" | "anonymous" = !key
+            ? "anonymous"
+            : purchased.has(key)
+              ? "purchased"
+              : openCarts.has(key)
+                ? "abandoned"
+                : "browsing";
+
           return {
             ip: x.ip,
             count: x.count,

@@ -268,6 +268,16 @@ Deno.serve(async (req) => {
         const rawItems = Array.isArray(cart.items) ? (cart.items as Array<{ id?: string; q?: number }>) : [];
         if (!email || rawItems.length === 0) { stat.skipped++; continue; }
 
+        // Regla dura: si el correo YA COMPRÓ (cualquier producto/pasarela), no
+        // recibe nunca correos de carrito abandonado — antes seguían llegando y
+        // los clientes los marcaban como spam.
+        const buyers = await getPurchasedEmails(admin, [email]);
+        if (buyers.has(email)) {
+          await admin.from("persistent_carts").update({ converted: true }).eq("email", email);
+          stat.skipped++;
+          continue;
+        }
+
         // Filter out SKUs the buyer already purchased (manual/hotmart/digital sends).
         // This is the fix for "cliente compró 1,000 palabras y aun así recibió
         // recordatorio de 1,000 palabras". If nothing remains, mark cart converted.

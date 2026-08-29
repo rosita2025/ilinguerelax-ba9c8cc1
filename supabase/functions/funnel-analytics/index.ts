@@ -154,7 +154,7 @@ serve(async (req) => {
 
     const priorEmails = new Set(
       (priorAbandoned || [])
-        .map((r) => String(r.customer_email || "").trim().toLowerCase())
+        .map((r) => String(r.email || "").trim().toLowerCase())
         .filter(Boolean),
     );
 

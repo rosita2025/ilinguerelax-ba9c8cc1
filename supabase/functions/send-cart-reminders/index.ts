@@ -10,6 +10,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { sendEmail } from "../_shared/brevo.ts";
 import { getPurchasedSkus } from "../_shared/purchasedSkus.ts";
+import { getPurchasedEmails } from "../_shared/purchasedEmails.ts";
 
 const corsHeaders = adminCorsHeaders;
 // Steps are measured in MINUTES. 30 min, 1440 min (1 día), 7200 min (5 días).

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { CreditCard, Building2, Banknote, Loader2, Lock, Smartphone, Copy, Check, MessageCircle, Wallet } from "lucide-react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { supabase } from "@/integrations/supabase/client";
+import { captureEmailContact } from "@/lib/captureContact";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { useCheckoutPruebaStore, calcTotals, itemPrice, calcTotalsPen, formatPen } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
@@ -644,12 +645,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       const clientSecret = await fetchSecret();
 
 
-      supabase.from("email_contacts").upsert({
+      captureEmailContact({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
-        source: "checkout-prueba-1",
         metadata: { phone: s.buyer.phone ?? "", processor: "stripe" },
-      }, { onConflict: "email,source" }).then(() => {});
+      });
       return clientSecret;
 
     } catch (err) {
@@ -703,12 +703,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     
     try {
       void captureAbandonedCheckout(`mercadopago_${paymentType}`, true);
-      void supabase.from("email_contacts").upsert({
+      captureEmailContact({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
-        source: "checkout-prueba-1",
         metadata: { phone: s.buyer.phone ?? "", processor: "mercadopago", paymentType },
-      }, { onConflict: "email,source" }).then(() => {}, () => {});
+      });
 
       const pricing = {
         priceUsd: currentUsdRef,
@@ -824,12 +823,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       // pantalla de retorno puede consultar el estado real y mostrar un
       // mensaje claro en vez de dejar al comprador en un error sin salida.
       saveDlocalPending(dlOrderId, s.buyer.email.trim());
-      void supabase.from("email_contacts").upsert({
+      captureEmailContact({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
-        source: "checkout-prueba-1",
         metadata: { phone: s.buyer.phone ?? "", processor: "dlocalgo" },
-      }, { onConflict: "email,source" }).then(() => {}, () => {});
+      });
 
       const returnUrl = `${window.location.origin}/checkouts/return?provider=dlocal&order=${encodeURIComponent(dlOrderId)}`;
       const { data, error } = await invokeWithRetry<{ redirect_url?: string }>("dlocal-create-payment", {
@@ -1162,12 +1160,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         },
       }).catch((err) => console.warn("[customer-manual-pending] notify failed", err));
 
-      supabase.from("email_contacts").upsert({
+      captureEmailContact({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
-        source: "checkout-prueba-1",
         metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "yape_plin", orderNumber },
-      }, { onConflict: "email,source" }).then(() => {});
+      });
 
       window.open(waUrl, "_blank", "noopener,noreferrer");
       const q = new URLSearchParams({
@@ -1280,12 +1277,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         },
       }).catch((err) => console.warn("[customer-manual-pending] binance notify failed", err));
 
-      supabase.from("email_contacts").upsert({
+      captureEmailContact({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
-        source: "checkout-prueba-1",
         metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "binance_pay", orderNumber },
-      }, { onConflict: "email,source" }).then(() => {});
+      });
 
       window.open(waUrl, "_blank", "noopener,noreferrer");
       const q = new URLSearchParams({
@@ -1389,12 +1385,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         },
       }).catch((err) => console.warn("[customer-manual-pending] clabe notify failed", err));
 
-      supabase.from("email_contacts").upsert({
+      captureEmailContact({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
-        source: "checkout-prueba-1",
         metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "clabe_mx", orderNumber },
-      }, { onConflict: "email,source" }).then(() => {});
+      });
 
       window.open(waUrl, "_blank", "noopener,noreferrer");
       const q = new URLSearchParams({
@@ -1899,12 +1894,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       // El correo de confirmación/entrega ya NO se dispara desde el navegador:
       // la página de éxito resuelve el pedido con `order-delivery` (service-role)
       // y genera el enlace privado /mi-descarga?t=<token>.
-      supabase.from("email_contacts").upsert({
+      captureEmailContact({
         email: s.buyer.email.trim().toLowerCase(),
         name: s.buyer.fullName.trim(),
-        source: "checkout-prueba-1",
         metadata: { processor: "free-coupon", coupon: s.coupon ?? "" },
-      }, { onConflict: "email,source" }).then(() => {});
+      });
 
     } catch (e) {
       console.error("free order confirmation failed", e);

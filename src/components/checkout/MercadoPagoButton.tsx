@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2, Smartphone, Building2, Wallet } from "lucide-react";
 import { formatAmountLocalized } from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
+import { captureEmailContact } from "@/lib/captureContact";
 import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { toast } from "@/hooks/use-toast";
@@ -56,19 +57,13 @@ export function MercadoPagoButton() {
     redirectingRef.current = true;
     setLoading(true);
     try {
-      // Guardar contacto (best-effort)
-      supabase
-        .from("email_contacts")
-        .upsert(
-          {
-            email: b.email.trim().toLowerCase(),
-            name: b.fullName.trim(),
-            source: "checkout-prueba-1",
-            metadata: { phone: b.phone ?? "", processor: "mercadopago" },
-          },
-          { onConflict: "email,source" },
-        )
-        .then(() => {});
+      // Guardar contacto (best-effort, vía edge function con service-role)
+      captureEmailContact({
+        email: b.email.trim().toLowerCase(),
+        name: b.fullName.trim(),
+        metadata: { phone: b.phone ?? "", processor: "mercadopago" },
+      });
+
 
       const { data, error } = await supabase.functions.invoke("create-mercadopago-preference", {
         body: {

@@ -133,24 +133,28 @@ serve(async (req) => {
     // Fetch abandoned carts from persistent_carts
     const { data: abandonedRaw, error: abandonedErr } = await supabase
       .from("persistent_carts")
-      .select("id, created_at, converted, is_completed, customer_email, items_summary")
+      .select("id, created_at, converted, email, items")
       .gte("created_at", fromDate.toISOString())
       .lte("created_at", toDate.toISOString());
     if (abandonedErr) console.error("persistent_carts query failed", abandonedErr);
 
-    const abandoned = (abandonedRaw || []).map(r => ({
+    const abandoned = (abandonedRaw || []).map((r: Record<string, unknown>) => ({
       ...r,
-      product_type: r.items_summary || "digital"
+      customer_email: r.email,
+      product_type: Array.isArray(r.items) && r.items.length
+        ? String((r.items[0] as Record<string, unknown>)?.id ?? "digital")
+        : "digital",
     }));
 
     // Correos que ya habían abandonado antes del rango
     const { data: priorAbandoned } = await supabase
       .from("persistent_carts")
-      .select("customer_email")
+      .select("email")
       .lt("created_at", fromDate.toISOString());
+
     const priorEmails = new Set(
       (priorAbandoned || [])
-        .map((r) => String(r.customer_email || "").trim().toLowerCase())
+        .map((r) => String(r.email || "").trim().toLowerCase())
         .filter(Boolean),
     );
 
@@ -850,7 +854,7 @@ serve(async (req) => {
     const abandonedReturning = abandonedTotal - abandonedNew;
     const recoveredEmails = new Set(
       abandonedRows
-        .filter((c) => c.converted === true || c.is_completed === true)
+        .filter((c) => c.converted === true)
         .map((c) => String(c.customer_email || "").trim().toLowerCase())
         .filter(Boolean),
     );

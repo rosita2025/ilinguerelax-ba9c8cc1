@@ -4,12 +4,12 @@
 // flows never label a real buyer as "abandoned cart".
 //
 // Sources of truth (any hit = purchased):
-//  - digital_email_sends (digital delivery sent)
-//  - order_events (paid/approved/completed payment events)
-//  - manual_payments (verified/completed)
-//  - funnel_events (Purchase events)
-//  - shopify_sales (physical orders)
-//  - persistent_carts.converted = true
+//  - order_events with an explicit successful payment status/event
+//  - funnel_events emitted as Purchase by a confirmed provider flow
+//
+// Delivery emails, manual review flags, and persistent_carts.converted are not
+// payment evidence. They may be written before/without a completed charge and
+// must never promote an abandoned checkout to "purchased" by themselves.
 
 export async function getPurchasedEmails(admin: any, rawEmails: string[]): Promise<Set<string>> {
   const emails = [...new Set(
@@ -26,13 +26,6 @@ export async function getPurchasedEmails(admin: any, rawEmails: string[]): Promi
   const queries: Promise<void>[] = [
     (async () => {
       const { data } = await admin
-        .from("digital_email_sends")
-        .select("customer_email, status")
-        .in("customer_email", emails);
-      for (const r of data ?? []) if (r?.status !== "failed") add(r?.customer_email);
-    })(),
-    (async () => {
-      const { data } = await admin
         .from("order_events")
         .select("customer_email, status, event")
         .in("customer_email", emails);
@@ -46,26 +39,10 @@ export async function getPurchasedEmails(admin: any, rawEmails: string[]): Promi
     })(),
     (async () => {
       const { data } = await admin
-        .from("manual_payments")
-        .select("buyer_email, status")
-        .in("buyer_email", emails)
-        .in("status", ["verified", "completed", "paid", "approved"]);
-      for (const r of data ?? []) add(r?.buyer_email);
-    })(),
-    (async () => {
-      const { data } = await admin
         .from("funnel_events")
         .select("email, event_name")
         .in("email", emails)
         .in("event_name", ["Purchase", "purchase"]);
-      for (const r of data ?? []) add(r?.email);
-    })(),
-    (async () => {
-      const { data } = await admin
-        .from("persistent_carts")
-        .select("email, converted")
-        .in("email", emails)
-        .eq("converted", true);
       for (const r of data ?? []) add(r?.email);
     })(),
   ];

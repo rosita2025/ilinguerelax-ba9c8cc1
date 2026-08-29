@@ -38,7 +38,17 @@ interface Row {
 type Rows = Record<string, Row>;
 
 let cache: Rows | null = null;
+let cacheFetchedAt = 0;
 let inflight: Promise<Rows> | null = null;
+// Ventana máxima que la caché de precios de las tarjetas puede quedarse
+// "vieja" sin que nadie la refresque. Antes no había límite: si el admin
+// cambiaba un precio desde OTRO dispositivo/navegador, y el usuario ya tenía
+// el sitio abierto, la tarjeta podía seguir mostrando el precio anterior
+// indefinidamente (hasta que la pestaña recuperara el foco o pasaran los 2
+// minutos del poll) — mientras la ficha de producto y el sticky bar, que
+// piden el precio de nuevo en cada carga, ya mostraban el correcto. Esto
+// generaba precios distintos para el mismo producto en el mismo momento.
+const CACHE_TTL_MS = 60_000;
 
 async function fetchRows(): Promise<Rows> {
   let data: Row[] | null = null;
@@ -68,13 +78,15 @@ async function fetchRows(): Promise<Rows> {
     map[r.sku] = { ...r, local_prices, local_usd_prices };
   }
   cache = map;
+  cacheFetchedAt = Date.now();
   return map;
 }
 
 /** Deduped load. `force` bypasses the cache when the admin publishes an edit. */
 async function loadAll(force = false): Promise<Rows> {
+  const isFresh = cache !== null && Date.now() - cacheFetchedAt < CACHE_TTL_MS;
   if (!force) {
-    if (cache) return cache;
+    if (isFresh) return cache as Rows;
     if (inflight) return inflight;
   }
   inflight = fetchRows().finally(() => {
@@ -109,7 +121,11 @@ export function useCardPrice(): CardPriceFormatter {
     const apply = (r: Rows) => {
       if (!cancelled) setRows(r);
     };
-    if (!cache) loadAll().then(apply);
+    // loadAll() decide internamente si la caché sigue vigente (ver
+    // CACHE_TTL_MS) o si hay que pedir los precios de nuevo — así una
+    // caché vieja-pero-presente ya no se queda pegada hasta el próximo
+    // aviso/poll.
+    loadAll().then(apply);
     // Refresh when the admin publishes a price change (broadcast, focus, poll)
     // so cards never keep a stale amount for the rest of the session.
     const unsubscribe = subscribeCatalogUpdates({
@@ -177,10 +193,10 @@ export function useCardPrice(): CardPriceFormatter {
   };
 
   // El precio "antes" usa la MISMA regla que la ficha de producto y el sticky
-  // bar (precio mostrado x 2.5) para que no haya diferencias entre tarjeta y
-  // página. Solo si el producto aún no existe en el admin se usa el precio
-  // tachado del catálogo estático.
-  const ORIGINAL_MULTIPLIER = 2.5;
+  // bar (precio mostrado x 1.54, ~35% de descuento creíble) para que no haya
+  // diferencias entre tarjeta y página. Solo si el producto aún no existe en
+  // el admin se usa el precio tachado del catálogo estático.
+  const ORIGINAL_MULTIPLIER = 1.54;
 
   const formatOriginal = (sku: string | null | undefined, originalUsd: number): string => {
     const row = sku && rows ? rows[sku] : undefined;

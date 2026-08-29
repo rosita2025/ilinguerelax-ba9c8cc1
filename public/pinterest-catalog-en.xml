@@ -253,7 +253,7 @@
       <g:image_link>https://ilinguerelax.com/images/product-patrones-especiales.webp</g:image_link>
       <g:condition>new</g:condition>
       <g:availability>in stock</g:availability>
-      <g:price>35.00 USD</g:price>
+      <g:price>18.00 USD</g:price>
       <g:brand>iLingue Relax</g:brand>
       <g:mpn>patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
@@ -346,26 +346,6 @@
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
-      <g:id>2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca</g:id>
-      <g:title>2,000 Palabras Esenciales para Aprender Coreano | Hangul + Pronunciación para Hispanohablantes</g:title>
-      <g:description>Aprende las 2,000 palabras más importantes del idioma coreano con pronunciación adaptada para hispanohablantes, traducción al español y vocabulario organizado por categorías. 🎁 Todas las futuras actualizaciones serán gratuitas para los compradores.</g:description>
-      <g:link>https://ilinguerelax.com/products/2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca</g:link>
-      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca/1787124640669-p7blc.webp</g:image_link>
-      <g:condition>new</g:condition>
-      <g:availability>in stock</g:availability>
-      <g:price>18.99 USD</g:price>
-      <g:brand>iLingue Relax</g:brand>
-      <g:mpn>2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca</g:mpn>
-      <g:identifier_exists>no</g:identifier_exists>
-      <g:adult>no</g:adult>
-      <g:content_language>en</g:content_language>
-      <g:target_country>US</g:target_country>
-      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Digital Books &gt; Languages &gt; Korean</g:product_type>
-      <g:custom_label_0>Korean</g:custom_label_0>
-      <g:custom_label_1>Digital</g:custom_label_1>
-    </item>
-    <item>
       <g:id>5-000-spanish-words-with-english-pronunciation-physical</g:id>
       <g:title>Spanish Relax - 5,000 Words Physical</g:title>
       <g:description>With English Pronunciation</g:description>
@@ -384,6 +364,26 @@
       <g:product_type>Books &gt; Languages &gt; Spanish</g:product_type>
       <g:custom_label_0>Spanish</g:custom_label_0>
       <g:custom_label_1>Physical</g:custom_label_1>
+    </item>
+    <item>
+      <g:id>2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca</g:id>
+      <g:title>2,000 Palabras Esenciales para Aprender Coreano | Hangul + Pronunciación para Hispanohablantes</g:title>
+      <g:description>Aprende las 2,000 palabras más importantes del idioma coreano con pronunciación adaptada para hispanohablantes, traducción al español y vocabulario organizado por categorías. 🎁 Todas las futuras actualizaciones serán gratuitas para los compradores.</g:description>
+      <g:link>https://ilinguerelax.com/products/2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca</g:link>
+      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca/1787124640669-p7blc.webp</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in stock</g:availability>
+      <g:price>19.00 USD</g:price>
+      <g:brand>iLingue Relax</g:brand>
+      <g:mpn>2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:adult>no</g:adult>
+      <g:content_language>en</g:content_language>
+      <g:target_country>US</g:target_country>
+      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
+      <g:product_type>Digital Books &gt; Languages &gt; Korean</g:product_type>
+      <g:custom_label_0>Korean</g:custom_label_0>
+      <g:custom_label_1>Digital</g:custom_label_1>
     </item>
   </channel>
 </rss>

@@ -160,6 +160,14 @@ const ProductDynamic = () => {
 
   const region = useRegionTier();
   const pricingReady = loading === false && product !== null;
+  // El precio depende del país del visitante (region.tier: global/latam/tienda),
+  // que tarda 2-3 segundos en confirmarse por IP. Antes, en cuanto el producto
+  // cargaba, ya se mostraba un precio calculado con el tier POR DEFECTO
+  // ("global"), y ese número visiblemente CAMBIABA una vez terminaba la
+  // detección real — por ejemplo, mostrar $25 unos segundos y luego saltar a
+  // $28. Con esta bandera, el precio no se muestra como definitivo hasta que
+  // ambos (producto Y país) están listos, evitando ese salto.
+  const priceReady = pricingReady && !region.loading;
   const upperCountry = region.country?.toUpperCase() || "";
   const isPEN = upperCountry === "PE";
   const flag = (() => {
@@ -460,12 +468,16 @@ const ProductDynamic = () => {
 
               <div className="p-3 rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
                 <div className="flex items-end gap-2 mb-1">
-                  <span className="text-3xl md:text-4xl font-black text-foreground">{displayFormatted}</span>
-                  {discountPercentage > 0 && (
+                  {priceReady ? (
+                    <span className="text-3xl md:text-4xl font-black text-foreground">{displayFormatted}</span>
+                  ) : (
+                    <span className="h-9 md:h-10 w-24 rounded-lg bg-foreground/10 animate-pulse" aria-hidden="true" />
+                  )}
+                  {priceReady && discountPercentage > 0 && (
                     <span className="text-xl text-muted-foreground line-through opacity-70 mb-1">{originalFormatted}</span>
                   )}
                 </div>
-                {discountPercentage > 0 && (
+                {priceReady && discountPercentage > 0 && (
                   <div className="inline-block px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-black mb-3">
                     SAVE {discountPercentage}%
                   </div>
@@ -475,8 +487,9 @@ const ProductDynamic = () => {
                   onClick={handleBuy}
                   size="lg" 
                   className="w-full h-12 text-base font-black shadow-hero bg-emerald-600 hover:bg-emerald-700 text-white mb-2"
+                  disabled={!priceReady}
                 >
-                  GET IT NOW — {displayFormatted}
+                  {priceReady ? `GET IT NOW — ${displayFormatted}` : "GET IT NOW"}
                 </Button>
 
                 <StockAlert count={7} className="mt-2 w-full justify-center" />

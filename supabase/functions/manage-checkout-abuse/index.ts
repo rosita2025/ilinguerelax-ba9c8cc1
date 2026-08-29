@@ -6,6 +6,7 @@
 //   - stats:      totales por ip en las últimas 24 h
 
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
+import { getPurchasedEmails, markCartsConverted } from "../_shared/purchasedEmails.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {

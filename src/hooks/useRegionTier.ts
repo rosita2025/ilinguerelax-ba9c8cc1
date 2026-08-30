@@ -134,8 +134,10 @@ export function useRegionTier(): RegionInfo {
   useEffect(() => {
     const sync = () => {
       const urlOverride = new URLSearchParams(window.location.search).get("country")?.toUpperCase();
-      if (urlOverride && urlOverride !== state.country) {
-        setState({ tier: classify(urlOverride), country: urlOverride, loading: false });
+      if (urlOverride) {
+        if (urlOverride !== state.country) {
+          setState({ tier: classify(urlOverride), country: urlOverride, loading: false });
+        }
         return;
       }
       const manual = getManualCountryOverride();

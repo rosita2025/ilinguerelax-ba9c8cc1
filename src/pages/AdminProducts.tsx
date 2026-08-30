@@ -323,11 +323,11 @@ const AdminProducts = () => {
                     {p.description && (
                       <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{p.description}</p>
                     )}
-                    <div className="flex items-baseline gap-2 mb-3">
-                      <span className="text-lg font-bold text-primary">${Number(p.price_usd).toFixed(2)}</span>
-                      {effectivePen(p) != null && (
-                        <span className="text-xs text-muted-foreground">S/ {effectivePen(p)!.toFixed(2)}</span>
-                      )}
+                    <div className="flex flex-wrap items-center gap-1.5 mb-3 text-[10px]">
+                      <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">LATAM ${tierPrices(p).latam.toFixed(2)}</span>
+                      <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">ANGLO/EU ${tierPrices(p).global.toFixed(2)}</span>
+                      <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">ASIA/RESTO ${tierPrices(p).rest.toFixed(2)}</span>
+
                       {!p.drive_url && (
                         <span className="ml-auto text-[10px] text-red-500">Sin Drive</span>
                       )}

@@ -9,7 +9,7 @@ import {
   exchangeRates,
   type Currency,
 } from "@/i18n";
-import { LATAM_HOTMART_COUNTRIES, TIENDA_USD_COUNTRIES } from "./useCountryTierRouting";
+import { REGIONS } from "@/lib/countryRegions";
 
 /**
  * Bulk-fetches admin pricing for all active digital products and returns a
@@ -140,8 +140,19 @@ export function useCardPrice(): CardPriceFormatter {
 
   const cc = (country || "").toUpperCase();
   const isPeru = cc === "PE";
-  const isTiendaUsd = TIENDA_USD_COUNTRIES.has(cc);
-  const isLatamHotmart = LATAM_HOTMART_COUNTRIES.has(cc);
+  // MISMA clasificación de 3 tiers que la ficha de producto
+  // (useCountryTierRouting / ProductDynamic):
+  //   LATAM (REGIONS.latam)          -> price_usd_latam
+  //   Angloparlantes + Europa        -> price_usd
+  //   Asia / África / resto del mundo -> price_usd_tienda
+  // Antes las tarjetas usaban otra lista (solo VE/CU/NI iban al tier "tienda"),
+  // así que un visitante de Asia veía en la tarjeta el precio GLOBAL mientras
+  // la página de producto mostraba el precio TIENDA — precios distintos para
+  // el mismo producto en el mismo momento.
+  const isLatamTier = REGIONS.latam.codes.includes(cc);
+  const isAngloEuTier =
+    REGIONS.english_speaking.codes.includes(cc) || REGIONS.europe.codes.includes(cc);
+  const isTiendaUsd = !isLatamTier && !isAngloEuTier;
 
   const displayCurrency: Currency = isPeru ? "PEN" : (detectCurrency(cc || "US") as Currency);
 
@@ -149,7 +160,7 @@ export function useCardPrice(): CardPriceFormatter {
     ? "PE"
     : isTiendaUsd
       ? "TiendaUSD"
-      : isLatamHotmart
+      : isLatamTier
         ? "LATAM"
         : "Global";
 
@@ -162,12 +173,12 @@ export function useCardPrice(): CardPriceFormatter {
       if (isTiendaUsd) {
         return Number(row?.price_usd_tienda ?? row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd);
       }
-      if (isLatamHotmart) {
+      if (isLatamTier) {
         return Number(row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd);
       }
       return Number(row?.price_usd ?? fallbackUsd);
     },
-    [isTiendaUsd, isLatamHotmart, displayCurrency],
+    [isTiendaUsd, isLatamTier, displayCurrency],
   );
 
   const format = (sku: string | null | undefined, fallbackUsd: number): string => {

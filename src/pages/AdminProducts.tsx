@@ -17,12 +17,11 @@ interface Product {
   learner_language: string;
   target_language: string;
   price_usd: number;
+  price_usd_latam?: number | null;
+  price_usd_tienda?: number | null;
   price_pen: number | null;
-  /** Precios manuales exactos por moneda (ej. { PEN: 60.71 }), configurados
-   *  en la pantalla de "Configuración de Precios Regionales". Cuando existe
-   *  un valor para PEN aquí, es el precio REAL que ve el cliente — tiene
-   *  prioridad sobre la columna `price_pen`, que puede quedar desactualizada. */
   local_prices?: Record<string, number> | null;
+
   drive_url: string | null;
   is_upsell: boolean;
   active: boolean;
@@ -41,17 +40,19 @@ const FLAGS: Record<string, string> = {
 };
 
 /**
- * Precio en soles que REALMENTE ve el cliente para este producto — el mismo
- * criterio que ya usa la ficha de producto y el checkout: el monto manual
- * exacto (`local_prices.PEN`) tiene prioridad; `price_pen` es solo un
- * respaldo legado que puede quedar desactualizado tras editar el precio
- * regional.
+ * Los 3 tiers USD que realmente usa el sitio (ver `useCountryTierRouting`):
+ *  - LATAM        → price_usd_latam
+ *  - Anglo / EU   → price_usd
+ *  - Asia / Resto → price_usd_tienda
+ * Cuando un tier no tiene precio propio, hereda el precio Anglo/EU.
  */
-function effectivePen(p: Pick<Product, "price_pen" | "local_prices">): number | null {
-  const manual = p.local_prices?.["PEN"];
-  if (typeof manual === "number" && manual > 0) return manual;
-  return p.price_pen != null && Number(p.price_pen) > 0 ? Number(p.price_pen) : null;
+function tierPrices(p: Pick<Product, "price_usd" | "price_usd_latam" | "price_usd_tienda">) {
+  const base = Number(p.price_usd) || 0;
+  const latam = p.price_usd_latam != null && Number(p.price_usd_latam) > 0 ? Number(p.price_usd_latam) : base;
+  const rest = p.price_usd_tienda != null && Number(p.price_usd_tienda) > 0 ? Number(p.price_usd_tienda) : base;
+  return { latam, global: base, rest };
 }
+
 
 const AdminProducts = () => {
   const { adminKey } = useAdminKey();
@@ -322,11 +323,11 @@ const AdminProducts = () => {
                     {p.description && (
                       <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{p.description}</p>
                     )}
-                    <div className="flex items-baseline gap-2 mb-3">
-                      <span className="text-lg font-bold text-primary">${Number(p.price_usd).toFixed(2)}</span>
-                      {effectivePen(p) != null && (
-                        <span className="text-xs text-muted-foreground">S/ {effectivePen(p)!.toFixed(2)}</span>
-                      )}
+                    <div className="flex flex-wrap items-center gap-1.5 mb-3 text-[10px]">
+                      <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">LATAM ${tierPrices(p).latam.toFixed(2)}</span>
+                      <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">ANGLO/EU ${tierPrices(p).global.toFixed(2)}</span>
+                      <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">ASIA/RESTO ${tierPrices(p).rest.toFixed(2)}</span>
+
                       {!p.drive_url && (
                         <span className="ml-auto text-[10px] text-red-500">Sin Drive</span>
                       )}
@@ -401,8 +402,10 @@ const AdminProducts = () => {
                       {FLAGS[p.learner_language] ?? p.learner_language} → {FLAGS[p.target_language] ?? p.target_language}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <div className="font-semibold">${Number(p.price_usd).toFixed(2)}</div>
-                      {effectivePen(p) != null && <div className="text-xs text-muted-foreground">S/ {effectivePen(p)!.toFixed(2)}</div>}
+                      <div className="font-semibold">LATAM ${tierPrices(p).latam.toFixed(2)}</div>
+                      <div className="text-xs text-muted-foreground">ANGLO/EU ${tierPrices(p).global.toFixed(2)}</div>
+                      <div className="text-xs text-muted-foreground">ASIA/RESTO ${tierPrices(p).rest.toFixed(2)}</div>
+
                     </td>
                     <td className="px-4 py-3 text-center">
                       {p.drive_url ? (

@@ -402,8 +402,10 @@ const AdminProducts = () => {
                       {FLAGS[p.learner_language] ?? p.learner_language} → {FLAGS[p.target_language] ?? p.target_language}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <div className="font-semibold">${Number(p.price_usd).toFixed(2)}</div>
-                      {effectivePen(p) != null && <div className="text-xs text-muted-foreground">S/ {effectivePen(p)!.toFixed(2)}</div>}
+                      <div className="font-semibold">LATAM ${tierPrices(p).latam.toFixed(2)}</div>
+                      <div className="text-xs text-muted-foreground">ANGLO/EU ${tierPrices(p).global.toFixed(2)}</div>
+                      <div className="text-xs text-muted-foreground">ASIA/RESTO ${tierPrices(p).rest.toFixed(2)}</div>
+
                     </td>
                     <td className="px-4 py-3 text-center">
                       {p.drive_url ? (

@@ -33,6 +33,11 @@ interface Row {
   price_pen: number | null;
   local_prices: Record<string, number> | null;
   local_usd_prices: Record<string, number> | null;
+  compare_at_price_usd: number | null;
+  compare_at_price_usd_latam: number | null;
+  compare_at_price_usd_tienda: number | null;
+  compare_at_price_pen: number | null;
+  local_compare_at_prices: Record<string, number> | null;
 }
 
 type Rows = Record<string, Row>;
@@ -55,8 +60,13 @@ async function fetchRows(): Promise<Rows> {
   try {
     const result = await supabase
       .from("digital_products")
-      .select("sku, price_usd, price_usd_latam, price_usd_tienda, price_pen, local_prices, local_usd_prices")
-      .eq("active", true);
+      .select("sku, price_usd, price_usd_latam, price_usd_tienda, price_pen, local_prices, local_usd_prices, compare_at_price_usd, compare_at_price_usd_latam, compare_at_price_usd_tienda, compare_at_price_pen, local_compare_at_prices");
+    // Sin filtro `active`: el homepage/listados también muestran productos que
+    // el admin dejó inactivos, y la ficha de producto (/products/:sku) SÍ lee
+    // sus precios. Al filtrarlos aquí, la tarjeta se quedaba sin fila y caía al
+    // precio base del catálogo estático (ignorando el tier regional), mostrando
+    // un precio distinto al de la página del producto.
+
     data = result.data as unknown as Row[] | null;
   } catch {
     data = [];
@@ -75,7 +85,13 @@ async function fetchRows(): Promise<Rows> {
         ? (rawLocalUsd as Record<string, number>)
         : null;
         
-    map[r.sku] = { ...r, local_prices, local_usd_prices };
+    const rawCompare = (r as any).local_compare_at_prices;
+    const local_compare_at_prices =
+      rawCompare && typeof rawCompare === "object" && !Array.isArray(rawCompare)
+        ? (rawCompare as Record<string, number>)
+        : null;
+
+    map[r.sku] = { ...r, local_prices, local_usd_prices, local_compare_at_prices };
   }
   cache = map;
   cacheFetchedAt = Date.now();
@@ -104,7 +120,7 @@ export interface CardPriceFormatter {
    * Formats a "before" (crossed-out) price in the SAME currency as `format`,
    * so cards never mix a local amount with a raw USD figure.
    */
-  formatOriginal: (sku: string | null | undefined, originalUsd: number) => string;
+  formatOriginal: (sku: string | null | undefined, originalUsd: number, currentUsd?: number) => string;
   /** Currency badge (e.g. `USD`, `PEN`, `EUR`). */
   currencyLabel: (sku: string | null | undefined) => string;
   /** Region tier badge. */
@@ -209,9 +225,37 @@ export function useCardPrice(): CardPriceFormatter {
   // el admin se usa el precio tachado del catálogo estático.
   const ORIGINAL_MULTIPLIER = 1.54;
 
-  const formatOriginal = (sku: string | null | undefined, originalUsd: number): string => {
+  const formatOriginal = (
+    sku: string | null | undefined,
+    originalUsd: number,
+    currentUsd?: number,
+  ): string => {
     const row = sku && rows ? rows[sku] : undefined;
     const override = row?.local_prices?.[displayCurrency];
+    // MISMA prioridad que la ficha de producto: precio "antes" manual del
+    // admin (por moneda, o PEN, o USD por tier) antes del multiplicador
+    // automático — así el tachado de la tarjeta y el de /products/:sku
+    // coinciden exactamente.
+    const manualCompareLocal = row?.local_compare_at_prices?.[isPeru ? "PEN" : displayCurrency];
+    if (typeof manualCompareLocal === "number" && manualCompareLocal > 0) {
+      return formatCurrencyAmount(manualCompareLocal, isPeru ? "PEN" : displayCurrency);
+    }
+    if (isPeru && row?.compare_at_price_pen && Number(row.compare_at_price_pen) > 0) {
+      return formatCurrencyAmount(Number(row.compare_at_price_pen), "PEN");
+    }
+    const regionCompareUsd = isTiendaUsd
+      ? row?.compare_at_price_usd_tienda
+      : isLatamTier
+        ? row?.compare_at_price_usd_latam
+        : row?.compare_at_price_usd;
+    if (regionCompareUsd && Number(regionCompareUsd) > 0) {
+      const compareRate = isPeru ? (exchangeRates["PEN"] ?? 3.75) : (exchangeRates[displayCurrency] ?? 1);
+      return formatCurrencyAmount(Number(regionCompareUsd) * compareRate, isPeru ? "PEN" : displayCurrency);
+    }
+    // Precio mostrado actual (mismo cálculo que `format`), para que el tachado
+    // sea siempre 1.54x ese importe aunque el producto no tenga fila en admin.
+    const fallbackCurrentUsd =
+      typeof currentUsd === "number" && currentUsd > 0 ? currentUsd : originalUsd / ORIGINAL_MULTIPLIER;
 
     if (isPeru) {
       const overridePen = row?.local_prices?.["PEN"];
@@ -220,7 +264,7 @@ export function useCardPrice(): CardPriceFormatter {
       const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
       if (pen) return formatCurrencyAmount(pen * ORIGINAL_MULTIPLIER, "PEN");
 
-      const tierUsdValForPen = tierUsd(row, originalUsd / ORIGINAL_MULTIPLIER);
+      const tierUsdValForPen = tierUsd(row, fallbackCurrentUsd);
       return formatCurrencyAmount(tierUsdValForPen * ORIGINAL_MULTIPLIER * (exchangeRates["PEN"] ?? 3.75), "PEN");
     }
 
@@ -229,10 +273,11 @@ export function useCardPrice(): CardPriceFormatter {
     }
 
     const rate = exchangeRates[displayCurrency] ?? 1;
-    const current = tierUsd(row, 0);
+    const current = tierUsd(row, fallbackCurrentUsd);
     if (current > 0) return formatCurrencyAmount(current * ORIGINAL_MULTIPLIER * rate, displayCurrency);
     return formatCurrencyAmount(originalUsd * rate, displayCurrency);
   };
+
 
   const currencyLabel = (_sku: string | null | undefined): string => displayCurrency;
 

@@ -470,7 +470,7 @@ const Products = () => {
                             <div className="flex items-baseline gap-1.5">
                               <span className="text-lg font-black text-foreground">{cardPrice.format(p.slug || p.id, priceFor(p))}</span>
                               {p.originalPrice && p.originalPrice > p.price && (
-                                <span className="text-xs text-muted-foreground line-through">{cardPrice.formatOriginal(p.slug || p.id, p.originalPrice)}</span>
+                                <span className="text-xs text-muted-foreground line-through">{cardPrice.formatOriginal(p.slug || p.id, p.originalPrice, p.price)}</span>
                               )}
                               <span className="text-[10px] text-accent font-semibold">{cardPrice.currencyLabel(p.slug)}</span>
                               <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>
@@ -493,7 +493,7 @@ const Products = () => {
                           </span>
                           {(product.originalPrice || priceFor(product) > 0) && (
                             <span className="text-lg text-muted-foreground line-through opacity-70">
-                              {cardPrice.formatOriginal(product.slug || product.id, product.originalPrice || priceFor(product) * 2.5)}
+                              {cardPrice.formatOriginal(product.slug || product.id, product.originalPrice || priceFor(product) * 1.54, priceFor(product))}
                             </span>
                           )}
                         </div>

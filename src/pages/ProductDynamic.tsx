@@ -362,7 +362,7 @@ const ProductDynamic = () => {
 
 
       },
-      pricePen: product.price_pen || undefined,
+      pricePen: Number(product.local_prices?.PEN ?? 0) || undefined,
       localPrices: product.local_prices || undefined,
       localUsdPrices: product.local_usd_prices || undefined,
       image: product.cover_image_url || "/placeholder.svg",

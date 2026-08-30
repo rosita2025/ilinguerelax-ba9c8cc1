@@ -133,6 +133,11 @@ export function useRegionTier(): RegionInfo {
   // Re-sync if the manual override changes in localStorage (e.g. from another component)
   useEffect(() => {
     const sync = () => {
+      const urlOverride = new URLSearchParams(window.location.search).get("country")?.toUpperCase();
+      if (urlOverride && urlOverride !== state.country) {
+        setState({ tier: classify(urlOverride), country: urlOverride, loading: false });
+        return;
+      }
       const manual = getManualCountryOverride();
       if (manual && manual !== state.country) {
         setState({ tier: classify(manual), country: manual, loading: false });

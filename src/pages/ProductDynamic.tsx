@@ -239,7 +239,8 @@ const ProductDynamic = () => {
     );
   }
 
-  const penAmount = isPEN ? (Number(localPrices?.PEN ?? 0) || Number(product.price_pen ?? 0)) : 0;
+  // Sólo el PEN manual vigente del admin; `price_pen` es legacy y desactualizado.
+  const penAmount = isPEN ? Number(localPrices?.PEN ?? 0) : 0;
   const displayPrice = penAmount > 0 ? penAmount : (local.amount || 0);
   const displayFormatted = penAmount > 0 ? formatCurrencyAmount(penAmount, "PEN") : (local.formatted || "$0.00");
   const displayCurrencyCode = isPEN ? "PEN" : (local.currency || "USD");

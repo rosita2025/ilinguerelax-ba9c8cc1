@@ -17,12 +17,11 @@ interface Product {
   learner_language: string;
   target_language: string;
   price_usd: number;
+  price_usd_latam?: number | null;
+  price_usd_tienda?: number | null;
   price_pen: number | null;
-  /** Precios manuales exactos por moneda (ej. { PEN: 60.71 }), configurados
-   *  en la pantalla de "Configuración de Precios Regionales". Cuando existe
-   *  un valor para PEN aquí, es el precio REAL que ve el cliente — tiene
-   *  prioridad sobre la columna `price_pen`, que puede quedar desactualizada. */
   local_prices?: Record<string, number> | null;
+
   drive_url: string | null;
   is_upsell: boolean;
   active: boolean;

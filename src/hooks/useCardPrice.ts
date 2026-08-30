@@ -214,9 +214,17 @@ export function useCardPrice(): CardPriceFormatter {
   // el admin se usa el precio tachado del catálogo estático.
   const ORIGINAL_MULTIPLIER = 1.54;
 
-  const formatOriginal = (sku: string | null | undefined, originalUsd: number): string => {
+  const formatOriginal = (
+    sku: string | null | undefined,
+    originalUsd: number,
+    currentUsd?: number,
+  ): string => {
     const row = sku && rows ? rows[sku] : undefined;
     const override = row?.local_prices?.[displayCurrency];
+    // Precio mostrado actual (mismo cálculo que `format`), para que el tachado
+    // sea siempre 1.54x ese importe aunque el producto no tenga fila en admin.
+    const fallbackCurrentUsd =
+      typeof currentUsd === "number" && currentUsd > 0 ? currentUsd : originalUsd / ORIGINAL_MULTIPLIER;
 
     if (isPeru) {
       const overridePen = row?.local_prices?.["PEN"];
@@ -225,7 +233,7 @@ export function useCardPrice(): CardPriceFormatter {
       const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
       if (pen) return formatCurrencyAmount(pen * ORIGINAL_MULTIPLIER, "PEN");
 
-      const tierUsdValForPen = tierUsd(row, originalUsd / ORIGINAL_MULTIPLIER);
+      const tierUsdValForPen = tierUsd(row, fallbackCurrentUsd);
       return formatCurrencyAmount(tierUsdValForPen * ORIGINAL_MULTIPLIER * (exchangeRates["PEN"] ?? 3.75), "PEN");
     }
 
@@ -234,10 +242,11 @@ export function useCardPrice(): CardPriceFormatter {
     }
 
     const rate = exchangeRates[displayCurrency] ?? 1;
-    const current = tierUsd(row, 0);
+    const current = tierUsd(row, fallbackCurrentUsd);
     if (current > 0) return formatCurrencyAmount(current * ORIGINAL_MULTIPLIER * rate, displayCurrency);
     return formatCurrencyAmount(originalUsd * rate, displayCurrency);
   };
+
 
   const currencyLabel = (_sku: string | null | undefined): string => displayCurrency;
 

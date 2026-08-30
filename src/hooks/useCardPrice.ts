@@ -140,8 +140,19 @@ export function useCardPrice(): CardPriceFormatter {
 
   const cc = (country || "").toUpperCase();
   const isPeru = cc === "PE";
-  const isTiendaUsd = TIENDA_USD_COUNTRIES.has(cc);
-  const isLatamHotmart = LATAM_HOTMART_COUNTRIES.has(cc);
+  // MISMA clasificación de 3 tiers que la ficha de producto
+  // (useCountryTierRouting / ProductDynamic):
+  //   LATAM (REGIONS.latam)          -> price_usd_latam
+  //   Angloparlantes + Europa        -> price_usd
+  //   Asia / África / resto del mundo -> price_usd_tienda
+  // Antes las tarjetas usaban otra lista (solo VE/CU/NI iban al tier "tienda"),
+  // así que un visitante de Asia veía en la tarjeta el precio GLOBAL mientras
+  // la página de producto mostraba el precio TIENDA — precios distintos para
+  // el mismo producto en el mismo momento.
+  const isLatamTier = REGIONS.latam.codes.includes(cc);
+  const isAngloEuTier =
+    REGIONS.english_speaking.codes.includes(cc) || REGIONS.europe.codes.includes(cc);
+  const isTiendaUsd = !isLatamTier && !isAngloEuTier;
 
   const displayCurrency: Currency = isPeru ? "PEN" : (detectCurrency(cc || "US") as Currency);
 

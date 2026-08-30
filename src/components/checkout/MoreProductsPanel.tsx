@@ -17,7 +17,7 @@ interface DBRow {
   price_usd: number;
   price_usd_latam: number | null;
   price_usd_tienda: number | null;
-  price_pen: number | null;
+  local_prices: Record<string, number> | null;
   cover_image_url: string | null;
 }
 
@@ -63,7 +63,7 @@ export function MoreProductsPanel({ parentSku }: Props) {
       const skus = links.map((l: any) => l.upsell_sku);
       const { data: prods } = await supabase
         .from("digital_products")
-        .select("id, sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, active")
+        .select("id, sku, name, description, price_usd, price_usd_latam, price_usd_tienda, local_prices, cover_image_url, active")
         .in("sku", skus)
         .eq("active", true);
       if (cancelled) return;
@@ -97,8 +97,8 @@ export function MoreProductsPanel({ parentSku }: Props) {
           ? Number(r.price_usd_latam)
           : Number(r.price_usd) || 0;
       const expectedDisplayUsd = Math.round(regUsd * factor * 100) / 100;
-      const expectedPen = r.price_pen && Number(r.price_pen) > 0
-        ? Math.round(Number(r.price_pen) * factor * 100) / 100 : undefined;
+      const expectedPen = r.local_prices?.PEN && Number(r.local_prices.PEN) > 0
+        ? Math.round(Number(r.local_prices.PEN) * factor * 100) / 100 : undefined;
       // Detect if already discounted (avoid infinite loop)
       const currentUsd = existing.regionPrices?.[region.tier === "latam" ? "latam" : (isTienda ? "tienda" : "global")] ?? existing.price;
       const currentPen = existing.pricePen;
@@ -155,12 +155,12 @@ export function MoreProductsPanel({ parentSku }: Props) {
       ? roundMoney(Number(r.price_usd_latam) * factor) : global;
     const tienda = r.price_usd_tienda && Number(r.price_usd_tienda) > 0
       ? roundMoney(Number(r.price_usd_tienda) * factor) : undefined;
-    const pen = r.price_pen && Number(r.price_pen) > 0
-      ? roundMoney(Number(r.price_pen) * factor) : undefined;
+    const pen = r.local_prices?.PEN && Number(r.local_prices.PEN) > 0
+      ? roundMoney(Number(r.local_prices.PEN) * factor) : undefined;
     return {
       displayUsd: roundMoney(regionalUsd(r) * factor),
       originalDisplayUsd: regionalUsd(r),
-      originalPen: r.price_pen ? Number(r.price_pen) : undefined,
+      originalPen: r.local_prices?.PEN ? Number(r.local_prices.PEN) : undefined,
       price: global,
       pricePen: pen,
       regionPrices: { latam, global, ...(tienda != null ? { tienda } : {}) },

@@ -239,7 +239,8 @@ const ProductDynamic = () => {
     );
   }
 
-  const penAmount = isPEN ? (Number(localPrices?.PEN ?? 0) || Number(product.price_pen ?? 0)) : 0;
+  // Sólo el PEN manual vigente del admin; `price_pen` es legacy y desactualizado.
+  const penAmount = isPEN ? Number(localPrices?.PEN ?? 0) : 0;
   const displayPrice = penAmount > 0 ? penAmount : (local.amount || 0);
   const displayFormatted = penAmount > 0 ? formatCurrencyAmount(penAmount, "PEN") : (local.formatted || "$0.00");
   const displayCurrencyCode = isPEN ? "PEN" : (local.currency || "USD");
@@ -259,7 +260,6 @@ const ProductDynamic = () => {
 
   let originalAmount: number | null = null;
   if (typeof manualCompareLocal === "number" && manualCompareLocal > 0) originalAmount = manualCompareLocal;
-  else if (isPEN && product.compare_at_price_pen != null && Number(product.compare_at_price_pen) > 0) originalAmount = Number(product.compare_at_price_pen);
   else if (regionCompareUsd && regionCompareUsd > 0) originalAmount = Number(regionCompareUsd) * compareRate;
   
   if (originalAmount === null || originalAmount <= displayPrice) originalAmount = displayPrice * ORIGINAL_MULTIPLIER;
@@ -361,7 +361,7 @@ const ProductDynamic = () => {
 
 
       },
-      pricePen: product.price_pen || undefined,
+      pricePen: Number(product.local_prices?.PEN ?? 0) || undefined,
       localPrices: product.local_prices || undefined,
       localUsdPrices: product.local_usd_prices || undefined,
       image: product.cover_image_url || "/placeholder.svg",

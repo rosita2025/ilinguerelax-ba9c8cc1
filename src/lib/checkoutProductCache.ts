@@ -86,13 +86,13 @@ export async function loadCheckoutProduct(adminSku: string): Promise<CheckoutPro
       name: string;
       description: string | null;
       price_usd: number;
-      price_pen: number | null;
+      local_prices: Record<string, number> | null;
       cover_image_url: string | null;
     }> = [];
     try {
       const result = await supabase
         .from("digital_products")
-        .select("sku, name, description, price_usd, price_pen, cover_image_url")
+        .select("sku, name, description, price_usd, local_prices, cover_image_url")
         .in("sku", skus)
         .eq("active", true);
       upProducts = (result.data ?? []) as typeof upProducts;
@@ -107,7 +107,7 @@ export async function loadCheckoutProduct(adminSku: string): Promise<CheckoutPro
         const original = Number(p.price_usd);
         const discountPct = Number(u.discount_pct) || 0;
         const price = Math.round(original * (1 - discountPct / 100) * 100) / 100;
-        const rawPen = p.price_pen != null ? Number(p.price_pen) : null;
+        const rawPen = p.local_prices?.PEN != null ? Number(p.local_prices.PEN) : null;
         const pricePen =
           rawPen != null && rawPen > 0
             ? Math.round(rawPen * (1 - discountPct / 100) * 100) / 100
@@ -139,7 +139,10 @@ export async function loadCheckoutProduct(adminSku: string): Promise<CheckoutPro
     rowWithTienda.price_usd_tienda != null && Number(rowWithTienda.price_usd_tienda) > 0
       ? Number(rowWithTienda.price_usd_tienda)
       : null;
-  const pricePen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : undefined;
+  // `price_pen` es legacy y suele traer valores obsoletos (ej. S/3.80): sólo
+  // usamos el PEN manual vigente del admin (`local_prices.PEN`).
+  const manualPen = (data.local_prices as Record<string, number> | null)?.PEN;
+  const pricePen = manualPen != null && Number(manualPen) > 0 ? Number(manualPen) : undefined;
 
   const item = {
     id: data.sku,

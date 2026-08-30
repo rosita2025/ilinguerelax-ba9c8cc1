@@ -95,7 +95,7 @@ export function useAdminPricing(sku: string): AdminPricing {
         price_usd: number | null;
         price_usd_latam: number | null;
         price_usd_tienda: number | null;
-        price_pen: number | null;
+        local_prices: Record<string, number> | null;
         compare_at_price_usd: number | null;
         compare_at_price_usd_latam: number | null;
         compare_at_price_usd_tienda: number | null;
@@ -116,7 +116,7 @@ export function useAdminPricing(sku: string): AdminPricing {
       try {
         const result = await supabase
           .from("digital_products")
-          .select("price_usd, price_usd_latam, price_usd_tienda, price_pen, compare_at_price_usd, compare_at_price_usd_latam, compare_at_price_usd_tienda, compare_at_price_pen, name, description, hotmart_url, store_enabled, cover_image_url, active, rating, review_count, local_usd_prices, local_compare_at_prices, gallery_images, gallery_metadata")
+          .select("price_usd, price_usd_latam, price_usd_tienda, local_prices, compare_at_price_usd, compare_at_price_usd_latam, compare_at_price_usd_tienda, compare_at_price_pen, name, description, hotmart_url, store_enabled, cover_image_url, active, rating, review_count, local_usd_prices, local_compare_at_prices, gallery_images, gallery_metadata")
 
           .eq("sku", sku)
           .maybeSingle();
@@ -134,7 +134,8 @@ export function useAdminPricing(sku: string): AdminPricing {
       const tienda = (data as any).price_usd_tienda != null && Number((data as any).price_usd_tienda) > 0
         ? Number((data as any).price_usd_tienda)
         : latam;
-      const pen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : null;
+      const manualPen = data.local_prices?.PEN;
+      const pen = manualPen != null && Number(manualPen) > 0 ? Number(manualPen) : null;
 
       const compareGlobal = data.compare_at_price_usd != null ? Number(data.compare_at_price_usd) : null;
       const compareLatam = data.compare_at_price_usd_latam != null ? Number(data.compare_at_price_usd_latam) : compareGlobal;

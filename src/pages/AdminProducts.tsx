@@ -41,17 +41,19 @@ const FLAGS: Record<string, string> = {
 };
 
 /**
- * Precio en soles que REALMENTE ve el cliente para este producto — el mismo
- * criterio que ya usa la ficha de producto y el checkout: el monto manual
- * exacto (`local_prices.PEN`) tiene prioridad; `price_pen` es solo un
- * respaldo legado que puede quedar desactualizado tras editar el precio
- * regional.
+ * Los 3 tiers USD que realmente usa el sitio (ver `useCountryTierRouting`):
+ *  - LATAM        → price_usd_latam
+ *  - Anglo / EU   → price_usd
+ *  - Asia / Resto → price_usd_tienda
+ * Cuando un tier no tiene precio propio, hereda el precio Anglo/EU.
  */
-function effectivePen(p: Pick<Product, "price_pen" | "local_prices">): number | null {
-  const manual = p.local_prices?.["PEN"];
-  if (typeof manual === "number" && manual > 0) return manual;
-  return p.price_pen != null && Number(p.price_pen) > 0 ? Number(p.price_pen) : null;
+function tierPrices(p: Pick<Product, "price_usd" | "price_usd_latam" | "price_usd_tienda">) {
+  const base = Number(p.price_usd) || 0;
+  const latam = p.price_usd_latam != null && Number(p.price_usd_latam) > 0 ? Number(p.price_usd_latam) : base;
+  const rest = p.price_usd_tienda != null && Number(p.price_usd_tienda) > 0 ? Number(p.price_usd_tienda) : base;
+  return { latam, global: base, rest };
 }
+
 
 const AdminProducts = () => {
   const { adminKey } = useAdminKey();

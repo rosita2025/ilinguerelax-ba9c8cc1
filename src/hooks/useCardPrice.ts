@@ -55,8 +55,13 @@ async function fetchRows(): Promise<Rows> {
   try {
     const result = await supabase
       .from("digital_products")
-      .select("sku, price_usd, price_usd_latam, price_usd_tienda, price_pen, local_prices, local_usd_prices")
-      .eq("active", true);
+      .select("sku, price_usd, price_usd_latam, price_usd_tienda, price_pen, local_prices, local_usd_prices");
+    // Sin filtro `active`: el homepage/listados también muestran productos que
+    // el admin dejó inactivos, y la ficha de producto (/products/:sku) SÍ lee
+    // sus precios. Al filtrarlos aquí, la tarjeta se quedaba sin fila y caía al
+    // precio base del catálogo estático (ignorando el tier regional), mostrando
+    // un precio distinto al de la página del producto.
+
     data = result.data as unknown as Row[] | null;
   } catch {
     data = [];

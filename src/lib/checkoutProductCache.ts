@@ -139,7 +139,10 @@ export async function loadCheckoutProduct(adminSku: string): Promise<CheckoutPro
     rowWithTienda.price_usd_tienda != null && Number(rowWithTienda.price_usd_tienda) > 0
       ? Number(rowWithTienda.price_usd_tienda)
       : null;
-  const pricePen = data.price_pen != null && Number(data.price_pen) > 0 ? Number(data.price_pen) : undefined;
+  // `price_pen` es legacy y suele traer valores obsoletos (ej. S/3.80): sólo
+  // usamos el PEN manual vigente del admin (`local_prices.PEN`).
+  const manualPen = (data.local_prices as Record<string, number> | null)?.PEN;
+  const pricePen = manualPen != null && Number(manualPen) > 0 ? Number(manualPen) : undefined;
 
   const item = {
     id: data.sku,

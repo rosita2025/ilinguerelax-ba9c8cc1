@@ -86,13 +86,13 @@ export async function loadCheckoutProduct(adminSku: string): Promise<CheckoutPro
       name: string;
       description: string | null;
       price_usd: number;
-      price_pen: number | null;
+      local_prices: Record<string, number> | null;
       cover_image_url: string | null;
     }> = [];
     try {
       const result = await supabase
         .from("digital_products")
-        .select("sku, name, description, price_usd, price_pen, cover_image_url")
+        .select("sku, name, description, price_usd, local_prices, cover_image_url")
         .in("sku", skus)
         .eq("active", true);
       upProducts = (result.data ?? []) as typeof upProducts;

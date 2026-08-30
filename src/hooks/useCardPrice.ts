@@ -160,7 +160,7 @@ export function useCardPrice(): CardPriceFormatter {
     ? "PE"
     : isTiendaUsd
       ? "TiendaUSD"
-      : isLatamHotmart
+      : isLatamTier
         ? "LATAM"
         : "Global";
 
@@ -173,12 +173,12 @@ export function useCardPrice(): CardPriceFormatter {
       if (isTiendaUsd) {
         return Number(row?.price_usd_tienda ?? row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd);
       }
-      if (isLatamHotmart) {
+      if (isLatamTier) {
         return Number(row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd);
       }
       return Number(row?.price_usd ?? fallbackUsd);
     },
-    [isTiendaUsd, isLatamHotmart, displayCurrency],
+    [isTiendaUsd, isLatamTier, displayCurrency],
   );
 
   const format = (sku: string | null | undefined, fallbackUsd: number): string => {

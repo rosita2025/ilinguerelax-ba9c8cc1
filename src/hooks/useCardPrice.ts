@@ -17,7 +17,7 @@ import { CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
  * formatter that renders card prices with EXACTLY the same rules as the product
  * page (`/products/:sku`) and the checkout:
  *
- *   - Peru (PE): native PEN from admin `price_pen`.
+ *   - Peru (PE): manual `local_prices.PEN`, otherwise LATAM USD converted with the live rate.
  *   - Tienda (VE/CU/NI): local currency from admin `price_usd_tienda`.
  *   - LATAM Hotmart: local currency from admin `price_usd_latam`.
  *   - Global (US/CA/EU/Asia/resto): local currency from admin `price_usd`.
@@ -237,16 +237,15 @@ export function useCardPrice(): CardPriceFormatter {
     const resolvedSku = resolveCardSku(sku, rows);
     const row = resolvedSku ? rows[resolvedSku] : undefined;
 
-    // Perú → PEN nativo desde admin.
+    // Perú → precio PEN manual actual del admin o conversión automática del
+    // precio USD LATAM. No usar `price_pen`: es un campo legacy y puede guardar
+    // importes antiguos (por ejemplo S/67,50 cuando el precio vigente convertido
+    // desde el tier LATAM es S/60,70).
     if (isPeru) {
-      // Prioridad: monto manual PEN del admin (local_prices) > columna legacy price_pen.
       const overridePen = row?.local_prices?.["PEN"];
       if (typeof overridePen === "number" && overridePen > 0) return formatCurrencyAmount(overridePen, "PEN");
 
-      const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
-      if (pen) return formatCurrencyAmount(pen, "PEN");
-
-      // Si no hay PEN manual, convertimos el USD regional al PEN actual
+      // Si no hay PEN manual, convertimos el USD LATAM al tipo de cambio actual.
       const tierUsdValForPen = tierUsd(row, fallbackUsd);
       return formatPrice(tierUsdValForPen, "PEN", row?.local_prices, row?.local_usd_prices);
     }
@@ -279,9 +278,6 @@ export function useCardPrice(): CardPriceFormatter {
     if (typeof manualCompareLocal === "number" && manualCompareLocal > 0) {
       return formatCurrencyAmount(manualCompareLocal, isPeru ? "PEN" : displayCurrency);
     }
-    if (isPeru && row?.compare_at_price_pen && Number(row.compare_at_price_pen) > 0) {
-      return formatCurrencyAmount(Number(row.compare_at_price_pen), "PEN");
-    }
     const regionCompareUsd = isTiendaUsd
       ? row?.compare_at_price_usd_tienda
       : isLatamTier
@@ -299,9 +295,6 @@ export function useCardPrice(): CardPriceFormatter {
     if (isPeru) {
       const overridePen = row?.local_prices?.["PEN"];
       if (typeof overridePen === "number" && overridePen > 0) return formatCurrencyAmount(overridePen * ORIGINAL_MULTIPLIER, "PEN");
-
-      const pen = row?.price_pen && Number(row.price_pen) > 0 ? Number(row.price_pen) : null;
-      if (pen) return formatCurrencyAmount(pen * ORIGINAL_MULTIPLIER, "PEN");
 
       const tierUsdValForPen = tierUsd(row, fallbackCurrentUsd);
       return formatCurrencyAmount(tierUsdValForPen * ORIGINAL_MULTIPLIER * (exchangeRates["PEN"] ?? 3.75), "PEN");

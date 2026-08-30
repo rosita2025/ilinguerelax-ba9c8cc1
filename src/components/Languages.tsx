@@ -400,11 +400,11 @@ export const Languages = () => {
                       </span>
                       {product.originalPrice ? (
                         <span className="text-sm text-muted-foreground line-through">
-                          {cardPrice.formatOriginal(product.slug || product.id, product.originalPrice)}
+                          {cardPrice.formatOriginal(product.slug || product.id, product.originalPrice, product.price)}
                         </span>
                       ) : product.price > 0 ? (
                         <span className="text-sm text-muted-foreground line-through">
-                          {cardPrice.formatOriginal(product.slug || product.id, product.price * 2.5)}
+                          {cardPrice.formatOriginal(product.slug || product.id, product.price * 1.54, product.price)}
                         </span>
                       ) : null}
                       {product.price > 0 && (

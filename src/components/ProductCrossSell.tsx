@@ -162,7 +162,7 @@ export const ProductCrossSell = ({ currentProduct, lang = "es" }: ProductCrossSe
                         {cardPrice.format(product.sku, product.priceUsd)}
                       </span>
                       <span className="text-lg text-muted-foreground line-through opacity-70">
-                        {cardPrice.formatOriginal(product.sku, product.priceUsd * 2.5)}
+                        {cardPrice.formatOriginal(product.sku, product.priceUsd * 1.54, product.priceUsd)}
                       </span>
                       <span className="text-sm text-primary font-semibold">{cardPrice.currencyLabel(product.sku)}</span>
                       <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">{cardPrice.regionLabel}</span>

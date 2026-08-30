@@ -109,7 +109,7 @@ export interface CardPriceFormatter {
    * Formats a "before" (crossed-out) price in the SAME currency as `format`,
    * so cards never mix a local amount with a raw USD figure.
    */
-  formatOriginal: (sku: string | null | undefined, originalUsd: number) => string;
+  formatOriginal: (sku: string | null | undefined, originalUsd: number, currentUsd?: number) => string;
   /** Currency badge (e.g. `USD`, `PEN`, `EUR`). */
   currencyLabel: (sku: string | null | undefined) => string;
   /** Region tier badge. */

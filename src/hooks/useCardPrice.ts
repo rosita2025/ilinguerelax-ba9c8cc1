@@ -10,6 +10,7 @@ import {
   type Currency,
 } from "@/i18n";
 import { REGIONS } from "@/lib/countryRegions";
+import { CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
 
 /**
  * Bulk-fetches admin pricing for all active digital products and returns a
@@ -41,6 +42,38 @@ interface Row {
 }
 
 type Rows = Record<string, Row>;
+
+// Some legacy cards still identify a product with a short static id rather
+// than the canonical SKU used by /admin/products/:sku. Resolve those ids here
+// so every card reads the same admin row as the product page.
+const LEGACY_CARD_SKUS: Record<string, string> = {
+  "5000": "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+  "8000": "8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+};
+
+function resolveCardSku(value: string | null | undefined, rows: Rows | null): string | null {
+  const candidate = String(value ?? "").trim();
+  if (!candidate) return null;
+  if (rows?.[candidate]) return candidate;
+
+  const legacySku = LEGACY_CARD_SKUS[candidate];
+  if (legacySku && rows?.[legacySku]) return legacySku;
+
+  const directCatalogItem = CHECKOUT_CATALOG[candidate];
+  if (directCatalogItem?.adminSku && rows?.[directCatalogItem.adminSku]) {
+    return directCatalogItem.adminSku;
+  }
+
+  for (const item of Object.values(CHECKOUT_CATALOG)) {
+    const productSlug = item.productPath?.split("/").filter(Boolean).pop();
+    if (item.id === candidate || item.adminSku === candidate || productSlug === candidate) {
+      const adminSku = item.adminSku ?? productSlug ?? item.id;
+      if (rows?.[adminSku]) return adminSku;
+    }
+  }
+
+  return candidate;
+}
 
 let cache: Rows | null = null;
 let cacheFetchedAt = 0;
@@ -187,7 +220,7 @@ export function useCardPrice(): CardPriceFormatter {
       if (typeof regionalUsd === "number" && regionalUsd > 0) return regionalUsd;
 
       if (isTiendaUsd) {
-        return Number(row?.price_usd_tienda ?? row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd);
+        return Number(row?.price_usd_tienda ?? row?.price_usd ?? fallbackUsd);
       }
       if (isLatamTier) {
         return Number(row?.price_usd_latam ?? row?.price_usd ?? fallbackUsd);
@@ -198,7 +231,11 @@ export function useCardPrice(): CardPriceFormatter {
   );
 
   const format = (sku: string | null | undefined, fallbackUsd: number): string => {
-    const row = sku && rows ? rows[sku] : undefined;
+    // Never expose a provisional static/global price while either the country
+    // or the admin prices are still loading; that was the visible price jump.
+    if (loading || rows === null) return "—";
+    const resolvedSku = resolveCardSku(sku, rows);
+    const row = resolvedSku ? rows[resolvedSku] : undefined;
 
     // Perú → PEN nativo desde admin.
     if (isPeru) {
@@ -230,7 +267,9 @@ export function useCardPrice(): CardPriceFormatter {
     originalUsd: number,
     currentUsd?: number,
   ): string => {
-    const row = sku && rows ? rows[sku] : undefined;
+    if (loading || rows === null) return "—";
+    const resolvedSku = resolveCardSku(sku, rows);
+    const row = resolvedSku ? rows[resolvedSku] : undefined;
     const override = row?.local_prices?.[displayCurrency];
     // MISMA prioridad que la ficha de producto: precio "antes" manual del
     // admin (por moneda, o PEN, o USD por tier) antes del multiplicador

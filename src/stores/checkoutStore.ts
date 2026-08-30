@@ -141,6 +141,7 @@ const FIXED_TOTAL_COUPONS: Record<string, number> = {
   PRUEBA1: 1,
   PRUEBA1USD: 1,
   TEST1USD: 1,
+  QAGRATIS7X: 0.5,
 };
 
 

@@ -9,7 +9,7 @@ import {
   exchangeRates,
   type Currency,
 } from "@/i18n";
-import { LATAM_HOTMART_COUNTRIES, TIENDA_USD_COUNTRIES } from "./useCountryTierRouting";
+import { REGIONS } from "@/lib/countryRegions";
 
 /**
  * Bulk-fetches admin pricing for all active digital products and returns a

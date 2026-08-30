@@ -107,7 +107,7 @@ export async function loadCheckoutProduct(adminSku: string): Promise<CheckoutPro
         const original = Number(p.price_usd);
         const discountPct = Number(u.discount_pct) || 0;
         const price = Math.round(original * (1 - discountPct / 100) * 100) / 100;
-        const rawPen = p.price_pen != null ? Number(p.price_pen) : null;
+        const rawPen = p.local_prices?.PEN != null ? Number(p.local_prices.PEN) : null;
         const pricePen =
           rawPen != null && rawPen > 0
             ? Math.round(rawPen * (1 - discountPct / 100) * 100) / 100

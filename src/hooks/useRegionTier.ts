@@ -3,16 +3,28 @@ import { detectCountryByIp } from "@/lib/geoDetection";
 
 export type RegionTier = "latam" | "global" | "tienda";
 
-const STORAGE_KEY = "region_tier_v1";
+// v2: invalida la caché de 24h de la clasificación vieja de 2 tiers para que
+// los visitantes que tenían guardado "global" (p. ej. Asia/África) reciban el
+// tier correcto ("tienda") sin esperar un día.
+const STORAGE_KEY = "region_tier_v2";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
-// Países que compran vía Hotmart LATAM (USD reducido latam).
-const LATAM = new Set([
-  "AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV",
-  "GT", "HN", "MX", "PA", "PY", "PE", "PR", "UY",
+import { REGIONS } from "@/lib/countryRegions";
+
+// Clasificación UNIFICADA de 3 tiers (misma lista `REGIONS` que usan las
+// tarjetas de homepage/all-products y las páginas estáticas):
+//   LATAM                    -> price_usd_latam
+//   Angloparlantes + Europa  -> price_usd (global)
+//   Asia / África / resto    -> price_usd_tienda
+// Antes este hook solo distinguía LATAM vs "todo lo demás" (y VE/CU/NI como
+// "tienda"), así que un visitante de Asia/África veía el precio GLOBAL en la
+// página de producto mientras las tarjetas y el admin prometían el precio
+// TIENDA — precios distintos para el mismo producto en el mismo momento.
+const LATAM = new Set(REGIONS.latam.codes);
+const ANGLO_EU = new Set([
+  ...REGIONS.english_speaking.codes,
+  ...REGIONS.europe.codes,
 ]);
-// Países con tier "tienda" (USD aún más reducido, sin acceso Hotmart).
-const TIENDA = new Set(["VE", "CU", "NI"]);
 
 interface Cached {
   tier: RegionTier;
@@ -22,8 +34,9 @@ interface Cached {
 
 function classify(country: string): RegionTier {
   const c = country.toUpperCase();
-  if (TIENDA.has(c)) return "tienda";
-  return LATAM.has(c) ? "latam" : "global";
+  if (LATAM.has(c)) return "latam";
+  if (ANGLO_EU.has(c)) return "global";
+  return "tienda";
 }
 
 function readCache(): Cached | null {

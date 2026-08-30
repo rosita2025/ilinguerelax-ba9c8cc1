@@ -3,7 +3,10 @@ import { detectCountryByIp } from "@/lib/geoDetection";
 
 export type RegionTier = "latam" | "global" | "tienda";
 
-const STORAGE_KEY = "region_tier_v1";
+// v2: invalida la caché de 24h de la clasificación vieja de 2 tiers para que
+// los visitantes que tenían guardado "global" (p. ej. Asia/África) reciban el
+// tier correcto ("tienda") sin esperar un día.
+const STORAGE_KEY = "region_tier_v2";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 import { REGIONS } from "@/lib/countryRegions";

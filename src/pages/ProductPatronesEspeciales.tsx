@@ -321,7 +321,7 @@ const ProductPatronesEspeciales = () => {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-4 h-4 sm:w-5 sm:h-5 ${i < Math.floor(pricingAdmin.rating ?? 4.9) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"}`}
+                      className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-400 text-amber-400"
                     />
                   ))}
                 </div>

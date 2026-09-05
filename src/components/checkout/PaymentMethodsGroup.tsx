@@ -1911,7 +1911,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     } catch (e) {
       console.error("free order confirmation failed", e);
     } finally {
-      trackPurchase(orderId, "mercadopago_cash");
+      // No se dispara "Purchase" aquí: la navegación de abajo lleva a
+      // /checkouts/success, que ya dispara ese evento una sola vez (con su
+      // propio control de duplicados). Dispararlo también aquí generaba 2
+      // eventos de compra falsos para el mismo pedido.
       navigate(`/checkouts/success?session_id=${encodeURIComponent(orderId)}&status=approved&external_reference=${encodeURIComponent(orderId)}`);
     }
   };
@@ -2294,7 +2297,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   payerZip={buyer.zip ?? undefined}
                   language={language}
                   onPaid={(orderId) => {
-                    trackPurchase(orderId, "mercadopago_transfer");
+                    // No se dispara "Purchase" aquí: ver mismo comentario en
+                    // submitFreeOrder — /checkouts/success ya lo dispara una
+                    // sola vez, con control de duplicados propio.
                     navigate(`/checkouts/success?session_id=${encodeURIComponent(orderId)}&status=approved&external_reference=${encodeURIComponent(orderId)}`);
                   }}
                   onError={(message) => setMethodError({ method: "dlocal_card", message })}

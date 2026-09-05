@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { useNavigate } from "react-router-dom";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { motion } from "framer-motion";
 import {
@@ -21,10 +22,11 @@ import { Button } from "@/components/ui/button";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 
 const Footer = lazy(() => import("@/components/Footer").then((m) => ({ default: m.Footer })));
 
-const HOTMART_URL = "https://pay.hotmart.com/A106319098M";
+
 
 import previewA1 from "@/assets/ilr-preview-a1.png.asset.json";
 import previewComparativos from "@/assets/ilr-preview-comparativos.png.asset.json";
@@ -119,17 +121,43 @@ const testimonials = [
   },
 ];
 
-const goToCheckout = () => {
-  // Skip Meta Pixel: Hotmart embeds the same pixel id at its checkout,
-  // firing here would double-count InitiateCheckout.
-  window.open(HOTMART_URL, "_blank", "noopener,noreferrer");
-};
-
 const scrollToContent = () => {
   document.getElementById("contenido")?.scrollIntoView({ behavior: "smooth" });
 };
 
+// SKU exacto del producto ya creado en /admin/productos — mismo texto que la
+// URL pública, para que quede todo conectado.
+const PRODUCT_SKU = "estructuras-gramaticales-ingles-a1-c1";
+
 const ProductEstructurasGramaticalesIngles = () => {
+  const navigate = useNavigate();
+  const addItem = useCheckoutPruebaStore((s) => s.addItem);
+
+  // Antes esto mandaba siempre a Hotmart (sitio externo), rompiendo la
+  // confianza justo en el momento de comprar. Ahora va al checkout propio,
+  // igual que el resto del catálogo. Es un PDF digital: isPhysical false,
+  // no se pide dirección de envío.
+  const goToCheckout = () => {
+    trackHotmartEvent("AddToCart", {
+      content_name: "Estructuras Gramaticales A1 a B1 Inglés",
+      content_category: "Digital Book",
+      content_ids: [PRODUCT_SKU],
+      content_type: "product",
+      value: 12,
+      currency: "USD",
+      num_items: 1,
+    });
+    addItem({
+      id: PRODUCT_SKU,
+      name: "Estructuras Gramaticales A1 a B1 Inglés (PDF)",
+      price: 12,
+      quantity: 1,
+      isPhysical: false,
+      image: coverImage.url,
+    });
+    navigate(`/checkouts/${PRODUCT_SKU}`);
+  };
+
   return (
     <main className="min-h-screen bg-[#04102a] text-white">
       <SEO

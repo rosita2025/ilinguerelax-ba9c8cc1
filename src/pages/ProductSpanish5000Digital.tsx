@@ -160,24 +160,22 @@ const ProductSpanish5000Digital = () => {
     lockRef.current = true;
     setIsRedirecting(true);
     
-    // Always force internal checkout for this product if on US/Global tier
-    if (useTiendaOnly) {
-      trackHotmartEvent("AddToCart", {
-        content_name: "Spanish Mastery System - Digital Only",
-        content_category: "Digital Book",
-        content_ids: ["product-spanish-5000-digital"],
-        content_type: "product",
-        value: currentPrice,
-        currency: "USD",
-        num_items: 1,
-      });
-      addItem(buildCartItem());
-      navigate(TIENDA_PATH_SP5K);
-    } else {
-      window.open(tier.hotmartUrl || HOTMART_SP5K_LATAM, "_blank", "noopener,noreferrer");
-      lockRef.current = false;
-      setIsRedirecting(false);
-    }
+    // Siempre al checkout propio: mandar al cliente a un sitio externo justo
+    // en el momento de comprar rompe la confianza que ya ganamos en esta
+    // página. Si Hotmart debe seguir disponible para algún país, se ofrece
+    // como un método de pago MÁS dentro de este mismo checkout (panel
+    // /admin/checkout-methods), no como un salto a otra web.
+    trackHotmartEvent("AddToCart", {
+      content_name: "Spanish Mastery System - Digital Only",
+      content_category: "Digital Book",
+      content_ids: ["product-spanish-5000-digital"],
+      content_type: "product",
+      value: currentPrice,
+      currency: "USD",
+      num_items: 1,
+    });
+    addItem(buildCartItem());
+    navigate(TIENDA_PATH_SP5K);
   };
 
   const handleAddToCart = () => {

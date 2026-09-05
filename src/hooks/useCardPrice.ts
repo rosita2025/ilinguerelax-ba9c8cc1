@@ -11,6 +11,7 @@ import {
 } from "@/i18n";
 import { REGIONS } from "@/lib/countryRegions";
 import { CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
+import { resolveAdminSku } from "./useLocalCurrency";
 
 /**
  * Bulk-fetches admin pricing for all active digital products and returns a
@@ -234,7 +235,7 @@ export function useCardPrice(): CardPriceFormatter {
     // Never expose a provisional static/global price while either the country
     // or the admin prices are still loading; that was the visible price jump.
     if (loading || rows === null) return "—";
-    const resolvedSku = resolveCardSku(sku, rows);
+    const resolvedSku = resolveAdminSku(sku);
     const row = resolvedSku ? rows[resolvedSku] : undefined;
 
     // Perú → precio PEN manual actual del admin o conversión automática del
@@ -267,7 +268,7 @@ export function useCardPrice(): CardPriceFormatter {
     currentUsd?: number,
   ): string => {
     if (loading || rows === null) return "—";
-    const resolvedSku = resolveCardSku(sku, rows);
+    const resolvedSku = resolveAdminSku(sku);
     const row = resolvedSku ? rows[resolvedSku] : undefined;
     const override = row?.local_prices?.[displayCurrency];
     // MISMA prioridad que la ficha de producto: precio "antes" manual del

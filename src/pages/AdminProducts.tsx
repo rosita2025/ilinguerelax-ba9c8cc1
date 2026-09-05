@@ -39,6 +39,12 @@ const FLAGS: Record<string, string> = {
   de: "🇩🇪", it: "🇮🇹", ja: "🇯🇵", nl: "🇳🇱",
 };
 
+function effectivePen(p: Pick<Product, "price_pen" | "local_prices">): number | null {
+  const manual = p.local_prices?.["PEN"];
+  if (typeof manual === "number" && manual > 0) return manual;
+  return p.price_pen != null && Number(p.price_pen) > 0 ? Number(p.price_pen) : null;
+}
+
 /**
  * Los 3 tiers USD que realmente usa el sitio (ver `useCountryTierRouting`):
  *  - LATAM        → price_usd_latam
@@ -327,6 +333,9 @@ const AdminProducts = () => {
                       <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">LATAM ${tierPrices(p).latam.toFixed(2)}</span>
                       <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">ANGLO/EU ${tierPrices(p).global.toFixed(2)}</span>
                       <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">ASIA/RESTO ${tierPrices(p).rest.toFixed(2)}</span>
+                      {effectivePen(p) != null && (
+                        <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold">PEN S/ {effectivePen(p)!.toFixed(2)}</span>
+                      )}
 
                       {!p.drive_url && (
                         <span className="ml-auto text-[10px] text-red-500">Sin Drive</span>
@@ -405,6 +414,9 @@ const AdminProducts = () => {
                       <div className="font-semibold">LATAM ${tierPrices(p).latam.toFixed(2)}</div>
                       <div className="text-xs text-muted-foreground">ANGLO/EU ${tierPrices(p).global.toFixed(2)}</div>
                       <div className="text-xs text-muted-foreground">ASIA/RESTO ${tierPrices(p).rest.toFixed(2)}</div>
+                      {effectivePen(p) != null && (
+                        <div className="text-xs font-semibold text-emerald-600">PEN S/ {effectivePen(p)!.toFixed(2)}</div>
+                      )}
 
                     </td>
                     <td className="px-4 py-3 text-center">

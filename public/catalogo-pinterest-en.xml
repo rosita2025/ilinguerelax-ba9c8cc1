@@ -246,26 +246,6 @@
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
-      <g:id>patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:id>
-      <g:title>Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés</g:title>
-      <g:description>Método visual para dominar la pronunciación del inglés desde cero.</g:description>
-      <g:link>https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:link>
-      <g:image_link>https://ilinguerelax.com/images/product-patrones-especiales.webp</g:image_link>
-      <g:condition>new</g:condition>
-      <g:availability>in stock</g:availability>
-      <g:price>18.00 USD</g:price>
-      <g:brand>iLingue Relax</g:brand>
-      <g:mpn>patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:mpn>
-      <g:identifier_exists>no</g:identifier_exists>
-      <g:adult>no</g:adult>
-      <g:content_language>en</g:content_language>
-      <g:target_country>US</g:target_country>
-      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Digital Books &gt; Languages &gt; English</g:product_type>
-      <g:custom_label_0>English</g:custom_label_0>
-      <g:custom_label_1>Digital</g:custom_label_1>
-    </item>
-    <item>
       <g:id>5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</g:id>
       <g:title>5,000 Palabras con Pronunciación Español y Fonética UK/USA</g:title>
       <g:description>Incluye estructura gramatical completa desde Nivel Cero hasta Avanzado C1. Perfecto para principiantes y estudiantes avanzados.</g:description>
@@ -403,6 +383,26 @@
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
       <g:product_type>Digital Books &gt; Languages &gt; Korean</g:product_type>
       <g:custom_label_0>Korean</g:custom_label_0>
+      <g:custom_label_1>Digital</g:custom_label_1>
+    </item>
+    <item>
+      <g:id>patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:id>
+      <g:title>Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés</g:title>
+      <g:description>Método visual para dominar la pronunciación del inglés desde cero.</g:description>
+      <g:link>https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:link>
+      <g:image_link>https://ilinguerelax.com/images/product-patrones-especiales.webp</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in stock</g:availability>
+      <g:price>18.00 USD</g:price>
+      <g:brand>iLingue Relax</g:brand>
+      <g:mpn>patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:adult>no</g:adult>
+      <g:content_language>en</g:content_language>
+      <g:target_country>US</g:target_country>
+      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
+      <g:product_type>Digital Books &gt; Languages &gt; English</g:product_type>
+      <g:custom_label_0>English</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
   </channel>

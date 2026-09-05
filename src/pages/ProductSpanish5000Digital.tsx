@@ -15,6 +15,7 @@ import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { useTrackProductView, useScrollTimeTracking } from "@/hooks/useGoogleAnalytics";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
+import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
@@ -320,9 +321,7 @@ const ProductSpanish5000Digital = () => {
                 </Button>
                 <div className="mt-4 pt-4 border-t border-slate-200">
                   <div className="flex items-center justify-center gap-6 grayscale opacity-60">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Stripe" className="h-4" />
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4" />
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4" />
+                    <PaymentLogos />
                   </div>
                 </div>
               </div>

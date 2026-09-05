@@ -414,6 +414,7 @@ const ProductDynamic = () => {
                   alt={product.name}
                   className="w-full aspect-square object-cover transition-all duration-300"
                   loading="eager"
+                  fetchPriority="high"
                 />
                 <PinterestSave 
                   overlay 
@@ -437,7 +438,7 @@ const ProductDynamic = () => {
                         activeImage === img ? "border-primary scale-95" : "border-transparent opacity-70"
                       }`}
                     >
-                      <img src={img} className="w-full h-full object-cover" alt="" />
+                      <img src={img} className="w-full h-full object-cover" alt="" loading="lazy" />
                     </button>
                   ))}
                 </div>
@@ -497,7 +498,6 @@ const ProductDynamic = () => {
 
                 <div className="flex items-center justify-between pt-3 border-t border-slate-200">
                   <div className="flex items-center gap-4 grayscale opacity-60">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" className="h-4" alt="" />
                     <PaymentLogos />
                   </div>
                   <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500">
@@ -585,7 +585,7 @@ const ProductDynamic = () => {
                         <DialogTitle>{asset.title} - Preview</DialogTitle>
                       </DialogHeader>
                       <div className="p-1">
-                        <img src={asset.image} className="w-full h-auto" alt="" />
+                        <img src={asset.image} className="w-full h-auto" alt="" loading="lazy" />
                       </div>
                     </DialogContent>
                   </Dialog>

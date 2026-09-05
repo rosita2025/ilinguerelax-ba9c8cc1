@@ -39,6 +39,12 @@ const FLAGS: Record<string, string> = {
   de: "🇩🇪", it: "🇮🇹", ja: "🇯🇵", nl: "🇳🇱",
 };
 
+function effectivePen(p: Pick<Product, "price_pen" | "local_prices">): number | null {
+  const manual = p.local_prices?.["PEN"];
+  if (typeof manual === "number" && manual > 0) return manual;
+  return p.price_pen != null && Number(p.price_pen) > 0 ? Number(p.price_pen) : null;
+}
+
 /**
  * Los 3 tiers USD que realmente usa el sitio (ver `useCountryTierRouting`):
  *  - LATAM        → price_usd_latam

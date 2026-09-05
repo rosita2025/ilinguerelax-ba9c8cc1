@@ -2475,17 +2475,6 @@ export type Database = {
         }
         Relationships: []
       }
-      recent_sales_public: {
-        Row: {
-          buyer_name: string | null
-          country: string | null
-          product_name: string | null
-          provider: string | null
-          sku: string | null
-          sold_at: string | null
-        }
-        Relationships: []
-      }
       reviews_public: {
         Row: {
           created_at: string | null

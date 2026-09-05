@@ -1,0 +1,1 @@
+DROP VIEW IF EXISTS public.recent_sales_public;

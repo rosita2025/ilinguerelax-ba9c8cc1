@@ -1205,15 +1205,26 @@ const AdminProductEdit = () => {
                             )}
                             value={product.local_prices?.[code] ?? ""}
                             onChange={(e) => {
-                              const rawValue = e.target.value.replace(/,/g, ".");
+                              const config = currencyConfig[code as Currency];
+                              const decimals = config?.decimals ?? 2;
+                              // Monedas sin decimales (CLP, COP, ARS, PYG, CRC,
+                              // JPY, KRW...): cualquier punto o coma que
+                              // escriban es casi seguro un separador de miles
+                              // (así se escribe en Latinoamérica: "16.460" =
+                              // dieciséis mil cuatrocientos sesenta), NUNCA un
+                              // decimal — se quitan por completo. Antes se
+                              // trataba el punto como decimal y "16.460" se
+                              // guardaba como 16.46: mil veces menos de lo que
+                              // el admin quiso escribir, sin ningún aviso.
+                              const rawValue = decimals === 0
+                                ? e.target.value.replace(/[.,]/g, "")
+                                : e.target.value.replace(/,/g, ".");
                               const next = { ...(product.local_prices || {}) };
                               
                               if (rawValue === "" || isNaN(Number(rawValue)) || Number(rawValue) < 0) {
                                 delete next[code];
                               } else {
                                 const amount = Number(rawValue);
-                                const config = currencyConfig[code as Currency];
-                                const decimals = config?.decimals ?? 2;
                                 next[code] = Math.round(amount * Math.pow(10, decimals)) / Math.pow(10, decimals);
                               }
                               update("local_prices", next);
@@ -1247,15 +1258,20 @@ const AdminProductEdit = () => {
                             )}
                             value={product.local_compare_at_prices?.[code] ?? ""}
                             onChange={(e) => {
-                              const rawValue = e.target.value.replace(/,/g, ".");
+                              const config = currencyConfig[code as Currency];
+                              const decimals = config?.decimals ?? 2;
+                              // Mismo criterio que el precio de oferta: en
+                              // monedas sin decimales, punto o coma es un
+                              // separador de miles, no un decimal.
+                              const rawValue = decimals === 0
+                                ? e.target.value.replace(/[.,]/g, "")
+                                : e.target.value.replace(/,/g, ".");
                               const next = { ...(product.local_compare_at_prices || {}) };
                               
                               if (rawValue === "" || isNaN(Number(rawValue)) || Number(rawValue) < 0) {
                                 delete next[code];
                               } else {
                                 const amount = Number(rawValue);
-                                const config = currencyConfig[code as Currency];
-                                const decimals = config?.decimals ?? 2;
                                 next[code] = Math.round(amount * Math.pow(10, decimals)) / Math.pow(10, decimals);
                               }
                               update("local_compare_at_prices", next);

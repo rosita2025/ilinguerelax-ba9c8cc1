@@ -438,6 +438,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const [stripeLoading, setStripeLoading] = useState(false);
   const [stripeError, setStripeError] = useState<MappedStripeError | null>(null);
 
+  // `selectedMethod` en el store se guarda en localStorage. Sin este reinicio,
+  // un método elegido en una visita anterior (abandonada) podría quedar
+  // "pegado" y ocultar la barra fija de pago en una compra nueva, antes de
+  // que el comprador haya elegido nada esta vez.
+  useEffect(() => {
+    useCheckoutPruebaStore.getState().setSelectedMethod(null);
+  }, []);
+
   const [stripeRetryKey, setStripeRetryKey] = useState(0);
   const [stripeFrameMounted, setStripeFrameMounted] = useState(false);
   const [stripeElapsed, setStripeElapsed] = useState(0);

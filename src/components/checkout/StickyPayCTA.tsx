@@ -16,7 +16,16 @@ export function StickyPayCTA() {
   const { language } = useI18n();
   const buyer = useCheckoutPruebaStore((s) => s.buyer);
   const hasPhysicalItems = useCheckoutPruebaStore((s) => s.hasPhysicalItems());
+  const selectedMethod = useCheckoutPruebaStore((s) => s.selectedMethod);
   const valid = isBuyerValid(buyer, hasPhysicalItems);
+
+  // Antes esta barra seguía visible incluso después de elegir un método de
+  // pago (Stripe, Hotmart, transferencia, etc.), compitiendo con el botón
+  // real de pago que ya aparece en pantalla en ese momento — el comprador
+  // veía "2 botones" y no sabía cuál tocar. Una vez hay un método elegido, el
+  // botón real ya está a la vista y esta barra de navegación deja de hacer
+  // falta, así que se oculta sola (no toca ninguna pasarela ni lógica de pago).
+  if (valid && selectedMethod) return null;
 
   const label = valid
     ? (language === "en"

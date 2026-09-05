@@ -125,13 +125,13 @@ Deno.serve(async (req) => {
     let shippingAmountCents = 0;
     if (shippingUsd > 0 && !hasUpsell) {
       if (targetCurrency === "usd") {
-        shippingAmountCents = Math.round(shippingUsd * 100);
+        shippingAmountCents = toStripeAmount(shippingUsd, targetCurrency);
       } else {
         const shippingLocal = await localAmountFromUsd(shippingUsd, targetCurrency.toUpperCase());
         if (shippingLocal) {
-          shippingAmountCents = Math.round(shippingLocal * 100);
+          shippingAmountCents = toStripeAmount(shippingLocal, targetCurrency);
         } else {
-          shippingAmountCents = Math.round(shippingUsd * 100);
+          shippingAmountCents = toStripeAmount(shippingUsd, targetCurrency);
         }
       }
     }
@@ -139,7 +139,7 @@ Deno.serve(async (req) => {
     const line_items = await Promise.all(pricing.items.map(async (item) => {
       let unit_amount;
       if (targetCurrency === "usd") {
-        unit_amount = Math.round(item.unitUsd * discountMultiplier * 100);
+        unit_amount = toStripeAmount(item.unitUsd * discountMultiplier, targetCurrency);
       } else {
         // Obtenemos el precio unitario local con cupon
         const rate = await localAmountFromUsd(1, targetCurrency.toUpperCase()) || 1;
@@ -151,7 +151,7 @@ Deno.serve(async (req) => {
           ? override
           : activeUsd * rate;
           
-        unit_amount = Math.round(localUnit * discountMultiplier * 100);
+        unit_amount = toStripeAmount(localUnit * discountMultiplier, targetCurrency);
       }
       
       return {

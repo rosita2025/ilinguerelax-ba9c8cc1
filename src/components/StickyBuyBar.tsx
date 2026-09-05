@@ -248,9 +248,13 @@ export const StickyBuyBar = ({
         return p.startsWith("/checkout") || p.startsWith("/checkouts");
       } catch { return false; }
     })();
-    // NOTE: AddToCart pixel is ONLY fired if navigating to our OWN checkout.
+    // NOTE: AddToCart pixel is ONLY fired if navigating to our OWN checkout,
+    // AND only when this component handles the click itself (no onBuyClick).
+    // Cuando se pasa onBuyClick, la página de producto (handleBuy) ya dispara
+    // su propio AddToCart para el mismo clic — dispararlo también aquí
+    // generaba 2 eventos por cada compra iniciada desde la barra fija.
     // Hotmart has its own pixel 24959578143733255 embedded in its checkout.
-    if (goesToInternalCheckout) {
+    if (goesToInternalCheckout && !onBuyClick) {
       try {
         // Detect current currency to find regional USD override
         const currency = detectCurrency((flag ? currencyCode : "US").toUpperCase());

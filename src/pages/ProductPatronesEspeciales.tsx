@@ -316,19 +316,19 @@ const ProductPatronesEspeciales = () => {
                 {pricingAdmin.description ?? "Domina la pronunciación en inglés con patrones secretos, letras mudas, combinaciones especiales y ejercicios prácticos. Método fácil para hispanohablantes paso a paso."}
               </p>
 
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex items-center gap-1">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-4">
+                <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
-                      className={`w-5 h-5 ${i < Math.floor(pricingAdmin.rating ?? 4.9) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"}`} 
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 sm:w-5 sm:h-5 ${i < Math.floor(pricingAdmin.rating ?? 4.9) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"}`}
                     />
                   ))}
                 </div>
-                <span className="font-bold text-foreground">
+                <span className="font-bold text-sm sm:text-base text-foreground">
                   {pricingAdmin.rating != null ? pricingAdmin.rating.toFixed(1) : "4.9"}/5
                 </span>
-                <span className="text-muted-foreground">
+                <span className="text-xs sm:text-sm text-muted-foreground">
                   ({pricingAdmin.reviewCount ?? 6} {t.product.verifiedReviews})
                 </span>
               </div>

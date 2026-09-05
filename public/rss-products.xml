@@ -5,8 +5,18 @@
     <link>https://ilinguerelax.com/products</link>
     <description>Libros digitales y físicos de iLingue Relax: vocabulario, pronunciación y fonética para aprender idiomas sin estrés.</description>
     <language>es</language>
-    <lastBuildDate>Sun, 30 Aug 2026 02:30:13 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 30 Aug 2026 19:06:42 GMT</lastBuildDate>
     <atom:link href="https://ilinguerelax.com/rss-productos.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés</title>
+      <link>https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</link>
+      <guid isPermaLink="true">https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</guid>
+      <pubDate>Sun, 30 Aug 2026 19:06:42 GMT</pubDate>
+      <description>Método visual para dominar la pronunciación del inglés desde cero.</description>
+      <enclosure url="https://ilinguerelax.com/images/product-patrones-especiales.webp" type="image/jpeg" length="0" />
+      <media:content url="https://ilinguerelax.com/images/product-patrones-especiales.webp" medium="image" />
+      <media:thumbnail url="https://ilinguerelax.com/images/product-patrones-especiales.webp" />
+    </item>
     <item>
       <title>1,000 Verbos Esenciales en Coreano | Pronunciación para Hispanohablantes + Presente, Pasado y Futuro</title>
       <link>https://ilinguerelax.com/products/1-000-verbos-esenciales-en-coreano-pronunciacion-para-hispanohablantes-presente-pasado-y-futuro-wgzq</link>
@@ -26,16 +36,6 @@
       <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca/1787124640669-p7blc.webp" type="image/jpeg" length="0" />
       <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca/1787124640669-p7blc.webp" medium="image" />
       <media:thumbnail url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca/1787124640669-p7blc.webp" />
-    </item>
-    <item>
-      <title>Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés</title>
-      <link>https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</link>
-      <guid isPermaLink="true">https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</guid>
-      <pubDate>Sat, 29 Aug 2026 20:07:09 GMT</pubDate>
-      <description>Método visual para dominar la pronunciación del inglés desde cero.</description>
-      <enclosure url="https://ilinguerelax.com/images/product-patrones-especiales.webp" type="image/jpeg" length="0" />
-      <media:content url="https://ilinguerelax.com/images/product-patrones-especiales.webp" medium="image" />
-      <media:thumbnail url="https://ilinguerelax.com/images/product-patrones-especiales.webp" />
     </item>
     <item>
       <title>5,000 Palabras con Pronunciación Español y Fonética UK/USA</title>

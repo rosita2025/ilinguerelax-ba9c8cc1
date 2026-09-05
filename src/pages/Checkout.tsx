@@ -328,31 +328,15 @@ export default function Checkout() {
   ]);
 
   // Safety net: the main product cannot be removed from the checkout. If the
-  // buyer taps the trash by mistake, we re-add it automatically and notify them.
-  // On the very first load the product is simply added silently (no toast), so
-  // opening /checkouts/:slug in Safari/Chrome móvil no muestra un aviso raro.
-  const mainSeenRef = useRef(false);
+  // buyer taps the trash by mistake, we re-add it automatically — silently,
+  // sin ningún aviso al comprador (antes se mostraba un toast que generaba
+  // confusión y no aportaba nada útil).
   useEffect(() => {
     if (!catalogItem) return;
     const hasMain = items.some((i) => i.id === catalogItem.id);
-    if (hasMain) {
-      mainSeenRef.current = true;
-      return;
-    }
-    const wasRemovedByUser = mainSeenRef.current;
+    if (hasMain) return;
     addItem({ ...catalogItem, quantity: 1 }, { silent: true });
-    if (!wasRemovedByUser) return;
-    toast.info(
-      language === "en"
-        ? `“${catalogItem.name}” was re-added to your cart. This product cannot be removed here.`
-        : language === "fr"
-        ? `« ${catalogItem.name} » a été rajouté au panier. Ce produit ne peut pas être retiré ici.`
-        : language === "pt"
-        ? `“${catalogItem.name}” foi adicionado novamente ao carrinho. Este produto não pode ser removido aqui.`
-        : `“${catalogItem.name}” se agregó de nuevo a tu carrito. Este producto no se puede quitar desde aquí.`,
-      { duration: 4500 }
-    );
-  }, [items, catalogItem, addItem, language]);
+  }, [items, catalogItem, addItem]);
 
   // Shopify-style abandoned checkout tracking: saves buyer info if they
   // fill name+email but leave without completing card payment.

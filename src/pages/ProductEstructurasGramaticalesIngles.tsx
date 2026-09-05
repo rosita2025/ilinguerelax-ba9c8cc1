@@ -153,6 +153,7 @@ const ProductEstructurasGramaticalesIngles = () => {
       price: 12,
       quantity: 1,
       isPhysical: false,
+      image: coverImage.url,
     });
     navigate(`/checkouts/${PRODUCT_SKU}`);
   };

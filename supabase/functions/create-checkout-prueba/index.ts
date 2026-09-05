@@ -4,6 +4,24 @@ import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { resolveServerPricing, PricingError, isRestrictedCurrency, tierForCountry } from "../_shared/catalogPricing.ts";
 import { localAmountFromUsd } from "../_shared/fxRates.ts";
 
+// Monedas "sin decimales" según Stripe: para estas, el monto que se le manda
+// a la API ya es la unidad completa (ej. 16460 = ₡16.460), NO se multiplica
+// por 100 como con USD/EUR/PEN (que sí usan centavos). Antes esto no se
+// respetaba y CADA compra en estas monedas cobraba 100 VECES MÁS de lo
+// debido — ej. una compra de $18 USD en Chile se cobraba como $1,645,200 CLP
+// en vez de $16,460 CLP. Lista oficial:
+// https://docs.stripe.com/currencies#zero-decimal
+const ZERO_DECIMAL_CURRENCIES = new Set([
+  "bif", "clp", "djf", "gnf", "jpy", "kmf", "krw", "mga",
+  "pyg", "rwf", "ugx", "vnd", "vuv", "xaf", "xof", "xpf",
+]);
+
+/** Convierte un monto a la unidad que Stripe espera para la moneda dada. */
+function toStripeAmount(amount: number, currency: string): number {
+  const isZeroDecimal = ZERO_DECIMAL_CURRENCIES.has(currency.toLowerCase());
+  return Math.round(isZeroDecimal ? amount : amount * 100);
+}
+
 const corsHeaders = { 
   "Access-Control-Allow-Origin": "*", 
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", 

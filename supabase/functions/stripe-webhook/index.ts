@@ -7,6 +7,25 @@ import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
 import { upsertPhysicalShipment } from "../_shared/physicalShipments.ts";
 
+// Monedas "sin decimales" según Stripe: el monto que Stripe devuelve para
+// estas YA es la unidad completa (ej. 16460 = ₡16.460), no hay que dividir
+// entre 100 como con USD/EUR/PEN. Antes esto no se respetaba aquí y una
+// venta en CLP/PYG/JPY/KRW se registraba en las analíticas internas con un
+// valor 100 veces MÁS BAJO del real (ej. una venta de $18 USD en Chile
+// aparecía como $0.16 en vez de ~$16), arrastrando el total reportado muy
+// por debajo de lo que Stripe realmente cobró.
+// https://docs.stripe.com/currencies#zero-decimal
+const ZERO_DECIMAL_CURRENCIES = new Set([
+  "bif", "clp", "djf", "gnf", "jpy", "kmf", "krw", "mga",
+  "pyg", "rwf", "ugx", "vnd", "vuv", "xaf", "xof", "xpf",
+]);
+
+/** Convierte un monto devuelto por Stripe a la unidad real, según la moneda. */
+function fromStripeAmount(amount: number, currency: string): number {
+  const isZeroDecimal = ZERO_DECIMAL_CURRENCIES.has(String(currency).toLowerCase());
+  return isZeroDecimal ? amount : amount / 100;
+}
+
 // NOTE: We do NOT instantiate the Stripe SDK here. There is no STRIPE_SECRET_KEY
 // in this project; API keys are opaque gateway connection IDs. Webhook signature
 // verification only needs HMAC-SHA256 against PAYMENTS_*_WEBHOOK_SECRET, so we
@@ -96,8 +115,8 @@ async function raiseStripeAlert(reason: string, severity: "warn" | "error" | "cr
 }
 
 const labelStripeProduct = (session: any) => {
-  const amount = (session.amount_total || 0) / 100;
   const currency = (session.currency || "usd").toUpperCase();
+  const amount = fromStripeAmount(session.amount_total || 0, currency);
   if (Math.round(amount) === 22) {
     return { product_id: "product-spanish-5000-digital", content_name: "Spanish Relax - 5,000 Words (Digital)", value: amount, currency };
   }
@@ -309,13 +328,13 @@ async function sendStripePurchaseEmails(params: {
 
 
 // Extrae info de cupón desde session.metadata (checkout propio) o total_details (Stripe promo codes)
-function extractStripeCoupon(source: any): { couponCode?: string; couponPercent?: number; couponAmount?: number } {
+function extractStripeCoupon(source: any, currency: string): { couponCode?: string; couponPercent?: number; couponAmount?: number } {
   const md = source?.metadata || {};
   const codeMeta = String(md.coupon_code || "").trim().toUpperCase() || undefined;
   const pctMeta = Number(md.coupon_percent);
   const couponPercent = Number.isFinite(pctMeta) && pctMeta > 0 ? pctMeta : undefined;
   const amountDiscount = Number(source?.total_details?.amount_discount || 0);
-  const couponAmount = amountDiscount > 0 ? Number((amountDiscount / 100).toFixed(2)) : undefined;
+  const couponAmount = amountDiscount > 0 ? Number(fromStripeAmount(amountDiscount, currency).toFixed(2)) : undefined;
   const discountCode =
     source?.total_details?.breakdown?.discounts?.[0]?.discount?.promotion_code?.code ||
     source?.total_details?.breakdown?.discounts?.[0]?.discount?.coupon?.name ||
@@ -374,7 +393,7 @@ async function handlePaidCheckoutSession(session: any, eventType: string) {
     return { delivered: false, reason: "already_processed" };
   }
 
-  const coupon = extractStripeCoupon(session);
+  const coupon = extractStripeCoupon(session, purchase.currency);
   await sendStripePurchaseEmails({
     adminClient,
     customerEmail,
@@ -426,11 +445,12 @@ async function handleSucceededPaymentIntent(paymentIntent: any, eventType: strin
   }
 
   const adminClient = getAdminClient();
+  const piCurrency = String(paymentIntent.currency || "usd").toUpperCase();
   const purchase = {
     product_id: "stripe-checkout",
     content_name: metadata.items_summary || "iLingue Relax Digital",
-    value: Number(((paymentIntent.amount_received || paymentIntent.amount || 0) / 100).toFixed(2)),
-    currency: String(paymentIntent.currency || "usd").toUpperCase(),
+    value: Number(fromStripeAmount(paymentIntent.amount_received || paymentIntent.amount || 0, piCurrency).toFixed(2)),
+    currency: piCurrency,
   };
   const paymentKey = paymentIntent.id;
   const orderNumber = `ILR-ST-${String(paymentKey).slice(-8).toUpperCase()}`;
@@ -460,7 +480,7 @@ async function handleSucceededPaymentIntent(paymentIntent: any, eventType: strin
     return { delivered: false, reason: "already_processed" };
   }
 
-  const coupon = extractStripeCoupon(paymentIntent);
+  const coupon = extractStripeCoupon(paymentIntent, piCurrency);
   await sendStripePurchaseEmails({
     adminClient,
     customerEmail,

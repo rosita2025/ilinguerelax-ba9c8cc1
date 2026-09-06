@@ -65,6 +65,14 @@ export default function CheckoutSuccess() {
   const [delivery, setDelivery] = useState<DeliveryItem[]>([]);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [deliveryLoading, setDeliveryLoading] = useState(false);
+  // El navegador NO puede confirmar por sí solo que un pago es real (la URL
+  // se puede fabricar a mano). Solo el servidor lo sabe con certeza, y
+  // order-delivery ya verifica esto antes de devolver algo. Usamos esa misma
+  // respuesta para decidir si el pixel de Facebook debe disparar "Purchase"
+  // — antes se disparaba solo con datos del navegador, permitiendo que
+  // visitas sin pago real (pruebas, bots, links compartidos) contaran como
+  // compras falsas en los reportes de anuncios.
+  const [serverVerifiedPaid, setServerVerifiedPaid] = useState(false);
 
 
   // Build a friendly order number: ILR-<PROVIDER>-<6 chars>
@@ -125,8 +133,15 @@ export default function CheckoutSuccess() {
   // Global Meta Pixel: fire Purchase once per order (dedupe via sessionStorage).
   // Uses trackHotmartEvent so it goes to Pixel 24959578143733255 (browser)
   // + Meta CAPI (server) + funnel_events (internal analytics).
+  //
+  // Se dispara solo cuando `serverVerifiedPaid` es true (el backend ya
+  // confirmó el pago real vía order-delivery) — no basta con que la URL o el
+  // carrito del navegador "parezcan" una compra aprobada. Antes, cualquier
+  // visita a esta página con datos de comprador en el carrito (una prueba,
+  // un bot, un link compartido) contaba como una compra real ante Facebook,
+  // inflando el valor total reportado sin que hubiera pago de por medio.
   useEffect(() => {
-    if (!isVerifiedBuyer) return;
+    if (!isVerifiedBuyer || !serverVerifiedPaid) return;
     const key = `fbq-purchase:${orderNumber}`;
     if (sessionStorage.getItem(key)) return;
     try {
@@ -143,7 +158,7 @@ export default function CheckoutSuccess() {
       });
       sessionStorage.setItem(key, "1");
     } catch { /* ignore */ }
-  }, [isVerifiedBuyer, orderNumber, total, items]);
+  }, [isVerifiedBuyer, serverVerifiedPaid, orderNumber, total, items]);
 
 
   useEffect(() => {
@@ -186,8 +201,10 @@ export default function CheckoutSuccess() {
       .invoke("order-delivery", { body: { orderId: orderNumber, email: buyer.email } })
       .then(({ data, error }) => {
         if (error) throw error;
-        setDelivery((data?.items ?? []) as DeliveryItem[]);
+        const deliveredItems = (data?.items ?? []) as DeliveryItem[];
+        setDelivery(deliveredItems);
         setDownloadUrl((data?.downloadUrl ?? null) as string | null);
+        if (deliveredItems.length > 0) setServerVerifiedPaid(true);
       })
       .catch((e) => console.error("order-delivery failed", e))
       .finally(() => setDeliveryLoading(false));

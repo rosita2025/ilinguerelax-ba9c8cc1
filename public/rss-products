@@ -5,8 +5,18 @@
     <link>https://ilinguerelax.com/products</link>
     <description>Libros digitales y físicos de iLingue Relax: vocabulario, pronunciación y fonética para aprender idiomas sin estrés.</description>
     <language>es</language>
-    <lastBuildDate>Sat, 05 Sep 2026 20:25:20 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 06 Sep 2026 15:49:56 GMT</lastBuildDate>
     <atom:link href="https://ilinguerelax.com/rss-productos.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>100 Mapas Mentales para Aprender Coreano (Hangul → C1)</title>
+      <link>https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1</link>
+      <guid isPermaLink="true">https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1</guid>
+      <pubDate>Sun, 06 Sep 2026 15:49:56 GMT</pubDate>
+      <description>Guía completa con 100 mapas mentales para dominar el coreano de forma visual.</description>
+      <enclosure url="https://cdn.phototourl.com/free/2026-07-10-5f5094b8-a227-48c8-a17d-b580c92702af.png" type="image/jpeg" length="0" />
+      <media:content url="https://cdn.phototourl.com/free/2026-07-10-5f5094b8-a227-48c8-a17d-b580c92702af.png" medium="image" />
+      <media:thumbnail url="https://cdn.phototourl.com/free/2026-07-10-5f5094b8-a227-48c8-a17d-b580c92702af.png" />
+    </item>
     <item>
       <title>Structural Spanish Grammar A1–C1 | Spanish Relax by iLingue Relax</title>
       <link>https://ilinguerelax.com/products/structural-spanish-grammar-a1-c1-spanish-relax-by-ilingue-relax-aeej</link>
@@ -106,16 +116,6 @@
       <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-spanish-words-with-english-pronunciation-digital/1787096587307-ino46.webp" type="image/jpeg" length="0" />
       <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-spanish-words-with-english-pronunciation-digital/1787096587307-ino46.webp" medium="image" />
       <media:thumbnail url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-spanish-words-with-english-pronunciation-digital/1787096587307-ino46.webp" />
-    </item>
-    <item>
-      <title>100 Mapas Mentales para Aprender Coreano (Hangul → C1)</title>
-      <link>https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1</link>
-      <guid isPermaLink="true">https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1</guid>
-      <pubDate>Tue, 18 Aug 2026 03:47:37 GMT</pubDate>
-      <description>Guía completa con 100 mapas mentales para dominar el coreano de forma visual.</description>
-      <enclosure url="https://cdn.phototourl.com/free/2026-07-10-5f5094b8-a227-48c8-a17d-b580c92702af.png" type="image/jpeg" length="0" />
-      <media:content url="https://cdn.phototourl.com/free/2026-07-10-5f5094b8-a227-48c8-a17d-b580c92702af.png" medium="image" />
-      <media:thumbnail url="https://cdn.phototourl.com/free/2026-07-10-5f5094b8-a227-48c8-a17d-b580c92702af.png" />
     </item>
     <item>
       <title>1,000 palabras ingles más utilizadas en Ingeniería Civil</title>

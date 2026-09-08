@@ -254,6 +254,7 @@ const App = () => (
                   <Route path="/products/500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes" element={<Product500Preguntas />} />
                   
                   <Route path="/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles" element={<ProductPatronesEspeciales />} />
+                  <Route path="/products/puppy-planner" element={<ProductPuppyPlanner />} />
                   <Route path="/products/100-mapas-mentales-para-aprender-coreano-hangul-c1" element={<ProductCoreano100Mapas />} />
                   <Route path="/products/1-000-palabras-esenciales-para-aprender-coreano" element={<ProductCoreanoRelax />} />
                  <Route path="/descarga/coreano-100-mapas" element={<Navigate to="/mi-descarga" replace />} />

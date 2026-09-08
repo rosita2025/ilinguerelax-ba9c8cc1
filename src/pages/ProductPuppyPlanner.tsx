@@ -333,20 +333,20 @@ const ProductPuppyPlanner = () => {
       </main>
 
       <StickyBuyBar
-        productSku={ADMIN_SKU}
+        sku={ADMIN_SKU}
         productName="Puppy Planner"
-        productImage={productImage}
-        goesToInternalCheckout={true}
-        externalUrl={undefined}
-        priceUsd={PRICE_USD}
-        displayCurrency={displayCurrency}
-        loaded={pricingReady}
-        isDigital={true}
-        isBook={false}
-        savingsPercent={tier.savingsPercent > 0 ? tier.savingsPercent : 0}
-        onBuyClick={handleBuy}
-        ctaText={"LO QUIERO"}
+        price={tier.priceLabel}
+        originalPrice={tier.originalLabel || undefined}
+        currencyCode={tier.currencyCode}
+        flag={tier.loaded ? (tier.currencyCode === "USD" ? "🇺🇸" : tier.currencyCode === "EUR" ? "🇪🇺" : tier.currencyCode === "GBP" ? "🇬🇧" : tier.currencyCode === "AUD" ? "🇦🇺" : tier.currencyCode === "CAD" ? "🇨🇦" : "🌎") : undefined}
+        usdValue={PRICE_USD}
         localUsdPrices={pricingAdmin.localUsdPrices}
+        buyUrl={undefined}
+        onBuyClick={handleBuy}
+        ctaText={`LO QUIERO — ${tier.priceLabel}`}
+        lang="es"
+        isPhysical={false}
+        goesToInternalCheckout={true}
       />
 
       <Footer />

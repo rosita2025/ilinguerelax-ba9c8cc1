@@ -433,6 +433,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const { trackPurchase } = usePurchaseTracking();
   const [selected, setSelected] = useState<Method | null>(null);
   const [selectedCardRow, setSelectedCardRow] = useState<string | null>(null);
+  const [dlocalDocument, setDlocalDocument] = useState("");
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
   const [showStripe, setShowStripe] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
@@ -794,6 +795,18 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     const dlMethod: Method = kind === "cash" ? "dlocal_cash" : kind === "wallet" ? "dlocal_wallet" : "dlocal_transfer";
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
+    // Los proveedores de pago en efectivo (OXXO y equivalentes) exigen un
+    // documento de identidad por regulación. Antes nunca se pedía, así que
+    // dLocal rechazaba la solicitud con error 400 en TODOS los intentos.
+    if (kind === "cash" && !dlocalDocument.trim()) {
+      setMethodError({
+        method: dlMethod,
+        message: language === "en"
+          ? "Please enter your ID document above to continue."
+          : "Ingresa tu documento de identidad arriba para continuar.",
+      });
+      return;
+    }
     const s = useCheckoutPruebaStore.getState();
     const totals = calcTotals(s.items, s.couponPercent, region.tier);
     const ctry = (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2);
@@ -847,6 +860,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           payerEmail: s.buyer.email.trim(),
           payerName: s.buyer.fullName.trim(),
           payerPhone: (s.buyer.phone ?? "").trim() || undefined,
+          payerDocument: kind === "cash" ? dlocalDocument.trim() : undefined,
           // Mismos datos que enviamos a Stripe: necesarios para despachar libros físicos.
           payerAddress: (s.buyer.address ?? "").trim().slice(0, 160) || undefined,
           payerCity: (s.buyer.city ?? "").trim().slice(0, 80) || undefined,
@@ -2473,6 +2487,30 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
                 <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
+              </div>
+            )}
+
+            {m.id === "dlocal_cash" && isSelected && (
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-3">
+                <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 p-3">
+                  <p className="text-xs text-amber-800 dark:text-amber-300">
+                    {language === "en"
+                      ? "Cash payment providers (like OXXO) require an ID document by law. Please enter it to generate your voucher."
+                      : "Los pagos en efectivo (como OXXO) requieren un documento de identidad por regulación. Ingrésalo para generar tu cupón."}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1 block">
+                    {language === "en" ? "ID document (e.g. RFC, CURP, DNI, CI)" : "Documento de identidad (ej. RFC, CURP, DNI, CI)"}
+                  </label>
+                  <input
+                    type="text"
+                    value={dlocalDocument}
+                    onChange={(e) => setDlocalDocument(e.target.value.trim())}
+                    placeholder={language === "en" ? "Enter your document number" : "Ingresa tu número de documento"}
+                    className="w-full px-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                </div>
               </div>
             )}
 

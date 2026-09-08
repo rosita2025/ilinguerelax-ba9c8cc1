@@ -75,7 +75,8 @@ Deno.serve(async (req) => {
     const calculatedUsd = Number(pricing.totalUsd.toFixed(2));
     const orderId = body.orderId ?? `ILR-DL-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const skus = normalizeSkus(pricing.items.map((i) => i.sku));
-    const description = `iLingue Relax · ${pricing.items.map((i) => `${i.quantity}x ${i.name}`).join(" · ")}`.slice(0, 250);
+    // dLocal Go rechaza (400, code 5000) cualquier descripción de más de 100 caracteres.
+    const description = `iLingue Relax · ${pricing.items.map((i) => `${i.quantity}x ${i.name}`).join(" · ")}`.slice(0, 100);
 
     console.log(`[dLocal] Inicia creación de pago: ${orderId} (${body.country}) - ${pricing.totalUsd} USD`);
 

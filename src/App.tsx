@@ -39,6 +39,7 @@ const Product1000Verbos = lazy(() => import("./pages/Product1000Verbos"));
 const Product500Preguntas = lazy(() => import("./pages/Product500Preguntas"));
 
 const ProductPatronesEspeciales = lazy(() => import("./pages/ProductPatronesEspeciales"));
+const ProductPuppyPlanner = lazy(() => import("./pages/ProductPuppyPlanner"));
 const ProductCoreanoRelax = lazy(() => import("./pages/ProductCoreanoRelax"));
 const ProductCoreano100Mapas = lazy(() => import("./pages/ProductCoreano100Mapas"));
 const ProductComparisonSpanish = lazy(() => import("./pages/ProductComparisonSpanish"));

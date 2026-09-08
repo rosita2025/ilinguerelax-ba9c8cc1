@@ -795,10 +795,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     const dlMethod: Method = kind === "cash" ? "dlocal_cash" : kind === "wallet" ? "dlocal_wallet" : "dlocal_transfer";
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
-    // Los proveedores de pago en efectivo (OXXO y equivalentes) exigen un
-    // documento de identidad por regulación. Antes nunca se pedía, así que
-    // dLocal rechazaba la solicitud con error 400 en TODOS los intentos.
-    if (kind === "cash" && !dlocalDocument.trim()) {
+    // Los rieles de dLocal Go en efectivo Y transferencia (OXXO, SPEI vía
+    // dLocal, y equivalentes) exigen un documento de identidad por
+    // regulación. Antes nunca se pedía, así que dLocal rechazaba la
+    // solicitud con error 400 en TODOS los intentos. Esto NO aplica a
+    // Stripe, ni a los métodos manuales aparte (CLABE propia, Yape/Plin,
+    // Binance) — esos no lo necesitan.
+    if ((kind === "cash" || kind === "transfer") && !dlocalDocument.trim()) {
       setMethodError({
         method: dlMethod,
         message: language === "en"
@@ -860,7 +863,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           payerEmail: s.buyer.email.trim(),
           payerName: s.buyer.fullName.trim(),
           payerPhone: (s.buyer.phone ?? "").trim() || undefined,
-          payerDocument: kind === "cash" ? dlocalDocument.trim() : undefined,
+          payerDocument: (kind === "cash" || kind === "transfer") ? dlocalDocument.trim() : undefined,
           // Mismos datos que enviamos a Stripe: necesarios para despachar libros físicos.
           payerAddress: (s.buyer.address ?? "").trim().slice(0, 160) || undefined,
           payerCity: (s.buyer.city ?? "").trim().slice(0, 80) || undefined,
@@ -2490,13 +2493,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               </div>
             )}
 
-            {m.id === "dlocal_cash" && isSelected && (
+            {(m.id === "dlocal_cash" || m.id === "dlocal_transfer") && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-3">
                 <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 p-3">
                   <p className="text-xs text-amber-800 dark:text-amber-300">
                     {language === "en"
-                      ? "Cash payment providers (like OXXO) require an ID document by law. Please enter it to generate your voucher."
-                      : "Los pagos en efectivo (como OXXO) requieren un documento de identidad por regulación. Ingrésalo para generar tu cupón."}
+                      ? "This local payment provider requires an ID document by law. Please enter it to continue."
+                      : "Este método de pago local requiere un documento de identidad por regulación. Ingrésalo para continuar."}
                   </p>
                 </div>
                 <div>

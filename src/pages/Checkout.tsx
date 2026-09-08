@@ -32,6 +32,7 @@ import { getStripe } from "@/lib/stripe";
 import { trackHotmartEvent, trackBeginCheckout } from "@/hooks/useMetaPixel";
 import { cn } from "@/lib/utils";
 import { authorizeCheckout, evaluateCheckoutGate } from "@/lib/checkoutGate";
+import { getCountryInfo } from "@/lib/countryInfo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -646,7 +647,20 @@ export default function Checkout() {
                 <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-900/30 rounded-xl p-3 flex gap-2.5 items-center mb-1">
                   <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                   <p className="text-[11px] sm:text-xs text-emerald-900 dark:text-emerald-100 font-medium leading-tight">
-                    {t.verifiedReviewNotice}
+                    {(() => {
+                      // Mismo cuadro, mismo alto — solo cambia el texto según
+                      // el país real del visitante (sin agregar scroll). Si
+                      // todavía no se detecta el país, se usa el genérico.
+                      const countryName = getCountryInfo(region.country)?.name;
+                      if (!countryName) return t.verifiedReviewNotice;
+                      return language === "en"
+                        ? `Verified buyers in ${countryName}: ⭐⭐⭐⭐⭐ 5.0/5.0. Fast digital delivery, no delays.`
+                        : language === "pt"
+                        ? `Compradores verificados no(a) ${countryName}: ⭐⭐⭐⭐⭐ 5.0/5.0. Entrega digital rápida, sem atrasos.`
+                        : language === "fr"
+                        ? `Acheteurs vérifiés en ${countryName} : ⭐⭐⭐⭐⭐ 5.0/5.0. Livraison numérique rapide, sans délai.`
+                        : `Compradores verificados en ${countryName}: ⭐⭐⭐⭐⭐ 5.0/5.0. Envío digital rápido, sin demoras.`;
+                    })()}
                   </p>
                 </div>
                 

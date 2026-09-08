@@ -421,7 +421,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const priceBadge = penBadge ?? localTotalLabel;
   // Usamos el usdReference calculado por sumItemsLocal que ya contempla el USD Regional.
   const usdSuffix = (isActuallyShowingLocal && !local.isUsd) 
-    ? ` ≈ USD $${currentUsdRef.toFixed(2)}`
+    ? ` · $${Math.round(currentUsdRef)}`
     : "";
   const finalPriceLabel = isActuallyShowingLocal ? `${priceBadge}${usdSuffix}` : "...";
   

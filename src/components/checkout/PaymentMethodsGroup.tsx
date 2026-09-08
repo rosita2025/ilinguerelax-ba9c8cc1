@@ -795,6 +795,18 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     const dlMethod: Method = kind === "cash" ? "dlocal_cash" : kind === "wallet" ? "dlocal_wallet" : "dlocal_transfer";
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
+    // Los proveedores de pago en efectivo (OXXO y equivalentes) exigen un
+    // documento de identidad por regulación. Antes nunca se pedía, así que
+    // dLocal rechazaba la solicitud con error 400 en TODOS los intentos.
+    if (kind === "cash" && !dlocalDocument.trim()) {
+      setMethodError({
+        method: dlMethod,
+        message: language === "en"
+          ? "Please enter your ID document above to continue."
+          : "Ingresa tu documento de identidad arriba para continuar.",
+      });
+      return;
+    }
     const s = useCheckoutPruebaStore.getState();
     const totals = calcTotals(s.items, s.couponPercent, region.tier);
     const ctry = (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2);

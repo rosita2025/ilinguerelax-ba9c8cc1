@@ -860,6 +860,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           payerEmail: s.buyer.email.trim(),
           payerName: s.buyer.fullName.trim(),
           payerPhone: (s.buyer.phone ?? "").trim() || undefined,
+          payerDocument: kind === "cash" ? dlocalDocument.trim() : undefined,
           // Mismos datos que enviamos a Stripe: necesarios para despachar libros físicos.
           payerAddress: (s.buyer.address ?? "").trim().slice(0, 160) || undefined,
           payerCity: (s.buyer.city ?? "").trim().slice(0, 80) || undefined,

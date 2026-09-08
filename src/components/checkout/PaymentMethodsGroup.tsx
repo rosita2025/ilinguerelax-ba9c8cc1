@@ -1666,10 +1666,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     {
       id: "dlocal_transfer",
       icon: Building2,
-      title: language === "en" ? "Bank transfer"
-        : language === "pt" ? "Transferência bancária"
-        : language === "fr" ? "Virement bancaire"
-        : "Transferencia bancaria",
+      title: language === "en" ? "Transfer"
+        : language === "pt" ? "Transferência"
+        : language === "fr" ? "Virement"
+        : "Transferencia",
       sub: (dlocalRails(country, "transfer").length
         ? `${dlocalRails(country, "transfer").join(" · ")} — `
         : "") + (language === "en" ? "Pay from your bank or wallet in local currency. Instant confirmation."

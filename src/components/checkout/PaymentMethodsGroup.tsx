@@ -433,6 +433,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const { trackPurchase } = usePurchaseTracking();
   const [selected, setSelected] = useState<Method | null>(null);
   const [selectedCardRow, setSelectedCardRow] = useState<string | null>(null);
+  const [dlocalDocument, setDlocalDocument] = useState("");
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
   const [showStripe, setShowStripe] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);

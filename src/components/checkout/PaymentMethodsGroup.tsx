@@ -120,6 +120,7 @@ function renderMethodBadge(badge: MethodBadge) {
   if (badge.label === "Visa") return <LogoBadge key={badge.label} src={visaLogo} alt="Visa" />;
   if (badge.label === "Mastercard") return <LogoBadge key={badge.label} src={mastercardLogo} alt="Mastercard" />;
   if (badge.label === "Apple Pay") return <LogoBadge key={badge.label} src={applePayLogo} alt="Apple Pay" bg="#000000" />;
+  if (badge.label === "Hotmart") return <LogoBadge key={badge.label} src={hotmartLogo.url} alt="Hotmart" />;
   if (badge.label === "Google Pay") return <GooglePayBadge key={badge.label} />;
   if (badge.label === "Link") return <LinkBadge key={badge.label} />;
   return <BankBadge key={badge.label} {...badge} />;

@@ -12,7 +12,7 @@ import {
 
 const BUCKET = "product-images";
 const MAX_BYTES = 15 * 1024 * 1024; // 15 MB decoded
-const PATH_RE = /^[a-z0-9-]{1,80}\/[a-z0-9-]{1,80}\.(webp|jpg|jpeg|png|gif|avif)$/;
+const PATH_RE = /^[a-z0-9-]{1,150}\/[a-z0-9-]{1,80}\.(webp|jpg|jpeg|png|gif|avif)$/;
 
 function decodeBase64(b64: string): Uint8Array {
   const bin = atob(b64);

@@ -161,7 +161,7 @@ const es: CheckoutUIStrings = {
 
   choosePaymentMethod: "Método de pago",
   cardPayment: "Pago con tarjeta",
-  cardTitlePeru: "Tarjeta, Apple Pay o Link",
+  cardTitlePeru: "Tarjeta",
   cardTitleGlobal: "Tarjeta débito o crédito",
   cardSubtitlePeru: (lb) => `Visa · Mastercard · Amex · Apple Pay · Link · Cobro en tu moneda local${lb}`,
   cardSubtitleGlobal: (curr, lb) => `Débito o crédito · Apple Pay · Google Pay · Link · Cobro en ${curr}${lb}`,
@@ -274,7 +274,7 @@ const en: CheckoutUIStrings = {
 
   choosePaymentMethod: "Payment Method",
   cardPayment: "Card payment",
-  cardTitlePeru: "Card, Apple Pay or Link",
+  cardTitlePeru: "Card",
   cardTitleGlobal: "Debit or Credit Card",
   cardSubtitlePeru: (lb) => `Visa · Mastercard · Amex · Apple Pay · Link${lb}`,
   cardSubtitleGlobal: (curr, lb) => `Credit or Debit Card · Apple Pay · Google Pay · Link · Charged in ${curr}${lb}`,
@@ -387,7 +387,7 @@ const pt: CheckoutUIStrings = {
 
   choosePaymentMethod: "Método de pagamento",
   cardPayment: "Pagamento com cartão",
-  cardTitlePeru: "Cartão, Apple Pay ou Link",
+  cardTitlePeru: "Cartão",
   cardTitleGlobal: "Cartão de débito ou crédito",
   cardSubtitlePeru: (lb) => `Visa · Mastercard · Amex · Apple Pay · Link · Cobrado na sua moeda local${lb}`,
   cardSubtitleGlobal: (curr, lb) => `Débito ou crédito · Apple Pay · Google Pay · Link · Cobrado em ${curr}${lb}`,
@@ -500,7 +500,7 @@ const fr: CheckoutUIStrings = {
 
   choosePaymentMethod: "Mode de paiement",
   cardPayment: "Paiement par carte",
-  cardTitlePeru: "Carte, Apple Pay ou Link",
+  cardTitlePeru: "Carte",
   cardTitleGlobal: "Carte de débit ou crédit",
   cardSubtitlePeru: (lb) => `Visa · Mastercard · Amex · Apple Pay · Link · Débité dans votre monnaie locale${lb}`,
   cardSubtitleGlobal: (curr, lb) => `Débit ou crédit · Apple Pay · Google Pay · Link · Débité en ${curr}${lb}`,

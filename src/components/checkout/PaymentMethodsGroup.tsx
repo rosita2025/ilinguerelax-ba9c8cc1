@@ -2490,6 +2490,30 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               </div>
             )}
 
+            {m.id === "dlocal_cash" && isSelected && (
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-3">
+                <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 p-3">
+                  <p className="text-xs text-amber-800 dark:text-amber-300">
+                    {language === "en"
+                      ? "Cash payment providers (like OXXO) require an ID document by law. Please enter it to generate your voucher."
+                      : "Los pagos en efectivo (como OXXO) requieren un documento de identidad por regulación. Ingrésalo para generar tu cupón."}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1 block">
+                    {language === "en" ? "ID document (e.g. RFC, CURP, DNI, CI)" : "Documento de identidad (ej. RFC, CURP, DNI, CI)"}
+                  </label>
+                  <input
+                    type="text"
+                    value={dlocalDocument}
+                    onChange={(e) => setDlocalDocument(e.target.value.trim())}
+                    placeholder={language === "en" ? "Enter your document number" : "Ingresa tu número de documento"}
+                    className="w-full px-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                </div>
+              </div>
+            )}
+
             {m.id === "clabe" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
                 <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 sm:p-5 space-y-4">

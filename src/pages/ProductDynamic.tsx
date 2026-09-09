@@ -293,6 +293,11 @@ const ProductDynamic = () => {
     { icon: FilePlus, title: "Quick Conversations", description: "High-impact guide for 100 common conversations." },
   ];
 
+  const SP5K_SKUS = [
+    "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7",
+    "5-000-spanish-words-with-english-pronunciation-digital",
+  ];
+
   const previewAssets = [
     { title: "Vocabulary", image: previewSpanishVocab },
     { title: "Grammar Guide", image: grammarPreviewAsset.url },
@@ -308,7 +313,7 @@ const ProductDynamic = () => {
   ].filter(asset => {
     const KOREAN_SKU = "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca";
     
-    if (product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7") {
+    if (SP5K_SKUS.includes(product.sku)) {
       return [
         "Study Planner (6 Months)", 
         "Spanish Exam Pack", 
@@ -648,7 +653,7 @@ const ProductDynamic = () => {
             <FAQ 
               title="FAQ" 
               subtitle="Quick Answers" 
-              items={["5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7", "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca"].includes(product.sku) ? [
+              items={[...SP5K_SKUS, "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca"].includes(product.sku) ? [
                 { question: "Delivery time?", answer: "Sent to your email within 5 minutes of purchase.", icon: Download },
                 { question: "What is the format?", answer: "High-quality Digital PDF (Official iLingue Relax Brand).", icon: FileText },
                 { question: "Payment methods?", answer: "Secure payments via Stripe, Credit/Debit Cards, and PayPal.", icon: CreditCard },
@@ -687,7 +692,7 @@ const ProductDynamic = () => {
         onBuyClick={handleBuy}
         usdValue={effectiveUsd}
         localUsdPrices={product.local_usd_prices}
-        testimonials={product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" ? [
+        testimonials={SP5K_SKUS.includes(product.sku) ? [
           "Sarah, USA: Exactly what I needed to stop translating in my head!",
           "James, UK: The 6-month study planner is a game changer for me.",
           "Elena, Canada: Clear pronunciation and very visual. Highly recommend."

@@ -680,15 +680,7 @@ const ProductDynamic = () => {
         reviewCount={reviewsCount}
         productName={product.name}
         lang={language === "es" ? "es" : "en"}
-        ctaText={
-          language === "es"
-            ? `LO QUIERO AHORA — ${displayFormatted}`
-            : language === "pt"
-              ? `QUERO AGORA — ${displayFormatted}`
-              : language === "fr"
-                ? `JE LE VEUX — ${displayFormatted}`
-                : `I want it — ${displayFormatted}`
-        }
+        ctaText={`I want it — ${displayFormatted}`}
         onBuyClick={handleBuy}
         usdValue={effectiveUsd}
         localUsdPrices={product.local_usd_prices}

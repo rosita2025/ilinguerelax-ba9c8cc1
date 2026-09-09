@@ -245,7 +245,11 @@ const App = () => (
                   <Route path="/products/5-000-spanish-words-with-english-pronunciation-physical" element={<ProductSpanish5000 />} />
                   <Route path="/products/5-000-spanish-words-with-english-pronunciation" element={<ProductComparisonSpanish />} />
                   <Route path="/products/5-000-words-spanish-with-pronunciation-english-nwna" element={<ProductSpanish5000Digital />} />
-                  <Route path="/products/5-000-spanish-words-with-english-pronunciation-digital" element={<ProductSpanish5000Digital />} />
+                  {/* "5-000-spanish-words-with-english-pronunciation-digital" ya NO tiene
+                      una ruta propia aquí a propósito: cae en el catch-all /products/:slug
+                      de más abajo, que renderiza ProductDynamic — el mismo componente que
+                      usa "cmb7", con el mismo diseño y todas las mejoras de conversión ya
+                      aplicadas. El SKU en el admin ya coincide exacto con este slug. */}
                   <Route path="/products/3-000-spanish-verbs-mastery-physical-book-preorder" element={<ProductSpanish3000VerbsBook />} />
                   <Route path="/products/spanish-grammar-patterns-a1-c1-mastery-preorder" element={<ProductSpanishGrammarPatterns />} />
                   <Route path="/products/1-000-verbs-in-spanish-past-present-future-with-english-pronunciation" element={<ProductSpanish1000Verbs />} />

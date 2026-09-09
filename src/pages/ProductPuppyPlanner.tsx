@@ -31,10 +31,8 @@ import { type Currency } from "@/i18n";
 const ADMIN_SKU = "puppy-planner";
 const TIENDA_CHECKOUT_PATH = `/checkouts/${ADMIN_SKU}`;
 
-// TODO: reemplaza esta ruta por tus propias fotos del producto (portada,
-// vistas previas de las páginas, etc.). Súbelas en /admin/productos o a
-// /public/images/ y actualiza estas rutas.
-const productImage = "/images/product-puppy-planner.webp";
+// Respaldo temporal SOLO si todavía no subiste una portada en /admin/productos.
+const FALLBACK_IMAGE = "/images/product-puppy-planner.webp";
 
 const features = [
   "Calendario de citas veterinarias",
@@ -66,6 +64,9 @@ const ProductPuppyPlanner = () => {
 
   const pricingAdmin = useAdminPricing(ADMIN_SKU);
   const tier = useCountryTierRouting(ADMIN_SKU, { tiendaPath: TIENDA_CHECKOUT_PATH });
+  // La foto real es la que subiste en /admin/productos (portada). Si todavía
+  // no subiste ninguna, usa el marcador de posición como respaldo temporal.
+  const productImage = pricingAdmin.coverImageUrl || FALLBACK_IMAGE;
 
   const {
     priceUsd: PRICE_USD, priceGlobalUsd: GLOBAL_USD, priceLatamUsd: LATAM_USD,

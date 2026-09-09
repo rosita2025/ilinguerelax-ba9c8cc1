@@ -327,7 +327,13 @@ const ProductDynamic = () => {
       ].includes(asset.title);
     }
     
-    return true;
+    // Para el resto de productos: nunca mostrar imágenes de coreano ni la guía de gramática
+    return ![
+      "Korean Cover",
+      "Korean Index",
+      "Korean Vocabulary Table",
+      "Grammar Guide",
+    ].includes(asset.title);
   });
 
 

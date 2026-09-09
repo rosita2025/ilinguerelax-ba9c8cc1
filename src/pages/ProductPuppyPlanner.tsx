@@ -1,5 +1,5 @@
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -12,7 +12,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import {
   Star, Check, ArrowRight, ShoppingCart, Smartphone, Shield, Download,
-  CalendarCheck, Bone, Stethoscope, Users, PawPrint,
+  CalendarCheck, Bone, Stethoscope, Users, PawPrint, ChevronLeft, ChevronRight, Images,
 } from "lucide-react";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 

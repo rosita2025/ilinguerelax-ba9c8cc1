@@ -665,6 +665,35 @@ const ProductDynamic = () => {
               ]}
             />
           </Suspense>
+
+          {product.sku === "5-000-spanish-words-with-english-pronunciation-digital" && (
+            <div className="max-w-4xl mx-auto px-4 mb-4">
+              <div className="p-3 md:p-4 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden relative group">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Package className="w-32 h-32 -mr-8 -mt-8" />
+                </div>
+                <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left relative z-10">
+                  <div className="w-16 h-16 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0 border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                    <BookOpen className="w-10 h-10 text-emerald-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg md:text-xl font-black mb-1 text-emerald-400 uppercase tracking-tight">Physical Book?</h3>
+                    <p className="text-slate-400 text-xs md:text-sm leading-tight">
+                      Get the premium printed edition of the 5,000 Spanish Words book shipped to your door. The perfect companion for your digital study.
+                    </p>
+                  </div>
+                  <Button 
+                    asChild
+                    className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black px-4 py-3 rounded-xl transition-all shadow-[0_8px_25px_rgba(16,185,129,0.3)] hover:scale-105 active:scale-95 h-auto text-[13px]"
+                  >
+                    <Link to="/products/5-000-spanish-words-with-english-pronunciation-physical">
+                      I want your physical book
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </main>
 

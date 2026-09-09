@@ -405,5 +405,25 @@
       <g:custom_label_0>Korean</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
+    <item>
+      <g:id>puppy-planner</g:id>
+      <g:title>Puppy &amp; Cats Planner in 30 Days</g:title>
+      <g:description></g:description>
+      <g:link>https://ilinguerelax.com/products/puppy-planner</g:link>
+      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/puppy-planner/1788911534469-kfv4f.webp</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in stock</g:availability>
+      <g:price>9.99 USD</g:price>
+      <g:brand>iLingue Relax</g:brand>
+      <g:mpn>puppy-planner</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:adult>no</g:adult>
+      <g:content_language>en</g:content_language>
+      <g:target_country>US</g:target_country>
+      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
+      <g:product_type>Digital Books &gt; Languages &gt; English</g:product_type>
+      <g:custom_label_0>English</g:custom_label_0>
+      <g:custom_label_1>Digital</g:custom_label_1>
+    </item>
   </channel>
 </rss>

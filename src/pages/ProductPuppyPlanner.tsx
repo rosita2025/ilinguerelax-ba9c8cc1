@@ -587,22 +587,24 @@ const ProductPuppyPlanner = () => {
       </main>
 
 
-      <StickyBuyBar
-        sku={ADMIN_SKU}
-        productName="Puppy Planner"
-        price={tier.priceLabel}
-        originalPrice={tier.originalLabel || undefined}
-        currencyCode={tier.currencyCode}
-        flag={tier.loaded ? (tier.currencyCode === "USD" ? "🇺🇸" : tier.currencyCode === "EUR" ? "🇪🇺" : tier.currencyCode === "GBP" ? "🇬🇧" : tier.currencyCode === "AUD" ? "🇦🇺" : tier.currencyCode === "CAD" ? "🇨🇦" : "🌎") : undefined}
-        usdValue={PRICE_USD}
-        localUsdPrices={pricingAdmin.localUsdPrices}
-        buyUrl={undefined}
-        onBuyClick={handleBuy}
-        ctaText={c.stickyCta(tier.priceLabel)}
-        lang={language === "es" ? "es" : "en"}
-        isPhysical={false}
-        goesToInternalCheckout={true}
-      />
+      {tier.loaded && (
+        <StickyBuyBar
+          sku={ADMIN_SKU}
+          productName="Puppy Planner"
+          price={tier.priceLabel}
+          originalPrice={tier.originalLabel || undefined}
+          currencyCode={tier.currencyCode}
+          flag={tier.currencyCode === "USD" ? "🇺🇸" : tier.currencyCode === "EUR" ? "🇪🇺" : tier.currencyCode === "GBP" ? "🇬🇧" : tier.currencyCode === "AUD" ? "🇦🇺" : tier.currencyCode === "CAD" ? "🇨🇦" : "🌎"}
+          usdValue={PRICE_USD}
+          localUsdPrices={pricingAdmin.localUsdPrices}
+          buyUrl={undefined}
+          onBuyClick={handleBuy}
+          ctaText={c.stickyCta(tier.priceLabel)}
+          lang={language === "es" ? "es" : "en"}
+          isPhysical={false}
+          goesToInternalCheckout={true}
+        />
+      )}
 
       <Footer />
       <WhatsAppButton />

@@ -266,18 +266,69 @@ const ProductPuppyPlanner = () => {
           </div>
         </section>
 
-        {/* Trust / disclaimer */}
-        <section className="py-12 md:py-16 bg-muted/30">
-          <div className="container px-4 mx-auto text-center max-w-2xl">
-            <div className="flex justify-center gap-1 mb-4">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+        {/* Cómo funciona — más detalle sobre el uso diario */}
+        <section className="py-16 md:py-20">
+          <div className="container px-4 mx-auto max-w-4xl">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+                Cómo funciona en el día a día
+              </h2>
+              <p className="text-muted-foreground">
+                Pensado para usarse desde el primer día, sin complicarte
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-3 gap-6">
+              {[
+                {
+                  step: "1",
+                  title: "Descarga e imprime (o abre en tablet)",
+                  text: "Recibes el PDF por email apenas confirmas tu compra. Imprímelo en casa o llénalo directo en tu tablet o celular.",
+                },
+                {
+                  step: "2",
+                  title: "Anota lo importante cada día",
+                  text: "Citas, comidas, paseos, vacunas — todo en las mismas hojas, para no andar buscando información en varios lugares.",
+                },
+                {
+                  step: "3",
+                  title: "Comparte con quien cuide a tu cachorro",
+                  text: "La hoja de información para paseadores o cuidadores hace que cualquiera que ayude tenga todo lo que necesita saber, a la mano.",
+                },
+              ].map(({ step, title, text }) => (
+                <div key={step} className="text-center">
+                  <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground font-bold flex items-center justify-center mx-auto mb-4">
+                    {step}
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">{title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{text}</p>
+                </div>
               ))}
             </div>
-            <p className="text-sm text-muted-foreground mb-6">
-              Basado en calificaciones de compradores verificados
-            </p>
+          </div>
+        </section>
 
+        {/* Reseñas — honesto: producto nuevo, sin inventar compras falsas.
+            Listo para reemplazar por reseñas reales apenas existan. */}
+        <section className="py-12 md:py-16 bg-muted/30">
+          <div className="container px-4 mx-auto text-center max-w-lg">
+            <div className="flex justify-center gap-1 mb-4 opacity-40">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-5 h-5 text-muted-foreground" />
+              ))}
+            </div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              Sé de los primeros en probarlo
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Puppy Planner es un producto nuevo — todavía no tiene reseñas.
+              Cuando compres, tu opinión será de las primeras en aparecer aquí.
+            </p>
+          </div>
+        </section>
+
+        {/* Trust / disclaimer */}
+        <section className="py-12 md:py-16">
+          <div className="container px-4 mx-auto text-center max-w-2xl">
             <h3 className="text-xl font-semibold text-foreground mb-3">
               No reemplaza a tu veterinario — te ayuda a organizarte
             </h3>

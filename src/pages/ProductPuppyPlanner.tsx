@@ -1,5 +1,5 @@
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -12,7 +12,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import {
   Star, Check, ArrowRight, ShoppingCart, Smartphone, Shield, Download,
-  CalendarCheck, Bone, Stethoscope, Users, PawPrint,
+  CalendarCheck, Bone, Stethoscope, Users, PawPrint, ChevronLeft, ChevronRight, Images,
 } from "lucide-react";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 
@@ -105,6 +105,11 @@ const ProductPuppyPlanner = () => {
     });
     navigate(TIENDA_CHECKOUT_PATH);
   };
+
+  // Vista previa: galería real subida en /admin/productos (slider izquierda/derecha).
+  const gallery = (pricingAdmin.galleryImages || []).filter(Boolean);
+  const [slide, setSlide] = useState(0);
+  const safeSlide = gallery.length ? slide % gallery.length : 0;
 
   const buyClickedRef = useRef(false);
   const handleBuy = () => {
@@ -265,6 +270,77 @@ const ProductPuppyPlanner = () => {
             </div>
           </div>
         </section>
+
+        {/* Vista previa — imágenes reales de la galería del admin */}
+        {gallery.length > 0 && (
+          <section className="py-12 md:py-16 bg-background border-t border-border/50">
+            <div className="container px-4 mx-auto max-w-3xl">
+              <div className="text-center mb-8">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 text-primary px-3 py-1 text-xs font-semibold mb-3">
+                  <Images className="w-3.5 h-3.5" />
+                  Vista previa
+                </span>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                  Mira el interior de Puppy Planner
+                </h2>
+                <p className="text-muted-foreground text-sm md:text-base">
+                  Desliza para ver páginas reales del producto
+                </p>
+              </div>
+
+              <div className="relative">
+                <div className="rounded-2xl overflow-hidden border border-border/60 bg-muted aspect-[4/5] max-w-md mx-auto">
+                  <img
+                    key={gallery[safeSlide]}
+                    src={gallery[safeSlide]}
+                    alt={`Vista previa ${safeSlide + 1} de Puppy Planner`}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+
+                {gallery.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setSlide((s) => (s - 1 + gallery.length) % gallery.length)}
+                      aria-label="Imagen anterior"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/60 text-white p-2 hover:bg-black/80 transition"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSlide((s) => (s + 1) % gallery.length)}
+                      aria-label="Imagen siguiente"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/60 text-white p-2 hover:bg-black/80 transition"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {gallery.length > 1 && (
+                <div className="flex justify-center gap-2 mt-4">
+                  {gallery.map((g, i) => (
+                    <button
+                      key={g}
+                      type="button"
+                      onClick={() => setSlide(i)}
+                      aria-label={`Ir a la imagen ${i + 1}`}
+                      className={`w-14 h-14 rounded-lg overflow-hidden border-2 transition ${
+                        i === safeSlide ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"
+                      }`}
+                    >
+                      <img src={g} alt="" className="w-full h-full object-cover" loading="lazy" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* Cómo funciona — más detalle sobre el uso diario */}
         <section className="py-16 md:py-20">

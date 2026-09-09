@@ -15,7 +15,7 @@ import {
   CalendarCheck, Bone, Stethoscope, Users, PawPrint,
 } from "lucide-react";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
-import { PaymentLogos } from "@/components/checkout/PaymentLogos";
+
 import { motion } from "framer-motion";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
@@ -381,8 +381,8 @@ const ProductPuppyPlanner = () => {
           </div>
         </section>
 
-        <PaymentLogos />
       </main>
+
 
       <StickyBuyBar
         sku={ADMIN_SKU}

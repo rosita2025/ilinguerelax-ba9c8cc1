@@ -9,7 +9,7 @@ import { InstagramFeed } from "@/components/InstagramFeed";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { AllProductsReviews } from "@/components/AllProductsReviews";
-import { CoreanoLaunchBanner } from "@/components/CoreanoLaunchBanner";
+
 import { TrackingSearchBar } from "@/components/TrackingSearchBar";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useSpanishRelaxPixelPageView } from "@/hooks/useMetaPixel";
@@ -64,8 +64,8 @@ const Index = () => {
           </div>
         </div>
       </section>
+      
 
-      <CoreanoLaunchBanner />
       
       <section className="py-24 px-4 relative overflow-hidden bg-[#0a0a0a]">
         <div className="absolute inset-0 bg-primary/5 -skew-y-3 transform origin-top-left" />

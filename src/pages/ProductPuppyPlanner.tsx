@@ -106,6 +106,11 @@ const ProductPuppyPlanner = () => {
     navigate(TIENDA_CHECKOUT_PATH);
   };
 
+  // Vista previa: galería real subida en /admin/productos (slider izquierda/derecha).
+  const gallery = (pricingAdmin.galleryImages || []).filter(Boolean);
+  const [slide, setSlide] = useState(0);
+  const safeSlide = gallery.length ? slide % gallery.length : 0;
+
   const buyClickedRef = useRef(false);
   const handleBuy = () => {
     if (!pricingReady) return;

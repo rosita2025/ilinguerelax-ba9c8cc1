@@ -496,7 +496,7 @@ const ProductDynamic = () => {
                   className="w-full h-12 text-base font-black shadow-hero bg-emerald-600 hover:bg-emerald-700 text-white mb-2"
                   disabled={!priceReady}
                 >
-                  {priceReady ? `GET IT NOW — ${displayFormatted}` : "GET IT NOW"}
+                  {priceReady ? `I want it — ${displayFormatted}` : "I want it"}
                 </Button>
 
                 <StockAlert count={7} className="mt-2 w-full justify-center" />
@@ -682,7 +682,7 @@ const ProductDynamic = () => {
               ? `QUERO AGORA — ${displayFormatted}`
               : language === "fr"
                 ? `JE LE VEUX — ${displayFormatted}`
-                : `I WANT IT NOW — ${displayFormatted}`
+                : `I want it — ${displayFormatted}`
         }
         onBuyClick={handleBuy}
         usdValue={effectiveUsd}

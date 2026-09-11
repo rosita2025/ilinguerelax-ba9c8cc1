@@ -22,13 +22,25 @@ export async function getPurchasedEmails(admin: any, rawEmails: string[]): Promi
     const s = String(v || "").trim().toLowerCase();
     if (s && emails.includes(s)) out.add(s);
   };
+  // Escapa los comodines de SQL LIKE (% y _) para que un correo con guion
+  // bajo (muy común, ej. john_doe@gmail.com) no coincida por accidente con
+  // otro correo que difiera en esa posición.
+  const escapeIlike = (v: string) => v.replace(/[%_]/g, (c) => `\\${c}`);
 
   const queries: Promise<void>[] = [
     (async () => {
+      // Antes esto usaba .in("customer_email", emails) con comparación EXACTA
+      // (sensible a mayúsculas/minúsculas). Stripe guarda el correo tal cual
+      // lo escribió el navegador del cliente (a veces con mayúsculas), así
+      // que una compra real podía no reconocerse aquí si el correo no
+      // coincidía letra por letra en mayúsculas/minúsculas con el mismo
+      // correo en minúsculas. Ahora se compara ignorando mayúsculas.
+      if (!emails.length) return;
+      const orFilter = emails.map((e) => `customer_email.ilike.${escapeIlike(e)}`).join(",");
       const { data } = await admin
         .from("order_events")
         .select("customer_email, status, event")
-        .in("customer_email", emails);
+        .or(orFilter);
       for (const r of data ?? []) {
         const st = String(r?.status || "").toLowerCase();
         const ev = String(r?.event || "").toLowerCase();
@@ -38,10 +50,14 @@ export async function getPurchasedEmails(admin: any, rawEmails: string[]): Promi
       }
     })(),
     (async () => {
+      // Mismo criterio para funnel_events: comparación sin distinguir
+      // mayúsculas/minúsculas.
+      if (!emails.length) return;
+      const orFilter = emails.map((e) => `email.ilike.${escapeIlike(e)}`).join(",");
       const { data } = await admin
         .from("funnel_events")
         .select("email, event_name")
-        .in("email", emails)
+        .or(orFilter)
         .in("event_name", ["Purchase", "purchase"]);
       for (const r of data ?? []) add(r?.email);
     })(),

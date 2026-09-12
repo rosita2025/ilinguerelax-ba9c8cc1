@@ -19,10 +19,10 @@ const products = {
     image: product5000Image,
     title: "5,000 Palabras en Inglés",
     subtitle: "con Pronunciación Español",
-    sku: "5000",
-    priceUsd: 10,
-    originalPrice: "$54",
-    discount: "81%",
+    // SKU EXACTO del admin (/admin/products/:sku) para que la tarjeta muestre
+    // siempre el mismo precio que la ficha del producto y el checkout.
+    sku: "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+    priceUsd: 20,
     url: "/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
     rating: 4.8,
     reviews: 800,
@@ -31,10 +31,8 @@ const products = {
     image: product8000Image,
     title: "8,000 Palabras en Inglés",
     subtitle: "con Pronunciación Español",
-    sku: "8000",
-    priceUsd: 20,
-    originalPrice: "$54",
-    discount: "63%",
+    sku: "8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+    priceUsd: 25,
     url: "/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
     rating: 4.9,
     reviews: 892,
@@ -103,10 +101,6 @@ export const ProductCrossSell = ({ currentProduct, lang = "es" }: ProductCrossSe
             <CardContent className="p-0">
               {/* Product Image */}
               <div className="relative bg-gradient-to-br from-secondary/50 to-background p-6">
-                {/* Discount Badge */}
-                <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold shadow-lg">
-                  {text.save} {product.discount}
-                </div>
                 <img
                   src={product.image}
                   alt={product.title}

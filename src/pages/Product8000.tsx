@@ -541,42 +541,6 @@ const Product8000 = () => {
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas sobre INGLÉS RELAX" />
 
-      {/* Physical Book Promo */}
-      <section className="bg-gray-950 py-10 md:py-14">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center gap-6 max-w-4xl mx-auto">
-            {/* Bundle Image */}
-            <img
-              src="/images/promo-8000-bundle.webp"
-              alt="Inglés Relax 8,000 Palabras - Libro Físico + Digital Gratis"
-              className="w-full max-w-md rounded-2xl shadow-2xl" />
-            
-            <div className="text-center">
-              <span className="inline-block bg-yellow-400 text-gray-950 text-xs font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wide">🎁 Pack Promoción</span>
-              <h3 className="text-2xl md:text-3xl font-bold text-yellow-400 mb-2">
-                ¿Prefieres un libro físico?
-              </h3>
-              <p className="text-yellow-200 text-lg mb-1">
-                📖 Compra el físico y recibe el digital <span className="font-black text-yellow-400">GRATIS</span> al instante
-              </p>
-              <p className="text-yellow-300/60 text-sm mb-4">
-                Tapa blanda · Envío disponible · No incluye envío internacional
-              </p>
-
-              <div className="flex items-baseline gap-3 justify-center mb-5">
-                <span className="text-4xl font-black text-yellow-400">$34.99 USD</span>
-                <span className="text-lg text-yellow-300/50 line-through">$49.99</span>
-              </div>
-
-              <a
-                href="/products/8-000-palabras-libro-fisico"
-                className="inline-flex items-center gap-2 bg-[#FF9900] hover:bg-[#e88b00] text-gray-950 font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-300">
-                📦 Ver Libro Físico + Digital Gratis
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <Footer />
 

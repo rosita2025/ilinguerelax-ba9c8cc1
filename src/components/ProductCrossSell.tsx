@@ -101,10 +101,6 @@ export const ProductCrossSell = ({ currentProduct, lang = "es" }: ProductCrossSe
             <CardContent className="p-0">
               {/* Product Image */}
               <div className="relative bg-gradient-to-br from-secondary/50 to-background p-6">
-                {/* Discount Badge */}
-                <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold shadow-lg">
-                  {text.save} {product.discount}
-                </div>
                 <img
                   src={product.image}
                   alt={product.title}

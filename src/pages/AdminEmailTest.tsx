@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { canonicalProductId } from "@/lib/productSkuAliases";
 import { supabase } from "@/integrations/supabase/client";
-import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck, ArrowUpDown, Search, ShieldCheck, ShieldAlert, AlertTriangle, Radio, Send, FileSearch } from "lucide-react";
+import { ShoppingBag, RefreshCw, Mail, CheckCircle2, XCircle, Gift, PackageCheck, ArrowUpDown, Search, ShieldCheck, ShieldAlert, AlertTriangle, Radio, Send, FileSearch, Trophy, CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 
 type Source = "manual" | "stripe" | "paypal" | "mercadopago" | "digital";
@@ -614,6 +614,62 @@ const AdminEmailTest = () => {
   };
   const problemCount = useMemo(() => rows.filter((r) => !validateRow(r).ok).length, [rows]);
 
+  const salesSummary = useMemo(() => {
+    const limaParts = (iso: string) => {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Lima",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).formatToParts(new Date(iso));
+      const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((part) => part.type === type)?.value ?? "";
+      return { day: `${get("year")}-${get("month")}-${get("day")}`, month: `${get("year")}-${get("month")}` };
+    };
+    const today = limaParts(new Date().toISOString()).day;
+    const months = new Map<string, Map<string, { sku: string; name: string; sales: number; patternsUpsells: number }>>();
+    const daily = new Map<string, { sku: string; name: string; sales: number }>();
+
+    rows.filter(isPaid).forEach((row) => {
+      const principal = row.productLines.find((product) => product.role === "principal") ?? row.productLines[0];
+      if (!principal) return;
+      const sku = String(principal.sku || principal.name).trim();
+      if (!sku) return;
+      const date = limaParts(row.created_at);
+      const monthProducts = months.get(date.month) ?? new Map();
+      const current = monthProducts.get(sku) ?? { sku, name: principal.name, sales: 0, patternsUpsells: 0 };
+      current.sales += 1;
+      const isPatterns = /patrones-especiales/i.test(sku) || /patrones especiales/i.test(principal.name);
+      const hasFiveThousandUpsell = row.productLines.some((product) =>
+        product.role === "upsell" && (/5[-.]?000|5000/i.test(product.sku || "") || /5[,.]?000/i.test(product.name)),
+      );
+      if (isPatterns && hasFiveThousandUpsell) current.patternsUpsells += 1;
+      monthProducts.set(sku, current);
+      months.set(date.month, monthProducts);
+
+      if (date.day === today) {
+        const dayCurrent = daily.get(sku) ?? { sku, name: principal.name, sales: 0 };
+        dayCurrent.sales += 1;
+        daily.set(sku, dayCurrent);
+      }
+    });
+
+    const monthly = [...months.entries()]
+      .sort(([a], [b]) => b.localeCompare(a))
+      .map(([month, products]) => {
+        const ranking = [...products.values()].sort((a, b) => b.sales - a.sales || a.name.localeCompare(b.name));
+        return { month, ranking, winner: ranking[0] };
+      });
+    const todayRanking = [...daily.values()].sort((a, b) => b.sales - a.sales || a.name.localeCompare(b.name));
+    return { monthly, todayRanking, todayWinner: todayRanking[0] };
+  }, [rows]);
+
+  const monthLabel = (month: string) => {
+    const [year, monthNumber] = month.split("-").map(Number);
+    if (!year || !monthNumber) return month;
+    return new Intl.DateTimeFormat("es-PE", { month: "long", year: "numeric", timeZone: "America/Lima" })
+      .format(new Date(Date.UTC(year, monthNumber - 1, 15)));
+  };
+
 
 
 
@@ -716,6 +772,63 @@ const AdminEmailTest = () => {
               </Button>
             </div>
           </header>
+
+          <Card className="p-3 md:p-4 space-y-4 border-l-4 border-l-amber-500/70">
+            <div className="flex items-start justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-2 min-w-0">
+                <Trophy className="w-5 h-5 text-amber-600 shrink-0" />
+                <div>
+                  <h2 className="text-sm md:text-base font-semibold">Productos ganadores</h2>
+                  <p className="text-xs text-muted-foreground">Solo pagos confirmados · producto principal · hora de Lima</p>
+                </div>
+              </div>
+              <div className="rounded-md border bg-muted/40 px-3 py-2 min-w-[210px]">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                  <CalendarDays className="w-3.5 h-3.5" /> Ganador de hoy
+                </div>
+                {salesSummary.todayWinner ? (
+                  <div className="mt-1">
+                    <div className="font-semibold text-sm leading-snug break-words">{salesSummary.todayWinner.name}</div>
+                    <div className="text-xs text-muted-foreground break-all">{salesSummary.todayWinner.sku} · {salesSummary.todayWinner.sales} venta(s)</div>
+                  </div>
+                ) : (
+                  <div className="mt-1 text-sm text-muted-foreground">Sin ventas confirmadas hoy</div>
+                )}
+              </div>
+            </div>
+
+            {salesSummary.monthly.length > 0 ? (
+              <div className="space-y-3">
+                {salesSummary.monthly.map(({ month, ranking, winner }) => (
+                  <div key={month} className="rounded-md border overflow-hidden">
+                    <div className="flex items-center justify-between gap-2 bg-muted/50 px-3 py-2">
+                      <span className="font-semibold capitalize text-sm">{monthLabel(month)}</span>
+                      <span className="text-xs font-medium text-amber-700 dark:text-amber-400">🏆 {winner.name} · {winner.sales}</span>
+                    </div>
+                    <div className="divide-y">
+                      {ranking.map((product, index) => (
+                        <div key={product.sku} className="grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-2 px-3 py-2 text-xs">
+                          <span className="font-semibold text-muted-foreground">{index + 1}.</span>
+                          <div className="min-w-0">
+                            <div className="font-medium break-words">{product.name}</div>
+                            <div className="font-mono text-[10px] text-muted-foreground break-all">{product.sku}</div>
+                            {product.patternsUpsells > 0 && (
+                              <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
+                                Upsell 5,000 Palabras: {product.patternsUpsells} de {product.sales} ({Math.round((product.patternsUpsells / product.sales) * 100)}%)
+                              </div>
+                            )}
+                          </div>
+                          <span className="font-semibold whitespace-nowrap">{product.sales} venta(s)</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">Aún no hay ventas confirmadas para resumir.</p>
+            )}
+          </Card>
 
           <Card className="p-3 md:p-4 space-y-3 border-l-4 border-l-primary/60">
             <div className="flex items-center gap-2">

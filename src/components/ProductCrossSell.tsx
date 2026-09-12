@@ -45,15 +45,16 @@ export const ProductCrossSell = ({ currentProduct, lang = "es" }: ProductCrossSe
   const otherProduct = currentProduct === "5000" ? "8000" : "5000";
   const product = products[otherProduct];
   const cardPrice = useCardPrice();
+  const isEconomyOption = currentProduct === "8000";
 
   const text = lang === "en" ? {
-    heading: "Would you like another option?",
-    subheading: "Discover our complete collection",
+    heading: isEconomyOption ? "A more affordable option" : "Would you like another option?",
+    subheading: isEconomyOption ? "5,000 most-used English words with Spanish pronunciation" : "Discover our complete collection",
     viewNow: "View Now",
     save: "SAVE",
   } : {
-    heading: "¿Te gustaría otra opción?",
-    subheading: "Descubre nuestra colección completa",
+    heading: isEconomyOption ? "La opción más económica" : "¿Te gustaría otra opción?",
+    subheading: isEconomyOption ? "5,000 palabras más usadas en inglés con pronunciación en español" : "Descubre nuestra colección completa",
     viewNow: "Ver Ahora",
     save: "AHORRA",
   };

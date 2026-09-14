@@ -48,20 +48,10 @@ interface SemrushReport {
   notConnected?: boolean;
 }
 
-const PRESETS: { label: string; days: number }[] = [
-  { label: "Hoy", days: 1 },
-  { label: "7 días", days: 7 },
-  { label: "15 días", days: 15 },
-  { label: "28 días", days: 28 },
-  { label: "2 meses", days: 60 },
-  { label: "3 meses", days: 90 },
-  { label: "6 meses", days: 180 },
-  { label: "1 año", days: 365 },
-];
 
 const AdminSEO = () => {
   const { adminKey } = useAdminKey();
-  const [days, setDays] = useState(28);
+  const [days] = useState(28);
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<GscReport | null>(null);
   const [semrush, setSemrush] = useState<SemrushReport | null>(null);
@@ -411,10 +401,6 @@ const AdminSEO = () => {
   }, [genPosts, adminKey]);
 
 
-  const applyPreset = (d: number) => {
-    setDays(d);
-    void loadGsc(d);
-  };
 
   const fmtPct = (n: number) => `${(n * 100).toFixed(1)}%`;
   const fmtPos = (n: number) => n.toFixed(1);

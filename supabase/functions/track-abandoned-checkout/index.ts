@@ -280,9 +280,17 @@ Deno.serve(async (req) => {
           paymentMethod,
           triggerReason,
         });
+        // Si la sincronización falló de verdad, libera el reclamo del día
+        // para que un reintento legítimo más tarde no quede bloqueado por
+        // un error pasajero (ej. Brevo caído un momento).
+        if (!brevoSynced) {
+          await supabase.from("abandoned_sync_claims").delete().eq("email", email).eq("sync_day", syncDay);
+        }
       }
     } catch (e) {
       console.warn("brevo push failed:", e instanceof Error ? e.message : String(e));
+      const syncDay = new Date().toISOString().slice(0, 10);
+      await supabase.from("abandoned_sync_claims").delete().eq("email", email).eq("sync_day", syncDay).then(() => {}, () => {});
     }
 
 

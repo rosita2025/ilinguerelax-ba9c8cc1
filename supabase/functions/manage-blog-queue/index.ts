@@ -141,6 +141,12 @@ serve(async (req) => {
       startTomorrow?: boolean;
       force?: boolean;
       count?: number;
+      limit?: number;
+      topic?: string;
+      keyword?: string;
+      language?: string;
+      category?: string;
+      scheduled_at?: string;
     };
 
     const expected = Deno.env.get("ADMIN_REVIEW_KEY");
@@ -160,6 +166,29 @@ serve(async (req) => {
           .limit(body.limit || 50);
         if (error) throw error;
         return json({ items: data ?? [] });
+      }
+
+      // Programa UN post individual para una fecha/hora exacta — mismo
+      // patrón que "seed" (masivo), pero para un solo tema elegido a mano
+      // desde el generador individual.
+      case "add-custom": {
+        if (!body.topic || !body.scheduled_at) {
+          return json({ error: "Faltan topic o scheduled_at" }, 400);
+        }
+        const row = {
+          topic: String(body.topic),
+          keyword: String(body.keyword || body.topic),
+          language: String(body.language || "es"),
+          category: String(body.category || "General"),
+          scheduled_at: new Date(body.scheduled_at).toISOString(),
+        };
+        const { data, error } = await supabase
+          .from("blog_post_queue")
+          .insert([row])
+          .select("id")
+          .single();
+        if (error) throw error;
+        return json({ id: data?.id, scheduled_at: row.scheduled_at });
       }
 
       case "seed": {

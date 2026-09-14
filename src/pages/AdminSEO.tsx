@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Search, FileText, ExternalLink, TrendingUp, Link2, Sparkles, Target, RefreshCw, Zap, Copy, X } from "lucide-react";
+import { Loader2, Search, FileText, ExternalLink, TrendingUp, Link2, Sparkles, Target, RefreshCw, Zap, Copy, X, CalendarClock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin/AdminNav";
@@ -71,6 +71,8 @@ const AdminSEO = () => {
   const [genTopic, setGenTopic] = useState("");
   const [genKeyword, setGenKeyword] = useState("");
   const [genCategory, setGenCategory] = useState("Aprendizaje");
+  const [scheduledAt, setScheduledAt] = useState("");
+  const [scheduling, setScheduling] = useState(false);
   const [genLanguage, setGenLanguage] = useState<"es" | "en" | "fr" | "pt" | "it" | "de">("es");
   const [genLoading, setGenLoading] = useState(false);
   const [genPosts, setGenPosts] = useState<Array<{ id: string; slug: string; title: string; category: string; created_at: string; published: boolean; google_index_requested_at: string | null }>>([]);
@@ -300,6 +302,44 @@ const AdminSEO = () => {
       toast.error(err instanceof Error ? err.message : "Error al generar el post");
     } finally {
       setGenLoading(false);
+    }
+  };
+
+  // Programa este mismo tema para generarse y publicarse solo, en la fecha
+  // y hora elegidas — usa el mismo sistema de cola que ya usa la agenda
+  // masiva de 300 posts, así que el cron que ya corre lo recoge automático.
+  const schedulePost = async () => {
+    if (!genTopic.trim()) {
+      toast.error("Escribe un tema o título aproximado");
+      return;
+    }
+    if (!scheduledAt) {
+      toast.error("Elige fecha y hora de publicación");
+      return;
+    }
+    setScheduling(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("manage-blog-queue", {
+        body: {
+          adminKey,
+          action: "add-custom",
+          topic: genTopic.trim(),
+          keyword: genKeyword.trim() || genTopic.trim(),
+          category: genCategory,
+          language: genLanguage,
+          scheduled_at: new Date(scheduledAt).toISOString(),
+        },
+      });
+      if (error) throw error;
+      if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
+      toast.success(`Post programado para ${new Date(scheduledAt).toLocaleString("es-PE")}`);
+      setGenTopic("");
+      setGenKeyword("");
+      setScheduledAt("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al programar el post");
+    } finally {
+      setScheduling(false);
     }
   };
 
@@ -767,6 +807,31 @@ const AdminSEO = () => {
               {genLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
               {publishNow ? "Generar y publicar" : "Generar borrador"}
             </Button>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-3 border-t">
+              <div className="flex-1">
+                <Label htmlFor="scheduled-at" className="text-xs text-muted-foreground">
+                  O programa este tema para una fecha y hora específica
+                </Label>
+                <input
+                  id="scheduled-at"
+                  type="datetime-local"
+                  value={scheduledAt}
+                  onChange={(e) => setScheduledAt(e.target.value)}
+                  min={new Date().toISOString().slice(0, 16)}
+                  className="mt-1 w-full sm:w-auto border rounded-md px-3 py-2 text-sm"
+                />
+              </div>
+              <Button
+                onClick={schedulePost}
+                disabled={scheduling}
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
+                {scheduling ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CalendarClock className="w-4 h-4 mr-2" />}
+                Programar
+              </Button>
+            </div>
 
             {genPosts.length > 0 && (() => {
               const filteredPosts = genPosts.filter((p) => {

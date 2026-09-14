@@ -15,7 +15,7 @@ interface Props {
   language: string;
 }
 
-const COPY: Record = {
+const COPY: Record<string, { title: string; subtitle: string; apply: string; copied: string; close: string }> = {
   es: {
     title: "¡Espera, no te vayas!",
     subtitle: "Llévate 10% de descuento en tu pedido — solo aplica este código antes de pagar.",

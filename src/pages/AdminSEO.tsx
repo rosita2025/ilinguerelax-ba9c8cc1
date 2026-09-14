@@ -455,40 +455,6 @@ const AdminSEO = () => {
           <IndexingEventsCard />
 
 
-          <Card className="p-4 space-y-3">
-            <div className="flex flex-wrap gap-2">
-              {PRESETS.map((p) => (
-                <Button
-                  key={p.days}
-                  size="sm"
-                  variant={days === p.days ? "default" : "outline"}
-                  onClick={() => applyPreset(p.days)}
-                  disabled={loading}
-                >
-                  {p.label}
-                </Button>
-              ))}
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs text-muted-foreground">Personalizado:</span>
-              <Input
-                type="number"
-                min={1}
-                max={480}
-                value={days}
-                onChange={(e) => setDays(parseInt(e.target.value) || 28)}
-                className="w-28"
-              />
-              <Button size="sm" onClick={() => loadGsc(days)} disabled={loading}>
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Aplicar"}
-              </Button>
-              {report && (
-                <p className="text-xs text-muted-foreground ml-auto">
-                  Últimos {report.days} días · {report.site}
-                </p>
-              )}
-            </div>
-          </Card>
 
           {loading && !report ? (
             <div className="grid gap-6 lg:grid-cols-2">

@@ -305,6 +305,44 @@ const AdminSEO = () => {
     }
   };
 
+  // Programa este mismo tema para generarse y publicarse solo, en la fecha
+  // y hora elegidas — usa el mismo sistema de cola que ya usa la agenda
+  // masiva de 300 posts, así que el cron que ya corre lo recoge automático.
+  const schedulePost = async () => {
+    if (!genTopic.trim()) {
+      toast.error("Escribe un tema o título aproximado");
+      return;
+    }
+    if (!scheduledAt) {
+      toast.error("Elige fecha y hora de publicación");
+      return;
+    }
+    setScheduling(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("manage-blog-queue", {
+        body: {
+          adminKey,
+          action: "add-custom",
+          topic: genTopic.trim(),
+          keyword: genKeyword.trim() || genTopic.trim(),
+          category: genCategory,
+          language: genLanguage,
+          scheduled_at: new Date(scheduledAt).toISOString(),
+        },
+      });
+      if (error) throw error;
+      if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
+      toast.success(`Post programado para ${new Date(scheduledAt).toLocaleString("es-PE")}`);
+      setGenTopic("");
+      setGenKeyword("");
+      setScheduledAt("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al programar el post");
+    } finally {
+      setScheduling(false);
+    }
+  };
+
 
 
 

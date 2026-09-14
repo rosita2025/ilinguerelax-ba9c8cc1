@@ -428,7 +428,12 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
       "Accept": "application/json",
     },
     body: JSON.stringify({
-      model: "gpt-image-2-ext",
+      // FIX: antes decía "gpt-image-2-ext" (el modelo de IMÁGENES, correcto
+      // en la función de arriba para /v1/images/generations) copiado por
+      // error aquí, en la llamada de TEXTO/artículo (/v1/chat/completions).
+      // Por eso la IA a veces devolvía una imagen en formato markdown en vez
+      // del JSON del artículo, causando el error "JSON inválido".
+      model: "gpt-4o",
       stream: false,
       temperature: 0.7, // Añadimos un poco de variedad para que no sean idénticos
       messages: [

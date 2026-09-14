@@ -40,8 +40,14 @@ interface AbandonedLog {
 
 interface PurchaseRow {
   email: string;
+  name?: string | null;
   mapped_status: string;
   provider: string;
+  country?: string | null;
+  product?: string | null;
+  amount?: number | null;
+  currency?: string | null;
+  received_at?: string;
 }
 
 export default function AdminMarketingDrips() {
@@ -114,6 +120,26 @@ export default function AdminMarketingDrips() {
     }
   }, [adminKey]);
 
+  const filteredPurchases = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return purchases;
+    return purchases.filter((p) =>
+      p.email?.toLowerCase().includes(q) ||
+      p.name?.toLowerCase().includes(q) ||
+      p.country?.toLowerCase().includes(q) ||
+      p.product?.toLowerCase().includes(q)
+    );
+  }, [purchases, search]);
+
+  const newsletterSends = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return sends.filter((s) => {
+      if (s.category !== "newsletter") return false;
+      if (!q) return true;
+      return s.email?.toLowerCase().includes(q) || s.metadata?.country?.toLowerCase?.().includes(q);
+    });
+  }, [sends, search]);
+
 
   return (
     <div className="space-y-6">
@@ -181,6 +207,8 @@ export default function AdminMarketingDrips() {
         <TabsList>
           <TabsTrigger value="activity">Actividad Reciente</TabsTrigger>
           <TabsTrigger value="abandoned">Abandonos (Logs)</TabsTrigger>
+          <TabsTrigger value="buyers">Compradores</TabsTrigger>
+          <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
           <TabsTrigger value="config">Configuración</TabsTrigger>
         </TabsList>
 
@@ -280,6 +308,102 @@ export default function AdminMarketingDrips() {
                       </tr>
                     );
                   })}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="buyers">
+          <Card className="overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="bg-muted/50 border-b">
+                  <tr>
+                    <th className="px-4 py-2 text-left">Email / Nombre</th>
+                    <th className="px-4 py-2 text-left">País</th>
+                    <th className="px-4 py-2 text-left">Producto</th>
+                    <th className="px-4 py-2 text-left">Método</th>
+                    <th className="px-4 py-2 text-left">Fecha</th>
+                    <th className="px-4 py-2 text-right">Monto</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {filteredPurchases.map((p, i) => (
+                    <tr key={i} className="hover:bg-muted/30">
+                      <td className="px-4 py-2">
+                        <div className="font-medium">{p.email}</div>
+                        {p.name && <div className="text-[9px] text-muted-foreground">{p.name}</div>}
+                      </td>
+                      <td className="px-4 py-2">
+                        <span className="flex items-center gap-1">
+                          <Globe className="w-2.5 h-2.5 text-muted-foreground" /> {p.country || "—"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 max-w-[220px] truncate">{p.product || "—"}</td>
+                      <td className="px-4 py-2">
+                        <Badge variant="outline" className="text-[9px] font-mono">
+                          {p.provider?.toUpperCase() || "—"}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-2 text-muted-foreground">
+                        {p.received_at ? new Date(p.received_at).toLocaleString("es-PE") : "—"}
+                      </td>
+                      <td className="px-4 py-2 text-right font-mono">
+                        {p.amount != null ? `${p.currency ?? ""} ${p.amount}` : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                  {filteredPurchases.length === 0 && !loading && (
+                    <tr><td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">No se encontraron compradores con ese filtro.</td></tr>
+                  )}
+                  {loading && filteredPurchases.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-12 text-center">
+                        <RefreshCw className="w-8 h-8 animate-spin mx-auto text-muted-foreground opacity-20" />
+                        <p className="mt-2 text-xs text-muted-foreground">Cargando compradores...</p>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="newsletter">
+          <Card className="overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="bg-muted/50 border-b">
+                  <tr>
+                    <th className="px-4 py-2 text-left">Email / País</th>
+                    <th className="px-4 py-2 text-left">Paso</th>
+                    <th className="px-4 py-2 text-left">Fecha</th>
+                    <th className="px-4 py-2 text-right">Estado</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {newsletterSends.map((s, i) => (
+                    <tr key={i} className="hover:bg-muted/30">
+                      <td className="px-4 py-2">
+                        <div className="font-medium">{s.email}</div>
+                        <div className="text-[9px] text-muted-foreground flex items-center gap-1">
+                          <Globe className="w-2 h-2" /> {s.metadata?.country || "—"}
+                        </div>
+                      </td>
+                      <td className="px-4 py-2">{s.step_name}</td>
+                      <td className="px-4 py-2 text-muted-foreground">{new Date(s.sent_at).toLocaleString("es-PE")}</td>
+                      <td className="px-4 py-2 text-right">
+                        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[9px]">
+                          ENVIADO
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                  {newsletterSends.length === 0 && !loading && (
+                    <tr><td colSpan={4} className="px-4 py-12 text-center text-muted-foreground">No se encontraron envíos de newsletter con ese filtro.</td></tr>
+                  )}
                 </tbody>
               </table>
             </div>

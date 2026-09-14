@@ -8,7 +8,7 @@ const COUPON_CODE = "NEW10";
 const SESSION_KEY = "exit-coupon-shown-v1";
 // Antes 25s — se sentía muy lento. 12s da tiempo de terminar de escribir el
 // nombre sin ser tan tarde como para perder a alguien que ya se está yendo.
-const MOBILE_TIMEOUT_MS = 12000;
+const MOBILE_TIMEOUT_MS = 35000;
 // Scroll hacia arriba más rápido que esto (px/ms) se interpreta como
 // "puede estar por irse" (gesto típico antes de cerrar o cambiar de app).
 const FAST_SCROLL_UP_THRESHOLD = 1.2;

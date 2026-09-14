@@ -29,7 +29,7 @@ serve(async (req) => {
     // 0. Obtener productos activos para contexto de la IA
     const { data: products } = await supabase
       .from("digital_products")
-      .select("id,name,sku,description")
+      .select("id,name,sku,description,price_usd")
       .eq("active", true)
       .limit(10);
 
@@ -37,7 +37,8 @@ serve(async (req) => {
       id: p.id,
       title: p.name,
       slug: p.sku,
-      description: p.description
+      description: p.description,
+      priceUsd: p.price_usd,
     }));
 
     const { data: due, error } = await supabase

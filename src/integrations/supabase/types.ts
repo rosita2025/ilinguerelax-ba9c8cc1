@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      abandoned_sync_claims: {
+        Row: {
+          claimed_at: string
+          email: string
+          sync_day: string
+        }
+        Insert: {
+          claimed_at?: string
+          email: string
+          sync_day: string
+        }
+        Update: {
+          claimed_at?: string
+          email?: string
+          sync_day?: string
+        }
+        Relationships: []
+      }
       admin_payment_errors: {
         Row: {
           created_at: string | null

@@ -216,26 +216,31 @@ Deno.serve(async (req) => {
 
     // Push to Brevo — the Brevo Automation workflow sends Day 1/7/15/30 emails.
     try {
-      // Dedupe GLOBAL por email: 1 sola sincronización a Brevo cada 24h
+      // Dedupe GLOBAL por email: 1 sola sincronización a Brevo cada día
       // (sin importar el SKU). Antes empujábamos por producto → Brevo mandaba
       // 2-3 emails al día si el cliente veía 2-3 productos distintos.
       // Ahora nuestro cron interno (send-cart-reminders) consolida todos los
       // productos en 1 solo email; Brevo actúa sólo como backup.
-      const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-      const { data: recent } = await supabase
-        .from("brevo_sync_logs")
-        .select("id")
-        .eq("email", email)
-        .eq("event_type", "tienda_abandoned")
-        .eq("status", "success")
-        .gte("created_at", dayAgo)
-        .limit(1)
-        .maybeSingle();
+      //
+      // RECLAMO ATÓMICO: antes esto era un SELECT (¿hay uno reciente?) seguido
+      // de la decisión de sincronizar — si 2-3 solicitudes llegaban casi al
+      // mismo instante, TODAS pasaban el chequeo antes de que la primera
+      // terminara de guardarse (condición de carrera), generando hasta 3
+      // sincronizaciones duplicadas en menos de 1 segundo. Ahora se usa un
+      // INSERT con clave primaria (email, día) en una tabla dedicada: solo
+      // la PRIMERA solicitud gana el "reclamo" del día — las demás fallan
+      // por violar la clave primaria y se saltan la sincronización, sin
+      // importar qué tan cerca en el tiempo hayan llegado.
+      const syncDay = new Date().toISOString().slice(0, 10);
+      const { error: claimError } = await supabase
+        .from("abandoned_sync_claims")
+        .insert({ email, sync_day: syncDay });
+      const recent = !!claimError; // conflicto de clave primaria = ya reclamado hoy
 
       const purchased = await getPurchasedSkus(supabase, email);
       const alreadyOwned = purchased.has(String(productType).toLowerCase());
       if (recent) {
-        console.log(`[dedupe] skipping Brevo push (already pushed <24h) for ${email}`);
+        console.log(`[dedupe] skipping Brevo push (already claimed today) for ${email}`);
       } else if (alreadyOwned) {
         console.log(`[skip] ${email} already purchased ${productType} — no Brevo abandoned push`);
       } else {
@@ -275,9 +280,17 @@ Deno.serve(async (req) => {
           paymentMethod,
           triggerReason,
         });
+        // Si la sincronización falló de verdad, libera el reclamo del día
+        // para que un reintento legítimo más tarde no quede bloqueado por
+        // un error pasajero (ej. Brevo caído un momento).
+        if (!brevoSynced) {
+          await supabase.from("abandoned_sync_claims").delete().eq("email", email).eq("sync_day", syncDay);
+        }
       }
     } catch (e) {
       console.warn("brevo push failed:", e instanceof Error ? e.message : String(e));
+      const syncDay = new Date().toISOString().slice(0, 10);
+      await supabase.from("abandoned_sync_claims").delete().eq("email", email).eq("sync_day", syncDay).then(() => {}, () => {});
     }
 
 

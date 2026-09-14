@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789415762569,
+      "tag": "0000_create_abandoned_sync_claims",
+      "breakpoints": true
+    }
+  ]
+}

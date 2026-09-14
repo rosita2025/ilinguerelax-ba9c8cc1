@@ -13,16 +13,16 @@ import { getPurchasedSkus } from "../_shared/purchasedSkus.ts";
 import { getPurchasedEmails } from "../_shared/purchasedEmails.ts";
 
 const corsHeaders = adminCorsHeaders;
-// Steps are measured in MINUTES. 30 min, 1440 min (1 día), 7200 min (5 días).
-const STEPS = [30, 1440, 7200, 21600, 43200] as const; // Added 15 days and 30 days steps
+// Steps are measured in MINUTES. 30 min, 1440 min (1 día), 10080 min (7 días).
+// Antes eran 5 correos por carrito (30min/1d/5d/15d/30d) — se redujo a 3
+// para que no se sienta como spam.
+const STEPS = [30, 1440, 10080] as const;
 type Step = typeof STEPS[number];
 
 const SUBJECTS_ES: Record<Step, string> = {
   30: "👀 ¿Olvidaste algo? Tu carrito sigue esperándote",
   1440: "⏰ Tu carrito te está esperando — recupéralo hoy",
-  7200: "Última llamada: tu carrito expira pronto (-10% con NEW10)",
-  21600: "🎁 Tenemos un regalo para ti (Finaliza tu pedido)",
-  43200: "👋 ¿Sigues ahí? Tu carrito extraña su nuevo hogar",
+  10080: "Última llamada: tu carrito expira pronto (-10% con NEW10)",
 };
 
 interface ProductItem {
@@ -42,9 +42,7 @@ function buildHtml(opts: {
   const stepMsg: Record<Step, string> = {
     30: "Notamos que hace unos minutos comenzaste tu compra y no la terminaste. Tus productos siguen reservados — retómalos en 1 clic.",
     1440: "Ayer dejaste tu compra sin finalizar. Te la reservamos para que la retomes fácilmente.",
-    7200: `Es la última llamada: tu carrito expira pronto. ${opts.coupon ? `Usa el código <strong>${opts.coupon}</strong> y obtén 10% de descuento.` : "Aprovecha antes que se libere el stock."}`,
-    21600: "Han pasado unos días desde que mostraste interés. Queremos que alcances tus metas de idiomas, por eso te guardamos este carrito.",
-    43200: "Esta es nuestra última comunicación sobre este carrito. Si aún quieres aprender con nosotros, este es el momento.",
+    10080: `Es la última llamada: tu carrito expira pronto. ${opts.coupon ? `Usa el código <strong>${opts.coupon}</strong> y obtén 10% de descuento.` : "Aprovecha antes que se libere el stock."}`,
   };
 
   const productsHtml = opts.products.map((p) => `
@@ -173,7 +171,7 @@ Deno.serve(async (req) => {
       .select("send_hour, timezone, enabled_steps, paused, updated_at")
       .eq("id", 1)
       .maybeSingle();
-    const cfg = cfgRow || { send_hour: 10, timezone: "America/Lima", enabled_steps: [30, 1440, 7200], paused: false, updated_at: null };
+    const cfg = cfgRow || { send_hour: 10, timezone: "America/Lima", enabled_steps: [30, 1440, 10080], paused: false, updated_at: null };
 
     // Handle config endpoints (admin-only)
     if (action === "get_config") {
@@ -319,9 +317,7 @@ Deno.serve(async (req) => {
         const windowMs: Record<Step, number> = {
           30: 25 * 60 * 1000,
           1440: 20 * 3600 * 1000,
-          7200: 4 * 24 * 3600 * 1000,
-          21600: 10 * 24 * 3600 * 1000,
-          43200: 10 * 24 * 3600 * 1000,
+          10080: 6 * 24 * 3600 * 1000,
         };
         // NOTA: la tabla usa `sent_at` (no `created_at`); usar la columna
         // equivocada hacía que estos filtros fallaran y se desactivara el
@@ -391,7 +387,7 @@ Deno.serve(async (req) => {
 
         const buyer = (cart.buyer || {}) as { name?: string };
         const name = buyer.name || undefined;
-        const coupon = step === 7200 ? "NEW10" : undefined;
+        const coupon = step === 10080 ? "NEW10" : undefined;
 
         const html = buildHtml({ name, products: products_list, step, coupon, primaryCta: recoverUrl });
 

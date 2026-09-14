@@ -340,7 +340,7 @@ export interface GenerateArgs {
   language?: string;
   publish?: boolean;
   relatedProducts?: string[];
-  productCards?: Array<{ id: string; title: string; slug: string; description?: string }>;
+  productCards?: Array<{ id: string; title: string; slug: string; description?: string; priceUsd?: number }>;
 }
 
 const LANG_MAP: Record<string, { name: string; audience: string; faqHeading: string; conclusionHeading: string; ctaLang: string }> = {
@@ -411,7 +411,7 @@ Return ONLY a valid JSON (no surrounding markdown) with this exact shape. ALL st
 The content field MUST start with "# " (H1) and contain the full article ready to publish. Do NOT explain anything outside the JSON.`;
 
   const productsCtx = productsList.length > 0
-    ? `\n\nPRODUCTOS iLINGUE RELAX A MENCIONAR NATURALMENTE en el CTA y "Recursos recomendados" (usa los títulos exactos y enlaza internamente usando el formato [PRODUCT_CARD:slug]):\n${productsList.map((p) => `- ${p.title} (slug: ${p.slug})${p.description ? " · " + p.description : ""}`).join("\n")}`
+    ? `\n\nPRODUCTOS iLINGUE RELAX A MENCIONAR NATURALMENTE en el CTA y "Recursos recomendados" (usa los títulos exactos, MENCIONA EL PRECIO tal cual aparece aquí, y enlaza internamente usando el formato [PRODUCT_CARD:slug]):\n${productsList.map((p) => `- ${p.title} (slug: ${p.slug}${typeof p.priceUsd === "number" ? `, precio: $${p.priceUsd} USD` : ""})${p.description ? " · " + p.description : ""}`).join("\n")}`
     : "";
 
   const user = `📝 Título del artículo: ${topic}
@@ -475,6 +475,26 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
 
   let content = parsed.content.trim();
   if (!content.startsWith("# ")) content = `# ${parsed.title}\n\n${content}`;
+
+  // VALIDACIÓN REAL de calidad SEO — antes solo se le PEDÍA a la IA que
+  // incluyera H2, productos y precio, pero nada lo confirmaba: si la IA no
+  // cumplía, el artículo se publicaba igual, incompleto. Ahora se verifica
+  // de verdad, y si falta algo, se completa con datos reales (no con lo que
+  // "prometió" la IA).
+  const h2Count = (content.match(/^##\s+/gm) || []).length;
+  if (h2Count < 2) {
+    console.warn(`[BlogGen] Artículo con solo ${h2Count} H2 (se esperaban 2+): "${parsed.title}"`);
+  }
+
+  const hasProductCard = /\[PRODUCT_CARD:[^\]]+\]/.test(content);
+  if (!hasProductCard && productsList.length > 0) {
+    console.warn(`[BlogGen] La IA no incluyó productos — agregando sección de respaldo con datos reales.`);
+    const picks = productsList.slice(0, 2);
+    content += `\n\n## Recursos recomendados\n\n` + picks.map((p) => {
+      const priceLine = typeof p.priceUsd === "number" ? ` — desde $${p.priceUsd} USD` : "";
+      return `- [PRODUCT_CARD:${p.slug}] **${p.title}**${priceLine}`;
+    }).join("\n") + "\n";
+  }
 
   const iLinks = Array.isArray(parsed.internalLinks) ? parsed.internalLinks.slice(0, 8) : [];
   const eLinks = Array.isArray(parsed.externalLinks) ? parsed.externalLinks.slice(0, 6) : [];

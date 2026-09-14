@@ -496,17 +496,11 @@ Genera el artículo completo siguiendo TODAS las reglas del sistema.`;
     }).join("\n") + "\n";
   }
 
-  const iLinks = Array.isArray(parsed.internalLinks) ? parsed.internalLinks.slice(0, 8) : [];
-  const eLinks = Array.isArray(parsed.externalLinks) ? parsed.externalLinks.slice(0, 6) : [];
-  if (iLinks.length || eLinks.length) {
-    content += `\n\n---\n\n<!-- SUGERENCIAS SEO PARA EL EDITOR -->\n`;
-    if (iLinks.length) {
-      content += `\n**Enlaces internos sugeridos:**\n${iLinks.map((l) => `- [${l.anchor}](${l.url})`).join("\n")}\n`;
-    }
-    if (eLinks.length) {
-      content += `\n**Enlaces externos sugeridos:**\n${eLinks.map((l) => `- [${l.anchor}](${l.url})`).join("\n")}\n`;
-    }
-  }
+  // Antes esto agregaba "<!-- SUGERENCIAS SEO PARA EL EDITOR -->" y los
+  // enlaces sugeridos DIRECTO en el contenido público del artículo — se veía
+  // tal cual en la página publicada, como texto visible para cualquier
+  // visitante. Eran sugerencias sin verificar, pensadas solo para uso
+  // interno, así que se quitan de aquí por completo (ya no se publican).
 
   const baseSlug = (parsed.slug ? slugify(parsed.slug) : "") || slugify(parsed.title);
   const excerpt = (parsed.metaDescription || parsed.excerpt || content.replace(/^#.*$/m, "").trim().slice(0, 180)).slice(0, 240);

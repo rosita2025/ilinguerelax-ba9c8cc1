@@ -808,6 +808,31 @@ const AdminSEO = () => {
               {publishNow ? "Generar y publicar" : "Generar borrador"}
             </Button>
 
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-3 border-t">
+              <div className="flex-1">
+                <Label htmlFor="scheduled-at" className="text-xs text-muted-foreground">
+                  O programa este tema para una fecha y hora específica
+                </Label>
+                <input
+                  id="scheduled-at"
+                  type="datetime-local"
+                  value={scheduledAt}
+                  onChange={(e) => setScheduledAt(e.target.value)}
+                  min={new Date().toISOString().slice(0, 16)}
+                  className="mt-1 w-full sm:w-auto border rounded-md px-3 py-2 text-sm"
+                />
+              </div>
+              <Button
+                onClick={schedulePost}
+                disabled={scheduling}
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
+                {scheduling ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CalendarClock className="w-4 h-4 mr-2" />}
+                Programar
+              </Button>
+            </div>
+
             {genPosts.length > 0 && (() => {
               const filteredPosts = genPosts.filter((p) => {
                 if (postsFilter === "drafts") return !p.published;

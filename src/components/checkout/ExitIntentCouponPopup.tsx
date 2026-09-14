@@ -15,7 +15,7 @@ interface Props {
   language: string;
 }
 
-const COPY: Record = {
+const COPY: Record<string, { title: string; subtitle: string; apply: string; copied: string; close: string }> = {
   es: {
     title: "¡Espera, no te vayas!",
     subtitle: "Llévate 10% de descuento en tu pedido — solo aplica este código antes de pagar.",
@@ -135,49 +135,49 @@ export function ExitIntentCouponPopup({ language }: Props) {
   };
 
   return (
-
- setOpen(false)}
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4"
+      onClick={() => setOpen(false)}
     >
-
- e.stopPropagation()}
+      <div
+        className="relative w-full max-w-sm rounded-2xl border bg-background p-6 text-center shadow-xl"
+        onClick={(e) => e.stopPropagation()}
       >
-         setOpen(false)}
+        <button
+          onClick={() => setOpen(false)}
           className="absolute top-3 right-3 text-muted-foreground hover:text-foreground"
           aria-label="Cerrar"
         >
+          <X className="h-4 w-4" />
+        </button>
 
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+          <Gift className="h-6 w-6 text-primary" />
+        </div>
 
+        <h3 className="text-lg font-bold">{t.title}</h3>
+        <p className="mt-2 text-sm text-muted-foreground">{t.subtitle}</p>
 
-
-
-          {t.title}
-
-
-        {t.subtitle}
-
-
-
-
-
+        <div className="mt-4 flex items-center justify-center gap-2">
+          <span className="rounded-lg border border-dashed px-4 py-2 font-mono text-base font-bold tracking-widest">
             {COUPON_CODE}
+          </span>
+          <Button variant="outline" size="icon" onClick={handleCopy} aria-label={t.copied}>
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          </Button>
+        </div>
 
-
-
-            {copied ?  : }
-
-
-
-
+        <Button className="mt-4 w-full" onClick={handleApply}>
           {t.apply}
+        </Button>
 
-
-         setOpen(false)}
-          className="text-xs text-muted-foreground hover:text-foreground underline"
+        <button
+          onClick={() => setOpen(false)}
+          className="mt-3 text-xs text-muted-foreground hover:text-foreground underline"
         >
           {t.close}
-
-
-
-
+        </button>
+      </div>
+    </div>
   );
 }

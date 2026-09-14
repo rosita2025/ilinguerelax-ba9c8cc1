@@ -12,7 +12,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
-import { products } from "@/data/products";
+// NOTA: ya no se usa el catálogo estático "@/data/products" aquí — los
+// productos ahora se cargan en vivo desde el admin (ver loadProductsForSeo),
+// así que cualquier producto nuevo que crees en /admin/productos aparece
+// automáticamente en este selector, sin tener que actualizar código.
 import SitemapHealthCard from "@/components/admin/SitemapHealthCard";
 import IndexingEventsCard from "@/components/admin/IndexingEventsCard";
 import BacklinksCard from "@/components/admin/BacklinksCard";
@@ -61,6 +64,7 @@ const AdminSEO = () => {
   const [genTopic, setGenTopic] = useState("");
   const [genKeyword, setGenKeyword] = useState("");
   const [genCategory, setGenCategory] = useState("Aprendizaje");
+  const [products, setProducts] = useState<Array<{ id: string; slug: string; name: string; title: string; subtitle: string; flag: string }>>([]);
   const [scheduledAt, setScheduledAt] = useState("");
   const [scheduling, setScheduling] = useState(false);
   const [genLanguage, setGenLanguage] = useState<"es" | "en" | "fr" | "pt" | "it" | "de">("es");
@@ -371,11 +375,34 @@ const AdminSEO = () => {
     }
   };
 
+  const loadProductsForSeo = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke("manage-products", {
+        body: { adminKey, action: "list" },
+      });
+      if (error) throw error;
+      const rows = (data as { products?: Array<{ sku: string; name: string; description?: string | null }> })?.products ?? [];
+      setProducts(
+        rows.map((p) => ({
+          id: p.sku,
+          slug: p.sku,
+          name: p.name,
+          title: p.name,
+          subtitle: p.description || "",
+          flag: "📘",
+        }))
+      );
+    } catch (err) {
+      console.error("Error cargando productos para SEO:", err);
+    }
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       void loadGsc(days);
       void loadSemrush();
       void loadGenPosts();
+      void loadProductsForSeo();
     }, 100);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps

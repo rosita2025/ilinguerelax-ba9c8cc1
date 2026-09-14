@@ -733,6 +733,7 @@ export default function Checkout() {
             </div>
 
             <StickyPayCTA />
+            <ExitIntentCouponPopup language={language} />
           </>
 
         )}

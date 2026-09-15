@@ -748,7 +748,10 @@ const ProductDynamic = () => {
             ? [
                 "Sarah, USA: Exactly what I needed to stop translating in my head!",
                 "James, UK: The 6-month study planner is a game changer for me.",
-                "Elena, Canada: Clear pronunciation and very visual. Highly recommend."
+                "Elena, Canada: Clear pronunciation and very visual. Highly recommend.",
+                "Michael, Australia: Everyone in my study group recommended this one — now I see why.",
+                "Rachel, Ireland: Thank you for making this, it's genuinely helped me learn faster.",
+                "David, New Zealand: 5,000 words is a huge vocabulary base, way more than other apps I tried."
               ]
             : product.sku === "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca"
               ? [

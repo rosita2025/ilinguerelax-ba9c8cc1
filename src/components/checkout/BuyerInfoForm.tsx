@@ -80,16 +80,22 @@ export function BuyerInfoForm() {
   const nameRef = useRef<HTMLInputElement | null>(null);
   const emailRef = useRef<HTMLInputElement | null>(null);
 
-  // Sync local state when global state changes (e.g. hydrate from localStorage or URL)
+  // Siempre tener la última versión del comprador global sin recrear callbacks.
+  const buyerRef = useRef(buyer);
+  buyerRef.current = buyer;
+
+  // Sync local state when global state changes (e.g. hydrate from localStorage or URL).
+  // Importante: NUNCA borrar lo que el comprador ya escribió. Solo se copia el valor
+  // global cuando trae contenido nuevo; si viene vacío, se respeta lo local.
   useEffect(() => {
-    setLocalName(buyer.fullName || "");
-    setLocalEmail(buyer.email || "");
-    setLocalPhone(safePhone(buyer.phone));
-    setLocalAddress(buyer.address || "");
-    setLocalCity(buyer.city || "");
-    setLocalZip(buyer.zip || "");
-    setLocalState(buyer.state || "");
-    setLocalCountry(buyer.country || "");
+    if (buyer.fullName) setLocalName((p) => (p ? p : buyer.fullName));
+    if (buyer.email) setLocalEmail((p) => (p ? p : buyer.email));
+    if (buyer.phone && safePhone(buyer.phone)) setLocalPhone((p) => (p ? p : safePhone(buyer.phone)));
+    if (buyer.address) setLocalAddress((p) => (p ? p : buyer.address || ""));
+    if (buyer.city) setLocalCity((p) => (p ? p : buyer.city || ""));
+    if (buyer.zip) setLocalZip((p) => (p ? p : buyer.zip || ""));
+    if (buyer.state) setLocalState((p) => (p ? p : buyer.state || ""));
+    if (buyer.country) setLocalCountry((p) => (p ? p : buyer.country || ""));
   }, [buyer]);
 
   const fireAbandonedCapture = useCallback((currentBuyer: typeof buyer) => {
@@ -107,10 +113,12 @@ export function BuyerInfoForm() {
     }).catch(() => {});
   }, [items, language, countryCode]);
 
-  const updateGlobalBuyer = useCallback((patch: Partial<typeof buyer>) => {
+  // Guarda en el estado global. `capture` solo en blur para no llamar al
+  // servidor en cada tecla.
+  const commitBuyer = useCallback((patch: Partial<typeof buyer>, capture = false) => {
     setBuyer(patch);
-    const updatedBuyer = { ...buyer, ...patch };
-    
+    const updatedBuyer = { ...buyerRef.current, ...patch };
+
     // Persist to localStorage
     try {
       const emailCheck = checkEmail(updatedBuyer.email || "");
@@ -120,13 +128,17 @@ export function BuyerInfoForm() {
       localStorage.setItem("ilr_buyer", JSON.stringify({
         ...prev,
         ...(email ? { email } : {}),
-        name: updatedBuyer.fullName,
-        phone: updatedBuyer.phone
+        ...(updatedBuyer.fullName ? { name: updatedBuyer.fullName } : {}),
+        ...(updatedBuyer.phone ? { phone: updatedBuyer.phone } : {}),
       }));
     } catch { /* ignore */ }
 
-    fireAbandonedCapture(updatedBuyer);
-  }, [buyer, setBuyer, fireAbandonedCapture]);
+    if (capture) fireAbandonedCapture(updatedBuyer);
+  }, [setBuyer, fireAbandonedCapture]);
+
+  const updateGlobalBuyer = useCallback((patch: Partial<typeof buyer>) => {
+    commitBuyer(patch, true);
+  }, [commitBuyer]);
 
   const nameInvalid = localName.trim().length < 3;
   const emailCheckResult = useMemo(() => checkEmail(localEmail), [localEmail]);

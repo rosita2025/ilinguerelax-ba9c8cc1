@@ -21,6 +21,10 @@ export interface CatalogItem extends Omit<PruebaItem, "quantity"> {
   adminSku?: string;
   /** Precio original (tachado) para mostrar el ahorro. */
   originalPrice?: number;
+  /** Idioma del público objetivo DEL PRODUCTO (ej. "es" para "Coreano para
+   *  Hispanohablantes"), configurado en /admin/productos. El checkout debe
+   *  mostrarse en este idioma, no en el idioma detectado del visitante. */
+  learnerLanguage?: string;
 }
 
 

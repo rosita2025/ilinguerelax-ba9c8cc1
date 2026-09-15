@@ -68,8 +68,7 @@ export default function Checkout() {
   const setBuyer = useCheckoutPruebaStore((s) => s.setBuyer);
   const items = useCheckoutPruebaStore((s) => s.items);
   const region = useRegionTier();
-  const { language } = useI18n();
-  const t = getCheckoutUI(language);
+  const { language: siteLanguage } = useI18n();
   const isPeru = (region.country || "").toUpperCase() === "PE";
 
   // Anti-fraude: /checkouts/:slug es una URL privada. Solo se permite si el
@@ -286,6 +285,18 @@ export default function Checkout() {
     ? { ...staticItem, ...(adminUpsells !== null ? { upsells: adminUpsells.length ? adminUpsells : undefined } : {}) }
     : null;
   const catalogItem = dbItem ?? mergedFromStatic;
+  // El checkout debe hablar el idioma del PÚBLICO OBJETIVO del producto
+  // (ej. "Coreano para Hispanohablantes" = español), no el idioma detectado
+  // del visitante — mismo criterio ya aplicado en la página de producto.
+  // Mientras el producto no ha cargado, o si el valor guardado no es uno de
+  // los 4 idiomas de interfaz soportados, usa el idioma del sitio como
+  // respaldo (evita pasarle a getCheckoutUI un valor inválido).
+  const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt"];
+  const learnerLang = catalogItem?.learnerLanguage;
+  const language = (
+    learnerLang && SUPPORTED_UI_LANGS.includes(learnerLang) ? learnerLang : siteLanguage
+  ) as typeof siteLanguage;
+  const t = getCheckoutUI(language);
   const slugUnknown = !!slug && !catalogItem && !loadingDb && dbMissing;
   const upsellsFingerprint = JSON.stringify(catalogItem?.upsells?.map((u) => [u.id, u.price, u.pricePen, u.originalPrice]) ?? []);
 

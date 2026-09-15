@@ -56,7 +56,7 @@ export async function loadCheckoutProduct(adminSku: string): Promise<CheckoutPro
         return await supabase
           .from("digital_products")
           .select(
-            "sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at, is_physical, local_prices, local_usd_prices",
+            "sku, name, description, price_usd, price_usd_latam, price_usd_tienda, price_pen, cover_image_url, updated_at, is_physical, local_prices, local_usd_prices, learner_language",
           )
           .eq("sku", adminSku)
           .eq("active", true)
@@ -88,11 +88,12 @@ export async function loadCheckoutProduct(adminSku: string): Promise<CheckoutPro
       price_usd: number;
       local_prices: Record<string, number> | null;
       cover_image_url: string | null;
+      learner_language: string | null;
     }> = [];
     try {
       const result = await supabase
         .from("digital_products")
-        .select("sku, name, description, price_usd, local_prices, cover_image_url")
+        .select("sku, name, description, price_usd, local_prices, cover_image_url, learner_language")
         .in("sku", skus)
         .eq("active", true);
       upProducts = (result.data ?? []) as typeof upProducts;
@@ -162,6 +163,7 @@ export async function loadCheckoutProduct(adminSku: string): Promise<CheckoutPro
     },
     localPrices: data.local_prices,
     localUsdPrices: data.local_usd_prices,
+    learnerLanguage: data.learner_language || undefined,
   } as CatalogItem;
 
   const payload: CheckoutProductPayload = { item, upsells, missing: false };

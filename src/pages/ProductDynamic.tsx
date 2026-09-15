@@ -490,7 +490,8 @@ const ProductDynamic = () => {
               <p className="text-sm text-muted-foreground leading-snug">
                 {product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" 
                   ? "Reach C1 fluency faster with our professional 5,000 words guide, 6-month study planner, and proficiency exams."
-                  : product.description?.split('\n')[0] || "Master your target language with our professional PDF guide."}
+                  : product.description?.split('\n')[0] || (isEs ? "Domina el idioma con nuestra guía profesional en PDF." : "Master your target language with our professional PDF guide.")}
+
 
               </p>
 

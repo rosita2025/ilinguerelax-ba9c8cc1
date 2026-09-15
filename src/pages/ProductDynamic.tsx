@@ -276,7 +276,17 @@ const ProductDynamic = () => {
   const cover = product.cover_image_url || "/placeholder.svg";
   const canonical = `https://ilinguerelax.com/products/${product.sku}`;
   
-  const features = [
+  const isEs = product.learner_language === "es";
+
+  const features = isEs ? [
+    `${product.name} + Pronunciación`,
+    "Versión PDF digital",
+    "Planificador de estudio (6 meses)",
+    "Tarjetas digitales (Anki/Quizlet)",
+    "Pack de exámenes de nivel",
+    "Descarga inmediata · Pago seguro",
+    "Garantía de 7 días"
+  ] : [
     `${product.name} + Pronunciation`,
     "Digital PDF Version",
     "Study Planner (6 Months Layout)",
@@ -286,12 +296,18 @@ const ProductDynamic = () => {
     "7-Day Money-Back Guarantee"
   ];
 
-  const benefits = [
+  const benefits = isEs ? [
+    { icon: Headphones, title: "Audio y App próximamente", description: "Bono GRATIS: audios MP3 con pronunciación nativa y acceso a la App." },
+    { icon: Layers, title: "Tarjetas digitales", description: "Mazos listos para memorizar vocabulario 3 veces más rápido." },
+    { icon: Zap, title: "Estudia donde sea", description: "Desde tu celular, tablet o PC. Siempre contigo." },
+    { icon: FilePlus, title: "Conversaciones rápidas", description: "Guía práctica con 100 conversaciones frecuentes." },
+  ] : [
     { icon: Headphones, title: "Future Audio & App Access", description: "FREE Bonus: Get native pronunciation MP3s and App access soon." },
     { icon: Layers, title: "Digital Flashcards", description: "Ready-to-use decks to memorize vocabulary 3x faster." },
     { icon: Zap, title: "Learn Anywhere", description: "Study on phone, tablet, or PC. Always with you." },
     { icon: FilePlus, title: "Quick Conversations", description: "High-impact guide for 100 common conversations." },
   ];
+
 
   const SP5K_SKUS = [
     "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7",

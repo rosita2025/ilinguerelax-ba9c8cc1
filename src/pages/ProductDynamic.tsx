@@ -764,6 +764,11 @@ const ProductDynamic = () => {
         }
       />
 
+      <ProductPageEmailCapturePopup
+        productSlug={product.sku}
+        productName={product.name}
+        learnerLanguage={product.learner_language}
+      />
 
     </div>
   );

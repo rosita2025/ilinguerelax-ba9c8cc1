@@ -560,7 +560,7 @@ const ProductDynamic = () => {
           <section className="mt-4 py-3 border-t border-slate-100">
             <div className="grid lg:grid-cols-2 gap-6">
               <div>
-                <h2 className="text-lg md:text-xl font-black mb-3 uppercase tracking-tight">What's Inside</h2>
+                <h2 className="text-lg md:text-xl font-black mb-3 uppercase tracking-tight">{isEs ? "Qué incluye" : "What's Inside"}</h2>
                 <div className="grid gap-2">
                   {features.map((f, i) => (
                     <div key={i} className="flex items-start gap-2 p-2 rounded-xl bg-white border border-slate-100 shadow-sm">

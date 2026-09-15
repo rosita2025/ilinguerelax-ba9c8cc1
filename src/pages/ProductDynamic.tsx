@@ -276,7 +276,17 @@ const ProductDynamic = () => {
   const cover = product.cover_image_url || "/placeholder.svg";
   const canonical = `https://ilinguerelax.com/products/${product.sku}`;
   
-  const features = [
+  const isEs = product.learner_language === "es";
+
+  const features = isEs ? [
+    `${product.name} + Pronunciación`,
+    "Versión PDF digital",
+    "Planificador de estudio (6 meses)",
+    "Tarjetas digitales (Anki/Quizlet)",
+    "Pack de exámenes de nivel",
+    "Descarga inmediata · Pago seguro",
+    "Garantía de 7 días"
+  ] : [
     `${product.name} + Pronunciation`,
     "Digital PDF Version",
     "Study Planner (6 Months Layout)",
@@ -286,12 +296,18 @@ const ProductDynamic = () => {
     "7-Day Money-Back Guarantee"
   ];
 
-  const benefits = [
+  const benefits = isEs ? [
+    { icon: Headphones, title: "Audio y App próximamente", description: "Bono GRATIS: audios MP3 con pronunciación nativa y acceso a la App." },
+    { icon: Layers, title: "Tarjetas digitales", description: "Mazos listos para memorizar vocabulario 3 veces más rápido." },
+    { icon: Zap, title: "Estudia donde sea", description: "Desde tu celular, tablet o PC. Siempre contigo." },
+    { icon: FilePlus, title: "Conversaciones rápidas", description: "Guía práctica con 100 conversaciones frecuentes." },
+  ] : [
     { icon: Headphones, title: "Future Audio & App Access", description: "FREE Bonus: Get native pronunciation MP3s and App access soon." },
     { icon: Layers, title: "Digital Flashcards", description: "Ready-to-use decks to memorize vocabulary 3x faster." },
     { icon: Zap, title: "Learn Anywhere", description: "Study on phone, tablet, or PC. Always with you." },
     { icon: FilePlus, title: "Quick Conversations", description: "High-impact guide for 100 common conversations." },
   ];
+
 
   const SP5K_SKUS = [
     "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7",
@@ -411,7 +427,7 @@ const ProductDynamic = () => {
                   <Star key={i} className="w-2 h-2 fill-emerald-500 text-emerald-500" strokeWidth={0} />
                 ))}
               </div>
-              <span className="text-[9px] font-bold text-slate-800">Excellent</span>
+              <span className="text-[9px] font-bold text-slate-800">{isEs ? "Excelente" : "Excellent"}</span>
               <span className="text-[9px] font-bold text-emerald-600">★ Trustpilot</span>
             </div>
           </div>
@@ -464,7 +480,7 @@ const ProductDynamic = () => {
                     <Star key={i} className="w-3 h-3 fill-emerald-500 text-emerald-500" />
                   ))}
                 </div>
-                <span className="text-[10px] font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ reviews)</span>
+                <span className="text-[10px] font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ {isEs ? "reseñas" : "reviews"})</span>
               </div>
 
               <h1 className="text-xl md:text-3xl font-black leading-tight text-slate-900 tracking-tight">
@@ -474,7 +490,8 @@ const ProductDynamic = () => {
               <p className="text-sm text-muted-foreground leading-snug">
                 {product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" 
                   ? "Reach C1 fluency faster with our professional 5,000 words guide, 6-month study planner, and proficiency exams."
-                  : product.description?.split('\n')[0] || "Master your target language with our professional PDF guide."}
+                  : product.description?.split('\n')[0] || (isEs ? "Domina el idioma con nuestra guía profesional en PDF." : "Master your target language with our professional PDF guide.")}
+
 
               </p>
 
@@ -514,7 +531,7 @@ const ProductDynamic = () => {
                     <PaymentLogos />
                   </div>
                   <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500">
-                    <Shield className="w-2.5 h-2.5" /> SECURE CHECKOUT
+                    <Shield className="w-2.5 h-2.5" /> {isEs ? "PAGO SEGURO" : "SECURE CHECKOUT"}
                   </div>
                 </div>
               </div>
@@ -523,15 +540,16 @@ const ProductDynamic = () => {
                 <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
                   <Globe className="w-5 h-5 text-emerald-600" />
                   <div>
-                    <div className="text-[9px] font-black uppercase text-slate-400">Availability</div>
-                    <div className="text-[11px] font-bold text-slate-700">Global Access</div>
+                    <div className="text-[9px] font-black uppercase text-slate-400">{isEs ? "Disponibilidad" : "Availability"}</div>
+                    <div className="text-[11px] font-bold text-slate-700">{isEs ? "Acceso global" : "Global Access"}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
                   <Smartphone className="w-5 h-5 text-emerald-600" />
                   <div>
-                    <div className="text-[9px] font-black uppercase text-slate-400">Format</div>
-                    <div className="text-[11px] font-bold text-slate-700">Digital PDF</div>
+                    <div className="text-[9px] font-black uppercase text-slate-400">{isEs ? "Formato" : "Format"}</div>
+                    <div className="text-[11px] font-bold text-slate-700">PDF digital</div>
+
                   </div>
                 </div>
               </div>
@@ -542,7 +560,7 @@ const ProductDynamic = () => {
           <section className="mt-4 py-3 border-t border-slate-100">
             <div className="grid lg:grid-cols-2 gap-6">
               <div>
-                <h2 className="text-lg md:text-xl font-black mb-3 uppercase tracking-tight">What's Inside</h2>
+                <h2 className="text-lg md:text-xl font-black mb-3 uppercase tracking-tight">{isEs ? "Qué incluye" : "What's Inside"}</h2>
                 <div className="grid gap-2">
                   {features.map((f, i) => (
                     <div key={i} className="flex items-start gap-2 p-2 rounded-xl bg-white border border-slate-100 shadow-sm">
@@ -653,19 +671,29 @@ const ProductDynamic = () => {
 
           <Suspense fallback={<Skeleton className="h-48 w-full" />}>
             <FAQ 
-              title="FAQ" 
-              subtitle="Quick Answers" 
-              items={[...SP5K_SKUS, "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca"].includes(product.sku) ? [
+              title={isEs ? "Preguntas frecuentes" : "FAQ"} 
+              subtitle={isEs ? "Respuestas rápidas" : "Quick Answers"} 
+              items={[...SP5K_SKUS, "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca"].includes(product.sku) ? (isEs ? [
+                { question: "¿Cuánto tarda la entrega?", answer: "Llega a tu correo en menos de 5 minutos después de la compra.", icon: Download },
+                { question: "¿Cuál es el formato?", answer: "PDF digital de alta calidad (marca oficial iLingue Relax).", icon: FileText },
+                { question: "¿Qué métodos de pago hay?", answer: "Pagos seguros con Stripe, tarjetas de crédito/débito y PayPal.", icon: CreditCard },
+                { question: "¿Hay garantía de 7 días?", answer: "Sí — reembolso total dentro de 7 días si aún no descargaste los archivos, o 50% si ya los descargaste.", icon: Shield }
+              ] : [
                 { question: "Delivery time?", answer: "Sent to your email within 5 minutes of purchase.", icon: Download },
                 { question: "What is the format?", answer: "High-quality Digital PDF (Official iLingue Relax Brand).", icon: FileText },
                 { question: "Payment methods?", answer: "Secure payments via Stripe, Credit/Debit Cards, and PayPal.", icon: CreditCard },
                 { question: "7-Day Guarantee?", answer: "Yes — full refund within 7 days if you haven't downloaded the files yet, or 50% back if you already have.", icon: Shield }
+              ]) : (isEs ? [
+                { question: "¿Entrega?", answer: "Inmediata por correo electrónico.", icon: Download },
+                { question: "¿Formato?", answer: "PDF digital.", icon: FileText },
+                { question: "¿Garantía?", answer: "7 días de garantía de devolución.", icon: Shield }
               ] : [
                 { question: "Delivery?", answer: "Immediate via email.", icon: Download },
                 { question: "Format?", answer: "Digital PDF.", icon: FileText },
                 { question: "Guarantee?", answer: "7-day money-back.", icon: Shield }
-              ]}
+              ])}
             />
+
           </Suspense>
 
           {product.sku === "5-000-spanish-words-with-english-pronunciation-digital" && (

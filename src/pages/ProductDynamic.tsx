@@ -12,6 +12,7 @@ import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
+import { ProductPageEmailCapturePopup } from "@/components/ProductPageEmailCapturePopup";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PinterestSave } from "@/components/PinterestSave";
 import { VerifiedReviews } from "@/components/VerifiedReviews";

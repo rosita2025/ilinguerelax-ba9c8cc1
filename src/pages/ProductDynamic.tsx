@@ -480,7 +480,7 @@ const ProductDynamic = () => {
                     <Star key={i} className="w-3 h-3 fill-emerald-500 text-emerald-500" />
                   ))}
                 </div>
-                <span className="text-[10px] font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ reviews)</span>
+                <span className="text-[10px] font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ {isEs ? "reseñas" : "reviews"})</span>
               </div>
 
               <h1 className="text-xl md:text-3xl font-black leading-tight text-slate-900 tracking-tight">

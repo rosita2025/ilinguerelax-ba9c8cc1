@@ -531,7 +531,7 @@ const ProductDynamic = () => {
                     <PaymentLogos />
                   </div>
                   <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500">
-                    <Shield className="w-2.5 h-2.5" /> SECURE CHECKOUT
+                    <Shield className="w-2.5 h-2.5" /> {isEs ? "PAGO SEGURO" : "SECURE CHECKOUT"}
                   </div>
                 </div>
               </div>

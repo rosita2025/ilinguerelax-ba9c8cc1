@@ -743,11 +743,21 @@ const ProductDynamic = () => {
         onBuyClick={handleBuy}
         usdValue={effectiveUsd}
         localUsdPrices={product.local_usd_prices}
-        testimonials={SP5K_SKUS.includes(product.sku) ? [
-          "Sarah, USA: Exactly what I needed to stop translating in my head!",
-          "James, UK: The 6-month study planner is a game changer for me.",
-          "Elena, Canada: Clear pronunciation and very visual. Highly recommend."
-        ] : undefined}
+        testimonials={
+          SP5K_SKUS.includes(product.sku)
+            ? [
+                "Sarah, USA: Exactly what I needed to stop translating in my head!",
+                "James, UK: The 6-month study planner is a game changer for me.",
+                "Elena, Canada: Clear pronunciation and very visual. Highly recommend."
+              ]
+            : product.sku === "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca"
+              ? [
+                  "María, Perú: Por fin entendí el Hangul sin sentirme perdida, todo muy visual.",
+                  "Carlos, México: La pronunciación en español me ayudó muchísimo a no trabarme.",
+                  "Valentina, Colombia: Lo uso 15 minutos al día y ya reconozco palabras básicas."
+                ]
+              : undefined
+        }
       />
 
 

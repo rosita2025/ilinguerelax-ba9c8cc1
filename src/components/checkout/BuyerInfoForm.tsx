@@ -237,7 +237,7 @@ export function BuyerInfoForm() {
               autoComplete="name"
               required
               value={localName}
-              onChange={(e) => setLocalName(e.target.value)}
+              onChange={(e) => { setLocalName(e.target.value); commitBuyer({ fullName: e.target.value }); }}
               onBlur={() => updateGlobalBuyer({ fullName: localName })}
               placeholder={t.fullNamePlaceholder}
               aria-invalid={showNameError}
@@ -267,7 +267,7 @@ export function BuyerInfoForm() {
               autoComplete="email"
               required
               value={localEmail}
-              onChange={(e) => setLocalEmail(e.target.value.trim())}
+              onChange={(e) => { const v = e.target.value.trim(); setLocalEmail(v); commitBuyer({ email: v }); }}
               onBlur={() => {
                 const check = checkEmail(localEmail);
                 const finalEmail = check.corrected ? check.email : localEmail;
@@ -304,7 +304,7 @@ export function BuyerInfoForm() {
               international
               defaultCountry={(region.country as any) || "PE"}
               value={localPhone}
-              onChange={(v) => setLocalPhone(v ?? "")}
+              onChange={(v) => { setLocalPhone(v ?? ""); commitBuyer({ phone: v ?? "" }); }}
               onBlur={() => updateGlobalBuyer({ phone: localPhone })}
               placeholder="999 999 999"
               className={cn(
@@ -339,7 +339,7 @@ export function BuyerInfoForm() {
                   type="text"
                   required
                   value={localAddress}
-                  onChange={(e) => setLocalAddress(e.target.value)}
+                  onChange={(e) => { setLocalAddress(e.target.value); commitBuyer({ address: e.target.value }); }}
                   onBlur={() => updateGlobalBuyer({ address: localAddress })}
                   placeholder={t.addressPlaceholder}
                   className={cn(
@@ -360,7 +360,7 @@ export function BuyerInfoForm() {
                   type="text"
                   required
                   value={localCity}
-                  onChange={(e) => setLocalCity(e.target.value)}
+                  onChange={(e) => { setLocalCity(e.target.value); commitBuyer({ city: e.target.value }); }}
                   onBlur={() => updateGlobalBuyer({ city: localCity })}
                   className={cn(
                     "w-full px-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2 mt-1",
@@ -377,7 +377,7 @@ export function BuyerInfoForm() {
                   type="text"
                   required
                   value={localZip}
-                  onChange={(e) => setLocalZip(e.target.value)}
+                  onChange={(e) => { setLocalZip(e.target.value); commitBuyer({ zip: e.target.value }); }}
                   onBlur={() => updateGlobalBuyer({ zip: localZip })}
                   className={cn(
                     "w-full px-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2 mt-1",
@@ -395,7 +395,7 @@ export function BuyerInfoForm() {
                 <input
                   type="text"
                   value={localState}
-                  onChange={(e) => setLocalState(e.target.value)}
+                  onChange={(e) => { setLocalState(e.target.value); commitBuyer({ state: e.target.value }); }}
                   onBlur={() => updateGlobalBuyer({ state: localState })}
                   className="w-full px-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 mt-1"
                 />
@@ -407,7 +407,7 @@ export function BuyerInfoForm() {
                   <select
                     id="shipping-country"
                     value={localCountry}
-                    onChange={(e) => setLocalCountry(e.target.value)}
+                    onChange={(e) => { setLocalCountry(e.target.value); commitBuyer({ country: e.target.value }); }}
                     onBlur={() => updateGlobalBuyer({ country: localCountry })}
                     className={cn(
                       "w-full pl-9 pr-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2 appearance-none",

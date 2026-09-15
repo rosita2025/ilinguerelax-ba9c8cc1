@@ -568,8 +568,8 @@ const ProductDynamic = () => {
           <section className="mt-4 py-3 bg-slate-900 rounded-[1.5rem] text-white overflow-hidden">
             <div className="px-4 md:px-8">
               <div className="text-center mb-4">
-                <h2 className="text-xl md:text-2xl font-black mb-1 uppercase tracking-tight">Look Inside</h2>
-                <p className="text-slate-400 text-xs max-w-2xl mx-auto">Visual guides to reach fluency faster.</p>
+                <h2 className="text-xl md:text-2xl font-black mb-1 uppercase tracking-tight">{language === "es" ? "Vista Previa" : "Look Inside"}</h2>
+                <p className="text-slate-400 text-xs max-w-2xl mx-auto">{language === "es" ? "Guías visuales para llegar a la fluidez más rápido." : "Visual guides to reach fluency faster."}</p>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
@@ -593,7 +593,7 @@ const ProductDynamic = () => {
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl p-0 overflow-hidden bg-white">
                       <DialogHeader className="p-4 bg-slate-900 text-white">
-                        <DialogTitle>{asset.title} - Preview</DialogTitle>
+                        <DialogTitle>{asset.title} - {language === "es" ? "Vista previa" : "Preview"}</DialogTitle>
                       </DialogHeader>
                       <div className="p-1">
                         <img src={asset.image} className="w-full h-auto" alt="" loading="lazy" />
@@ -709,7 +709,7 @@ const ProductDynamic = () => {
         reviewCount={reviewsCount}
         productName={product.name}
         lang={language === "es" ? "es" : "en"}
-        ctaText={`I want it — ${displayFormatted}`}
+        ctaText={language === "es" ? `Lo quiero — ${displayFormatted}` : `I want it — ${displayFormatted}`}
         onBuyClick={handleBuy}
         usdValue={effectiveUsd}
         localUsdPrices={product.local_usd_prices}

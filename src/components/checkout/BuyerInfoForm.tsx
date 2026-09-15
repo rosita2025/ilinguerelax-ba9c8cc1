@@ -80,16 +80,22 @@ export function BuyerInfoForm() {
   const nameRef = useRef<HTMLInputElement | null>(null);
   const emailRef = useRef<HTMLInputElement | null>(null);
 
-  // Sync local state when global state changes (e.g. hydrate from localStorage or URL)
+  // Siempre tener la última versión del comprador global sin recrear callbacks.
+  const buyerRef = useRef(buyer);
+  buyerRef.current = buyer;
+
+  // Sync local state when global state changes (e.g. hydrate from localStorage or URL).
+  // Importante: NUNCA borrar lo que el comprador ya escribió. Solo se copia el valor
+  // global cuando trae contenido nuevo; si viene vacío, se respeta lo local.
   useEffect(() => {
-    setLocalName(buyer.fullName || "");
-    setLocalEmail(buyer.email || "");
-    setLocalPhone(safePhone(buyer.phone));
-    setLocalAddress(buyer.address || "");
-    setLocalCity(buyer.city || "");
-    setLocalZip(buyer.zip || "");
-    setLocalState(buyer.state || "");
-    setLocalCountry(buyer.country || "");
+    if (buyer.fullName) setLocalName((p) => (p ? p : buyer.fullName));
+    if (buyer.email) setLocalEmail((p) => (p ? p : buyer.email));
+    if (buyer.phone && safePhone(buyer.phone)) setLocalPhone((p) => (p ? p : safePhone(buyer.phone)));
+    if (buyer.address) setLocalAddress((p) => (p ? p : buyer.address || ""));
+    if (buyer.city) setLocalCity((p) => (p ? p : buyer.city || ""));
+    if (buyer.zip) setLocalZip((p) => (p ? p : buyer.zip || ""));
+    if (buyer.state) setLocalState((p) => (p ? p : buyer.state || ""));
+    if (buyer.country) setLocalCountry((p) => (p ? p : buyer.country || ""));
   }, [buyer]);
 
   const fireAbandonedCapture = useCallback((currentBuyer: typeof buyer) => {
@@ -107,10 +113,12 @@ export function BuyerInfoForm() {
     }).catch(() => {});
   }, [items, language, countryCode]);
 
-  const updateGlobalBuyer = useCallback((patch: Partial<typeof buyer>) => {
+  // Guarda en el estado global. `capture` solo en blur para no llamar al
+  // servidor en cada tecla.
+  const commitBuyer = useCallback((patch: Partial<typeof buyer>, capture = false) => {
     setBuyer(patch);
-    const updatedBuyer = { ...buyer, ...patch };
-    
+    const updatedBuyer = { ...buyerRef.current, ...patch };
+
     // Persist to localStorage
     try {
       const emailCheck = checkEmail(updatedBuyer.email || "");
@@ -120,13 +128,17 @@ export function BuyerInfoForm() {
       localStorage.setItem("ilr_buyer", JSON.stringify({
         ...prev,
         ...(email ? { email } : {}),
-        name: updatedBuyer.fullName,
-        phone: updatedBuyer.phone
+        ...(updatedBuyer.fullName ? { name: updatedBuyer.fullName } : {}),
+        ...(updatedBuyer.phone ? { phone: updatedBuyer.phone } : {}),
       }));
     } catch { /* ignore */ }
 
-    fireAbandonedCapture(updatedBuyer);
-  }, [buyer, setBuyer, fireAbandonedCapture]);
+    if (capture) fireAbandonedCapture(updatedBuyer);
+  }, [setBuyer, fireAbandonedCapture]);
+
+  const updateGlobalBuyer = useCallback((patch: Partial<typeof buyer>) => {
+    commitBuyer(patch, true);
+  }, [commitBuyer]);
 
   const nameInvalid = localName.trim().length < 3;
   const emailCheckResult = useMemo(() => checkEmail(localEmail), [localEmail]);
@@ -225,7 +237,7 @@ export function BuyerInfoForm() {
               autoComplete="name"
               required
               value={localName}
-              onChange={(e) => setLocalName(e.target.value)}
+              onChange={(e) => { setLocalName(e.target.value); commitBuyer({ fullName: e.target.value }); }}
               onBlur={() => updateGlobalBuyer({ fullName: localName })}
               placeholder={t.fullNamePlaceholder}
               aria-invalid={showNameError}
@@ -255,7 +267,7 @@ export function BuyerInfoForm() {
               autoComplete="email"
               required
               value={localEmail}
-              onChange={(e) => setLocalEmail(e.target.value.trim())}
+              onChange={(e) => { const v = e.target.value.trim(); setLocalEmail(v); commitBuyer({ email: v }); }}
               onBlur={() => {
                 const check = checkEmail(localEmail);
                 const finalEmail = check.corrected ? check.email : localEmail;
@@ -292,7 +304,7 @@ export function BuyerInfoForm() {
               international
               defaultCountry={(region.country as any) || "PE"}
               value={localPhone}
-              onChange={(v) => setLocalPhone(v ?? "")}
+              onChange={(v) => { setLocalPhone(v ?? ""); commitBuyer({ phone: v ?? "" }); }}
               onBlur={() => updateGlobalBuyer({ phone: localPhone })}
               placeholder="999 999 999"
               className={cn(
@@ -327,7 +339,7 @@ export function BuyerInfoForm() {
                   type="text"
                   required
                   value={localAddress}
-                  onChange={(e) => setLocalAddress(e.target.value)}
+                  onChange={(e) => { setLocalAddress(e.target.value); commitBuyer({ address: e.target.value }); }}
                   onBlur={() => updateGlobalBuyer({ address: localAddress })}
                   placeholder={t.addressPlaceholder}
                   className={cn(
@@ -348,7 +360,7 @@ export function BuyerInfoForm() {
                   type="text"
                   required
                   value={localCity}
-                  onChange={(e) => setLocalCity(e.target.value)}
+                  onChange={(e) => { setLocalCity(e.target.value); commitBuyer({ city: e.target.value }); }}
                   onBlur={() => updateGlobalBuyer({ city: localCity })}
                   className={cn(
                     "w-full px-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2 mt-1",
@@ -365,7 +377,7 @@ export function BuyerInfoForm() {
                   type="text"
                   required
                   value={localZip}
-                  onChange={(e) => setLocalZip(e.target.value)}
+                  onChange={(e) => { setLocalZip(e.target.value); commitBuyer({ zip: e.target.value }); }}
                   onBlur={() => updateGlobalBuyer({ zip: localZip })}
                   className={cn(
                     "w-full px-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2 mt-1",
@@ -383,7 +395,7 @@ export function BuyerInfoForm() {
                 <input
                   type="text"
                   value={localState}
-                  onChange={(e) => setLocalState(e.target.value)}
+                  onChange={(e) => { setLocalState(e.target.value); commitBuyer({ state: e.target.value }); }}
                   onBlur={() => updateGlobalBuyer({ state: localState })}
                   className="w-full px-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 mt-1"
                 />
@@ -395,7 +407,7 @@ export function BuyerInfoForm() {
                   <select
                     id="shipping-country"
                     value={localCountry}
-                    onChange={(e) => setLocalCountry(e.target.value)}
+                    onChange={(e) => { setLocalCountry(e.target.value); commitBuyer({ country: e.target.value }); }}
                     onBlur={() => updateGlobalBuyer({ country: localCountry })}
                     className={cn(
                       "w-full pl-9 pr-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus:outline-none focus:ring-2 appearance-none",

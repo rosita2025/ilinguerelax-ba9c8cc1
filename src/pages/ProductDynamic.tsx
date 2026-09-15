@@ -427,7 +427,7 @@ const ProductDynamic = () => {
                   <Star key={i} className="w-2 h-2 fill-emerald-500 text-emerald-500" strokeWidth={0} />
                 ))}
               </div>
-              <span className="text-[9px] font-bold text-slate-800">Excellent</span>
+              <span className="text-[9px] font-bold text-slate-800">{isEs ? "Excelente" : "Excellent"}</span>
               <span className="text-[9px] font-bold text-emerald-600">★ Trustpilot</span>
             </div>
           </div>

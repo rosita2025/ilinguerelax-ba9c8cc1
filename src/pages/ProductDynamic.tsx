@@ -491,7 +491,7 @@ const ProductDynamic = () => {
                 </div>
                 {priceReady && discountPercentage > 0 && (
                   <div className="inline-block px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-black mb-3">
-                    SAVE {discountPercentage}%
+                    {product.learner_language === "es" ? `AHORRA ${discountPercentage}%` : `SAVE ${discountPercentage}%`}
                   </div>
                 )}
                 
@@ -501,7 +501,9 @@ const ProductDynamic = () => {
                   className="w-full h-12 text-base font-black shadow-hero bg-emerald-600 hover:bg-emerald-700 text-white mb-2"
                   disabled={!priceReady}
                 >
-                  {priceReady ? `I want it — ${displayFormatted}` : "I want it"}
+                  {priceReady
+                    ? (product.learner_language === "es" ? `Lo quiero — ${displayFormatted}` : `I want it — ${displayFormatted}`)
+                    : (product.learner_language === "es" ? "Lo quiero" : "I want it")}
                 </Button>
 
                 <StockAlert count={7} className="mt-2 w-full justify-center" />
@@ -568,8 +570,8 @@ const ProductDynamic = () => {
           <section className="mt-4 py-3 bg-slate-900 rounded-[1.5rem] text-white overflow-hidden">
             <div className="px-4 md:px-8">
               <div className="text-center mb-4">
-                <h2 className="text-xl md:text-2xl font-black mb-1 uppercase tracking-tight">{language === "es" ? "Vista Previa" : "Look Inside"}</h2>
-                <p className="text-slate-400 text-xs max-w-2xl mx-auto">{language === "es" ? "Guías visuales para llegar a la fluidez más rápido." : "Visual guides to reach fluency faster."}</p>
+                <h2 className="text-xl md:text-2xl font-black mb-1 uppercase tracking-tight">{product.learner_language === "es" ? "Vista Previa" : "Look Inside"}</h2>
+                <p className="text-slate-400 text-xs max-w-2xl mx-auto">{product.learner_language === "es" ? "Guías visuales para llegar a la fluidez más rápido." : "Visual guides to reach fluency faster."}</p>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
@@ -593,7 +595,7 @@ const ProductDynamic = () => {
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl p-0 overflow-hidden bg-white">
                       <DialogHeader className="p-4 bg-slate-900 text-white">
-                        <DialogTitle>{asset.title} - {language === "es" ? "Vista previa" : "Preview"}</DialogTitle>
+                        <DialogTitle>{asset.title} - {product.learner_language === "es" ? "Vista previa" : "Preview"}</DialogTitle>
                       </DialogHeader>
                       <div className="p-1">
                         <img src={asset.image} className="w-full h-auto" alt="" loading="lazy" />
@@ -708,8 +710,8 @@ const ProductDynamic = () => {
         rating={reviewsRating}
         reviewCount={reviewsCount}
         productName={product.name}
-        lang={language === "es" ? "es" : "en"}
-        ctaText={language === "es" ? `Lo quiero — ${displayFormatted}` : `I want it — ${displayFormatted}`}
+        lang={product.learner_language === "es" ? "es" : "en"}
+        ctaText={product.learner_language === "es" ? `Lo quiero — ${displayFormatted}` : `I want it — ${displayFormatted}`}
         onBuyClick={handleBuy}
         usdValue={effectiveUsd}
         localUsdPrices={product.local_usd_prices}

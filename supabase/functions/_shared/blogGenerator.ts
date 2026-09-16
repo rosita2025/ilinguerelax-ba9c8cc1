@@ -302,60 +302,7 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
 }
 
 async function downloadAndStoreImage(tempUrl: string, slug: string): Promise<string | null> {
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error(`[BlogGen] Error APIMART imagen (Status ${res.status}):`, errorText);
-      return null;
-    }
-
-    const text = await res.text();
-    console.log("[BlogGen] Respuesta cruda de imagen:", text.slice(0, 500));
-    
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      console.log("[BlogGen] Respuesta de imagen no es JSON directo, intentando parsear SSE...");
-      const parsed = parseAiResponse(text);
-      try {
-        const contentStr = parsed.choices?.[0]?.message?.content;
-        data = (typeof contentStr === 'string' && (contentStr.trim().startsWith('{') || contentStr.trim().startsWith('[')))
-          ? JSON.parse(contentStr)
-          : contentStr || parsed;
-      } catch {
-        data = parsed;
-      }
-    }
-
-    // Estructuras comunes de Apimart/OpenAI:
-    // 1. { data: [{ url: "..." }] }
-    // 2. { choices: [{ message: { content: "..." } }] }
-    // 3. Texto plano que es una URL
-    let tempUrl = data?.data?.[0]?.url || data?.url;
-    
-    if (!tempUrl && data?.choices?.[0]?.message?.content) {
-       const content = data.choices[0].message.content.trim();
-       if (content.startsWith("http")) {
-         tempUrl = content;
-       } else {
-         try {
-           const nested = JSON.parse(content);
-           tempUrl = nested?.data?.[0]?.url || nested?.url || nested?.image_url;
-         } catch { /* ignore */ }
-       }
-    }
-
-    // Si data mismo es un string que empieza por http
-    if (!tempUrl && typeof data === 'string' && data.trim().startsWith("http")) {
-      tempUrl = data.trim();
-    }
-
-    if (!tempUrl) {
-      console.error("[BlogGen] APIMART no devolvió URL de imagen. Estructura recibida:", JSON.stringify(data).slice(0, 500));
-      return null;
-    }
-
+  try {
     // Descargar y subir a Storage
     const imgRes = await fetch(tempUrl);
     if (!imgRes.ok) throw new Error(`Error descargando imagen de APIMART: ${imgRes.status}`);
@@ -386,7 +333,7 @@ async function downloadAndStoreImage(tempUrl: string, slug: string): Promise<str
 
     return publicUrl;
   } catch (err) {
-    console.error("[BlogGen] generateImage error:", err);
+    console.error("[BlogGen] downloadAndStoreImage error:", err);
     return null;
   }
 }

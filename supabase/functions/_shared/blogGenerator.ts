@@ -252,7 +252,7 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
     }
 
     const created = await res.json().catch(() => null);
-    const taskId = created?.data?.task_id || created?.task_id;
+    const taskId = created?.data?.task_id || created?.data?.[0]?.task_id || created?.task_id;
     console.log(`[BlogGen] APIMART task creado: ${taskId ?? "(sin task_id)"}`);
 
     if (!taskId) {

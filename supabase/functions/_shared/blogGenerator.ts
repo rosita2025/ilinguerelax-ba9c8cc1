@@ -189,6 +189,34 @@ function parseAiResponse(text: string): any {
 }
 
 
+// Extrae la URL de imagen de la respuesta de Apimart. La API devuelve
+// { data: { result: { images: [ { url: ["https://..."] } ] } } } y a veces
+// variantes más simples; probamos todas las formas conocidas.
+// deno-lint-ignore no-explicit-any
+function extractImageUrl(data: any): string | null {
+  const candidates = [
+    data?.data?.[0]?.url,
+    data?.data?.url,
+    data?.data?.result?.images?.[0]?.url,
+    data?.data?.result?.images?.[0]?.url?.[0],
+    data?.result?.images?.[0]?.url,
+    data?.result?.images?.[0]?.url?.[0],
+    data?.result?.image_url,
+    data?.url,
+  ];
+  for (const c of candidates) {
+    if (typeof c === "string" && c.startsWith("http")) return c;
+    if (Array.isArray(c)) {
+      const first = c.find((u: unknown) => typeof u === "string" && String(u).startsWith("http"));
+      if (first) return String(first);
+    }
+  }
+  // data.result.images[0] podría ser directamente un string
+  const img0 = data?.data?.result?.images?.[0] ?? data?.result?.images?.[0];
+  if (typeof img0 === "string" && img0.startsWith("http")) return img0;
+  return null;
+}
+
 async function generateImage(prompt: string, slug: string): Promise<string | null> {
   const apimartToken = Deno.env.get("APIMART_TOKEN");
   if (!apimartToken || !prompt) {
@@ -199,6 +227,9 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
 
   try {
     console.log(`[BlogGen] Generando imagen con APIMART para: ${slug}...`);
+    // Apimart funciona de forma ASÍNCRONA: la creación devuelve un task_id y
+    // la imagen se consulta luego en GET /v1/tasks/{task_id} hasta que el
+    // status pase a "completed" (tarda ~30-100 s).
     const res = await fetch("https://api.apimart.ai/v1/images/generations", {
       method: "POST",
       headers: {
@@ -213,6 +244,64 @@ async function generateImage(prompt: string, slug: string): Promise<string | nul
         response_format: "url"
       }),
     });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`[BlogGen] Error APIMART imagen (Status ${res.status}):`, errorText);
+      return null;
+    }
+
+    const created = await res.json().catch(() => null);
+    const taskId = created?.data?.task_id || created?.task_id;
+    console.log(`[BlogGen] APIMART task creado: ${taskId ?? "(sin task_id)"}`);
+
+    if (!taskId) {
+      // Por si acaso la API respondió de forma síncrona con la URL incluida.
+      const direct = extractImageUrl(created);
+      if (!direct) {
+        console.error("[BlogGen] APIMART no devolvió task_id ni URL:", JSON.stringify(created).slice(0, 500));
+        return null;
+      }
+      return await downloadAndStoreImage(direct, slug);
+    }
+
+    // Polling de la tarea hasta completar (máx ~3 min).
+    const maxPolls = 18;
+    for (let i = 1; i <= maxPolls; i++) {
+      await new Promise((r) => setTimeout(r, 10000));
+      const tRes = await fetch(`https://api.apimart.ai/v1/tasks/${taskId}`, {
+        headers: { "Authorization": `Bearer ${apimartToken}` },
+      });
+      if (!tRes.ok) {
+        console.error(`[BlogGen] Error consultando tarea (poll ${i}, status ${tRes.status})`);
+        continue;
+      }
+      // deno-lint-ignore no-explicit-any
+      const tData: any = await tRes.json().catch(() => null);
+      const status = tData?.data?.status ?? tData?.status;
+      console.log(`[BlogGen] Imagen poll ${i}: ${status}`);
+      if (status === "completed") {
+        const url = extractImageUrl(tData);
+        if (!url) {
+          console.error("[BlogGen] Tarea completada sin URL de imagen:", JSON.stringify(tData).slice(0, 500));
+          return null;
+        }
+        return await downloadAndStoreImage(url, slug);
+      }
+      if (status === "failed" || status === "error" || status === "cancelled") {
+        console.error(`[BlogGen] Tarea APIMART terminó con status ${status}`);
+        return null;
+      }
+    }
+    console.error("[BlogGen] Timeout esperando imagen de APIMART");
+    return null;
+  } catch (err) {
+    console.error("[BlogGen] generateImage error:", err);
+    return null;
+  }
+}
+
+async function downloadAndStoreImage(tempUrl: string, slug: string): Promise<string | null> {
 
     if (!res.ok) {
       const errorText = await res.text();

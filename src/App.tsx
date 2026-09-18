@@ -98,6 +98,7 @@ const AdminGa4Compare = lazy(() => import("./pages/AdminGa4Compare"));
 const AdminBotReport = lazy(() => import("./pages/AdminBotReport"));
 const AdminEmailRules = lazy(() => import("./pages/AdminEmailRules"));
 const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
+const AdminSimple = lazy(() => import("./pages/AdminSimple"));
 const AdminSecurityAudit = lazy(() => import("./pages/AdminSecurityAudit"));
 
 const ProductDynamic = lazy(() => import("./pages/ProductDynamic"));
@@ -327,6 +328,7 @@ const App = () => (
                   <Route path="/admin/ga4-compare" element={<AdminGate><AdminGa4Compare /></AdminGate>} />
                   <Route path="/admin/bot-report" element={<AdminGate><AdminBotReport /></AdminGate>} />
                   <Route path="/admin/analytics" element={<AdminGate><AdminAnalytics /></AdminGate>} />
+                  <Route path="/admin/simple" element={<AdminGate><AdminSimple /></AdminGate>} />
                   <Route path="/admin/seguridad" element={<AdminGate><AdminSecurityAudit /></AdminGate>} />
                   
                   <Route path="/admin/checkouts" element={<Navigate to="/admin" replace />} />

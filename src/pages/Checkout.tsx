@@ -27,6 +27,7 @@ import { getCatalogItem, resolveCheckoutSlug, CHECKOUT_CATALOG, type CatalogItem
 import { readCheckoutCache, loadCheckoutProduct } from "@/lib/checkoutProductCache";
 import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker";
 import { ExitIntentCouponPopup } from "@/components/checkout/ExitIntentCouponPopup";
+import { InAppBrowserBanner } from "@/components/checkout/InAppBrowserBanner";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";
@@ -556,6 +557,7 @@ export default function Checkout() {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden max-w-full">
       <SectionErrorBoundary name="checkout-root">
+        <InAppBrowserBanner />
         {loadingDb && !catalogItem && (
           <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-5 lg:py-8 space-y-6">
             <header className="flex items-center justify-between gap-4 py-4 border-b">

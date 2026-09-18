@@ -55,6 +55,7 @@ const groups: Group[] = [
       { to: "/admin", label: "Inicio", icon: LayoutDashboard },
       { to: "/admin/live", label: "Visitas en vivo · Hoy", icon: Globe },
       { to: "/admin/audiencias", label: "Audiencias · Total único", icon: Users },
+      { to: "/admin/simple", label: "Resumen simple", icon: LayoutDashboard },
     ],
   },
   {

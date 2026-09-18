@@ -27,6 +27,7 @@ import { getCatalogItem, resolveCheckoutSlug, CHECKOUT_CATALOG, type CatalogItem
 import { readCheckoutCache, loadCheckoutProduct } from "@/lib/checkoutProductCache";
 import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker";
 import { ExitIntentCouponPopup } from "@/components/checkout/ExitIntentCouponPopup";
+import { InAppBrowserBanner } from "@/components/checkout/InAppBrowserBanner";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";

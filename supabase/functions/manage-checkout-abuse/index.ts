@@ -224,6 +224,9 @@ Deno.serve(async (req) => {
             city: x.city,
             email: x.email,
             status,
+            // true = el navegador reportó "Purchase" pero NO hay orden
+            // confirmada en la pasarela → posible pago fallido / falso positivo.
+            client_purchase_event: !!key && clientSidePurchase.has(key) && status !== "purchased",
             reminders: openCarts.get(key) ?? 0,
           };
         })
@@ -249,7 +252,7 @@ Deno.serve(async (req) => {
       };
       const leads = top
         .filter((r) => !!r.email)
-        .map((r) => ({ email: r.email, country: r.country, city: r.city, status: r.status, last: r.last, slugs: r.slugs, reminders: r.reminders }));
+        .map((r) => ({ email: r.email, country: r.country, city: r.city, status: r.status, last: r.last, slugs: r.slugs, reminders: r.reminders, client_purchase_event: r.client_purchase_event }));
       return json({ top, sources, countries, summary, leads, total: (data || []).length });
 
     }

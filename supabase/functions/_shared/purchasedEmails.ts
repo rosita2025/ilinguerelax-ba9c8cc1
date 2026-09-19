@@ -3,9 +3,14 @@
 // that ALREADY BOUGHT (any provider). Used so admin reports and reminder
 // flows never label a real buyer as "abandoned cart".
 //
-// Sources of truth (any hit = purchased):
+// Source of truth (única fuente confiable de "purchased"):
 //  - order_events with an explicit successful payment status/event
-//  - funnel_events emitted as Purchase by a confirmed provider flow
+//    (viene del webhook real de Stripe / pasarela — verificado en servidor)
+//
+// funnel_events "Purchase" NO es fuente de verdad: lo dispara el navegador del
+// cliente y puede aparecer sin pago real (recarga de la página de confirmación,
+// pago rechazado tras el redirect, etc.). Se expone aparte vía
+// getClientSidePurchaseEmails() solo con fines informativos/diagnóstico.
 //
 // Delivery emails, manual review flags, and persistent_carts.converted are not
 // payment evidence. They may be written before/without a completed charge and

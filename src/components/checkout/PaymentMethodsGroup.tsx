@@ -153,7 +153,7 @@ const SECTION_LABELS: Record<MethodSection, Record<string, string>> = {
   transfer: { es: "Transferencias bancarias", en: "Bank Transfers", pt: "Transferências bancárias", fr: "Virements bancaires" },
   cash: { es: "Pago en efectivo", en: "Cash Payments", pt: "Pagamento em dinheiro", fr: "Paiement en espèces" },
   wallet: { es: "Billeteras digitales", en: "Digital Wallets", pt: "Carteiras digitais", fr: "Portefeuilles numériques" },
-  other: { es: "Otros métodos", en: "Other Methods", pt: "Outros métodos", fr: "Autres moyens" },
+  other: { es: "O paga por otra plataforma", en: "Or pay via another platform", pt: "Ou pague por outra plataforma", fr: "Ou payez via une autre plateforme" },
 };
 
 function sectionLabel(section: MethodSection, language: string) {

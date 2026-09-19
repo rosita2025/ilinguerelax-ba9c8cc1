@@ -770,7 +770,8 @@ const ProductPatronesEspeciales = () => {
         reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}
         showReviews={true}
         onBuyClick={handleBuy}
-        ctaText={"LO QUIERO"}
+        ctaText={pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
+        isLoading={!pricingReady}
         localUsdPrices={pricingAdmin.localUsdPrices}
       />
 

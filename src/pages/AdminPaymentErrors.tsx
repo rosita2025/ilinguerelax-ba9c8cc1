@@ -212,7 +212,12 @@ export default function AdminPaymentErrors() {
                   <li key={r.id} className="p-3 space-y-1 text-sm">
                     <div className="flex items-start justify-between gap-2">
                       <span className="font-medium break-words">
-                        {REASON_LABEL[r.error_reason || ""] || r.error_reason || "Sin motivo registrado"}
+                        {REASON_LABEL[reasonHead(r.error_reason)] || reasonHead(r.error_reason) || "Sin motivo registrado"}
+                        {reasonDetail(r.error_reason) && (
+                          <span className="block mt-1 font-normal text-xs text-destructive break-words whitespace-pre-wrap">
+                            {reasonDetail(r.error_reason)}
+                          </span>
+                        )}
                       </span>
                       <span className="shrink-0 text-xs text-muted-foreground whitespace-nowrap">
                         {new Date(r.created_at).toLocaleString()}
@@ -254,10 +259,15 @@ export default function AdminPaymentErrors() {
                     {rows.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((r) => (
                       <tr key={r.id} className="border-t align-top">
                         <td className="p-2 whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
-                        <td className="p-2 max-w-[240px]">
-                          <span className="font-medium">
-                            {REASON_LABEL[r.error_reason || ""] || r.error_reason || "Sin motivo registrado"}
+                        <td className="p-2 max-w-[320px]">
+                          <span className="font-medium break-words">
+                            {REASON_LABEL[reasonHead(r.error_reason)] || reasonHead(r.error_reason) || "Sin motivo registrado"}
                           </span>
+                          {reasonDetail(r.error_reason) && (
+                            <div className="mt-1 text-xs text-destructive break-words whitespace-pre-wrap">
+                              {reasonDetail(r.error_reason)}
+                            </div>
+                          )}
                         </td>
                         <td className="p-2 whitespace-nowrap">{r.provider || "—"}</td>
                         <td className="p-2 whitespace-nowrap">{flagOf(r.country)} {r.country || "—"}</td>

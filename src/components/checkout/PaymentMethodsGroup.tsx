@@ -439,6 +439,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const [showStripe, setShowStripe] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
   const [stripeError, setStripeError] = useState<MappedStripeError | null>(null);
+  const [hostedLoading, setHostedLoading] = useState(false);
 
   // `selectedMethod` en el store se guarda en localStorage. Sin este reinicio,
   // un método elegido en una visita anterior (abandonada) podría quedar
@@ -1060,6 +1061,55 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     useCheckoutPruebaStore.getState().setClientSecret(null);
     setStripeRetryKey((k) => k + 1);
   }, []);
+
+  // Fallback anti-AdBlock: crea una sesión HOSPEDADA de Stripe (página
+  // completa en checkout.stripe.com, no un iframe) con exactamente el mismo
+  // carrito, precios por región y moneda que el checkout embebido.
+  const payWithHostedFallback = async () => {
+    const s = useCheckoutPruebaStore.getState();
+    const parts = s.buyer.fullName.trim().split(/\s+/);
+    const firstName = parts[0].slice(0, 50);
+    const lastName = (parts.slice(1).join(" ") || parts[0]).slice(0, 50);
+    setHostedLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout-hosted", {
+        body: {
+          environment: getStripeEnvironment(),
+          items: s.items.map((i) => ({
+            id: i.id, name: i.name, price: itemPrice(i, region.tier),
+            quantity: i.quantity, image: toAbsUrl(i.image), description: i.description,
+          })),
+          currency: (currency || "USD").toLowerCase(),
+          couponPercent: s.couponPercent,
+          couponCode: s.coupon ?? undefined,
+          contact: {
+            email: s.buyer.email.trim(),
+            phone: (s.buyer.phone ?? "").trim().slice(0, 20) || undefined,
+            firstName, lastName,
+            country,
+            address: (s.buyer.address ?? "").slice(0, 160) || undefined,
+            city: (s.buyer.city ?? "").slice(0, 80) || undefined,
+            state: (s.buyer.state ?? "").slice(0, 80) || undefined,
+            zip: (s.buyer.zip ?? "").slice(0, 24) || undefined,
+          },
+          returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: window.location.href,
+          isRestrictedRetry: RESTRICTED_CURRENCY_COUNTRIES.has(country),
+        },
+      });
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
+      console.error("Hosted fallback failed:", error);
+      toast({ title: t.errorPayment, description: (error as any)?.message || "No se pudo abrir la página de pago.", variant: "destructive" });
+    } catch (err) {
+      console.error("Hosted fallback failed:", err);
+      toast({ title: t.errorPayment, description: err instanceof Error ? err.message : "No se pudo abrir la página de pago.", variant: "destructive" });
+    } finally {
+      setHostedLoading(false);
+    }
+  };
 
   useEffect(() => {
     const handleOnline = () => {

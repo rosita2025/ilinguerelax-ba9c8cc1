@@ -1100,11 +1100,25 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         setStripeAutoRetried(true);
         setStripeRetryKey((k) => k + 1);
       }
-      // Hard failure at 90s → show retry UI
+      // Hard failure at 90s → show retry UI. If the iframe never mounted even
+      // after the silent retry at 45s, the most likely cause is an ad blocker
+      // (AdBlock/uBlock/Brave) blocking the embedded Stripe iframe — show the
+      // specific guidance and log a dedicated reason so we can measure impact.
       if (s >= 90) {
         window.clearInterval(tick);
         if (!container.querySelector('iframe[name="embedded-checkout"]')) {
-          setStripeError(mapStripeError(new Error("timeout: took too long to open"), language as StripeLang));
+          setStripeError(mapStripeError(new Error("iframe_blocked: timeout took too long to open"), language as StripeLang));
+          try {
+            const s2 = useCheckoutPruebaStore.getState();
+            trackPaymentError({
+              provider: selected === "card" ? "stripe_card" : String(selected),
+              skus: s2.items.map((i) => i.id),
+              reason: "iframe_blocked_suspected",
+              value: Number(s2.totalUsd ?? 0),
+              currency: "USD",
+              content_name: "Stripe iframe blocked suspected (adblock timeout 90s)",
+            });
+          } catch { /* noop */ }
         }
       }
     }, 1000);

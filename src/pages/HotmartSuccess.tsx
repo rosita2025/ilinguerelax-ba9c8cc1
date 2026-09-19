@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { getLastCheckoutForPurchase, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
+import { supabase } from "@/integrations/supabase/client";
 import {
   CheckCircle,
   MessageCircle,

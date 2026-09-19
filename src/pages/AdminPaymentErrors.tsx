@@ -23,7 +23,19 @@ interface ErrRow {
 
 interface Tally { label: string; count: number }
 
+/** Separa el motivo corto ("invalid_input") del detalle por campo. */
+const splitReason = (reason: string | null): { head: string; detail: string } => {
+  const r = (reason || "").trim();
+  if (!r) return { head: "", detail: "" };
+  const m = r.match(/^(invalid_input|Invalid input)\s*:\s*([\s\S]+)$/);
+  if (m) return { head: "invalid_input", detail: m[2].split(" | ").join("\n") };
+  return { head: r, detail: "" };
+};
+const reasonHead = (reason: string | null) => splitReason(reason).head;
+const reasonDetail = (reason: string | null) => splitReason(reason).detail;
+
 const REASON_LABEL: Record<string, string> = {
+  invalid_input: "Datos inválidos en el formulario",
   card_declined: "Tarjeta rechazada",
   insufficient_funds: "Fondos insuficientes",
   expired_card: "Tarjeta vencida",

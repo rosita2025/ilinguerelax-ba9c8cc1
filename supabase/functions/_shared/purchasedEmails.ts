@@ -34,6 +34,8 @@ export async function getPurchasedEmails(admin: any, rawEmails: string[]): Promi
 
   const queries: Promise<void>[] = [
     (async () => {
+      // ÚNICA fuente de verdad de compra: order_events confirmados por el
+      // webhook del proveedor de pago (Stripe, etc.). Ver nota del encabezado.
       // Antes esto usaba .in("customer_email", emails) con comparación EXACTA
       // (sensible a mayúsculas/minúsculas). Stripe guarda el correo tal cual
       // lo escribió el navegador del cliente (a veces con mayúsculas), así

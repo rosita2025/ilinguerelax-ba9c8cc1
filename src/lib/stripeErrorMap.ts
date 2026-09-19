@@ -28,6 +28,7 @@ export interface MappedStripeError {
     | "coupon"
     | "amount"
     | "config"
+    | "iframe_blocked"
     | "unknown";
   retryable: boolean;
   instructions?: string[];
@@ -145,6 +146,12 @@ const DICT: Record<
     pt: { title: "Pagamentos indisponíveis", message: "Pagamentos com cartão indisponíveis. Fale conosco no WhatsApp." },
     fr: { title: "Paiements indisponibles", message: "Les paiements par carte sont indisponibles. Contacte-nous sur WhatsApp." },
   },
+  iframe_blocked: {
+    es: { title: "El formulario de pago fue bloqueado", message: "Si usas un bloqueador de anuncios (AdBlock, uBlock, Brave Shields), desactívalo para este sitio e intenta de nuevo — puede estar bloqueando el formulario de pago seguro." },
+    en: { title: "Payment form was blocked", message: "If you use an ad blocker (AdBlock, uBlock, Brave Shields), disable it for this site and try again — it may be blocking the secure payment form." },
+    pt: { title: "O formulário de pagamento foi bloqueado", message: "Se você usa um bloqueador de anúncios (AdBlock, uBlock, Brave Shields), desative-o para este site e tente novamente — ele pode estar bloqueando o formulário de pagamento seguro." },
+    fr: { title: "Le formulaire de paiement a été bloqué", message: "Si vous utilisez un bloqueur de publicités (AdBlock, uBlock, Brave Shields), désactivez-le pour ce site et réessayez — il bloque peut-être le formulaire de paiement sécurisé." },
+  },
   unknown: {
     es: { title: "No pudimos abrir el pago", message: "Ocurrió un problema con Stripe. Intenta de nuevo o escríbenos por WhatsApp." },
     en: { title: "We couldn't open payment", message: "Something went wrong with Stripe. Try again or contact us on WhatsApp." },
@@ -217,6 +224,7 @@ function normalize(err: unknown): string {
 
 function detect(s: string): MappedStripeError["code"] {
   if (!s) return "unknown";
+  if (/iframe_blocked|adblock|ublock|brave shields/.test(s)) return "iframe_blocked";
   if (/failed to fetch|networkerror|network error|offline|net::err/.test(s)) return "network";
   if (/timeout|timed out|took too long|tardando/.test(s)) return "timeout";
   if (/rate.?limit|too many requests/.test(s)) return "rate_limit";

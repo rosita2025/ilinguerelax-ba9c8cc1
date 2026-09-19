@@ -523,6 +523,56 @@ export default function CheckoutSuccess() {
         )}
 
 
+        {/* Upsell post-compra de 1 clic (solo pagos con tarjeta/Stripe) */}
+        {upsellOffer && stripeCustomerId && upsellState !== "done" && upsellState !== "auth_required" && (
+          <section className="rounded-xl border-2 border-primary/40 bg-primary/5 p-5 space-y-4">
+            <h2 className="font-semibold text-base">
+              {language === "en" ? "Add it with 1 click" : language === "pt" ? "Adicione com 1 clique" : language === "fr" ? "Ajoutez en 1 clic" : "Agrégalo con 1 clic"}
+            </h2>
+            <div className="flex items-center gap-4">
+              <img src={upsellOffer.image} alt={upsellOffer.name} className="w-16 h-16 rounded-lg object-cover shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-sm">{upsellOffer.name}</div>
+                <div className="text-sm mt-0.5">
+                  {upsellOffer.originalPrice && (
+                    <span className="text-muted-foreground line-through mr-2">${upsellOffer.originalPrice.toFixed(2)}</span>
+                  )}
+                  <span className="font-bold">${upsellOffer.price.toFixed(2)} USD</span>
+                </div>
+              </div>
+            </div>
+            <Button onClick={chargeUpsell} disabled={upsellState === "charging"} className="w-full sm:w-auto gap-1.5">
+              {upsellState === "charging"
+                ? (language === "en" ? "Processing…" : "Procesando…")
+                : (language === "en" ? "Add with 1 click" : language === "pt" ? "Adicionar com 1 clique" : language === "fr" ? "Ajouter en 1 clic" : "Agregar con 1 clic")}
+            </Button>
+            {upsellState === "error" && (
+              <p className="text-xs text-destructive">
+                {language === "en" ? "We couldn't process the charge. You can buy it separately from the store." : "No pudimos procesar el cobro. Puedes comprarlo por separado desde la tienda."}
+              </p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              {language === "en" ? "Charged to the same card you just used. No need to enter it again." : "Se cobra a la misma tarjeta que acabas de usar. Sin volver a escribirla."}
+            </p>
+          </section>
+        )}
+        {upsellState === "done" && (
+          <section className="rounded-xl border border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-500/5 p-5">
+            <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+              {language === "en" ? "Added! The download link was sent to your email." : "¡Agregado! El enlace de descarga fue enviado a tu correo."}
+            </p>
+          </section>
+        )}
+        {upsellState === "auth_required" && (
+          <section className="rounded-xl border p-5">
+            <p className="text-sm text-muted-foreground">
+              {language === "en"
+                ? "Your bank requires extra verification for automatic charges. You can buy this product separately from the store."
+                : "Tu banco pide una verificación adicional para cargos automáticos. Puedes comprar este producto por separado desde la tienda."}
+            </p>
+          </section>
+        )}
+
         {/* Order summary */}
         {items.length > 0 && (
           <section className="rounded-xl border bg-card p-5 space-y-4">

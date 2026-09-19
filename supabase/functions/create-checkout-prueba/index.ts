@@ -255,8 +255,9 @@ Deno.serve(async (req) => {
       return_url: body.returnUrl,
       adaptive_pricing: { enabled: !forceUsd },
       currency: targetCurrency,
-      ...(stripeCustomerId ? { customer: stripeCustomerId } : {}),
-      customer_email: body.contact.email,
+      ...(stripeCustomerId
+        ? { customer: stripeCustomerId }
+        : { customer_email: body.contact.email }),
       payment_intent_data: {
         description: productSummary || "iLingue Relax Digital",
         receipt_email: body.contact.email,

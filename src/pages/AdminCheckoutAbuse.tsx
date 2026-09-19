@@ -257,6 +257,7 @@ export default function AdminCheckoutAbuse() {
                   {l.city && <span className="text-xs text-muted-foreground">📍 {l.city}</span>}
                   <a href={`mailto:${l.email}`} className="text-primary hover:underline break-all">{l.email}</a>
                   <StatusBadge status={l.status} />
+                  {l.client_purchase_event && <ClientPurchaseWarning />}
                   <span className="text-xs text-muted-foreground ml-auto">{new Date(l.last).toLocaleString()}</span>
                 </div>
               ))}
@@ -383,6 +384,7 @@ export default function AdminCheckoutAbuse() {
                   </div>
                   <div className="flex items-center gap-2 flex-wrap text-xs">
                     <StatusBadge status={r.status} />
+                    {r.client_purchase_event && <ClientPurchaseWarning />}
                     {r.email ? (
                       <a href={`mailto:${r.email}`} className="text-primary hover:underline break-all">
                         {r.email}

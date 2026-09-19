@@ -22,7 +22,18 @@ export async function extractEdgeErrorMessage(error: unknown): Promise<string | 
         (body as { reason?: string })?.reason ||
         (body as { error?: string; message?: string })?.error ||
         (body as { message?: string })?.message;
-      if (msg && typeof msg === "string") return msg.slice(0, 300);
+      // Si el error trae "details" (campos exactos que fallaron, ej. Zod
+      // fieldErrors de create-checkout-prueba), lo agregamos al mensaje
+      // para no perder esa información en el checkout ni en /admin/payment-errors.
+      const details = (body as { details?: Record<string, string[]> })?.details;
+      const detailsText = details && typeof details === "object"
+        ? Object.entries(details)
+            .map(([field, errs]) => `${field}: ${Array.isArray(errs) ? errs.join(", ") : errs}`)
+            .join(" | ")
+        : null;
+      if (msg && typeof msg === "string") {
+        return detailsText ? `${msg} (${detailsText})`.slice(0, 300) : msg.slice(0, 300);
+      }
       if (body && typeof body === "string") return (body as string).slice(0, 300);
     } catch {
       try {

@@ -10,6 +10,16 @@ import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutStrings } from "@/i18n/checkoutStatus";
 import { useToast } from "@/hooks/use-toast";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { loadCheckoutProduct } from "@/lib/checkoutProductCache";
+import { getStripeEnvironment } from "@/lib/stripe";
+
+interface UpsellOffer {
+  id: string;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  image: string;
+}
 
 interface DeliveryItem {
   sku: string;
@@ -65,6 +75,9 @@ export default function CheckoutSuccess() {
   const [delivery, setDelivery] = useState<DeliveryItem[]>([]);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [deliveryLoading, setDeliveryLoading] = useState(false);
+  const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null);
+  const [upsellOffer, setUpsellOffer] = useState<UpsellOffer | null>(null);
+  const [upsellState, setUpsellState] = useState<"idle" | "charging" | "done" | "auth_required" | "error">("idle");
   // El navegador NO puede confirmar por sí solo que un pago es real (la URL
   // se puede fabricar a mano). Solo el servidor lo sabe con certeza, y
   // order-delivery ya verifica esto antes de devolver algo. Usamos esa misma
@@ -204,12 +217,71 @@ export default function CheckoutSuccess() {
         const deliveredItems = (data?.items ?? []) as DeliveryItem[];
         setDelivery(deliveredItems);
         setDownloadUrl((data?.downloadUrl ?? null) as string | null);
+        setStripeCustomerId((data?.stripeCustomerId ?? null) as string | null);
         if (deliveredItems.length > 0) setServerVerifiedPaid(true);
       })
       .catch((e) => console.error("order-delivery failed", e))
       .finally(() => setDeliveryLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Upsell post-compra de 1 clic: solo si el pago fue con Stripe (hay
+  // stripeCustomerId) y el producto principal tiene un upsell que el cliente
+  // NO compró en el checkout original.
+  useEffect(() => {
+    if (!stripeCustomerId || delivery.length === 0) return;
+    const mainSku = delivery[0]?.sku;
+    if (!mainSku) return;
+    const purchased = new Set(delivery.map((d) => d.sku.toLowerCase()));
+    loadCheckoutProduct(mainSku)
+      .then(({ upsells }) => {
+        const offer = (upsells ?? []).find((u) => u && !purchased.has(String(u.id).toLowerCase()));
+        if (offer) setUpsellOffer({
+          id: offer.id,
+          name: offer.name,
+          price: offer.price,
+          originalPrice: offer.originalPrice,
+          image: offer.image,
+        });
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stripeCustomerId, delivery]);
+
+  const chargeUpsell = async () => {
+    if (!upsellOffer || !stripeCustomerId || upsellState === "charging") return;
+    setUpsellState("charging");
+    try {
+      const country = (buyer.country || (() => { try { return localStorage.getItem("ilr_country") || ""; } catch { return ""; } })() || "US")
+        .slice(0, 2).toUpperCase();
+      const { data, error } = await supabase.functions.invoke("charge-saved-payment-method", {
+        body: {
+          environment: getStripeEnvironment(),
+          stripeCustomerId,
+          upsellSku: upsellOffer.id,
+          upsellName: upsellOffer.name,
+          amountUsd: upsellOffer.price,
+          currency: "usd",
+          customerEmail: buyer.email,
+          customerName: buyer.fullName || buyer.email,
+          customerPhone: buyer.phone ?? "",
+          customerCountry: country,
+          originalOrderId: orderNumber,
+        },
+      });
+      if (error) throw error;
+      if ((data as any)?.success) {
+        setUpsellState("done");
+      } else if ((data as any)?.error === "authentication_required") {
+        setUpsellState("auth_required");
+      } else {
+        setUpsellState("error");
+      }
+    } catch (e) {
+      console.error("upsell 1-clic falló", e);
+      setUpsellState("error");
+    }
+  };
 
 
 
@@ -450,6 +522,56 @@ export default function CheckoutSuccess() {
           </section>
         )}
 
+
+        {/* Upsell post-compra de 1 clic (solo pagos con tarjeta/Stripe) */}
+        {upsellOffer && stripeCustomerId && upsellState !== "done" && upsellState !== "auth_required" && (
+          <section className="rounded-xl border-2 border-primary/40 bg-primary/5 p-5 space-y-4">
+            <h2 className="font-semibold text-base">
+              {language === "en" ? "Add it with 1 click" : language === "pt" ? "Adicione com 1 clique" : language === "fr" ? "Ajoutez en 1 clic" : "Agrégalo con 1 clic"}
+            </h2>
+            <div className="flex items-center gap-4">
+              <img src={upsellOffer.image} alt={upsellOffer.name} className="w-16 h-16 rounded-lg object-cover shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-sm">{upsellOffer.name}</div>
+                <div className="text-sm mt-0.5">
+                  {upsellOffer.originalPrice && (
+                    <span className="text-muted-foreground line-through mr-2">${upsellOffer.originalPrice.toFixed(2)}</span>
+                  )}
+                  <span className="font-bold">${upsellOffer.price.toFixed(2)} USD</span>
+                </div>
+              </div>
+            </div>
+            <Button onClick={chargeUpsell} disabled={upsellState === "charging"} className="w-full sm:w-auto gap-1.5">
+              {upsellState === "charging"
+                ? (language === "en" ? "Processing…" : "Procesando…")
+                : (language === "en" ? "Add with 1 click" : language === "pt" ? "Adicionar com 1 clique" : language === "fr" ? "Ajouter en 1 clic" : "Agregar con 1 clic")}
+            </Button>
+            {upsellState === "error" && (
+              <p className="text-xs text-destructive">
+                {language === "en" ? "We couldn't process the charge. You can buy it separately from the store." : "No pudimos procesar el cobro. Puedes comprarlo por separado desde la tienda."}
+              </p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              {language === "en" ? "Charged to the same card you just used. No need to enter it again." : "Se cobra a la misma tarjeta que acabas de usar. Sin volver a escribirla."}
+            </p>
+          </section>
+        )}
+        {upsellState === "done" && (
+          <section className="rounded-xl border border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-500/5 p-5">
+            <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+              {language === "en" ? "Added! The download link was sent to your email." : "¡Agregado! El enlace de descarga fue enviado a tu correo."}
+            </p>
+          </section>
+        )}
+        {upsellState === "auth_required" && (
+          <section className="rounded-xl border p-5">
+            <p className="text-sm text-muted-foreground">
+              {language === "en"
+                ? "Your bank requires extra verification for automatic charges. You can buy this product separately from the store."
+                : "Tu banco pide una verificación adicional para cargos automáticos. Puedes comprar este producto por separado desde la tienda."}
+            </p>
+          </section>
+        )}
 
         {/* Order summary */}
         {items.length > 0 && (

@@ -210,9 +210,38 @@ Deno.serve(async (req) => {
 
     if (!paid) return json({ found: true, paid: false, items: [] }, 200);
 
+    // Customer de Stripe del pago (para el upsell post-compra de 1 clic).
+    // La referencia guardada por el webhook es el PaymentIntent (pi_…) o, en
+    // pedidos antiguos, la sesión de Checkout (cs_…). null en otros providers.
+    let stripeCustomerId: string | null = null;
+    if (provider === "stripe") {
+      const ref = String((events ?? []).map((e) => e.reference).filter(Boolean).pop() ?? "");
+      if (ref) {
+        try {
+          const { createStripeClient } = await import("../_shared/stripe.ts");
+          for (const env of ["sandbox", "live"] as const) {
+            try {
+              const stripe = createStripeClient(env);
+              const piId = ref.startsWith("cs_")
+                ? String((await stripe.checkout.sessions.retrieve(ref)).payment_intent ?? "")
+                : ref;
+              if (!piId) continue;
+              const pi = await stripe.paymentIntents.retrieve(piId);
+              if (pi.customer) {
+                stripeCustomerId = String(pi.customer);
+                break;
+              }
+            } catch (_) { /* probamos el otro ambiente */ }
+          }
+        } catch (e) {
+          console.warn("[order-delivery] stripe customer lookup:", e instanceof Error ? e.message : String(e));
+        }
+      }
+    }
+
     // ---- Enlaces: producto + bonos + upsells del pedido --------------------
     const rawSkus = await skusForOrder(admin, orderNumber, email);
-    if (!rawSkus.length) return json({ found: true, paid: true, items: [] }, 200);
+    if (!rawSkus.length) return json({ found: true, paid: true, items: [], stripeCustomerId }, 200);
 
     let skus = normalizeSkus(rawSkus);
     // Alias configurados en admin (digital_products.sku_aliases)
@@ -284,7 +313,7 @@ Deno.serve(async (req) => {
       console.warn("[order-delivery] token:", e instanceof Error ? e.message : String(e));
     }
 
-    return json({ found: true, paid: true, items, downloadUrl });
+    return json({ found: true, paid: true, items, downloadUrl, stripeCustomerId });
 
   } catch (err) {
     console.error("order-delivery error:", err);

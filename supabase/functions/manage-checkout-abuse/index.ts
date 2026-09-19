@@ -6,7 +6,7 @@
 //   - stats:      totales por ip en las últimas 24 h
 
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
-import { getPurchasedEmails, markCartsConverted } from "../_shared/purchasedEmails.ts";
+import { getPurchasedEmails, getClientSidePurchaseEmails, markCartsConverted } from "../_shared/purchasedEmails.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -173,6 +173,10 @@ Deno.serve(async (req) => {
       // recuperación → los marcaban como spam).
       const emails = [...new Set([...byIp.values()].map((x) => (x.email || "").toLowerCase()).filter(Boolean))];
       const purchased = await getPurchasedEmails(admin, emails);
+      // Señal informativa (NO fuente de verdad): navegador disparó "Purchase"
+      // en funnel_events. Sirve para detectar falsos positivos — evento de
+      // compra del navegador sin orden confirmada en la pasarela.
+      const clientSidePurchase = await getClientSidePurchaseEmails(admin, emails);
       // Auto-corrección: si compró, su carrito abierto queda como convertido
       // para que ninguna secuencia de abandono le vuelva a escribir.
       if (purchased.size) void markCartsConverted(admin, [...purchased]);

@@ -26,6 +26,7 @@ interface StatRow {
   city?: string | null;
   email?: string | null;
   status?: "purchased" | "abandoned" | "browsing" | "anonymous";
+  client_purchase_event?: boolean;
   reminders?: number;
 }
 
@@ -127,6 +128,18 @@ interface Lead {
   last: string;
   slugs?: string[];
   reminders?: number;
+  client_purchase_event?: boolean;
+}
+
+function ClientPurchaseWarning() {
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border bg-red-500/10 text-red-600 border-red-500/30"
+      title="El navegador reportó una compra, pero NO hay pago confirmado en la pasarela. Posible pago fallido o falso positivo."
+    >
+      ⚠️ Compra no confirmada
+    </span>
+  );
 }
 
 export default function AdminCheckoutAbuse() {

@@ -232,6 +232,20 @@ Deno.serve(async (req) => {
     };
 
 
+    // Crea o reutiliza un Customer de Stripe para poder cobrar el upsell
+    // post-compra con 1 clic más adelante, sin pedir la tarjeta de nuevo.
+    let stripeCustomerId: string | undefined;
+    try {
+      const existing = await stripe.customers.list({ email: body.contact.email, limit: 1 });
+      stripeCustomerId = existing.data[0]?.id
+        ?? (await stripe.customers.create({
+          email: body.contact.email,
+          name: fullName,
+        })).id;
+    } catch (custErr) {
+      console.error("[create-checkout-prueba] customer create/find failed (non-fatal):", custErr);
+    }
+
     console.log(`[Stripe] Creating session. TargetCurrency: ${targetCurrency}, Total: ${totalCents}, Country: ${country}`);
 
     const session = await stripe.checkout.sessions.create({
@@ -241,10 +255,12 @@ Deno.serve(async (req) => {
       return_url: body.returnUrl,
       adaptive_pricing: { enabled: !forceUsd },
       currency: targetCurrency,
+      ...(stripeCustomerId ? { customer: stripeCustomerId } : {}),
       customer_email: body.contact.email,
       payment_intent_data: {
         description: productSummary || "iLingue Relax Digital",
         receipt_email: body.contact.email,
+        setup_future_usage: "off_session",
         metadata: checkoutMetadata,
       },
       metadata: checkoutMetadata,

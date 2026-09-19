@@ -1066,6 +1066,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // completa en checkout.stripe.com, no un iframe) con exactamente el mismo
   // carrito, precios por región y moneda que el checkout embebido.
   const payWithHostedFallback = async () => {
+    const toAbsUrl = (u?: string) => {
+      if (!u) return undefined;
+      if (/^https?:\/\//i.test(u)) return u;
+      try { return new URL(u, window.location.origin).toString(); } catch { return undefined; }
+    };
     const s = useCheckoutPruebaStore.getState();
     const parts = s.buyer.fullName.trim().split(/\s+/);
     const firstName = parts[0].slice(0, 50);

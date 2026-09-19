@@ -3,9 +3,14 @@
 // that ALREADY BOUGHT (any provider). Used so admin reports and reminder
 // flows never label a real buyer as "abandoned cart".
 //
-// Sources of truth (any hit = purchased):
+// Source of truth (única fuente confiable de "purchased"):
 //  - order_events with an explicit successful payment status/event
-//  - funnel_events emitted as Purchase by a confirmed provider flow
+//    (viene del webhook real de Stripe / pasarela — verificado en servidor)
+//
+// funnel_events "Purchase" NO es fuente de verdad: lo dispara el navegador del
+// cliente y puede aparecer sin pago real (recarga de la página de confirmación,
+// pago rechazado tras el redirect, etc.). Se expone aparte vía
+// getClientSidePurchaseEmails() solo con fines informativos/diagnóstico.
 //
 // Delivery emails, manual review flags, and persistent_carts.converted are not
 // payment evidence. They may be written before/without a completed charge and
@@ -29,6 +34,8 @@ export async function getPurchasedEmails(admin: any, rawEmails: string[]): Promi
 
   const queries: Promise<void>[] = [
     (async () => {
+      // ÚNICA fuente de verdad de compra: order_events confirmados por el
+      // webhook del proveedor de pago (Stripe, etc.). Ver nota del encabezado.
       // Antes esto usaba .in("customer_email", emails) con comparación EXACTA
       // (sensible a mayúsculas/minúsculas). Stripe guarda el correo tal cual
       // lo escribió el navegador del cliente (a veces con mayúsculas), así
@@ -49,21 +56,40 @@ export async function getPurchasedEmails(admin: any, rawEmails: string[]): Promi
         }
       }
     })(),
-    (async () => {
-      // Mismo criterio para funnel_events: comparación sin distinguir
-      // mayúsculas/minúsculas.
-      if (!emails.length) return;
-      const orFilter = emails.map((e) => `email.ilike.${escapeIlike(e)}`).join(",");
-      const { data } = await admin
-        .from("funnel_events")
-        .select("email, event_name")
-        .or(orFilter)
-        .in("event_name", ["Purchase", "purchase"]);
-      for (const r of data ?? []) add(r?.email);
-    })(),
   ];
 
   await Promise.allSettled(queries);
+  return out;
+}
+
+/**
+ * Señal INFORMATIVA (no fuente de verdad): correos cuyo navegador disparó un
+ * evento "Purchase" en funnel_events. No implica pago confirmado — el evento
+ * lo emite el cliente y puede darse sin cobro real. Sirve para detectar en el
+ * admin casos sospechosos: evento de compra del navegador SIN orden
+ * confirmada en Stripe (pago fallido tras el redirect, recarga de la página
+ * de confirmación, etc.). Nunca usar para excluir a alguien de recordatorios.
+ */
+export async function getClientSidePurchaseEmails(admin: any, rawEmails: string[]): Promise<Set<string>> {
+  const emails = [...new Set(
+    (rawEmails || []).map((e) => String(e || "").trim().toLowerCase()).filter(Boolean),
+  )];
+  const out = new Set<string>();
+  if (!emails.length) return out;
+
+  const escapeIlike = (v: string) => v.replace(/[%_]/g, (c) => `\\${c}`);
+  try {
+    const orFilter = emails.map((e) => `email.ilike.${escapeIlike(e)}`).join(",");
+    const { data } = await admin
+      .from("funnel_events")
+      .select("email, event_name")
+      .or(orFilter)
+      .in("event_name", ["Purchase", "purchase"]);
+    for (const r of data ?? []) {
+      const s = String(r?.email || "").trim().toLowerCase();
+      if (s && emails.includes(s)) out.add(s);
+    }
+  } catch (_) { /* ignore */ }
   return out;
 }
 

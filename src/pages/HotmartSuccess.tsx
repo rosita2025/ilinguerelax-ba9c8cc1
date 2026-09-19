@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { getLastCheckoutForPurchase, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackGAEvent } from "@/hooks/useGoogleAnalytics";
+import { supabase } from "@/integrations/supabase/client";
 import {
   CheckCircle,
   MessageCircle,
@@ -22,93 +23,140 @@ const HotmartSuccess = () => {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    // Fire browser-side Purchase event for Meta Pixel attribution
-    // This complements the server-side CAPI event for better matching
-    const productParam = searchParams.get("product") || "";
-    const valueParam = searchParams.get("value");
-    
-    const lastCheckout = getLastCheckoutForPurchase();
+    let cancelled = false;
 
-    // Determine product info from URL params, last checkout memory, or defaults
-    let contentName = "Inglés Relax - Compra";
-    let contentId = "product-5000";
-    let value = 12;
+    const run = async () => {
+      const productParam = searchParams.get("product") || "";
+      const valueParam = searchParams.get("value");
+      const transactionParam =
+        searchParams.get("transaction") || searchParams.get("transaction_id") || "";
+      const emailParam = searchParams.get("email") || "";
 
-    if (!productParam && lastCheckout) {
-      contentName = typeof lastCheckout.content_name === "string" ? lastCheckout.content_name : contentName;
-      const ids = Array.isArray(lastCheckout.content_ids) ? lastCheckout.content_ids : [];
-      contentId = ids.length ? String(ids[0]) : contentId;
-      value = typeof lastCheckout.value === "number" ? lastCheckout.value : value;
-    }
+      // Verificación contra el servidor: sólo se reporta Purchase si el webhook
+      // autenticado de Hotmart (hottok) ya registró una compra APROBADA.
+      let verified = false;
+      let serverProductId: string | null = null;
+      let serverValue: number | null = null;
 
-    if (productParam.includes("coreano") || productParam.includes("korean")) {
-      contentName = "Coreano Sin Complicaciones - 100 Mapas Mentales";
-      contentId = "product-coreano-100-mapas";
-      value = 10;
-    } else if (productParam.includes("patrones")) {
-      contentName = "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés";
-      contentId = "patrones-especiales";
-      value = 8.08;
-    } else if (productParam.includes("estructuras") || productParam.includes("grammar")) {
-      contentName = "Estructuras Gramaticales de Inglés A1-C1";
-      contentId = "product-estructuras-gramaticales";
-      value = 12;
-    } else if (productParam.includes("8000") || productParam.includes("8,000")) {
-      contentName = "Inglés Relax - 8,000 Palabras";
-      contentId = "product-8000";
-      value = 22;
-    } else if (productParam.includes("5000") || productParam.includes("5,000")) {
-      contentName = "Inglés Relax - 5,000 Palabras";
-      contentId = "product-5000";
-      value = 12;
-    } else if (productParam.includes("verbos") || productParam.includes("1000")) {
-      contentName = "Inglés Relax - 1,000 Verbos";
-      contentId = "product-1000-verbos";
-      value = 12;
-    } else if (productParam.includes("preguntas") || productParam.includes("500")) {
-      contentName = "Inglés Relax - 500 Preguntas";
-      contentId = "product-500-preguntas";
-      value = 7;
-    } else if (productParam.includes("spanish")) {
-      contentName = "Spanish Relax - 5,000 Words";
-      contentId = "product-spanish-5000";
-      value = 22;
-    }
+      try {
+        const { data, error } = await supabase.functions.invoke("verify-hotmart-purchase", {
+          body: {
+            transaction: transactionParam,
+            email: emailParam,
+            page_path: "/hotmart-success",
+          },
+        });
+        if (error) throw error;
+        verified = !!data?.verified;
+        serverProductId = data?.product_id ?? null;
+        serverValue = typeof data?.value === "number" ? data.value : null;
+      } catch (err) {
+        console.warn("[hotmart-success] verificación de compra falló:", err);
+        verified = false;
+      }
 
-    if (valueParam) {
-      value = parseFloat(valueParam) || value;
-    }
+      if (cancelled) return;
 
-    trackHotmartEvent("Purchase", {
-      content_name: contentName,
-      content_category: "Digital Book",
-      content_ids: [contentId],
-      content_type: "product",
-      value: value,
-      currency: "USD",
-      num_items: 1,
-      __skipFunnelLog: true,
-    });
+      if (!verified) {
+        console.warn(
+          "[hotmart-success] Página cargada SIN compra confirmada en el servidor — no se reporta Purchase.",
+          { transaction: transactionParam || null, product: productParam || null },
+        );
+        return;
+      }
 
-    // Google Analytics 4: purchase (Hotmart)
-    trackGAEvent("purchase", {
-      transaction_id: searchParams.get("transaction") || `hotmart_${Date.now()}`,
-      currency: "USD",
-      value: value,
-      payment_provider: "hotmart",
-      items: [
-        {
-          item_id: contentId,
-          item_name: contentName,
-          item_category: "Digital Book",
-          price: value,
-          quantity: 1,
-        },
-      ],
-    });
+      const lastCheckout = getLastCheckoutForPurchase();
+
+      // Determine product info from URL params, last checkout memory, or defaults
+      let contentName = "Inglés Relax - Compra";
+      let contentId = "product-5000";
+      let value = 12;
+
+      if (!productParam && lastCheckout) {
+        contentName = typeof lastCheckout.content_name === "string" ? lastCheckout.content_name : contentName;
+        const ids = Array.isArray(lastCheckout.content_ids) ? lastCheckout.content_ids : [];
+        contentId = ids.length ? String(ids[0]) : contentId;
+        value = typeof lastCheckout.value === "number" ? lastCheckout.value : value;
+      }
+
+      if (productParam.includes("coreano") || productParam.includes("korean")) {
+        contentName = "Coreano Sin Complicaciones - 100 Mapas Mentales";
+        contentId = "product-coreano-100-mapas";
+        value = 10;
+      } else if (productParam.includes("patrones")) {
+        contentName = "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés";
+        contentId = "patrones-especiales";
+        value = 8.08;
+      } else if (productParam.includes("estructuras") || productParam.includes("grammar")) {
+        contentName = "Estructuras Gramaticales de Inglés A1-C1";
+        contentId = "product-estructuras-gramaticales";
+        value = 12;
+      } else if (productParam.includes("8000") || productParam.includes("8,000")) {
+        contentName = "Inglés Relax - 8,000 Palabras";
+        contentId = "product-8000";
+        value = 22;
+      } else if (productParam.includes("5000") || productParam.includes("5,000")) {
+        contentName = "Inglés Relax - 5,000 Palabras";
+        contentId = "product-5000";
+        value = 12;
+      } else if (productParam.includes("verbos") || productParam.includes("1000")) {
+        contentName = "Inglés Relax - 1,000 Verbos";
+        contentId = "product-1000-verbos";
+        value = 12;
+      } else if (productParam.includes("preguntas") || productParam.includes("500")) {
+        contentName = "Inglés Relax - 500 Preguntas";
+        contentId = "product-500-preguntas";
+        value = 7;
+      } else if (productParam.includes("spanish")) {
+        contentName = "Spanish Relax - 5,000 Words";
+        contentId = "product-spanish-5000";
+        value = 22;
+      }
+
+      if (valueParam) {
+        value = parseFloat(valueParam) || value;
+      }
+
+      // El dato del servidor manda sobre los parámetros de la URL.
+      if (serverProductId) contentId = serverProductId;
+      if (serverValue && serverValue > 0) value = serverValue;
+
+      trackHotmartEvent("Purchase", {
+        content_name: contentName,
+        content_category: "Digital Book",
+        content_ids: [contentId],
+        content_type: "product",
+        value: value,
+        currency: "USD",
+        num_items: 1,
+        __skipFunnelLog: true,
+      });
+
+      // Google Analytics 4: purchase (Hotmart)
+      trackGAEvent("purchase", {
+        transaction_id: transactionParam || `hotmart_${Date.now()}`,
+        currency: "USD",
+        value: value,
+        payment_provider: "hotmart",
+        items: [
+          {
+            item_id: contentId,
+            item_name: contentName,
+            item_category: "Digital Book",
+            price: value,
+            quantity: 1,
+          },
+        ],
+      });
+    };
+
+    void run();
 
     const timer = setTimeout(() => setConfetti(false), 5000);
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [searchParams]);
 
   const handleWhatsApp = () => {

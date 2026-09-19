@@ -56,21 +56,40 @@ export async function getPurchasedEmails(admin: any, rawEmails: string[]): Promi
         }
       }
     })(),
-    (async () => {
-      // Mismo criterio para funnel_events: comparación sin distinguir
-      // mayúsculas/minúsculas.
-      if (!emails.length) return;
-      const orFilter = emails.map((e) => `email.ilike.${escapeIlike(e)}`).join(",");
-      const { data } = await admin
-        .from("funnel_events")
-        .select("email, event_name")
-        .or(orFilter)
-        .in("event_name", ["Purchase", "purchase"]);
-      for (const r of data ?? []) add(r?.email);
-    })(),
   ];
 
   await Promise.allSettled(queries);
+  return out;
+}
+
+/**
+ * Señal INFORMATIVA (no fuente de verdad): correos cuyo navegador disparó un
+ * evento "Purchase" en funnel_events. No implica pago confirmado — el evento
+ * lo emite el cliente y puede darse sin cobro real. Sirve para detectar en el
+ * admin casos sospechosos: evento de compra del navegador SIN orden
+ * confirmada en Stripe (pago fallido tras el redirect, recarga de la página
+ * de confirmación, etc.). Nunca usar para excluir a alguien de recordatorios.
+ */
+export async function getClientSidePurchaseEmails(admin: any, rawEmails: string[]): Promise<Set<string>> {
+  const emails = [...new Set(
+    (rawEmails || []).map((e) => String(e || "").trim().toLowerCase()).filter(Boolean),
+  )];
+  const out = new Set<string>();
+  if (!emails.length) return out;
+
+  const escapeIlike = (v: string) => v.replace(/[%_]/g, (c) => `\\${c}`);
+  try {
+    const orFilter = emails.map((e) => `email.ilike.${escapeIlike(e)}`).join(",");
+    const { data } = await admin
+      .from("funnel_events")
+      .select("email, event_name")
+      .or(orFilter)
+      .in("event_name", ["Purchase", "purchase"]);
+    for (const r of data ?? []) {
+      const s = String(r?.email || "").trim().toLowerCase();
+      if (s && emails.includes(s)) out.add(s);
+    }
+  } catch (_) { /* ignore */ }
   return out;
 }
 

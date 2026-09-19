@@ -1114,7 +1114,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               provider: selected === "card" ? "stripe_card" : String(selected),
               skus: s2.items.map((i) => i.id),
               reason: "iframe_blocked_suspected",
-              value: Number(s2.totalUsd ?? 0),
+              value: calcTotals(s2.items, s2.couponPercent, region.tier).total,
               currency: "USD",
               content_name: "Stripe iframe blocked suspected (adblock timeout 90s)",
             });

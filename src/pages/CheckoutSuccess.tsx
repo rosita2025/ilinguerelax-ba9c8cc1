@@ -217,12 +217,71 @@ export default function CheckoutSuccess() {
         const deliveredItems = (data?.items ?? []) as DeliveryItem[];
         setDelivery(deliveredItems);
         setDownloadUrl((data?.downloadUrl ?? null) as string | null);
+        setStripeCustomerId((data?.stripeCustomerId ?? null) as string | null);
         if (deliveredItems.length > 0) setServerVerifiedPaid(true);
       })
       .catch((e) => console.error("order-delivery failed", e))
       .finally(() => setDeliveryLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Upsell post-compra de 1 clic: solo si el pago fue con Stripe (hay
+  // stripeCustomerId) y el producto principal tiene un upsell que el cliente
+  // NO compró en el checkout original.
+  useEffect(() => {
+    if (!stripeCustomerId || delivery.length === 0) return;
+    const mainSku = delivery[0]?.sku;
+    if (!mainSku) return;
+    const purchased = new Set(delivery.map((d) => d.sku.toLowerCase()));
+    loadCheckoutProduct(mainSku)
+      .then(({ upsells }) => {
+        const offer = (upsells ?? []).find((u) => u && !purchased.has(String(u.id).toLowerCase()));
+        if (offer) setUpsellOffer({
+          id: offer.id,
+          name: offer.name,
+          price: offer.price,
+          originalPrice: offer.originalPrice,
+          image: offer.image,
+        });
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stripeCustomerId, delivery]);
+
+  const chargeUpsell = async () => {
+    if (!upsellOffer || !stripeCustomerId || upsellState === "charging") return;
+    setUpsellState("charging");
+    try {
+      const country = (buyer.country || (() => { try { return localStorage.getItem("ilr_country") || ""; } catch { return ""; } })() || "US")
+        .slice(0, 2).toUpperCase();
+      const { data, error } = await supabase.functions.invoke("charge-saved-payment-method", {
+        body: {
+          environment: getStripeEnvironment(),
+          stripeCustomerId,
+          upsellSku: upsellOffer.id,
+          upsellName: upsellOffer.name,
+          amountUsd: upsellOffer.price,
+          currency: "usd",
+          customerEmail: buyer.email,
+          customerName: buyer.fullName || buyer.email,
+          customerPhone: buyer.phone ?? "",
+          customerCountry: country,
+          originalOrderId: orderNumber,
+        },
+      });
+      if (error) throw error;
+      if ((data as any)?.success) {
+        setUpsellState("done");
+      } else if ((data as any)?.error === "authentication_required") {
+        setUpsellState("auth_required");
+      } else {
+        setUpsellState("error");
+      }
+    } catch (e) {
+      console.error("upsell 1-clic falló", e);
+      setUpsellState("error");
+    }
+  };
 
 
 

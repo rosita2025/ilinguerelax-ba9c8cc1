@@ -10,6 +10,16 @@ import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutStrings } from "@/i18n/checkoutStatus";
 import { useToast } from "@/hooks/use-toast";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { loadCheckoutProduct } from "@/lib/checkoutProductCache";
+import { getStripeEnvironment } from "@/lib/stripe";
+
+interface UpsellOffer {
+  id: string;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  image: string;
+}
 
 interface DeliveryItem {
   sku: string;
@@ -65,6 +75,9 @@ export default function CheckoutSuccess() {
   const [delivery, setDelivery] = useState<DeliveryItem[]>([]);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [deliveryLoading, setDeliveryLoading] = useState(false);
+  const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null);
+  const [upsellOffer, setUpsellOffer] = useState<UpsellOffer | null>(null);
+  const [upsellState, setUpsellState] = useState<"idle" | "charging" | "done" | "auth_required" | "error">("idle");
   // El navegador NO puede confirmar por sí solo que un pago es real (la URL
   // se puede fabricar a mano). Solo el servidor lo sabe con certeza, y
   // order-delivery ya verifica esto antes de devolver algo. Usamos esa misma

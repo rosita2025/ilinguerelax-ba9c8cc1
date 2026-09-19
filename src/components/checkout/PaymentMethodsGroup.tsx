@@ -1584,8 +1584,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // Etiquetas visuales de los rails locales que Hotmart ofrece en cada país.
   const HOTMART_BADGES: Record<string, MethodBadge[]> = {
     MX: [
-      { label: "OXXO", bg: "#E31E24", color: "#ffffff" },
-      { label: "SPEI", bg: "#0F766E", color: "#ffffff" },
       { label: "Mercado Pago", bg: "#00A6E0", color: "#00263A" },
       { label: "Visa", bg: "#ffffff", color: "#1F2937" },
       { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
@@ -1809,7 +1807,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     },
     {
       id: "hotmart_separator",
-      title: "HOTMART",
+      title: language === "en" ? "OR PAY VIA ANOTHER PLATFORM"
+        : language === "pt" ? "OU PAGUE POR OUTRA PLATAFORMA"
+        : language === "fr" ? "OU PAYEZ VIA UNE AUTRE PLATEFORME"
+        : "O PAGA POR OTRA PLATAFORMA",
       isSeparator: true,
       icon: CreditCard,
       sub: "",

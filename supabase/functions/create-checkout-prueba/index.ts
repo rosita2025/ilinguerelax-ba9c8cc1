@@ -75,8 +75,21 @@ Deno.serve(async (req) => {
     const raw = await req.json();
     const parsed = BodySchema.safeParse(raw);
     if (!parsed.success) {
+      const flat = parsed.error.flatten();
+      const fieldErrors = flat.fieldErrors as Record<string, string[] | undefined>;
+      // Detalle legible por campo para que el panel /admin/payment-errors
+      // muestre EXACTAMENTE qué campo falló, no solo "Invalid input".
+      const detailText = [
+        ...parsed.error.issues.map((i) => `${i.path.join(".") || "body"}: ${i.message}`),
+        ...flat.formErrors,
+      ].join(" | ").slice(0, 400);
       return new Response(
-        JSON.stringify({ error: "Invalid input", details: parsed.error.flatten().fieldErrors }),
+        JSON.stringify({
+          error: detailText ? `Invalid input: ${detailText}` : "Invalid input",
+          reason: detailText ? `invalid_input: ${detailText}` : "invalid_input",
+          details: fieldErrors,
+          field_errors: fieldErrors,
+        }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }

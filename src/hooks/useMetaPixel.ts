@@ -485,7 +485,7 @@ export const trackPaymentError = (params: {
     content_ids: ids,
     content_type: "product",
     provider: params.provider,
-    reason: (params.reason || "").slice(0, 200),
+    reason: (params.reason || "").slice(0, 300),
     value: typeof params.value === "number" ? params.value : null,
     currency: params.currency || null,
   });

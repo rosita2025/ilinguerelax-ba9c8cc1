@@ -2331,7 +2331,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                         <p className="text-red-700 dark:text-red-300 text-sm max-w-xs">{stripeError.message}</p>
                       </div>
                       {stripeError.retryable && (
-                        <Button 
+                        <Button
                           onClick={() => {
                             if (stripeError.code === "currency_restricted") {
                               console.log("[Stripe] Falling back to USD due to currency restriction");
@@ -2343,6 +2343,23 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                         >
                           <RefreshCw className="h-4 w-4" />
                           {stripeError.code === "currency_restricted" ? "Intentar en USD" : t.tryAgain}
+                        </Button>
+                      )}
+                      {(stripeError.code === "iframe_blocked" || stripeError.code === "timeout") && (
+                        <Button
+                          onClick={payWithHostedFallback}
+                          disabled={hostedLoading}
+                          variant="outline"
+                          className="gap-2 border-red-300 text-red-800 dark:text-red-200"
+                        >
+                          {hostedLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                          {language === "en"
+                            ? "Pay on Stripe's secure page"
+                            : language === "pt"
+                              ? "Pagar na página segura da Stripe"
+                              : language === "fr"
+                                ? "Payer sur la page sécurisée Stripe"
+                                : "Pagar en página segura de Stripe"}
                         </Button>
                       )}
                     </div>

@@ -131,18 +131,16 @@ const VALID_COUPONS: Record<string, number> = {
 };
 
 /**
- * Cupones de prueba con total fijo en USD (espejo de
- * supabase/functions/_shared/catalogPricing.ts). El servidor es la fuente
- * autoritativa: aquí solo se calcula el descuento equivalente para mostrarlo.
+ * Cupones de prueba con total fijo en USD — SE ELIMINARON de aquí porque
+ * quedaron activos en producción por error. Cualquiera que encontrara o
+ * adivinara uno de estos códigos ("DLTEST1", "FIXED1", "PRUEBA1",
+ * "PRUEBA1USD", "TEST1USD", "QAGRATIS7X") podía comprar CUALQUIER producto
+ * por $0.50-$1 en vez del precio real — Stripe sí cobraba, pero ese monto
+ * mínimo. Si se necesitan cupones de prueba en el futuro, deben vivir en un
+ * entorno de staging separado, nunca en el mismo código que corre en
+ * producción.
  */
-const FIXED_TOTAL_COUPONS: Record<string, number> = {
-  DLTEST1: 1,
-  FIXED1: 1,
-  PRUEBA1: 1,
-  PRUEBA1USD: 1,
-  TEST1USD: 1,
-  QAGRATIS7X: 0.5,
-};
+const FIXED_TOTAL_COUPONS: Record<string, number> = {};
 
 
 interface PersistedCheckoutState {

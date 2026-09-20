@@ -41,19 +41,17 @@ const VALID_COUPONS: Record<string, number> = {
 };
 
 /**
- * Cupones de prueba con TOTAL FIJO en USD (para validar pasarelas en vivo).
- * Nunca llegan a 0: siempre se cobra un importe real mínimo.
- * SEGURIDAD: no existen cupones del 100% (regalarían el producto a cualquiera
- * que adivine el código).
+ * Cupones de prueba con TOTAL FIJO en USD — SE ELIMINARON de aquí porque
+ * quedaron activos en producción por error. Aunque nunca llegaban a $0
+ * (siempre cobraban un mínimo de $0.50-$1), cualquiera que encontrara o
+ * adivinara uno de estos códigos ("DLTEST1", "FIXED1", "PRUEBA1",
+ * "PRUEBA1USD", "TEST1USD", "QAGRATIS7X") podía comprar CUALQUIER producto
+ * por ese monto mínimo en vez del precio real — una pérdida financiera real,
+ * aunque no fuera un regalo del 100%. Si se necesitan cupones de prueba en
+ * el futuro, deben vivir en un entorno de staging separado, nunca en el
+ * mismo código que corre en producción.
  */
-export const FIXED_TOTAL_COUPONS: Record<string, number> = {
-  DLTEST1: 1,
-  FIXED1: 1,
-  PRUEBA1: 1,
-  PRUEBA1USD: 1,
-  TEST1USD: 1,
-  QAGRATIS7X: 0.5,
-};
+export const FIXED_TOTAL_COUPONS: Record<string, number> = {};
 
 export function fixedTotalForCoupon(code: string | null | undefined): number | null {
   const upper = String(code || "").trim().toUpperCase();

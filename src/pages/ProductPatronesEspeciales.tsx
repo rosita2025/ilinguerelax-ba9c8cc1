@@ -119,10 +119,14 @@ const ProductPatronesEspeciales = () => {
 
   // Imagen del producto: usa la portada configurada en el admin y,
   // si aún no carga o no existe, cae a la imagen local por defecto.
-  const heroImage = pricingAdmin.coverImageUrl ?? productImage;
-  const heroImageAbsolute = heroImage.startsWith("http")
-    ? heroImage
-    : `https://ilinguerelax.com${heroImage}`;
+  // Mientras el admin responde no mostramos la imagen local pesada para
+  // evitar descargar dos imágenes distintas (parpadeo y carga lenta).
+  const heroImage = pricingAdmin.coverImageUrl
+    ?? (pricingAdmin.loaded ? productImage : null);
+  const heroImageAbsolute = heroImage
+    ? (heroImage.startsWith("http") ? heroImage : `https://ilinguerelax.com${heroImage}`)
+    : `https://ilinguerelax.com${productImage}`;
+  const cartImage = heroImage ?? productImage;
   
   const pixelParams = useMemo(() => ({
     content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
@@ -151,7 +155,7 @@ const ProductPatronesEspeciales = () => {
       },
       pricePen: pricingAdmin.pricePen ?? undefined,
       localUsdPrices: pricingAdmin.localUsdPrices ?? undefined,
-      image: heroImage,
+      image: cartImage,
       description: "Alfabeto y combinaciones secretas de sonidos en inglés",
       quantity: 1,
     });
@@ -200,7 +204,7 @@ const ProductPatronesEspeciales = () => {
       },
       pricePen: pricingAdmin.pricePen ?? undefined,
       localUsdPrices: pricingAdmin.localUsdPrices ?? undefined,
-      image: heroImage,
+      image: cartImage,
       description: "Alfabeto y combinaciones secretas de sonidos en inglés",
       quantity: 1,
     });
@@ -296,11 +300,20 @@ const ProductPatronesEspeciales = () => {
             <div className="relative">
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative">
-                <img
-                  src={heroImage}
-                  alt="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
-                  className="w-full h-auto rounded-2xl shadow-hero"
-                />
+                {heroImage ? (
+                  <img
+                    src={heroImage}
+                    alt="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
+                    className="w-full h-auto rounded-2xl shadow-hero"
+                    width={1000}
+                    height={1250}
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
+                  />
+                ) : (
+                  <div className="w-full aspect-[4/5] rounded-2xl bg-muted animate-pulse" />
+                )}
                 <PinterestSave 
                   overlay 
                   media={heroImageAbsolute}

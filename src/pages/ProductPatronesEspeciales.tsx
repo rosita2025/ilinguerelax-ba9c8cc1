@@ -300,11 +300,20 @@ const ProductPatronesEspeciales = () => {
             <div className="relative">
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative">
-                <img
-                  src={heroImage}
-                  alt="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
-                  className="w-full h-auto rounded-2xl shadow-hero"
-                />
+                {heroImage ? (
+                  <img
+                    src={heroImage}
+                    alt="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
+                    className="w-full h-auto rounded-2xl shadow-hero"
+                    width={1000}
+                    height={1250}
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
+                  />
+                ) : (
+                  <div className="w-full aspect-[4/5] rounded-2xl bg-muted animate-pulse" />
+                )}
                 <PinterestSave 
                   overlay 
                   media={heroImageAbsolute}

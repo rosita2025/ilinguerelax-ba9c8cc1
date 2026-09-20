@@ -28,6 +28,7 @@ import { useRegionTier } from "@/hooks/useRegionTier";
 import { detectCurrency, formatPrice, formatCurrencyAmount, exchangeRates, type Currency } from "@/i18n";
 import { useLocalOverrides } from "@/lib/livePrices";
 import { useI18n } from "@/i18n/I18nContext";
+import { UrgencyTimerBar } from "@/components/UrgencyTimerBar";
 
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
 // ÚNICA regla final para Patrones:
@@ -246,6 +247,7 @@ const ProductPatronesEspeciales = () => {
 
   return (
     <main className="min-h-screen bg-background">
+      <UrgencyTimerBar productSlug={ADMIN_SKU} language="es" />
       <SEO
         title={pricingAdmin.name ?? "Patrones y Pronunciación en Inglés PDF · A1 a C1"}
         description={pricingAdmin.description ?? "Domina la pronunciación en inglés: patrones secretos, letras mudas, combinaciones especiales y ejercicios prácticos. Ebook PDF para hispanohablantes."}

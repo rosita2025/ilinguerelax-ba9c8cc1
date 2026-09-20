@@ -677,6 +677,17 @@ export default function Checkout() {
                     })()}
                   </p>
                 </div>
+
+                {/* Logos de métodos de pago — antes solo se veían en la
+                    barra lateral de computadora (hidden lg:block), invisible
+                    para casi todo el tráfico real, que es móvil. Verlos
+                    temprano genera confianza antes de llenar el formulario. */}
+                <div className="flex flex-col items-center gap-1.5 py-1">
+                  <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                    {language === "en" ? "Accepted payment methods" : "Métodos de pago aceptados"}
+                  </p>
+                  <PaymentLogos />
+                </div>
                 
                 <SectionErrorBoundary name="buyer-info">
                   <div id="buyer-info-section">

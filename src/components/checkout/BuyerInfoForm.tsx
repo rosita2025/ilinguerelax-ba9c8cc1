@@ -75,6 +75,7 @@ export function BuyerInfoForm() {
   const [localCountry, setLocalCountry] = useState(buyer.country || "");
 
   const [showErrors, setShowErrors] = useState(false);
+  const [showPhoneField, setShowPhoneField] = useState(false);
   const [shake, setShake] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const nameRef = useRef<HTMLInputElement | null>(null);
@@ -293,6 +294,18 @@ export function BuyerInfoForm() {
           )}
         </label>
 
+        {/* Para productos digitales el teléfono es opcional y la mayoría no
+            lo llena: lo escondemos detrás de un enlace para que el formulario
+            se vea de solo 2 campos (nombre + correo) y asuste menos. */}
+        {!hasPhysicalItems && !showPhoneField && !localPhone ? (
+          <button
+            type="button"
+            onClick={() => setShowPhoneField(true)}
+            className="text-[11px] text-primary hover:underline font-medium"
+          >
+            + {t.whatsappOptional}
+          </button>
+        ) : (
         <label className="block">
           <span className="text-xs font-medium text-muted-foreground">
             {t.whatsappOptional}
@@ -319,6 +332,7 @@ export function BuyerInfoForm() {
             <p className="text-[11px] text-destructive mt-1">If you provide a phone number, it must be at least 7 digits.</p>
           )}
         </label>
+        )}
 
         {hasPhysicalItems && (
           <div className="space-y-3 pt-3 border-t">

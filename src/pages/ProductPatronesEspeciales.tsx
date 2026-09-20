@@ -119,10 +119,14 @@ const ProductPatronesEspeciales = () => {
 
   // Imagen del producto: usa la portada configurada en el admin y,
   // si aún no carga o no existe, cae a la imagen local por defecto.
-  const heroImage = pricingAdmin.coverImageUrl ?? productImage;
-  const heroImageAbsolute = heroImage.startsWith("http")
-    ? heroImage
-    : `https://ilinguerelax.com${heroImage}`;
+  // Mientras el admin responde no mostramos la imagen local pesada para
+  // evitar descargar dos imágenes distintas (parpadeo y carga lenta).
+  const heroImage = pricingAdmin.coverImageUrl
+    ?? (pricingAdmin.loaded ? productImage : null);
+  const heroImageAbsolute = heroImage
+    ? (heroImage.startsWith("http") ? heroImage : `https://ilinguerelax.com${heroImage}`)
+    : `https://ilinguerelax.com${productImage}`;
+  const cartImage = heroImage ?? productImage;
   
   const pixelParams = useMemo(() => ({
     content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",

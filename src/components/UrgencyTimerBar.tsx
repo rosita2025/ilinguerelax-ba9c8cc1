@@ -31,15 +31,12 @@ function formatTime(totalSeconds: number): string {
 }
 
 /**
- * Barra fija (no en el header) con cuenta regresiva real para el cupón
- * NEW10. Es honesta a propósito: no dice "se acaba el stock" (eso sería
- * manipulador, el producto es digital e ilimitado) — dice que el
- * DESCUENTO está reservado por tiempo limitado, que sí es cierto: el
- * temporizador es real y no se reinicia si recargas la página (usa
- * localStorage con la hora de inicio real de esta visita).
- *
- * Se ubica justo encima de la StickyBuyBar usando la misma variable
- * CSS --sticky-bar-h que ya miden WhatsApp y ScrollToTop.
+ * Barra FIJA (no sticky) arriba de todo, por encima del header/menú, con
+ * cuenta regresiva real para el cupón NEW10. Es honesta a propósito: no
+ * dice "se acaba el stock" (eso sería manipulador, el producto es digital
+ * e ilimitado) — dice que el DESCUENTO está reservado por tiempo limitado,
+ * que sí es cierto: el temporizador es real y no se reinicia si recargas
+ * la página (usa localStorage con la hora de inicio real de esta visita).
  */
 export function UrgencyTimerBar({ productSlug, language = "es" }: Props) {
   const applyCoupon = useCheckoutPruebaStore((s) => s.applyCoupon);
@@ -80,32 +77,30 @@ export function UrgencyTimerBar({ productSlug, language = "es" }: Props) {
   };
 
   return (
-    <div className="fixed bottom-[var(--sticky-bar-h,105px)] left-0 right-0 z-[55] pointer-events-none">
-      <div className="mx-auto max-w-3xl px-14 sm:px-20 pb-2 pointer-events-auto">
-        <div className="flex items-center justify-center gap-2 rounded-2xl border border-accent/40 bg-accent text-accent-foreground px-3 py-2 shadow-lg text-xs sm:text-sm">
-          <Clock className="w-4 h-4 shrink-0" aria-hidden="true" />
-          {expired ? (
-            <span className="font-medium text-center leading-snug">{t.expired}</span>
-          ) : (
-            <span className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 leading-snug">
-              <span className="font-semibold whitespace-nowrap">{t.label}</span>
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="inline-flex items-center gap-1 rounded-lg border border-accent-foreground/40 bg-accent-foreground/15 hover:bg-accent-foreground/25 px-2 py-0.5 font-black uppercase tracking-wider transition-colors"
-                aria-label={`${COUPON_CODE} — copiar cupón`}
-              >
-                {COUPON_CODE}
-                {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-              </button>
-              <span className="opacity-90 whitespace-nowrap">{t.reserved}</span>
-              <span className="inline-flex items-center gap-1 rounded-lg border border-accent-foreground/40 bg-accent-foreground/15 px-2 py-0.5 font-black tabular-nums whitespace-nowrap">
-                <Clock className="w-3.5 h-3.5" aria-hidden="true" />
-                {formatTime(secondsLeft)}
-              </span>
+    <div className="fixed top-0 left-0 right-0 z-[100]">
+      <div className="flex items-center justify-center gap-1.5 sm:gap-2 bg-accent text-accent-foreground px-2 sm:px-3 py-1.5 text-[11px] leading-5 sm:text-sm whitespace-nowrap shadow-md">
+        <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" aria-hidden="true" />
+        {expired ? (
+          <span className="font-medium text-center leading-snug">{t.expired}</span>
+        ) : (
+          <span className="flex items-center justify-center gap-1.5 sm:gap-2 leading-snug min-w-0">
+            <span className="font-semibold whitespace-nowrap">{t.label}</span>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="inline-flex items-center gap-1 rounded-lg border border-accent-foreground/40 bg-accent-foreground/15 hover:bg-accent-foreground/25 px-2 py-0.5 font-black uppercase tracking-wider transition-colors"
+              aria-label={`${COUPON_CODE} — copiar cupón`}
+            >
+              {COUPON_CODE}
+              {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+            </button>
+            <span className="opacity-90 whitespace-nowrap hidden min-[420px]:inline">{t.reserved}</span>
+            <span className="inline-flex items-center gap-1 rounded-lg border border-accent-foreground/40 bg-accent-foreground/15 px-2 py-0.5 font-black tabular-nums whitespace-nowrap">
+              <Clock className="w-3.5 h-3.5" aria-hidden="true" />
+              {formatTime(secondsLeft)}
             </span>
-          )}
-        </div>
+          </span>
+        )}
       </div>
     </div>
   );

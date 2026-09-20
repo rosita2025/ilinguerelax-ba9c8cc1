@@ -78,12 +78,12 @@ export function UrgencyTimerBar({ productSlug, language = "es" }: Props) {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[100]">
-      <div className="flex items-center justify-center gap-2 bg-accent text-accent-foreground px-3 py-1.5 text-xs sm:text-sm shadow-md">
-        <Clock className="w-4 h-4 shrink-0" aria-hidden="true" />
+      <div className="flex items-center justify-center gap-1.5 sm:gap-2 bg-accent text-accent-foreground px-2 sm:px-3 py-1.5 text-[11px] leading-5 sm:text-sm whitespace-nowrap shadow-md">
+        <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" aria-hidden="true" />
         {expired ? (
           <span className="font-medium text-center leading-snug">{t.expired}</span>
         ) : (
-          <span className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 leading-snug">
+          <span className="flex items-center justify-center gap-1.5 sm:gap-2 leading-snug min-w-0">
             <span className="font-semibold whitespace-nowrap">{t.label}</span>
             <button
               type="button"
@@ -94,7 +94,7 @@ export function UrgencyTimerBar({ productSlug, language = "es" }: Props) {
               {COUPON_CODE}
               {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
             </button>
-            <span className="opacity-90 whitespace-nowrap">{t.reserved}</span>
+            <span className="opacity-90 whitespace-nowrap hidden min-[420px]:inline">{t.reserved}</span>
             <span className="inline-flex items-center gap-1 rounded-lg border border-accent-foreground/40 bg-accent-foreground/15 px-2 py-0.5 font-black tabular-nums whitespace-nowrap">
               <Clock className="w-3.5 h-3.5" aria-hidden="true" />
               {formatTime(secondsLeft)}

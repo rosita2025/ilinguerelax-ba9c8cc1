@@ -2709,6 +2709,19 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         </p>
       )}
 
+      <div className="flex items-center justify-center gap-1.5 mb-2 text-[11px] text-neutral-500 dark:text-neutral-400">
+        <Lock className="w-3 h-3" />
+        <span>
+          {language === "en"
+            ? "7-day guarantee — not satisfied? Full refund."
+            : language === "pt"
+            ? "Garantia de 7 dias — não gostou? Reembolso total."
+            : language === "fr"
+            ? "Garantie de 7 jours — pas satisfait ? Remboursement total."
+            : "Garantía de 7 días — ¿no te convenció? Reembolso total."}
+        </span>
+      </div>
+
       {selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "dlocal_card" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
         <button
           type="button"

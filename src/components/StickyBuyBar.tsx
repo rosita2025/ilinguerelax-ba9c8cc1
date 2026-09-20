@@ -388,12 +388,12 @@ export const StickyBuyBar = ({
                     {originalPrice && (
                       <span className="text-[11px] sm:text-xs text-muted-foreground line-through tabular-nums whitespace-nowrap opacity-70">{originalPrice}</span>
                     )}
+                    <span className="inline-flex items-center gap-1 shrink-0">
+                      {flagBadge}
+                      <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">{currencyCode}</span>
+                    </span>
                   </>
                 )}
-              </div>
-              <div className="flex items-center gap-1.5">
-                {flagBadge}
-                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">{currencyCode}</span>
               </div>
             </div>
             {savingsLabel && (

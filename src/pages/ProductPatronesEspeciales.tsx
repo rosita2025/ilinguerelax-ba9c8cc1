@@ -151,7 +151,7 @@ const ProductPatronesEspeciales = () => {
       },
       pricePen: pricingAdmin.pricePen ?? undefined,
       localUsdPrices: pricingAdmin.localUsdPrices ?? undefined,
-      image: productImage,
+      image: heroImage,
       description: "Alfabeto y combinaciones secretas de sonidos en inglés",
       quantity: 1,
     });
@@ -200,7 +200,7 @@ const ProductPatronesEspeciales = () => {
       },
       pricePen: pricingAdmin.pricePen ?? undefined,
       localUsdPrices: pricingAdmin.localUsdPrices ?? undefined,
-      image: productImage,
+      image: heroImage,
       description: "Alfabeto y combinaciones secretas de sonidos en inglés",
       quantity: 1,
     });
@@ -297,13 +297,13 @@ const ProductPatronesEspeciales = () => {
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative">
                 <img
-                  src={productImage}
+                  src={heroImage}
                   alt="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
                   className="w-full h-auto rounded-2xl shadow-hero"
                 />
                 <PinterestSave 
                   overlay 
-                  media={`https://ilinguerelax.com${productImage}`}
+                  media={heroImageAbsolute}
                   url="https://ilinguerelax.com/products/patrones-de-estructuras-gramaticales-especiales-ingles-con-pronunciacion"
                   description="Domina patrones especiales y estructuras gramaticales en inglés con pronunciación adaptada."
                 />

@@ -277,6 +277,26 @@ Deno.serve(async (req) => {
           continue;
         }
 
+        // No enviar "carrito abandonado" si el cliente tiene un pago de dLocal
+        // pendiente de confirmación (transferencia/efectivo ya iniciado, solo
+        // falta que se confirme) — evita el correo confuso de "olvidaste tu
+        // carrito" a alguien que ya está pagando. Ventana de 72h: si nunca se
+        // confirma después de eso, vuelve a considerarse abandono normal.
+        const { data: pendingDlocal } = await admin
+          .from("funnel_events")
+          .select("id")
+          .eq("email", email)
+          .eq("provider", "dlocalgo")
+          .like("event_name", "dlocal_%")
+          .gte("created_at", new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString())
+          .limit(1)
+          .maybeSingle();
+        if (pendingDlocal) {
+          stat.skipped++;
+          continue;
+        }
+
+
         // Filter out SKUs the buyer already purchased (manual/hotmart/digital sends).
         // This is the fix for "cliente compró 1,000 palabras y aun así recibió
         // recordatorio de 1,000 palabras". If nothing remains, mark cart converted.

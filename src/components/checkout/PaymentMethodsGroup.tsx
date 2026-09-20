@@ -2713,12 +2713,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         <Lock className="w-3 h-3" />
         <span>
           {language === "en"
-            ? "7-day guarantee — not satisfied? Full refund."
+            ? "7-day guarantee — Secure payment."
             : language === "pt"
-            ? "Garantia de 7 dias — não gostou? Reembolso total."
+            ? "Garantia de 7 dias — Pagamento seguro."
             : language === "fr"
-            ? "Garantie de 7 jours — pas satisfait ? Remboursement total."
-            : "Garantía de 7 días — ¿no te convenció? Reembolso total."}
+            ? "Garantie de 7 jours — Paiement sécurisé."
+            : "Garantía de 7 días — Pago seguro."}
         </span>
       </div>
 

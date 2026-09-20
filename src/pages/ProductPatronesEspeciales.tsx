@@ -246,7 +246,7 @@ const ProductPatronesEspeciales = () => {
   ];
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background pt-9 sm:pt-8">
       <UrgencyTimerBar productSlug={ADMIN_SKU} language="es" />
       <SEO
         title={pricingAdmin.name ?? "Patrones y Pronunciación en Inglés PDF · A1 a C1"}

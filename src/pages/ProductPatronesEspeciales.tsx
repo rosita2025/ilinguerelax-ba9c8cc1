@@ -417,26 +417,27 @@ const ProductPatronesEspeciales = () => {
                 <Button
                   variant="hero"
                   size="xl"
-                  className="w-full mb-4 text-lg py-6 shadow-2xl"
+                  className="w-full mb-2 text-lg py-6 shadow-2xl"
                   onClick={handleBuy}
+                  disabled={!pricingReady}
                 >
                   <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-                  LO QUIERO
+                  {pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
                   <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
                 </Button>
               </motion.div>
 
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full mb-4 text-base py-5 border-2"
+              <p className="text-center text-xs text-muted-foreground mb-3">
+                🔒 Pago seguro • ⬇️ Descarga inmediata • 🛡️ Garantía 7 días
+              </p>
+
+              <button
+                type="button"
                 onClick={handleAddToCart}
+                className="w-full mb-4 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors"
               >
-                <ShoppingCart className="w-5 h-5 mr-2" />
-                Agregar al carrito
-              </Button>
-
-
+                o agregar al carrito
+              </button>
 
               <p className="text-center text-sm text-muted-foreground mb-6">
                 👇 Mira la vista previa real antes de comprar

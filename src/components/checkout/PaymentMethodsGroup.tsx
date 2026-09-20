@@ -2088,6 +2088,18 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
       {!isFree && !isInvalidZero && (
+        <div className="flex items-center gap-2 mb-4 px-1 text-xs font-semibold">
+          <span className={valid ? "text-emerald-600 dark:text-emerald-400" : "text-teal-600 dark:text-teal-400"}>
+            {valid ? "✓ Paso 1: Tus datos" : "● Paso 1 de 2: Tus datos"}
+          </span>
+          <span className="text-neutral-300 dark:text-neutral-600">—</span>
+          <span className={valid ? "text-teal-600 dark:text-teal-400" : "text-neutral-400 dark:text-neutral-600"}>
+            {valid ? "● Paso 2 de 2: Pago" : "Paso 2: Pago"}
+          </span>
+        </div>
+      )}
+
+      {!isFree && !isInvalidZero && (
         <div className="flex items-center gap-2 mb-4 px-1">
           <Smartphone className="w-5 h-5 text-teal-600 dark:text-teal-400" />
           <h3 className="font-bold text-neutral-800 dark:text-neutral-100 uppercase tracking-tight">

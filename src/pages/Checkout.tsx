@@ -708,9 +708,14 @@ export default function Checkout() {
                 </div>
 
 
-                <SectionErrorBoundary name="checkout-testimonials">
-                  <CheckoutTestimonials />
-                </SectionErrorBoundary>
+                {/* Testimonios solo en computadora: en celular alargan mucho
+                    la página justo después del botón de pago y bajan la
+                    conversión (la mayoría del tráfico es móvil). */}
+                <div className="hidden lg:block">
+                  <SectionErrorBoundary name="checkout-testimonials">
+                    <CheckoutTestimonials />
+                  </SectionErrorBoundary>
+                </div>
 
                 <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">
                   <span className="flex items-center gap-1">

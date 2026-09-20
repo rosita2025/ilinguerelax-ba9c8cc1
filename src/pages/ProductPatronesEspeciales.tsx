@@ -155,7 +155,7 @@ const ProductPatronesEspeciales = () => {
       },
       pricePen: pricingAdmin.pricePen ?? undefined,
       localUsdPrices: pricingAdmin.localUsdPrices ?? undefined,
-      image: heroImage,
+      image: cartImage,
       description: "Alfabeto y combinaciones secretas de sonidos en inglés",
       quantity: 1,
     });
@@ -204,7 +204,7 @@ const ProductPatronesEspeciales = () => {
       },
       pricePen: pricingAdmin.pricePen ?? undefined,
       localUsdPrices: pricingAdmin.localUsdPrices ?? undefined,
-      image: heroImage,
+      image: cartImage,
       description: "Alfabeto y combinaciones secretas de sonidos en inglés",
       quantity: 1,
     });

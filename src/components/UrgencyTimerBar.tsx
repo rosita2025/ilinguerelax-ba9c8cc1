@@ -77,7 +77,7 @@ export function UrgencyTimerBar({ productSlug, language = "es" }: Props) {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[100]">
+    <div className="relative w-full z-0">
       <div className="flex items-center justify-center gap-1.5 sm:gap-2 bg-accent text-accent-foreground px-2 sm:px-3 py-1.5 text-[11px] leading-5 sm:text-sm whitespace-nowrap shadow-md">
         <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" aria-hidden="true" />
         {expired ? (

@@ -4,17 +4,10 @@ import { Play } from "lucide-react";
 const VIDEOS = [
   {
     id: "7596861806858079501",
-    author: "@hellomicrolearning",
     label: "Magic E: el patrón que cambia todo",
   },
   {
-    id: "7680998984676035853",
-    author: "@ingls.pal.jale",
-    label: "3 patrones en inglés que debes aprender",
-  },
-  {
     id: "7663520180038880532",
-    author: "@fernando_mejia0808",
     label: "Deja de traducir palabra por palabra",
   },
 ];
@@ -41,7 +34,7 @@ export const TikTokVideos = ({
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground">{title}</h2>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">{subtitle}</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
           {VIDEOS.map((v) => (
             <div
               key={v.id}

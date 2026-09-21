@@ -29,6 +29,7 @@ import { detectCurrency, formatPrice, formatCurrencyAmount, exchangeRates, type 
 import { useLocalOverrides } from "@/lib/livePrices";
 import { useI18n } from "@/i18n/I18nContext";
 import { UrgencyTimerBar } from "@/components/UrgencyTimerBar";
+import { TikTokVideos } from "@/components/TikTokVideos";
 
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
 // ÚNICA regla final para Patrones:

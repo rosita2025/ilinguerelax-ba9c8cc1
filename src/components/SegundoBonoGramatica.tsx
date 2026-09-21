@@ -1,4 +1,4 @@
-import { Sparkles, TrendingUp, BookOpen } from "lucide-react";
+import { Sparkles, BookOpen } from "lucide-react";
 import bonoGramaticaImg from "@/assets/estructuras-gramaticas-a1-a2.webp.asset.json";
 
 export const SegundoBonoGramatica = () => {

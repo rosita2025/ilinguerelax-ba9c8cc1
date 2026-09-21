@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import magicEVideo from "@/assets/patron-magic-e.mp4.asset.json";
 import magicEPoster from "@/assets/patron-magic-e.jpg.asset.json";
 import patternsVideo from "@/assets/patron-sin-traducir.mp4.asset.json";

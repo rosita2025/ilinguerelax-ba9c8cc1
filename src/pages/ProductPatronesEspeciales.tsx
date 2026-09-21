@@ -378,6 +378,13 @@ const ProductPatronesEspeciales = () => {
 
               <TikTokVideos />
 
+              <div className="mb-6 flex items-center justify-between bg-muted/30 p-3 rounded-xl border border-border/50">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Pagos Seguros:</span>
+                <PaymentLogos />
+              </div>
+
+
+
 
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
@@ -409,10 +416,6 @@ const ProductPatronesEspeciales = () => {
                 👇 Mira la vista previa real antes de comprar
               </p>
 
-              <div className="mb-6 flex items-center justify-between bg-muted/30 p-3 rounded-xl border border-border/50">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Pagos Seguros:</span>
-                <PaymentLogos />
-              </div>
 
             </div>
           </div>

@@ -30,6 +30,8 @@ import { useLocalOverrides } from "@/lib/livePrices";
 import { useI18n } from "@/i18n/I18nContext";
 import { UrgencyTimerBar } from "@/components/UrgencyTimerBar";
 import { TikTokVideos } from "@/components/TikTokVideos";
+import introVideo from "@/assets/introduccion-patrones-16x9.mp4.asset.json";
+import introPoster from "@/assets/intro-patrones-poster.jpg.asset.json";
 
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
 // ÚNICA regla final para Patrones:
@@ -355,6 +357,25 @@ const ProductPatronesEspeciales = () => {
               </div>
 
               <PrecioEconomicoBanner />
+
+              <div className="mb-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
+                  <Music2 className="w-4 h-4" /> Presentación del producto
+                </div>
+                <div className="relative rounded-2xl overflow-hidden border border-border/50 bg-black">
+                  <video
+                    src={introVideo.url}
+                    poster={introPoster.url}
+                    className="w-full aspect-video object-cover"
+                    controls
+                    playsInline
+                    preload="metadata"
+                    controlsList="nodownload noplaybackrate noremoteplayback"
+                    disablePictureInPicture
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                </div>
+              </div>
 
               <TikTokVideos />
 

@@ -69,7 +69,6 @@ export const TikTokVideos = ({
                     <Play className="w-6 h-6 ml-0.5" />
                   </span>
                   <span className="px-4 text-sm font-semibold text-foreground text-center">{v.label}</span>
-                  <span className="text-xs text-muted-foreground">{v.author}</span>
                 </button>
               )}
             </div>

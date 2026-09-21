@@ -16,20 +16,6 @@ export const SegundoBonoGramatica = () => {
         </p>
       </div>
 
-      <div className="max-w-2xl mx-auto mb-6 rounded-2xl border border-amber-400/40 bg-amber-400/10 p-4 md:p-5 flex items-center gap-3 text-center sm:text-left">
-        <div className="shrink-0 w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center shadow-md">
-          <TrendingUp className="w-5 h-5 text-black" />
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-extrabold text-foreground">
-            ⏳ Pronto subirá el precio · Aprovecha hoy
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Bono incluido sin costo extra solo por tiempo limitado.
-          </p>
-        </div>
-      </div>
-
       <div className="max-w-3xl mx-auto rounded-2xl overflow-hidden border border-accent/30 bg-card shadow-card">
 
         <div className="relative bg-white">

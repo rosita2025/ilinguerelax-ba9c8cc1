@@ -50,8 +50,6 @@ import resenaMx1 from "@/assets/resena-mx1.webp.asset.json";
 import resenaMx2 from "@/assets/resena-mx2.webp.asset.json";
 import resenaMx3 from "@/assets/resena-mx3.webp.asset.json";
 import resenaMx4 from "@/assets/resena-mx4.webp.asset.json";
-import introVideo from "@/assets/introduccion-patrones-especiales.mp4.asset.json";
-import introPoster from "@/assets/intro-patrones-poster.jpg.asset.json";
 import { PinterestSave } from "@/components/PinterestSave";
 
 const previews = [
@@ -358,21 +356,7 @@ const ProductPatronesEspeciales = () => {
 
               <PrecioEconomicoBanner />
 
-              <div className="mb-6 rounded-2xl overflow-hidden border border-border shadow-xl bg-white">
-                <video
-                  src={introVideo.url}
-                  poster={introPoster.url}
-                  controls
-                  controlsList="nodownload noplaybackrate noremoteplayback"
-                  disablePictureInPicture
-                  playsInline
-                  preload="metadata"
-                  onContextMenu={(e) => e.preventDefault()}
-                  className="w-full h-auto block"
-                  style={{ filter: "brightness(1.25) contrast(1.12) saturate(1.1)" }}
-                  aria-label="Introducción al ebook Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
-                />
-              </div>
+              <TikTokVideos onBuy={handleBuy} priceLabel={pricingReady ? priceLabel : undefined} />
 
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
@@ -736,8 +720,6 @@ const ProductPatronesEspeciales = () => {
           </div>
         </div>
       </section>
-
-      <TikTokVideos />
 
       <FAQ
         items={[

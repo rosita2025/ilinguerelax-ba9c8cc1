@@ -414,15 +414,6 @@ const ProductPatronesEspeciales = () => {
                 <PaymentLogos />
               </div>
 
-              <div className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border-2 border-green-500/30 mt-6">
-                <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 shadow-lg">
-                  <Shield className="w-7 h-7 text-white" />
-                </div>
-                <div>
-                  <p className="text-base font-bold text-green-700">🛡️ Garantía 7 Días</p>
-                  <p className="text-sm text-green-600">Si no estás satisfecho, te devolvemos tu dinero. Sin preguntas.</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>

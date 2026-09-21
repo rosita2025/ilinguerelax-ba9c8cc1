@@ -767,6 +767,8 @@ const ProductPatronesEspeciales = () => {
         </div>
       </section>
 
+      <TikTokVideos />
+
       <FAQ
         items={[
           { question: t.productFaq.specialTitle, answer: t.productFaq.specialAnswer, icon: Sparkles },

@@ -17,7 +17,7 @@ import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { motion } from "framer-motion";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBanner";
+import { SpotifyLaunchBanner } from "@/components/SpotifyLaunchBanner";
 import { CompradoresReales } from "@/components/CompradoresReales";
 import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
@@ -498,14 +498,6 @@ const ProductPatronesEspeciales = () => {
                     Podcast iLingue Relax · Gratis
                   </p>
                 </div>
-                <a
-                  href={SPOTIFY_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-[#1DB954] hover:bg-[#1ed760] text-black text-sm font-extrabold transition-colors"
-                >
-                  <Music2 className="w-4 h-4" /> Escuchar
-                </a>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

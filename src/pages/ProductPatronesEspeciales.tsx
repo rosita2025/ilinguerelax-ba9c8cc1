@@ -463,23 +463,6 @@ const ProductPatronesEspeciales = () => {
         </div>
       </section>
 
-      {/* ¿Por qué tan barato? - confianza */}
-      <section className="py-8 md:py-10 bg-muted/30">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-3xl mx-auto bg-card rounded-3xl border border-border shadow-card p-6 md:p-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
-              ¿Por qué tan barato? ¿Es de mala calidad o tiene errores?
-            </h2>
-            <p className="text-foreground/90 mb-3">
-              <strong>No.</strong> El precio bajo es intencional: queremos que más hispanohablantes accedan al método Inglés Relax sin barreras. El PDF está revisado, sin errores ortográficos, y es exactamente el mismo material que usamos en nuestros libros completos.
-            </p>
-            <p className="text-foreground/90">
-              Para que lo compruebes tú mismo, abajo puedes ver <strong>la vista previa real de las páginas interiores</strong>. Si te gusta lo que ves, el precio de {priceLabel} es honesto. Si no, tienes 7 días de garantía.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Vista previa real */}
       <section className="py-10 md:py-14">
         <div className="container px-4 md:px-6">

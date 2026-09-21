@@ -356,7 +356,7 @@ const ProductPatronesEspeciales = () => {
 
               <PrecioEconomicoBanner />
 
-              <TikTokVideos onBuy={handleBuy} priceLabel={pricingReady ? priceLabel : undefined} />
+              <TikTokVideos />
 
 
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>

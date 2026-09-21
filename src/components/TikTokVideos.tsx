@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Pause, Play, ShoppingCart } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import magicEVideo from "@/assets/patron-magic-e.mp4.asset.json";
 import magicEPoster from "@/assets/patron-magic-e.jpg.asset.json";
 import patternsVideo from "@/assets/patron-sin-traducir.mp4.asset.json";
@@ -29,12 +28,7 @@ const VIDEOS = [
   },
 ];
 
-interface TikTokVideosProps {
-  onBuy?: () => void;
-  priceLabel?: string;
-}
-
-export const TikTokVideos = ({ onBuy, priceLabel }: TikTokVideosProps) => {
+export const TikTokVideos = () => {
   const [current, setCurrent] = useState(0);
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -202,12 +196,6 @@ export const TikTokVideos = ({ onBuy, priceLabel }: TikTokVideosProps) => {
         ))}
       </div>
 
-      {onBuy && (
-        <Button type="button" variant="hero" size="xl" onClick={onBuy} className="mt-4 w-full shadow-xl">
-          <ShoppingCart className="h-5 w-5" />
-          LO QUIERO{priceLabel ? ` • ${priceLabel}` : ""}
-        </Button>
-      )}
     </section>
   );
 };

@@ -21,7 +21,6 @@ import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBann
 import { CompradoresReales } from "@/components/CompradoresReales";
 import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
-import { CanvaPreviewLink } from "@/components/CanvaPreviewLink";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useRegionTier } from "@/hooks/useRegionTier";
@@ -539,9 +538,7 @@ const ProductPatronesEspeciales = () => {
 
             <SegundoBonoGramatica />
 
-            <div className="mt-10">
-              <CanvaPreviewLink />
-            </div>
+
 
 
             <div className="text-center mt-8">

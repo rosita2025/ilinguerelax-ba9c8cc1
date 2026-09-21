@@ -358,31 +358,6 @@ const ProductPatronesEspeciales = () => {
 
               <TikTokVideos onBuy={handleBuy} priceLabel={pricingReady ? priceLabel : undefined} />
 
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-green-500/20 mb-6"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-green-600" />
-                  <span className="text-green-600 font-semibold text-sm uppercase">
-                    Precio de Lanzamiento
-                  </span>
-                </div>
-                <div className="mb-4">
-                  <DigitalProductNotice compact />
-                </div>
-                <div className="flex items-baseline flex-wrap gap-x-3 gap-y-2 mb-2">
-                  <span className="text-3xl sm:text-4xl md:text-6xl font-black text-foreground leading-none">{tier.priceLabel}</span>
-                  <span className="text-lg sm:text-xl md:text-2xl text-muted-foreground line-through opacity-70">{tier.originalLabel}</span>
-                  <span className="px-2.5 py-1 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs sm:text-sm font-bold shadow-lg whitespace-nowrap">
-                    AHORRA 35%
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  💳 Pago único • Descarga inmediata • Acceso de por vida
-                </p>
-              </motion.div>
 
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button

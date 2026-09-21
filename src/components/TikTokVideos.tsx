@@ -1,23 +1,21 @@
-import { useEffect } from "react";
+import { useCallback, useState } from "react";
+import { Play } from "lucide-react";
 
 const VIDEOS = [
   {
     id: "7596861806858079501",
-    url: "https://www.tiktok.com/@hellomicrolearning/video/7596861806858079501",
     author: "@hellomicrolearning",
-    authorUrl: "https://www.tiktok.com/@hellomicrolearning",
+    label: "Magic E: el patrón que cambia todo",
   },
   {
     id: "7680998984676035853",
-    url: "https://www.tiktok.com/@ingls.pal.jale/video/7680998984676035853",
     author: "@ingls.pal.jale",
-    authorUrl: "https://www.tiktok.com/@ingls.pal.jale",
+    label: "3 patrones en inglés que debes aprender",
   },
   {
     id: "7663520180038880532",
-    url: "https://www.tiktok.com/@fernando_mejia0808/video/7663520180038880532",
     author: "@fernando_mejia0808",
-    authorUrl: "https://www.tiktok.com/@fernando_mejia0808",
+    label: "Deja de traducir palabra por palabra",
   },
 ];
 
@@ -28,21 +26,12 @@ interface TikTokVideosProps {
 
 export const TikTokVideos = ({
   title = "Míralo en video",
-  subtitle = "Los patrones del inglés explicados en segundos",
+  subtitle = "Toca para reproducir — los videos no se activan solos",
 }: TikTokVideosProps) => {
-  useEffect(() => {
-    const SRC = "https://www.tiktok.com/embed.js";
-    const existing = document.querySelector<HTMLScriptElement>(`script[src="${SRC}"]`);
-    if (existing) {
-      // re-process embeds if the script is already loaded
-      (window as unknown as { tiktokEmbed?: { lib?: { render?: (n?: unknown) => void } } })
-        .tiktokEmbed?.lib?.render?.(document.querySelectorAll(".tiktok-embed"));
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = SRC;
-    script.async = true;
-    document.body.appendChild(script);
+  const [active, setActive] = useState<string | null>(null);
+
+  const handlePlay = useCallback((id: string) => {
+    setActive((current) => (current === id ? null : id));
   }, []);
 
   return (
@@ -52,21 +41,45 @@ export const TikTokVideos = ({
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground">{title}</h2>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">{subtitle}</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 justify-items-center">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {VIDEOS.map((v) => (
-            <blockquote
+            <div
               key={v.id}
-              className="tiktok-embed w-full"
-              cite={v.url}
-              data-video-id={v.id}
-              style={{ maxWidth: 605, minWidth: 325 }}
+              className="relative w-full rounded-2xl overflow-hidden border border-border bg-muted"
+              style={{ aspectRatio: "9 / 16" }}
             >
-              <section>
-                <a target="_blank" rel="noreferrer" title={v.author} href={v.authorUrl}>
-                  {v.author}
-                </a>
-              </section>
-            </blockquote>
+              {active === v.id ? (
+                <>
+                  <iframe
+                    src={`https://www.tiktok.com/player/v1/${v.id}?autoplay=1&controls=1&description=0&music_info=0&rel=0`}
+                    title={v.label}
+                    className="absolute inset-0 w-full h-full"
+                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                    frameBorder={0}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setActive(null)}
+                    className="absolute top-2 right-2 z-10 rounded-full bg-background/80 text-foreground text-xs px-3 py-1 border border-border"
+                  >
+                    Pausar
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handlePlay(v.id)}
+                  aria-label={`Reproducir video: ${v.label}`}
+                  className="absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-muted to-background hover:opacity-90 transition-opacity"
+                >
+                  <span className="w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg">
+                    <Play className="w-6 h-6 ml-0.5" />
+                  </span>
+                  <span className="px-4 text-sm font-semibold text-foreground text-center">{v.label}</span>
+                  <span className="text-xs text-muted-foreground">{v.author}</span>
+                </button>
+              )}
+            </div>
           ))}
         </div>
       </div>

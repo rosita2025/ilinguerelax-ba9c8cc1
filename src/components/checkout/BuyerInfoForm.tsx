@@ -10,6 +10,7 @@ import "react-phone-number-input/style.css";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import { checkEmail } from "@/lib/emailGuard";
+import { supabase } from "@/integrations/supabase/client";
 
 export function isBuyerValid(buyer: { 
   fullName: string; 
@@ -145,6 +146,23 @@ export function BuyerInfoForm() {
   const emailCheckResult = useMemo(() => checkEmail(localEmail), [localEmail]);
   const emailInvalid = !emailCheckResult.ok;
   const phoneInvalid = localPhone.trim().length > 0 && localPhone.trim().length < 7;
+
+  // Aviso informativo: ¿este correo ya compró el producto principal del
+  // carrito? Solo informa, nunca bloquea el pago.
+  const [alreadyOwned, setAlreadyOwned] = useState(false);
+  const mainSku = items?.[0]?.id;
+  useEffect(() => {
+    const check = checkEmail(localEmail);
+    if (!check.ok || !mainSku) { setAlreadyOwned(false); return; }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      supabase.functions
+        .invoke("check-existing-purchase", { body: { email: check.email, sku: mainSku } })
+        .then(({ data }) => { if (!cancelled) setAlreadyOwned(!!data?.alreadyPurchased); })
+        .catch(() => { if (!cancelled) setAlreadyOwned(false); });
+    }, 600);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [localEmail, mainSku]);
   
   const addressInvalid = hasPhysicalItems && localAddress.trim().length < 8;
   const cityInvalid = hasPhysicalItems && localCity.trim().length < 3;
@@ -293,6 +311,22 @@ export function BuyerInfoForm() {
             </p>
           )}
         </label>
+
+        {/* Aviso NO bloqueante: el comprador ya tiene este producto. */}
+        {alreadyOwned && (
+          <div className="rounded-lg border border-amber-400/60 bg-amber-50 dark:bg-amber-500/10 px-3 py-2 text-[12px] text-amber-800 dark:text-amber-200 flex gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>
+              {language === "en"
+                ? "You already have this product — if it's a gift or you want to buy it again, you can continue without any problem."
+                : language === "pt"
+                ? "Você já tem este produto — se for um presente ou quiser comprá-lo de novo, pode continuar sem problema."
+                : language === "fr"
+                ? "Vous avez déjà ce produit — s'il s'agit d'un cadeau ou si vous voulez le racheter, vous pouvez continuer sans problème."
+                : "Ya tienes este producto — si es un regalo o quieres comprarlo de nuevo, puedes continuar sin problema."}
+            </span>
+          </div>
+        )}
 
         {/* Para productos digitales el teléfono es opcional y la mayoría no
             lo llena: lo escondemos detrás de un enlace para que el formulario

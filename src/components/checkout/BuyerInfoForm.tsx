@@ -10,6 +10,7 @@ import "react-phone-number-input/style.css";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import { checkEmail } from "@/lib/emailGuard";
+import { supabase } from "@/integrations/supabase/client";
 
 export function isBuyerValid(buyer: { 
   fullName: string; 

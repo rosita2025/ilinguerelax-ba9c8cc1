@@ -226,8 +226,11 @@ export default function CheckoutSuccess() {
   }, []);
 
   // Upsell post-compra de 1 clic: solo si el pago fue con Stripe (hay
-  // stripeCustomerId) y el producto principal tiene un upsell que el cliente
-  // NO compró en el checkout original.
+  // stripeCustomerId) y el producto principal tiene upsells que el cliente
+  // NO compró en el checkout original. Guardamos TODOS los pendientes en una
+  // cola, y si el cliente no compra el primero, mostramos el siguiente.
+  const [upsellQueue, setUpsellQueue] = useState<UpsellOffer[]>([]);
+
   useEffect(() => {
     if (!stripeCustomerId || delivery.length === 0) return;
     const mainSku = delivery[0]?.sku;
@@ -235,18 +238,31 @@ export default function CheckoutSuccess() {
     const purchased = new Set(delivery.map((d) => d.sku.toLowerCase()));
     loadCheckoutProduct(mainSku)
       .then(({ upsells }) => {
-        const offer = (upsells ?? []).find((u) => u && !purchased.has(String(u.id).toLowerCase()));
-        if (offer) setUpsellOffer({
-          id: offer.id,
-          name: offer.name,
-          price: offer.price,
-          originalPrice: offer.originalPrice,
-          image: offer.image,
-        });
+        const pending = (upsells ?? [])
+          .filter((u) => u && !purchased.has(String(u.id).toLowerCase()))
+          .map((u) => ({
+            id: u.id,
+            name: u.name,
+            price: u.price,
+            originalPrice: u.originalPrice,
+            image: u.image,
+          }));
+        setUpsellQueue(pending);
+        if (pending[0]) setUpsellOffer(pending[0]);
       })
       .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stripeCustomerId, delivery]);
+
+  const skipUpsell = () => {
+    setUpsellQueue((prev) => {
+      const rest = prev.slice(1);
+      setUpsellOffer(rest[0] ?? null);
+      setUpsellState("idle");
+      return rest;
+    });
+  };
+
 
   const chargeUpsell = async () => {
     if (!upsellOffer || !stripeCustomerId || upsellState === "charging") return;
@@ -541,11 +557,18 @@ export default function CheckoutSuccess() {
                 </div>
               </div>
             </div>
-            <Button onClick={chargeUpsell} disabled={upsellState === "charging"} className="w-full sm:w-auto gap-1.5">
-              {upsellState === "charging"
-                ? (language === "en" ? "Processing…" : "Procesando…")
-                : (language === "en" ? "Add with 1 click" : language === "pt" ? "Adicionar com 1 clique" : language === "fr" ? "Ajouter en 1 clic" : "Agregar con 1 clic")}
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button onClick={chargeUpsell} disabled={upsellState === "charging"} className="w-full sm:w-auto gap-1.5">
+                {upsellState === "charging"
+                  ? (language === "en" ? "Processing…" : "Procesando…")
+                  : (language === "en" ? "Add with 1 click" : language === "pt" ? "Adicionar com 1 clique" : language === "fr" ? "Ajouter en 1 clic" : "Agregar con 1 clic")}
+              </Button>
+              {upsellQueue.length > 1 && (
+                <Button variant="ghost" onClick={skipUpsell} disabled={upsellState === "charging"} className="w-full sm:w-auto">
+                  {language === "en" ? "No thanks, show me another" : language === "pt" ? "Não, obrigado, outro" : language === "fr" ? "Non merci, un autre" : "No gracias, ver otro"}
+                </Button>
+              )}
+            </div>
             {upsellState === "error" && (
               <p className="text-xs text-destructive">
                 {language === "en" ? "We couldn't process the charge. You can buy it separately from the store." : "No pudimos procesar el cobro. Puedes comprarlo por separado desde la tienda."}

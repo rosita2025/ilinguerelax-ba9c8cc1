@@ -294,6 +294,22 @@ export function BuyerInfoForm() {
           )}
         </label>
 
+        {/* Aviso NO bloqueante: el comprador ya tiene este producto. */}
+        {alreadyOwned && (
+          <div className="rounded-lg border border-amber-400/60 bg-amber-50 dark:bg-amber-500/10 px-3 py-2 text-[12px] text-amber-800 dark:text-amber-200 flex gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>
+              {language === "en"
+                ? "You already have this product — if it's a gift or you want to buy it again, you can continue without any problem."
+                : language === "pt"
+                ? "Você já tem este produto — se for um presente ou quiser comprá-lo de novo, pode continuar sem problema."
+                : language === "fr"
+                ? "Vous avez déjà ce produit — s'il s'agit d'un cadeau ou si vous voulez le racheter, vous pouvez continuer sans problème."
+                : "Ya tienes este producto — si es un regalo o quieres comprarlo de nuevo, puedes continuar sin problema."}
+            </span>
+          </div>
+        )}
+
         {/* Para productos digitales el teléfono es opcional y la mayoría no
             lo llena: lo escondemos detrás de un enlace para que el formulario
             se vea de solo 2 campos (nombre + correo) y asuste menos. */}

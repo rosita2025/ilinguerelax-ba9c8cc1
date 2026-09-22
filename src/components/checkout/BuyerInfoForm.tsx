@@ -145,6 +145,23 @@ export function BuyerInfoForm() {
   const emailCheckResult = useMemo(() => checkEmail(localEmail), [localEmail]);
   const emailInvalid = !emailCheckResult.ok;
   const phoneInvalid = localPhone.trim().length > 0 && localPhone.trim().length < 7;
+
+  // Aviso informativo: ¿este correo ya compró el producto principal del
+  // carrito? Solo informa, nunca bloquea el pago.
+  const [alreadyOwned, setAlreadyOwned] = useState(false);
+  const mainSku = items?.[0]?.id;
+  useEffect(() => {
+    const check = checkEmail(localEmail);
+    if (!check.ok || !mainSku) { setAlreadyOwned(false); return; }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      supabase.functions
+        .invoke("check-existing-purchase", { body: { email: check.email, sku: mainSku } })
+        .then(({ data }) => { if (!cancelled) setAlreadyOwned(!!data?.alreadyPurchased); })
+        .catch(() => { if (!cancelled) setAlreadyOwned(false); });
+    }, 600);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [localEmail, mainSku]);
   
   const addressInvalid = hasPhysicalItems && localAddress.trim().length < 8;
   const cityInvalid = hasPhysicalItems && localCity.trim().length < 3;

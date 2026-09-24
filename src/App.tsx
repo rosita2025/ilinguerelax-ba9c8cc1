@@ -352,7 +352,7 @@ const App = () => (
                   <Route path="/transaction-status" element={<Navigate to="/mi-pedido" replace />} />
                   <Route path="/amazon" element={<AmazonRedirect />} />
                   {/* Dynamic product page — catches any /products/:slug not matched above (products created in /admin/productos). */}
-                  <Route path="/products/:slug" element={<ProductDynamic />} />
+                  <Route path="/products/:slug" element={<ProductInglesIngenieriaCivil />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                   </Routes>

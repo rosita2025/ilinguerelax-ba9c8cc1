@@ -1,6 +1,6 @@
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
 import { useMemo, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, Navigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -198,6 +198,8 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
       date: "2026-04-15",
     },
   ];
+
+  if (pricingAdmin.loaded && (pricingAdmin as { missing?: boolean }).missing && !isCivil) return <Navigate to="/404" replace />;
 
   return (
     <main className="min-h-screen bg-background">

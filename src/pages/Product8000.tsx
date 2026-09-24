@@ -113,6 +113,7 @@ const HOTMART_8000_LATAM = "https://pay.hotmart.com/U103990323W?checkoutMode=10"
 const Product8000 = () => {
   const { currency, countryCode } = useI18n();
   const pricing = useAdminPricing(ADMIN_SKU_8000);
+  const heroImage = pricing.coverImageUrl ?? (pricing.loaded ? product8000Image : null);
   const navigate = useNavigate();
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
@@ -193,10 +194,19 @@ const Product8000 = () => {
             <div className="relative">
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative">
+                {heroImage ? (
                 <img
-                  src={product8000Image}
+                  src={heroImage}
                   alt="Inglés Relax - 8,000 Palabras"
+                  width={1000}
+                  height={1250}
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
                   className="w-full h-auto rounded-2xl shadow-hero" />
+                ) : (
+                  <div className="w-full aspect-[4/5] rounded-2xl bg-muted animate-pulse" />
+                )}
                 <PinterestSave overlay />
                 
               </div>

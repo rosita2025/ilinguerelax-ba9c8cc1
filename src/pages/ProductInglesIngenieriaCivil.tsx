@@ -25,15 +25,20 @@ import { useI18n } from "@/i18n/I18nContext";
 import { UrgencyTimerBar } from "@/components/UrgencyTimerBar";
 import { PinterestSave } from "@/components/PinterestSave";
 
-const ADMIN_SKU = "1-000-palabras-ingles-mas-utilizadas-en-ingenieria-civil-n6mm";
-const TIENDA_CHECKOUT_PATH = `/checkouts/${ADMIN_SKU}`;
-const CANONICAL_URL = `https://ilinguerelax.com/products/${ADMIN_SKU}`;
+const CIVIL_SKU = "1-000-palabras-ingles-mas-utilizadas-en-ingenieria-civil-n6mm";
 
 const DEFAULT_NAME = "1,000 Palabras en Inglés Más Utilizadas en Ingeniería Civil";
 const DEFAULT_DESCRIPTION =
   "Aprende las 1,000 palabras más utilizadas en Ingeniería Civil con un método práctico, claro y diseñado especialmente para estudiantes y profesionales hispanohablantes.";
 
-const features = [
+const GENERIC_FEATURES = [
+  "Contenido completo y organizado paso a paso",
+  "Pronunciación adaptada para hispanohablantes",
+  "Método práctico, claro y fácil de seguir",
+  "Descarga digital inmediata (PDF)",
+];
+
+const CIVIL_FEATURES = [
   "Las 1,000 palabras más usadas en Ingeniería Civil",
   "Traducción al español de cada término",
   "Pronunciación adaptada para hispanohablantes",
@@ -44,7 +49,13 @@ const features = [
   "Descarga digital inmediata (PDF)",
 ];
 
-const ProductInglesIngenieriaCivil = () => {
+const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
+  const params = useParams<{ slug: string }>();
+  const ADMIN_SKU = sku ?? params.slug ?? CIVIL_SKU;
+  const TIENDA_CHECKOUT_PATH = `/checkouts/${ADMIN_SKU}`;
+  const CANONICAL_URL = `https://ilinguerelax.com/products/${ADMIN_SKU}`;
+  const isCivil = ADMIN_SKU === CIVIL_SKU;
+  const features = isCivil ? CIVIL_FEATURES : GENERIC_FEATURES;
   const { t, currency } = useI18n();
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
@@ -84,8 +95,8 @@ const ProductInglesIngenieriaCivil = () => {
     ? (heroImage.startsWith("http") ? heroImage : `https://ilinguerelax.com${heroImage}`)
     : undefined;
 
-  const productName = pricingAdmin.name ?? DEFAULT_NAME;
-  const productDescription = pricingAdmin.description ?? DEFAULT_DESCRIPTION;
+  const productName = pricingAdmin.name ?? (isCivil ? DEFAULT_NAME : "");
+  const productDescription = pricingAdmin.description ?? (isCivil ? DEFAULT_DESCRIPTION : "");
 
   // Vista previa real: las imágenes de galería configuradas en el admin.
   const galleryPreviews = (pricingAdmin.galleryImages ?? []).slice(0, 6);
@@ -193,7 +204,7 @@ const ProductInglesIngenieriaCivil = () => {
       <UrgencyTimerBar productSlug={ADMIN_SKU} language="es" />
       <SEO
         title={pricingAdmin.name ?? "1,000 Palabras en Inglés de Ingeniería Civil PDF"}
-        description={pricingAdmin.description ?? DEFAULT_DESCRIPTION}
+        description={pricingAdmin.description ?? (isCivil ? DEFAULT_DESCRIPTION : "")}
         canonicalUrl={CANONICAL_URL}
         image={heroImageAbsolute}
         type="product"

@@ -39,6 +39,7 @@ const Product1000Verbos = lazy(() => import("./pages/Product1000Verbos"));
 const Product500Preguntas = lazy(() => import("./pages/Product500Preguntas"));
 
 const ProductPatronesEspeciales = lazy(() => import("./pages/ProductPatronesEspeciales"));
+const ProductInglesIngenieriaCivil = lazy(() => import("./pages/ProductInglesIngenieriaCivil"));
 const ProductPuppyPlanner = lazy(() => import("./pages/ProductPuppyPlanner"));
 const ProductCoreanoRelax = lazy(() => import("./pages/ProductCoreanoRelax"));
 const ProductCoreano100Mapas = lazy(() => import("./pages/ProductCoreano100Mapas"));
@@ -259,6 +260,7 @@ const App = () => (
                   <Route path="/products/500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes" element={<Product500Preguntas />} />
                   
                   <Route path="/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles" element={<ProductPatronesEspeciales />} />
+                  <Route path="/products/1-000-palabras-ingles-mas-utilizadas-en-ingenieria-civil-n6mm" element={<ProductInglesIngenieriaCivil />} />
                   <Route path="/products/puppy-planner" element={<ProductPuppyPlanner />} />
                   <Route path="/products/100-mapas-mentales-para-aprender-coreano-hangul-c1" element={<ProductCoreano100Mapas />} />
                   <Route path="/products/1-000-palabras-esenciales-para-aprender-coreano" element={<ProductCoreanoRelax />} />

@@ -5,6 +5,7 @@ import { markAbandonedCartConverted, sendThankYouEmail } from "../_shared/thankY
 import { normalizeSku } from "../_shared/digitalSku.ts";
 import { ensureDownloadUrl } from "../_shared/downloadToken.ts";
 import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
+import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -192,6 +193,20 @@ Deno.serve(async (req) => {
         })
         .eq("id", orderId);
       if (updErr) throw updErr;
+
+      // Meta Conversions API (servidor): pagos manuales también cuentan en
+      // Facebook Ads. sendPurchaseCapi solo envía si hay atribución de Meta.
+      const capiOrderId = `ILR-MP-${String(order.order_number || orderId).slice(-8).toUpperCase()}`;
+      await sendPurchaseCapi({
+        eventId: `Purchase_${capiOrderId}`,
+        email: order.buyer_email,
+        country: order.buyer_country ?? null,
+        value: Number(order.amount_usd ?? order.amount_local) || null,
+        currency: order.amount_usd ? "USD" : (order.currency_local || "USD"),
+        contentIds: resolvedSkus,
+        contentName: productNames,
+        orderId: capiOrderId,
+      });
 
       // Registro digital ligado al pedido manual (Yape/Plin, Binance, SPEI,
       // transferencias). Sin esta fila el panel mostraba "Revisar" en rojo y

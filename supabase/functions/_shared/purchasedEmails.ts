@@ -56,6 +56,18 @@ export async function getPurchasedEmails(admin: any, rawEmails: string[]): Promi
         }
       }
     })(),
+    (async () => {
+      // SEGUNDA fuente de verdad: pagos manuales (Yape, Plin, Binance,
+      // transferencias) que un admin ya VERIFICÓ tras ver el comprobante.
+      if (!emails.length) return;
+      const orFilter = emails.map((e) => `buyer_email.ilike.${escapeIlike(e)}`).join(",");
+      const { data } = await admin
+        .from("manual_payments")
+        .select("buyer_email, status")
+        .or(orFilter)
+        .eq("status", "verified");
+      for (const r of data ?? []) add(r?.buyer_email);
+    })(),
   ];
 
   await Promise.allSettled(queries);

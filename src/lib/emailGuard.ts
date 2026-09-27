@@ -51,6 +51,7 @@ const FAKE_LOCAL_PARTS = new Set([
 ]);
 
 const EMAIL_RE = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)*\.[a-z]{2,}$/i;
+const EMAIL_LOCAL_RE = /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+$/i;
 
 export type EmailCheck = {
   ok: boolean;
@@ -115,7 +116,11 @@ export function checkEmail(raw: string): EmailCheck {
   const email = `${local}@${fixed}`;
   const corrected = email !== base;
 
-  if (!EMAIL_RE.test(email)) {
+  const invalidLocal = !EMAIL_LOCAL_RE.test(local)
+    || local.startsWith(".")
+    || local.endsWith(".")
+    || local.includes("..");
+  if (!EMAIL_RE.test(email) || invalidLocal) {
     return { ok: false, email, corrected, reason: "format", message: "Correo inválido" };
   }
   if (BLOCKED_DOMAINS.has(fixed)) {

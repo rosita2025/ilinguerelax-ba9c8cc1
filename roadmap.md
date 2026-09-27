@@ -2,3 +2,4 @@
 - [x] Remove preview watermark overlays and show complete images without cropping.
 - [x] Link the product preview to the existing local-price checkout button.
 - [x] Verify mobile rendering and image loading using CDN-backed previews.
+- [x] Align checkout email validation with the payment server and clear rejected emails visibly before retry.

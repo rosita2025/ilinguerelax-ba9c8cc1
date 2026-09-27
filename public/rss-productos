@@ -5,8 +5,18 @@
     <link>https://ilinguerelax.com/products</link>
     <description>Libros digitales y físicos de iLingue Relax: vocabulario, pronunciación y fonética para aprender idiomas sin estrés.</description>
     <language>es</language>
-    <lastBuildDate>Thu, 24 Sep 2026 17:54:59 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 24 Sep 2026 18:12:42 GMT</lastBuildDate>
     <atom:link href="https://ilinguerelax.com/rss-productos.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>8,000 Palabras con Pronunciación Español y Fonética UK/USA</title>
+      <link>https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</link>
+      <guid isPermaLink="true">https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</guid>
+      <pubDate>Thu, 24 Sep 2026 18:12:42 GMT</pubDate>
+      <description>El método completo para aprender inglés sin estrés, sin diccionarios, paso a paso. Diseñado exclusivamente para hispanohablantes.</description>
+      <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1790273451075-1ewwd.webp" type="image/jpeg" length="0" />
+      <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1790273451075-1ewwd.webp" medium="image" />
+      <media:thumbnail url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1790273451075-1ewwd.webp" />
+    </item>
     <item>
       <title>1,000 palabras ingles más utilizadas en Ingeniería Civil</title>
       <link>https://ilinguerelax.com/products/1-000-palabras-ingles-mas-utilizadas-en-ingenieria-civil-n6mm</link>
@@ -16,16 +26,6 @@
       <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/1-000-palabras-ingles-mas-utilizadas-en-ingenieria-civil-n6mm/1786071559812-punek.webp" type="image/jpeg" length="0" />
       <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/1-000-palabras-ingles-mas-utilizadas-en-ingenieria-civil-n6mm/1786071559812-punek.webp" medium="image" />
       <media:thumbnail url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/1-000-palabras-ingles-mas-utilizadas-en-ingenieria-civil-n6mm/1786071559812-punek.webp" />
-    </item>
-    <item>
-      <title>8,000 Palabras con Pronunciación Español y Fonética UK/USA</title>
-      <link>https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</link>
-      <guid isPermaLink="true">https://ilinguerelax.com/products/8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</guid>
-      <pubDate>Thu, 24 Sep 2026 17:51:00 GMT</pubDate>
-      <description>El método completo para aprender inglés sin estrés, sin diccionarios, paso a paso. Diseñado exclusivamente para hispanohablantes.</description>
-      <enclosure url="https://ilinguerelax.com/images/product-8000.webp" type="image/jpeg" length="0" />
-      <media:content url="https://ilinguerelax.com/images/product-8000.webp" medium="image" />
-      <media:thumbnail url="https://ilinguerelax.com/images/product-8000.webp" />
     </item>
     <item>
       <title>Cuaderno de Práctica de Patrones en Ingles + Clave de respuestas</title>

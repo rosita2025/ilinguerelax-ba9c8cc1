@@ -277,6 +277,22 @@ Deno.serve(async (req) => {
           continue;
         }
 
+        // Pago manual enviado (pendiente o aprobado) → no es abandono.
+        {
+          const since = new Date(Date.now() - 14 * 86400000).toISOString();
+          const { data: mp } = await admin
+            .from("manual_payments")
+            .select("status")
+            .ilike("buyer_email", email)
+            .gte("created_at", since)
+            .limit(5);
+          if ((mp ?? []).some((r: any) => !["rejected", "cancelled", "canceled"].includes(String(r?.status || "").toLowerCase()))) {
+            await admin.from("persistent_carts").update({ converted: true }).eq("email", email);
+            stat.skipped++;
+            continue;
+          }
+        }
+
         // No enviar "carrito abandonado" si el cliente tiene un pago de dLocal
         // pendiente de confirmación (transferencia/efectivo ya iniciado, solo
         // falta que se confirme) — evita el correo confuso de "olvidaste tu

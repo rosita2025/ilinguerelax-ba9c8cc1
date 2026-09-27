@@ -109,6 +109,24 @@ Deno.serve(async (req) => {
     email = guard.email;
 
 
+    // Si ya envió un pago manual (Yape, Plin, Binance, transferencia), aunque
+    // esté pendiente de aprobación, NO es abandono: no enviar nada a Brevo.
+    {
+      const since = new Date(Date.now() - 14 * 86400000).toISOString();
+      const { data: mp } = await supabase
+        .from("manual_payments")
+        .select("id, status")
+        .ilike("buyer_email", email)
+        .gte("created_at", since)
+        .limit(5);
+      if ((mp ?? []).some((r: any) => !["rejected", "cancelled", "canceled"].includes(String(r?.status || "").toLowerCase()))) {
+        await supabase.from("persistent_carts").update({ converted: true }).ilike("email", email);
+        return new Response(JSON.stringify({ ok: true, skipped: "manual_payment_submitted" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     // Ignorar si ya compró recientemente (evita spam de abandonos tras compra exitosa)
     const recentPurchased = await getPurchasedSkus(supabase, email);
     const ownedSkus = [...recentPurchased].map(s => s.toLowerCase());

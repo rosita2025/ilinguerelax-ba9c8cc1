@@ -3,6 +3,7 @@
 // into a single normalised list with "why blocked" / "failed step" reasons.
 import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getPurchasedEmails } from "../_shared/purchasedEmails.ts";
 
 const corsHeaders = adminCorsHeaders;
 
@@ -348,12 +349,21 @@ Deno.serve(async (req) => {
         .eq("converted", false)
         .order("last_activity", { ascending: false })
         .limit(take);
-      
+
+      // Antes, esta sección SIEMPRE marcaba "abandonado" sin importar qué
+      // pasara después — ni siquiera aprobar el pago manual (Yape/Plin/etc)
+      // cambiaba el estado mostrado aquí. Se revisa ahora si el correo del
+      // carrito ya tiene una compra real verificada, para mostrar
+      // "aprobado" en vez de "abandonado" cuando corresponda.
+      const cartEmails = (data ?? []).map((r) => r.email).filter(Boolean) as string[];
+      const purchasedCartEmails = cartEmails.length ? await getPurchasedEmails(admin, cartEmails) : new Set<string>();
+
       for (const r of data ?? []) {
         const buyer = r.buyer || {};
         const items = Array.isArray(r.items) ? r.items : [];
         const productSummary = items.map((it: any) => it.id).join(", ");
-        
+        const isNowPurchased = r.email && purchasedCartEmails.has(String(r.email).trim().toLowerCase());
+
         rows.push({
           id: `cart-${r.id}`,
           provider: "internal_cart",
@@ -365,10 +375,10 @@ Deno.serve(async (req) => {
           currency: null,
           product: productSummary || "Carrito vacío",
           transaction: r.id, // Use persistent_cart id for deduplication if session_id is missing
-          raw_status: "abandoned",
-          mapped_status: "abandoned",
+          raw_status: isNowPurchased ? "approved" : "abandoned",
+          mapped_status: isNowPurchased ? "approved" : "abandoned",
           failure_reason: null,
-          failed_step: "Abandono en checkout interno",
+          failed_step: isNowPurchased ? null : "Abandono en checkout interno",
           payload: r,
         });
       }

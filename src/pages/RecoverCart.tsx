@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { getCatalogItem, CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
 import { authorizeCheckout } from "@/lib/checkoutGate";
+import { checkEmail } from "@/lib/emailGuard";
 
 /**
  * /recuperar-carrito?t=<cart_token>
@@ -42,9 +43,11 @@ export default function RecoverCart() {
           if (!cancelled) setStatus("empty");
           return;
         }
+        // Validar el correo recuperado igual que el formulario normal.
+        const recoveredEmailCheck = checkEmail(data.email || "");
         setBuyer({
           fullName: data.buyer?.name || "",
-          email: data.email || "",
+          email: recoveredEmailCheck.ok ? recoveredEmailCheck.email : "",
           phone: data.buyer?.phone || "",
         });
 

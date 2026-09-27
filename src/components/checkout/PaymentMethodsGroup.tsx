@@ -666,6 +666,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     } catch (err) {
       const mapped = mapStripeError(err, language as StripeLang);
       setStripeError(mapped);
+
+      // Si Stripe rechazó el correo, se borra el valor guardado para no repetir el error.
+      const rawMessage = (err as any)?.message || "";
+      const rawParam = (err as any)?.param || "";
+      if (/invalid email/i.test(rawMessage) || /email/i.test(rawParam)) {
+        useCheckoutPruebaStore.getState().setBuyer({ email: "" });
+      }
+      
       
       // Auto-fallback UI if it's a currency error
       if (mapped.code === "currency_restricted" && !isFallingBackToUsd) {

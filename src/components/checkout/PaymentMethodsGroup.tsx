@@ -669,8 +669,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
       // Si Stripe rechazó el correo, se borra el valor guardado para no repetir el error.
       const rawMessage = (err as any)?.message || "";
-      const rawParam = (err as any)?.param || "";
-      if (/invalid email/i.test(rawMessage) || /email/i.test(rawParam)) {
+      const rawCode = (err as any)?.code || (err as any)?.stripe_code || "";
+      const isRealEmailFormatError = rawCode === "email_invalid"
+        || rawCode === "parameter_invalid_email"
+        || /invalid.{0,12}email|email.{0,12}invalid/i.test(rawMessage);
+      if (isRealEmailFormatError) {
         useCheckoutPruebaStore.getState().setBuyer({ email: "" });
         window.dispatchEvent(new CustomEvent(CLEAR_INVALID_EMAIL_EVENT));
       }

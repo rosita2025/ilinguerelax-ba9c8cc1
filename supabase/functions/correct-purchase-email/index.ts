@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
     let previousEmail: string | null = null;
     let deliveryPayload: Record<string, unknown> | null = null;
 
-    if (prefix === "hot") {
+    if (prefix === "hm") {
       provider = "hotmart";
       const { data: row, error } = await admin
         .from("hotmart_purchases")
@@ -142,6 +142,46 @@ Deno.serve(async (req) => {
           idempotencyKey: `man-correct-${id}-${email}`,
         };
       }
+    } else if (prefix === "cart") {
+      // Filas de "Carritos Abandonados" (persistent_carts) — es como
+      // aparecen en esta pantalla los clientes de pagos manuales (Yape,
+      // Plin, Binance, transferencias) mientras su carrito no se haya
+      // marcado como convertido. No es una compra confirmada en sí, así
+      // que solo se corrige el correo del carrito — no hay nada que
+      // reenviar desde aquí.
+      provider = "internal_cart";
+      const { data: row, error } = await admin
+        .from("persistent_carts")
+        .select("id, email")
+        .eq("id", id).maybeSingle();
+      if (error || !row) throw new Error("Carrito no encontrado");
+      previousEmail = row.email;
+      await admin.from("persistent_carts").update({ email }).eq("id", id);
+    } else if (prefix === "st" || prefix === "dl") {
+      // Stripe y dLocal Go se listan aquí desde funnel_events (eventos de
+      // seguimiento, no la fuente de verdad de pago). Se corrige el correo
+      // de seguimiento; no se reenvía material desde aquí porque
+      // funnel_events no es la fuente confiable de una compra confirmada.
+      provider = prefix === "st" ? "stripe" : "dlocalgo";
+      const { data: row, error } = await admin
+        .from("funnel_events")
+        .select("id, email")
+        .eq("id", id).maybeSingle();
+      if (error || !row) throw new Error("Evento no encontrado");
+      previousEmail = row.email;
+      await admin.from("funnel_events").update({ email }).eq("id", id);
+    } else if (prefix === "sh") {
+      // Pedidos físicos de Shopify (libros). El correo del comprador vive
+      // en customer_name cuando parece un correo (ver list-purchases-status);
+      // se corrige igual, en esa misma columna.
+      provider = "shopify";
+      const { data: row, error } = await admin
+        .from("shopify_sales")
+        .select("id, customer_name")
+        .eq("id", id).maybeSingle();
+      if (error || !row) throw new Error("Pedido Shopify no encontrado");
+      previousEmail = row.customer_name?.includes("@") ? row.customer_name : null;
+      await admin.from("shopify_sales").update({ customer_name: email }).eq("id", id);
     } else {
       return new Response(JSON.stringify({ error: "Prefijo desconocido" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },

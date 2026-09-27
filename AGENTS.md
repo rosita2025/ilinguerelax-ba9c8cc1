@@ -1,0 +1,1 @@
+- Keep Patrones preview images as CDN asset pointers under `src/assets/patrones-new/` and reuse them on the product and dedicated preview pages, so both pages stay synchronized without bundling large images.

@@ -7,16 +7,16 @@ import { SpotifyLaunchBanner, SPOTIFY_URL } from "@/components/SpotifyLaunchBann
 import { CompradoresReales } from "@/components/CompradoresReales";
 import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
+import { TercerBonoExamen } from "@/components/TercerBonoExamen";
 import { CanvaPreviewLink } from "@/components/CanvaPreviewLink";
 import { Eye, Sparkles, BookOpen, MessageCircle, Music2 } from "lucide-react";
 import { useState } from "react";
 
-import patronesPreview1 from "@/assets/patrones-preview-letras-mudas.webp.asset.json";
-import patronesPreview2 from "@/assets/patrones-preview-sufijos.webp.asset.json";
-import patronesPreview3 from "@/assets/patrones-preview-contracciones.webp.asset.json";
-import bono5000Indice from "@/assets/bono-5000-indice.webp.asset.json";
-import bono5000Ropa from "@/assets/bono-5000-ropa.webp.asset.json";
-import bono5000Transporte from "@/assets/bono-5000-transporte.webp.asset.json";
+import patronesPreview1 from "@/assets/patrones-new/patrones-20-30.webp.asset.json";
+import patronesPreview2 from "@/assets/patrones-new/patrones-letras-mudas.webp.asset.json";
+import patronesPreview3 from "@/assets/patrones-new/patrones-sufijos.webp.asset.json";
+import patronesPreview4 from "@/assets/patrones-new/patrones-contracciones.webp.asset.json";
+import bono1000 from "@/assets/patrones-new/bono-1000-palabras.webp.asset.json";
 import ogImage from "@/assets/og-vista-previa-patrones.jpg.asset.json";
 import resenaMx1 from "@/assets/resena-mx1.webp.asset.json";
 import resenaMx2 from "@/assets/resena-mx2.webp.asset.json";
@@ -26,15 +26,14 @@ import introVideo from "@/assets/introduccion-patrones-especiales.mp4.asset.json
 import introPoster from "@/assets/intro-patrones-poster.jpg.asset.json";
 
 const patronesPreviews = [
-  { src: patronesPreview1.url, alt: "Letras mudas en inglés con reglas y ejemplos — Inglés Relax", caption: "Letras Mudas · tabla completa con reglas" },
-  { src: patronesPreview2.url, alt: "Sufijos y prefijos en inglés con pronunciación adaptada", caption: "Sufijos y Prefijos · cómo suenan realmente" },
-  { src: patronesPreview3.url, alt: "Contracciones y habla rápida en inglés con pronunciación", caption: "Contracciones · habla como un nativo" },
+  { src: patronesPreview1.url, alt: "20 patrones nuevos de pronunciación", caption: "20 patrones nuevos" },
+  { src: patronesPreview2.url, alt: "Letras mudas en inglés", caption: "Letras mudas" },
+  { src: patronesPreview3.url, alt: "Sufijos y prefijos en inglés", caption: "Sufijos y prefijos" },
+  { src: patronesPreview4.url, alt: "Contracciones y habla rápida en inglés", caption: "Contracciones y habla rápida" },
 ];
 
 const bonusPreviews = [
-  { src: bono5000Indice.url, alt: "Índice del Bono 1,000 palabras en inglés con pronunciación en español", caption: "Índice por temas · A1 a B2" },
-  { src: bono5000Ropa.url, alt: "1,000 palabras en inglés - Ropa y vestimenta con pronunciación", caption: "Ropa · 7 subtemas con fonética" },
-  { src: bono5000Transporte.url, alt: "1,000 palabras en inglés - Transporte, alojamiento y turismo", caption: "Transporte y Turismo · vocabulario práctico" },
+  { src: bono1000.url, alt: "1,000 palabras en inglés con pronunciación para hispanohablantes", caption: "1,000 palabras · pronunciación y fonética" },
 ];
 
 type Resena = { src: string; country: "MX" | "PE"; flag: string; label: string; alt: string };
@@ -54,7 +53,7 @@ const PreviewGrid = ({
   badgeLabel?: string;
   badgeClass?: string;
 }) => (
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
     {items.map((p, i) => (
       <figure key={p.src} className="relative rounded-2xl overflow-hidden border border-border shadow-card bg-card">
         {badgeLabel && (
@@ -63,19 +62,16 @@ const PreviewGrid = ({
           </div>
         )}
 
-        <div className="relative aspect-[3/4] bg-white overflow-hidden">
+        <div className="relative aspect-square bg-card overflow-hidden">
           <img
             src={p.src}
             alt={p.alt}
             loading="lazy"
             decoding="async"
+            width={1254}
+            height={1254}
             className="absolute inset-0 w-full h-full object-contain"
           />
-          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-            <span className="text-3xl md:text-4xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap select-none">
-              ilinguerelax.com
-            </span>
-          </div>
         </div>
         <figcaption className="p-3 text-sm font-semibold text-foreground text-center">
           {p.caption}
@@ -110,7 +106,7 @@ const VistaPreviaPatrones = () => {
                 Patrones Especiales, Alfabeto y <span className="text-gradient">Combinaciones Secretas en Inglés</span>
               </h1>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Páginas reales del PDF para que veas la calidad antes de cualquier compra. Marca de agua incluida.
+                 Páginas reales del PDF para que veas la calidad antes de cualquier compra.
               </p>
             </div>
 
@@ -222,6 +218,7 @@ const VistaPreviaPatrones = () => {
             </div>
 
             <SegundoBonoGramatica />
+            <TercerBonoExamen />
 
             <div className="mt-10">
               <CanvaPreviewLink />
@@ -293,7 +290,7 @@ const VistaPreviaPatrones = () => {
 
 
             <p className="text-center text-xs text-muted-foreground mt-8">
-              Vistas previas con marca de agua. El PDF completo se entrega tras la compra.
+               El PDF completo se entrega tras la compra.
             </p>
           </div>
         </div>

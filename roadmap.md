@@ -1,0 +1,4 @@
+- [x] Replace the four Patrones pages and three bonus previews with optimized uploaded images on both preview surfaces.
+- [x] Remove preview watermark overlays and show complete images without cropping.
+- [x] Link the product preview to the existing local-price checkout button.
+- [x] Verify mobile rendering and image loading using CDN-backed previews.

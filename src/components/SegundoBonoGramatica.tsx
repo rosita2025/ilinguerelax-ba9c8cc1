@@ -1,5 +1,5 @@
 import { Sparkles, BookOpen } from "lucide-react";
-import bonoGramaticaImg from "@/assets/estructuras-gramaticas-a1-a2.webp.asset.json";
+import bonoGramaticaImg from "@/assets/patrones-new/bono-gramatica.webp.asset.json";
 
 export const SegundoBonoGramatica = () => {
   return (
@@ -18,19 +18,17 @@ export const SegundoBonoGramatica = () => {
 
       <div className="max-w-3xl mx-auto rounded-2xl overflow-hidden border border-accent/30 bg-card shadow-card">
 
-        <div className="relative bg-white">
+         <div className="relative bg-card">
           <img
             src={bonoGramaticaImg.url}
             alt="Estructuras Gramaticales de inglés A1 a A2 — Verbos en presente DO/DOES con pronunciación en español"
             loading="lazy"
+             decoding="async"
+             width={1254}
+             height={1254}
             className="w-full h-auto object-contain"
             onContextMenu={(e) => e.preventDefault()}
           />
-          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-            <span className="text-4xl md:text-6xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap select-none">
-              ilinguerelax.com
-            </span>
-          </div>
         </div>
         <div className="p-4 flex items-center gap-2 justify-center text-sm font-semibold text-foreground">
           <BookOpen className="w-4 h-4 text-accent" />
@@ -38,7 +36,7 @@ export const SegundoBonoGramatica = () => {
         </div>
       </div>
       <p className="text-center text-xs text-muted-foreground mt-4">
-        Vista previa con marca de agua. El PDF completo se entrega tras la compra.
+         El PDF completo se entrega tras la compra.
       </p>
     </div>
   );

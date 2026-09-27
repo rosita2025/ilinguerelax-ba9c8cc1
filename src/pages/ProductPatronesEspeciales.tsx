@@ -42,12 +42,11 @@ const TIENDA_USD_COUNTRIES = new Set(["VE", "CU", "NI"]);
 
 const productImage = "/images/product-patrones-especiales.webp";
 
-import patronesPreview1 from "@/assets/patrones-preview-letras-mudas.webp.asset.json";
-import patronesPreview2 from "@/assets/patrones-preview-sufijos.webp.asset.json";
-import patronesPreview3 from "@/assets/patrones-preview-contracciones.webp.asset.json";
-import bono5000Indice from "@/assets/bono-5000-indice.webp.asset.json";
-import bono5000Ropa from "@/assets/bono-5000-ropa.webp.asset.json";
-import bono5000Transporte from "@/assets/bono-5000-transporte.webp.asset.json";
+import patronesPreview1 from "@/assets/patrones-new/patrones-20-30.webp.asset.json";
+import patronesPreview2 from "@/assets/patrones-new/patrones-letras-mudas.webp.asset.json";
+import patronesPreview3 from "@/assets/patrones-new/patrones-sufijos.webp.asset.json";
+import patronesPreview4 from "@/assets/patrones-new/patrones-contracciones.webp.asset.json";
+import bono1000 from "@/assets/patrones-new/bono-1000-palabras.webp.asset.json";
 import resenaMx1 from "@/assets/resena-mx1.webp.asset.json";
 import resenaMx2 from "@/assets/resena-mx2.webp.asset.json";
 import resenaMx3 from "@/assets/resena-mx3.webp.asset.json";
@@ -55,15 +54,14 @@ import resenaMx4 from "@/assets/resena-mx4.webp.asset.json";
 import { PinterestSave } from "@/components/PinterestSave";
 
 const previews = [
-  { src: patronesPreview1.url, alt: "Letras mudas en inglés con reglas y ejemplos — Inglés Relax", caption: "Letras Mudas · tabla completa con reglas" },
-  { src: patronesPreview2.url, alt: "Sufijos y prefijos en inglés con pronunciación adaptada", caption: "Sufijos y Prefijos · cómo suenan realmente" },
-  { src: patronesPreview3.url, alt: "Contracciones y habla rápida en inglés con pronunciación", caption: "Contracciones · habla como un nativo" },
+  { src: patronesPreview1.url, alt: "20 patrones nuevos de pronunciación en inglés", caption: "20 patrones nuevos" },
+  { src: patronesPreview2.url, alt: "Letras mudas en inglés con reglas y ejemplos", caption: "Letras mudas" },
+  { src: patronesPreview3.url, alt: "Sufijos y prefijos en inglés con pronunciación adaptada", caption: "Sufijos y prefijos" },
+  { src: patronesPreview4.url, alt: "Contracciones y habla rápida en inglés", caption: "Contracciones y habla rápida" },
 ];
 
 const bonusPreviews = [
-  { src: bono5000Indice.url, alt: "Índice del Bono 1,000 palabras en inglés con pronunciación en español", caption: "Índice por temas · A1 a B2" },
-  { src: bono5000Ropa.url, alt: "1,000 palabras en inglés - Ropa y vestimenta con pronunciación", caption: "Ropa · 7 subtemas con fonética" },
-  { src: bono5000Transporte.url, alt: "1,000 palabras en inglés - Transporte, alojamiento y turismo", caption: "Transporte y Turismo · vocabulario práctico" },
+  { src: bono1000.url, alt: "1,000 palabras en inglés con pronunciación para hispanohablantes", caption: "1,000 palabras · pronunciación y fonética" },
 ];
 
 const photoReviews = [
@@ -413,9 +411,9 @@ const ProductPatronesEspeciales = () => {
                 o agregar al carrito
               </button>
 
-              <p className="text-center text-sm text-muted-foreground mb-6">
-                👇 Mira la vista previa real antes de comprar
-              </p>
+               <a href="#vista-previa" className="block text-center text-sm text-primary underline underline-offset-4 mb-6">
+                 Ver vista previa real antes de comprar
+               </a>
 
 
             </div>
@@ -424,7 +422,7 @@ const ProductPatronesEspeciales = () => {
       </section>
 
       {/* Vista previa real */}
-      <section className="py-10 md:py-14">
+       <section id="vista-previa" className="py-10 md:py-14 scroll-mt-24">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-8">
@@ -435,30 +433,28 @@ const ProductPatronesEspeciales = () => {
                 Mira por dentro <span className="text-gradient">antes de comprar</span>
               </h2>
               <p className="text-muted-foreground">
-                3 páginas reales del ebook. Calidad comprobada.
+                 4 páginas reales del ebook. Calidad comprobada.
               </p>
             </div>
 
             
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {previews.map((p, i) => (
                 <figure key={p.src} className="relative rounded-2xl overflow-hidden border border-border shadow-card bg-card">
                   <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold">
                     Página {i + 1}
                   </div>
-                  <div className="relative aspect-square bg-white overflow-hidden">
+                   <div className="relative aspect-square bg-card overflow-hidden">
                     <img
                       src={p.src}
                       alt={p.alt}
                       loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover object-top"
+                       decoding="async"
+                       width={1254}
+                       height={1254}
+                       className="absolute inset-0 w-full h-full object-contain"
                     />
-                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                      <span className="text-3xl md:text-4xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap select-none">
-                        ilinguerelax.com
-                      </span>
-                    </div>
                   </div>
                   <figcaption className="p-3 text-sm font-semibold text-foreground text-center">
                     {p.caption}
@@ -495,22 +491,20 @@ const ProductPatronesEspeciales = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+               <div className="max-w-3xl mx-auto">
                 {bonusPreviews.map((p, i) => (
                   <figure key={p.src} className="relative rounded-2xl overflow-hidden border border-accent/30 shadow-card bg-card">
 
-                    <div className="relative aspect-square bg-white overflow-hidden">
+                     <div className="relative aspect-square bg-card overflow-hidden">
                       <img
                         src={p.src}
                         alt={p.alt}
                         loading="lazy"
-                        className="absolute inset-0 w-full h-full object-cover object-top"
+                         decoding="async"
+                         width={1920}
+                         height={1920}
+                         className="absolute inset-0 w-full h-full object-contain"
                       />
-                      <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                        <span className="text-3xl md:text-4xl font-black text-slate-900/10 -rotate-45 tracking-widest whitespace-nowrap select-none">
-                          ilinguerelax.com
-                        </span>
-                      </div>
                     </div>
                     <figcaption className="p-3 text-sm font-semibold text-foreground text-center">
                       {p.caption}
@@ -519,7 +513,7 @@ const ProductPatronesEspeciales = () => {
                 ))}
               </div>
               <p className="text-center text-xs text-muted-foreground mt-4">
-                Vistas previas con marca de agua. El PDF completo se entrega tras la compra.
+                 El PDF completo se entrega tras la compra.
               </p>
             </div>
 
@@ -534,13 +528,14 @@ const ProductPatronesEspeciales = () => {
                 variant="hero"
                 size="xl"
                 onClick={handleBuy}
+                 disabled={!pricingReady}
                 className="w-full sm:w-auto max-w-full min-h-14 sm:min-h-[unset] px-4 sm:px-8 py-4 sm:py-6 shadow-2xl"
               >
                 <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
                 <span className="min-w-0 flex-1 text-center leading-tight">
-                  <span className="block text-[15px] sm:text-lg font-extrabold">Comprar ahora</span>
+                   <span className="block text-[15px] sm:text-lg font-extrabold">LO QUIERO</span>
                   <span className={`block tabular-nums ${hasLongPriceLabel ? "text-xs sm:text-sm" : "text-sm sm:text-base"}`}>
-                    por {priceLabel}
+                     {pricingReady ? priceLabel : "Cargando precio…"}
                   </span>
                 </span>
                 <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />

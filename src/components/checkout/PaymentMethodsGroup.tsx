@@ -11,7 +11,7 @@ import { useLocalCurrency, useSkuOverridesResolver, sumItemsLocal, formatLocalDi
 import { useCheckoutMethodsConfig, type FamilyKey } from "@/hooks/useCheckoutMethodsConfig";
 import { useBinancePayConfig } from "@/hooks/useBinancePayConfig";
 
-import { isBuyerValid, BUYER_ERRORS_EVENT } from "@/components/checkout/BuyerInfoForm";
+import { isBuyerValid, BUYER_ERRORS_EVENT, CLEAR_INVALID_EMAIL_EVENT } from "@/components/checkout/BuyerInfoForm";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AlertCircle, RefreshCw } from "lucide-react";
@@ -672,6 +672,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       const rawParam = (err as any)?.param || "";
       if (/invalid email/i.test(rawMessage) || /email/i.test(rawParam)) {
         useCheckoutPruebaStore.getState().setBuyer({ email: "" });
+        window.dispatchEvent(new CustomEvent(CLEAR_INVALID_EMAIL_EVENT));
       }
       
       

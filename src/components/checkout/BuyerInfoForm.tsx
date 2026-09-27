@@ -46,6 +46,7 @@ export function isBuyerValid(buyer: {
 
 export const BUYER_FORM_ID = "buyer-info-form";
 export const BUYER_ERRORS_EVENT = "checkout:showBuyerErrors";
+export const CLEAR_INVALID_EMAIL_EVENT = "checkout:clearInvalidEmail";
 
 export function BuyerInfoForm() {
   const { buyer, setBuyer, applyCoupon, coupon } = useCheckoutPruebaStore();
@@ -202,6 +203,17 @@ export function BuyerInfoForm() {
     window.addEventListener(BUYER_ERRORS_EVENT, handler);
     return () => window.removeEventListener(BUYER_ERRORS_EVENT, handler);
   }, [nameInvalid, emailInvalid, phoneInvalid, addressInvalid, cityInvalid, zipInvalid, countryInvalid]);
+
+  useEffect(() => {
+    const clearInvalidEmail = () => {
+      setLocalEmail("");
+      setAlreadyOwned(false);
+      setShowErrors(true);
+      window.setTimeout(() => emailRef.current?.focus(), 0);
+    };
+    window.addEventListener(CLEAR_INVALID_EMAIL_EVENT, clearInvalidEmail);
+    return () => window.removeEventListener(CLEAR_INVALID_EMAIL_EVENT, clearInvalidEmail);
+  }, []);
 
   useEffect(() => {
     if (valid) setShowErrors(false);

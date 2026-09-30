@@ -233,6 +233,7 @@ serve(async (req) => {
     const checkoutBySrcAgg = new Map<string, { country: string; source: TrafficSource; sessions: Set<string> }>();
     // Global sessions per traffic source (all visitors, not just checkouts)
     const bySourceAgg = new Map<TrafficSource, { sessions: Set<string>; pageviews: number }>();
+    const bySourceCountryAgg = new Map<string, { source: TrafficSource; country: string; sessions: Set<string> }>();
     // Sessions per URL / page path (top landing/most-visited URLs of the store)
     const byUrlAgg = new Map<string, { sessions: Set<string>; pageviews: number }>();
 
@@ -280,6 +281,13 @@ serve(async (req) => {
       }
       srcAgg.sessions.add(sid);
       if (r.event_name === "PageView") srcAgg.pageviews++;
+      const srcCountryKey = `${src}|${r.country || "??"}`;
+      let srcCountryAgg = bySourceCountryAgg.get(srcCountryKey);
+      if (!srcCountryAgg) {
+        srcCountryAgg = { source: src, country: r.country || "??", sessions: new Set() };
+        bySourceCountryAgg.set(srcCountryKey, srcCountryAgg);
+      }
+      srcCountryAgg.sessions.add(sid);
 
       // URL / page path aggregation
       const url = (r.page_path || "/").split("?")[0] || "/";
@@ -1080,6 +1088,11 @@ serve(async (req) => {
       .map(([source, v]) => ({ source, sessions: v.sessions.size, pageviews: v.pageviews }))
       .sort((a, b) => b.sessions - a.sessions);
 
+    const bySourceCountry = Array.from(bySourceCountryAgg.values())
+      .map((v) => ({ source: v.source, country: v.country, sessions: v.sessions.size }))
+      .sort((a, b) => b.sessions - a.sessions)
+      .slice(0, 100);
+
     const byUrl = Array.from(byUrlAgg.entries())
       .map(([url, v]) => ({ url, sessions: v.sessions.size, pageviews: v.pageviews }))
       .sort((a, b) => b.sessions - a.sessions)
@@ -1188,6 +1201,7 @@ serve(async (req) => {
         byCountry,
         checkoutsByCountrySource,
         bySource,
+        bySourceCountry,
         byUrl,
 
 

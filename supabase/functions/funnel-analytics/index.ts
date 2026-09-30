@@ -396,7 +396,7 @@ serve(async (req) => {
     // ---------- REAL purchases (USD only for revenue) ----------
     // Note: hotmart_purchases table was dropped. Purchases are now unified in funnel_events
     // with provider: 'hotmart' and referrer/event_data containing the webhook payload.
-    const [manualRes, digitalRes, storeGatewayRes] = await Promise.all([
+    const [manualRes, digitalRes, storeGatewayRes, orderEventsGatewayRes] = await Promise.all([
       supabase
         .from("manual_payments")
         .select("order_number, items, amount_usd, amount_local, currency_local, buyer_country, buyer_email, created_at, updated_at, status, verified_at, method")
@@ -412,7 +412,52 @@ serve(async (req) => {
         .in("event_name", ["Purchase", "purchase"])
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString()),
+      // Respaldo: pagos de pasarela confirmados en order_events (p. ej. dLocal
+      // confirmado horas después) que nunca generaron evento en funnel_events.
+      supabase
+        .from("order_events")
+        .select("order_number, customer_email, provider, event, status, amount, currency, metadata, created_at")
+        .eq("event", "payment_paid")
+        .in("provider", ["stripe", "dlocal", "dlocalgo", "dlocal_go", "mercadopago", "mercado_pago", "mp", "paypal"])
+        .gte("created_at", fromDate.toISOString())
+        .lte("created_at", toDate.toISOString()),
     ]);
+    // Evita contar dos veces: si el número de pedido ya aparece en un evento
+    // de funnel_events, se ignora la fila de order_events.
+    const knownFunnelText = ((storeGatewayRes.data ?? []) as any[])
+      .map((e) => `${e.referrer || ""}|${e.session_id || ""}`)
+      .join("\n");
+    const seenOe = new Set<string>();
+    const orderEventsGatewayRows = ((orderEventsGatewayRes?.data ?? []) as any[])
+      .filter((r) => {
+        const on = String(r.order_number || "");
+        if (!on || seenOe.has(on) || knownFunnelText.includes(on)) return false;
+        seenOe.add(on);
+        return true;
+      })
+      .map((r: any) => ({
+        id: `oe-${r.order_number}`,
+        created_at: r.created_at,
+        product_id: (Array.isArray(r.metadata?.skus) ? String(r.metadata.skus[0] ?? "") : r.metadata?.skus ? String(r.metadata.skus).replace(/[\[\]"]/g, "").split(",")[0].trim() : "") || r.metadata?.product_id || "store",
+        value: Number(r.amount || 0),
+        currency: r.currency || "USD",
+        country: r.metadata?.country || "??",
+        session_id: r.order_number,
+        referrer: JSON.stringify({
+          provider: r.provider,
+          status: "approved",
+          order_number: r.order_number,
+          transaction: r.order_number,
+          email: r.customer_email,
+          customer_email: r.customer_email,
+          product_name: r.metadata?.product_name || r.metadata?.name,
+          skus: Array.isArray(r.metadata?.skus) ? r.metadata.skus.join(",") : r.metadata?.skus,
+          country: r.metadata?.country,
+        }),
+        page_path: null,
+        is_bot: false,
+        provider: r.provider,
+      }));
     const APPROVED_STORE = new Set(["approved", "verified", "completed"]);
 
     // Build name/slug → SKU maps so aggregation collapses duplicate keys
@@ -606,7 +651,7 @@ serve(async (req) => {
       "stripe", "paypal", "mercadopago", "mercado_pago", "mp",
       "dlocal", "dlocalgo", "dlocal_go", "hotmart",
     ];
-    for (const ev of (storeGatewayRes.data ?? []) as any[]) {
+    for (const ev of [...(storeGatewayRes.data ?? []), ...orderEventsGatewayRows] as any[]) {
       let m: any = {};
       try { m = ev.referrer && ev.referrer.startsWith("{") ? JSON.parse(ev.referrer) : {}; } catch { m = {}; }
       const p = String(m.provider || ev.provider || (ev.referrer === "hotmart-webhook" ? "hotmart" : "")).toLowerCase();

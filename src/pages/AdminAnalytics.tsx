@@ -132,6 +132,7 @@ interface AnalyticsData {
   }>;
   checkoutsByCountrySource?: Array<{ country: string; source: string; sessions: number }>;
   bySource?: Array<{ source: string; sessions: number; pageviews: number }>;
+  bySourceCountry?: Array<{ source: string; country: string; sessions: number }>;
   byUrl?: Array<{ url: string; sessions: number; pageviews: number }>;
 
 
@@ -361,6 +362,11 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
       source: toText(r?.source, "directo"),
       sessions: toNumber(r?.sessions),
       pageviews: toNumber(r?.pageviews),
+    })),
+    bySourceCountry: toArray(value?.bySourceCountry).slice(0, 100).map((r) => ({
+      source: toText(r?.source, "directo"),
+      country: toText(r?.country, "??"),
+      sessions: toNumber(r?.sessions),
     })),
     byUrl: toArray(value?.byUrl).slice(0, 30).map((r) => ({
       url: toText(r?.url, "/"),
@@ -1245,6 +1251,51 @@ const AdminAnalytics = () => {
                 </Card>
               )}
 
+              {/* Fuente de tráfico cruzada con país */}
+              {data.bySourceCountry && data.bySourceCountry.length > 0 && (
+                <Card className="p-4">
+                  <h2 className="font-semibold mb-1">Fuente de tráfico por país · iLingue Relax</h2>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Mismo desglose de arriba, pero separado por país — útil para ver, por ejemplo, cuántas visitas de México vinieron de anuncios de Meta vs. directas u orgánicas.
+                  </p>
+                  <div className="overflow-x-auto max-h-96 overflow-y-auto">
+                    <table className="w-full text-sm">
+                      <thead className="text-xs text-muted-foreground border-b sticky top-0 bg-background">
+                        <tr>
+                          <th className="text-left py-2 pr-3">País</th>
+                          <th className="text-left py-2 pr-3">Fuente</th>
+                          <th className="text-right px-2">Sesiones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.bySourceCountry.map((row, i) => {
+                          const labelMap: Record<string, { label: string; cls: string }> = {
+                            pixel_meta:     { label: "Pixel Meta (FB/IG)", cls: "bg-blue-500/15 text-blue-600 border-blue-500/30" },
+                            google_ads:     { label: "Google Ads",         cls: "bg-yellow-500/15 text-yellow-700 border-yellow-500/30" },
+                            google_organic: { label: "Google orgánico",    cls: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30" },
+                            otro_organico:  { label: "Otro buscador",      cls: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" },
+                            social:         { label: "Redes sociales",     cls: "bg-pink-500/15 text-pink-600 border-pink-500/30" },
+                            mensajeria:     { label: "Mensajería (WA/TG)", cls: "bg-teal-500/15 text-teal-600 border-teal-500/30" },
+                            email:          { label: "Email / Newsletter", cls: "bg-purple-500/15 text-purple-600 border-purple-500/30" },
+                            referral:       { label: "Referral externo",   cls: "bg-orange-500/15 text-orange-600 border-orange-500/30" },
+                            directo:        { label: "Directo",           cls: "bg-muted text-foreground border-border" },
+                          };
+                          const s = labelMap[row.source] || labelMap.directo;
+                          return (
+                            <tr key={`${row.country}-${row.source}-${i}`} className="border-b border-border/40 hover:bg-muted/40">
+                              <td className="py-2 pr-3 font-medium">{row.country}</td>
+                              <td className="py-2 pr-3">
+                                <span className={cn("inline-block text-[11px] px-2 py-0.5 rounded border", s.cls)}>{s.label}</span>
+                              </td>
+                              <td className="text-right px-2 tabular-nums font-semibold">{row.sessions}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
+              )}
 
             </>
           )}

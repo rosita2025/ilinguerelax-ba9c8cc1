@@ -438,7 +438,7 @@ serve(async (req) => {
       .map((r: any) => ({
         id: `oe-${r.order_number}`,
         created_at: r.created_at,
-        product_id: (r.metadata?.skus ? String(r.metadata.skus).split(",")[0].trim() : null) || r.metadata?.product_id || "store",
+        product_id: (Array.isArray(r.metadata?.skus) ? String(r.metadata.skus[0] ?? "") : r.metadata?.skus ? String(r.metadata.skus).replace(/[\[\]"]/g, "").split(",")[0].trim() : "") || r.metadata?.product_id || "store",
         value: Number(r.amount || 0),
         currency: r.currency || "USD",
         country: r.metadata?.country || "??",
@@ -451,7 +451,7 @@ serve(async (req) => {
           email: r.customer_email,
           customer_email: r.customer_email,
           product_name: r.metadata?.product_name || r.metadata?.name,
-          skus: r.metadata?.skus,
+          skus: Array.isArray(r.metadata?.skus) ? r.metadata.skus.join(",") : r.metadata?.skus,
           country: r.metadata?.country,
         }),
         page_path: null,

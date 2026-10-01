@@ -11,9 +11,12 @@ import { SectionErrorBoundary } from "@/components/SectionErrorBoundary";
 
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 // Carga perezosa: PaymentMethodsGroup es enorme; se descarga aparte sin bloquear la primera pintura.
-const PaymentMethodsGroup = lazy(() =>
-  import("@/components/checkout/PaymentMethodsGroup").then((m) => ({ default: m.PaymentMethodsGroup }))
-);
+const loadPaymentMethodsGroup = () =>
+  import("@/components/checkout/PaymentMethodsGroup").then((m) => ({ default: m.PaymentMethodsGroup }));
+const PaymentMethodsGroup = lazy(loadPaymentMethodsGroup);
+// Empieza a descargar los métodos de pago apenas se carga este módulo, en paralelo
+// con la consulta del producto, en vez de esperar a que se pinte esa sección.
+if (typeof window !== "undefined") void loadPaymentMethodsGroup().catch(() => {});
 import { StickyPayCTA } from "@/components/checkout/StickyPayCTA";
 import { UpsellPanel } from "@/components/checkout/UpsellPanel";
 

@@ -587,11 +587,17 @@ serve(async (req) => {
 
 
 
-    // Detect language from body → country → IP
+    // For product-linked deliveries, speak the main product's audience language
+    // even when its buyer lives abroad (e.g. Patrones purchased in the US).
+    // Explicit language from an internal caller retains precedence.
+    const mainProduct = products.find((p) => p.sku === normalizedSkus[0]);
+    const productLang = mainProduct?.learner_language?.toLowerCase().slice(0, 2);
+    const audienceLang = productLang && SUPPORTED.includes(productLang as Lang) ? productLang : undefined;
+    // Explicit → product audience → country → IP.
     const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim()
       || req.headers.get("cf-connecting-ip") || "";
     const { lang, country: resolvedCountry } = await resolveLang(
-      supabase, body.lang, customerCountry, ip || undefined,
+      supabase, body.lang || audienceLang, customerCountry, ip || undefined,
     );
     const t = T[lang];
 

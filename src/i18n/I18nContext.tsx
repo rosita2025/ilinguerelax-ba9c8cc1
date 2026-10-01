@@ -180,3 +180,13 @@ export const useI18n = (): I18nContextType => {
   }
   return context;
 };
+
+/** Keep country/currency unchanged while checkout copy follows the product's audience. */
+export const CheckoutLanguageProvider: React.FC<{ language: Language; children: ReactNode }> = ({ language, children }) => {
+  const parent = useI18n();
+  return (
+    <I18nContext.Provider value={{ ...parent, language, t: translations[language] }}>
+      {children}
+    </I18nContext.Provider>
+  );
+};

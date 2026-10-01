@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Lock, ShieldCheck, MessageCircle, ArrowLeft, Zap, BadgeCheck, Users, Clock, Package } from "lucide-react";
@@ -10,7 +10,10 @@ import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { SectionErrorBoundary } from "@/components/SectionErrorBoundary";
 
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
-import { PaymentMethodsGroup } from "@/components/checkout/PaymentMethodsGroup";
+// Carga perezosa: PaymentMethodsGroup es enorme; se descarga aparte sin bloquear la primera pintura.
+const PaymentMethodsGroup = lazy(() =>
+  import("@/components/checkout/PaymentMethodsGroup").then((m) => ({ default: m.PaymentMethodsGroup }))
+);
 import { StickyPayCTA } from "@/components/checkout/StickyPayCTA";
 import { UpsellPanel } from "@/components/checkout/UpsellPanel";
 
@@ -703,7 +706,16 @@ export default function Checkout() {
 
                 <div id="payment-methods-section">
                   <SectionErrorBoundary name="payment-methods">
-                    <PaymentMethodsGroup parentSku={catalogItem?.adminSku ?? catalogItem?.id ?? slug ?? null} />
+                    <Suspense
+                      fallback={
+                        <div className="py-8 flex items-center justify-center text-sm text-muted-foreground gap-2">
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          Cargando métodos de pago…
+                        </div>
+                      }
+                    >
+                      <PaymentMethodsGroup parentSku={catalogItem?.adminSku ?? catalogItem?.id ?? slug ?? null} />
+                    </Suspense>
                   </SectionErrorBoundary>
                 </div>
 

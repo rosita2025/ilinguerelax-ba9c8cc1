@@ -1,8 +1,12 @@
 import React from "react";
 import { useRegionTier } from "@/hooks/useRegionTier";
 
-const VISA = "/__l5e/assets-v1/a96d5ad9-136a-425a-970a-b7889b8bdc30/visa.svg";
-const MASTERCARD = "/__l5e/assets-v1/94d65183-1752-495e-ac5b-70ec4cba62b2/mastercard.svg";
+// Antes usaban una ruta temporal de Lovable (asset borrado del CDN) que no
+// sobrevivía al publicar; ahora usan archivos propios del proyecto.
+import visaLogoAsset from "@/assets/payment-logos/visa.png.asset.json";
+import mastercardLogoAsset from "@/assets/payment-logos/mastercard.png.asset.json";
+const VISA = visaLogoAsset.url;
+const MASTERCARD = mastercardLogoAsset.url;
 const APPLE_PAY = "/__l5e/assets-v1/a38f0d22-72e4-4393-ace6-856f1b5379e6/apple-pay.svg";
 const PAYPAL = "https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg";
 const GOOGLE_PAY = "https://www.gstatic.com/instantbuy/images/mpay/google_pay_logo.svg";

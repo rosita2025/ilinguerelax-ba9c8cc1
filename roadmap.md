@@ -4,3 +4,4 @@
 - [x] Verify mobile rendering and image loading using CDN-backed previews.
 - [x] Align checkout email validation with the payment server and clear rejected emails visibly before retry.
 - [x] Keep checkout components, cart reminders, and digital delivery emails in the main product's audience language regardless of buyer country.
+- [x] Keep the Patrones product page and its checkout in Spanish for Spanish-to-English learners abroad, without changing regional prices.

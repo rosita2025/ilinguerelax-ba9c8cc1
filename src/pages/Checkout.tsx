@@ -27,7 +27,7 @@ import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
-import { useI18n } from "@/i18n/I18nContext";
+import { CheckoutLanguageProvider, useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
 import { getCatalogItem, resolveCheckoutSlug, CHECKOUT_CATALOG, type CatalogItem } from "@/config/checkoutCatalog";
 import { readCheckoutCache, loadCheckoutProduct } from "@/lib/checkoutProductCache";
@@ -360,7 +360,7 @@ export default function Checkout() {
 
   // Shopify-style abandoned checkout tracking: saves buyer info if they
   // fill name+email but leave without completing card payment.
-  useAbandonedCheckoutTracker(slug, catalogItem?.name);
+  useAbandonedCheckoutTracker(slug, catalogItem?.name, language);
 
   // Fire InitiateCheckout for every /checkouts/:slug (Pixel + CAPI + funnel_events).
   // Includes product_id + value + currency so /admin/live cuenta "Continuar pago"
@@ -562,6 +562,7 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden max-w-full">
+      <CheckoutLanguageProvider language={language}>
       <SectionErrorBoundary name="checkout-root">
         <InAppBrowserBanner />
         {loadingDb && !catalogItem && (
@@ -782,6 +783,7 @@ export default function Checkout() {
 
         )}
       </SectionErrorBoundary>
+      </CheckoutLanguageProvider>
     </div>
   );
 }

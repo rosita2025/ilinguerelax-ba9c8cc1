@@ -102,10 +102,11 @@ export async function trackAbandonedCheckoutNow(input: TrackAbandonedCheckoutInp
  * but hasn't completed payment, saves to `abandoned_carts` so the 6-step
  * recovery email sequence kicks in. Fires once per (email, slug) per 6h.
  */
-export function useAbandonedCheckoutTracker(slug: string | undefined, productName?: string) {
+export function useAbandonedCheckoutTracker(slug: string | undefined, productName?: string, checkoutLanguage?: string) {
   const buyer = useCheckoutPruebaStore((s) => s.buyer);
   const items = useCheckoutPruebaStore((s) => s.items);
-  const { language, countryCode } = useI18n();
+  const { language: siteLanguage, countryCode } = useI18n();
+  const language = checkoutLanguage || siteLanguage;
   const timer = useRef<number | null>(null);
   const trackedRef = useRef<string>("");
   const prevRef = useRef<{ email: string; cart: string; country: string; payment: string } | null>(null);

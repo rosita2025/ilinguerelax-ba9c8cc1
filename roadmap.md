@@ -3,3 +3,4 @@
 - [x] Link the product preview to the existing local-price checkout button.
 - [x] Verify mobile rendering and image loading using CDN-backed previews.
 - [x] Align checkout email validation with the payment server and clear rejected emails visibly before retry.
+- [x] Keep checkout components, cart reminders, and digital delivery emails in the main product's audience language regardless of buyer country.

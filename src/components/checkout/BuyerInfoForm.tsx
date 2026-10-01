@@ -1,12 +1,10 @@
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo, lazy, Suspense } from "react";
 import { User, Mail, CheckCircle2, AlertCircle, MapPin, Globe, Lock } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
-import PhoneInput from "react-phone-number-input";
-import flags from "react-phone-number-input/flags";
-import "react-phone-number-input/style.css";
+const PhoneField = lazy(() => import("./PhoneField"));
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import { checkEmail } from "@/lib/emailGuard";
@@ -357,22 +355,21 @@ export function BuyerInfoForm() {
             {t.whatsappOptional}
           </span>
           <div className="mt-1 phone-input-wrap">
-            <PhoneInput
-              key={`phone-${region.loading ? "pending" : region.country || "PE"}`}
-              flags={flags}
-              international
-              defaultCountry={(region.country as any) || "PE"}
-              value={localPhone}
-              onChange={(v) => { setLocalPhone(v ?? ""); commitBuyer({ phone: v ?? "" }); }}
-              onBlur={() => updateGlobalBuyer({ phone: localPhone })}
-              placeholder="999 999 999"
-              className={cn(
-                "w-full px-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus-within:ring-2 transition-all",
-                showPhoneError 
-                  ? "border-destructive focus-within:ring-destructive/40" 
-                  : "focus-within:ring-primary/40"
-              )}
-            />
+            <Suspense fallback={<div className="w-full h-[42px] rounded-lg border bg-background" />}>
+              <PhoneField
+                key={`phone-${region.loading ? "pending" : region.country || "PE"}`}
+                defaultCountry={region.country || "PE"}
+                value={localPhone}
+                onChange={(v) => { setLocalPhone(v ?? ""); commitBuyer({ phone: v ?? "" }); }}
+                onBlur={() => updateGlobalBuyer({ phone: localPhone })}
+                className={cn(
+                  "w-full px-3 py-2 rounded-lg border bg-background text-base sm:text-sm focus-within:ring-2 transition-all",
+                  showPhoneError
+                    ? "border-destructive focus-within:ring-destructive/40"
+                    : "focus-within:ring-primary/40"
+                )}
+              />
+            </Suspense>
           </div>
           {showPhoneError && (
             <p className="text-[11px] text-destructive mt-1">If you provide a phone number, it must be at least 7 digits.</p>

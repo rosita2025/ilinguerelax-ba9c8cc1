@@ -2219,7 +2219,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-[13px] sm:text-sm flex items-center gap-2 flex-nowrap min-w-0 text-neutral-800 dark:text-neutral-100">
                   {m.id === "hotmart" ? (
-                    <img src={hotmartLogo.url} alt="Hotmart" className="h-10 sm:h-12 w-auto object-contain -my-1" />
+                    <>
+                      <img src={hotmartLogo.url} alt="Hotmart" className="h-10 sm:h-12 w-auto object-contain -my-1 shrink-0" />
+                      <span className="min-w-0 truncate">{m.title}</span>
+                    </>
                   ) : (
                     <span className="min-w-0 truncate">{m.title}</span>
                   )}

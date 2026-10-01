@@ -61,8 +61,12 @@ interface PaymentMethodRow {
   isSeparator?: boolean;
 }
 
-const visaLogo = "/__l5e/assets-v1/a96d5ad9-136a-425a-970a-b7889b8bdc30/visa.svg";
-const mastercardLogo = "/__l5e/assets-v1/94d65183-1752-495e-ac5b-70ec4cba62b2/mastercard.svg";
+// Antes usaban una ruta temporal de Lovable (asset borrado del CDN) que no
+// sobrevivía al publicar; ahora usan archivos propios del proyecto.
+import visaLogoAsset from "@/assets/payment-logos/visa.png.asset.json";
+import mastercardLogoAsset from "@/assets/payment-logos/mastercard.png.asset.json";
+const visaLogo = visaLogoAsset.url;
+const mastercardLogo = mastercardLogoAsset.url;
 const applePayLogo = "/__l5e/assets-v1/a38f0d22-72e4-4393-ace6-856f1b5379e6/apple-pay.svg";
 
 

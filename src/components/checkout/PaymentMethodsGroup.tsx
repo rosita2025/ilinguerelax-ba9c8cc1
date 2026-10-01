@@ -1599,57 +1599,67 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       { label: "Mercado Pago", bg: "#00A6E0", color: "#00263A" },
       { label: "Visa", bg: "#ffffff", color: "#1F2937" },
       { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
+      { label: "PayPal", bg: "#003087", color: "#ffffff" },
     ],
     AR: [
       { label: "Cupón de Pago", bg: "#E4002B", color: "#ffffff" },
       { label: "Mercado Pago", bg: "#00A6E0", color: "#00263A" },
       { label: "Rapipago", bg: "#F5A623", color: "#1F2937" },
       { label: "Cuotas", bg: "#1F2937", color: "#ffffff" },
+      { label: "PayPal", bg: "#003087", color: "#ffffff" },
     ],
     CO: [
       { label: "PSE", bg: "#0B5AA6", color: "#ffffff" },
       { label: "Baloto", bg: "#111827", color: "#F5D000" },
       { label: "Nequi", bg: "#200020", color: "#DA0081" },
       { label: "Efecty", bg: "#FFD400", color: "#1F2937" },
+      { label: "PayPal", bg: "#003087", color: "#ffffff" },
     ],
     BR: [
       { label: "Pix", bg: "#32BCAD", color: "#06211F" },
       { label: "Boleto Bancário", bg: "#1F2937", color: "#ffffff" },
       { label: "Débito Bancário", bg: "#374151", color: "#ffffff" },
+      { label: "PayPal", bg: "#003087", color: "#ffffff" },
     ],
     PE: [
       { label: "PagoEfectivo", bg: "#EC0928", color: "#ffffff" },
       { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
       { label: "Visa", bg: "#ffffff", color: "#1F2937" },
       { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
+      { label: "PayPal", bg: "#003087", color: "#ffffff" },
     ],
     CL: [
       { label: "Sencillito", bg: "#111827", color: "#00C08B" },
       { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
       { label: "Visa", bg: "#ffffff", color: "#1F2937" },
       { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
+      { label: "PayPal", bg: "#003087", color: "#ffffff" },
     ],
     PT: [
       { label: "Multibanco", bg: "#1F4E79", color: "#ffffff" },
       { label: "MB WAY", bg: "#00A3E0", color: "#001B2D" },
       { label: "Visa", bg: "#ffffff", color: "#1F2937" },
       { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
+      { label: "PayPal", bg: "#003087", color: "#ffffff" },
     ],
     GB: [
       { label: "Direct Debit", bg: "#111827", color: "#ffffff" },
       { label: "Visa", bg: "#ffffff", color: "#1F2937" },
       { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
+      { label: "PayPal", bg: "#003087", color: "#ffffff" },
     ],
     EC: [
       { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
       { label: "Visa", bg: "#ffffff", color: "#1F2937" },
       { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
+      { label: "PayPal", bg: "#003087", color: "#ffffff" },
     ],
     UY: [
       { label: "Redpagos", bg: "#E4002B", color: "#ffffff" },
       { label: "Abitab", bg: "#F5A623", color: "#1F2937" },
       { label: "Visa", bg: "#ffffff", color: "#1F2937" },
       { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
+      { label: "PayPal", bg: "#003087", color: "#ffffff" },
     ],
   };
   const SEPA_COUNTRIES = ["ES", "FR", "DE", "IT", "NL", "BE", "AT", "IE", "FI", "GR", "LU", "SK", "SI", "EE", "LV", "LT", "CY", "MT"];
@@ -1831,10 +1841,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     {
       id: "hotmart",
       icon: CreditCard,
-      title: language === "en" ? "Hotmart (1-click)"
-        : language === "pt" ? "Hotmart (1 clique)"
-        : language === "fr" ? "Hotmart (1 clic)"
-        : "Hotmart (1 clic)",
+      title: language === "en" ? "Hotmart · PayPal & more (1-click)"
+        : language === "pt" ? "Hotmart · PayPal e mais (1 clique)"
+        : language === "fr" ? "Hotmart · PayPal et plus (1 clic)"
+        : "Hotmart · PayPal y más (1 clic)",
       sub: language === "en"
         ? `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 click`
         : language === "pt"
@@ -2209,7 +2219,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-[13px] sm:text-sm flex items-center gap-2 flex-nowrap min-w-0 text-neutral-800 dark:text-neutral-100">
                   {m.id === "hotmart" ? (
-                    <img src={hotmartLogo.url} alt="Hotmart" className="h-10 sm:h-12 w-auto object-contain -my-1" />
+                    <>
+                      <img src={hotmartLogo.url} alt="Hotmart" className="h-10 sm:h-12 w-auto object-contain -my-1 shrink-0" />
+                      <span className="min-w-0 truncate">{m.title}</span>
+                    </>
                   ) : (
                     <span className="min-w-0 truncate">{m.title}</span>
                   )}

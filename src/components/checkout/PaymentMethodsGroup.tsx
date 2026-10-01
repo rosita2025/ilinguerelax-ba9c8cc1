@@ -1626,7 +1626,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       { label: "Transferencia", bg: "#0F766E", color: "#ffffff" },
       { label: "Visa", bg: "#ffffff", color: "#1F2937" },
       { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
-      { label: "PayPal", bg: "#003087", color: "#ffffff" },
     ],
     CL: [
       { label: "Sencillito", bg: "#111827", color: "#00C08B" },
@@ -1841,10 +1840,15 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     {
       id: "hotmart",
       icon: CreditCard,
-      title: language === "en" ? "Hotmart · PayPal & more (1-click)"
-        : language === "pt" ? "Hotmart · PayPal e mais (1 clique)"
-        : language === "fr" ? "Hotmart · PayPal et plus (1 clic)"
-        : "Hotmart · PayPal y más (1 clic)",
+      title: isPeru
+        ? (language === "en" ? "Hotmart (1-click)"
+          : language === "pt" ? "Hotmart (1 clique)"
+          : language === "fr" ? "Hotmart (1 clic)"
+          : "Hotmart (1 clic)")
+        : (language === "en" ? "Hotmart · PayPal & more (1-click)"
+          : language === "pt" ? "Hotmart · PayPal e mais (1 clique)"
+          : language === "fr" ? "Hotmart · PayPal et plus (1 clic)"
+          : "Hotmart · PayPal y más (1 clic)"),
       sub: language === "en"
         ? `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 click`
         : language === "pt"

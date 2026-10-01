@@ -301,7 +301,9 @@ export default function Checkout() {
   const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt"];
   const learnerLang = catalogItem?.learnerLanguage;
   const language = (
-    learnerLang && SUPPORTED_UI_LANGS.includes(learnerLang) ? learnerLang : siteLanguage
+    slug === "patrones-ingles" || catalogItem?.adminSku === "patrones-especiales-alfabeto-combinaciones-secretas-ingles"
+      ? "es"
+      : learnerLang && SUPPORTED_UI_LANGS.includes(learnerLang) ? learnerLang : siteLanguage
   ) as typeof siteLanguage;
   const t = getCheckoutUI(language);
   const slugUnknown = !!slug && !catalogItem && !loadingDb && dbMissing;

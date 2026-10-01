@@ -27,7 +27,7 @@ import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { detectCurrency, formatPrice, formatCurrencyAmount, exchangeRates, type Currency } from "@/i18n";
 import { useLocalOverrides } from "@/lib/livePrices";
-import { useI18n } from "@/i18n/I18nContext";
+import { CheckoutLanguageProvider, useI18n } from "@/i18n/I18nContext";
 import { UrgencyTimerBar } from "@/components/UrgencyTimerBar";
 import { TikTokVideos } from "@/components/TikTokVideos";
 import introVideo from "@/assets/introduccion-patrones-16x9.mp4.asset.json";
@@ -82,7 +82,7 @@ const features = [
   "Descarga digital inmediata (PDF)",
 ];
 
-const ProductPatronesEspeciales = () => {
+const PatronesContent = () => {
   const { t, currency, countryCode } = useI18n();
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
@@ -736,5 +736,13 @@ const ProductPatronesEspeciales = () => {
     </main>
   );
 };
+
+// Patrones enseña inglés a hispanohablantes, también cuando compran desde EE. UU.
+// El idioma solo se limita a esta página; el país y la moneda permanecen intactos.
+const ProductPatronesEspeciales = () => (
+  <CheckoutLanguageProvider language="es">
+    <PatronesContent />
+  </CheckoutLanguageProvider>
+);
 
 export default ProductPatronesEspeciales;

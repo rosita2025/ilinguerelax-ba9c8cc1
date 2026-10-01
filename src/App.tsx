@@ -15,7 +15,7 @@ import { LivePricesProvider } from "@/lib/livePrices";
 import { getClientId, initClientIdSync } from "@/lib/clientId";
 import { captureMetaClickId } from "@/lib/metaAttribution";
 
-import Index from "./pages/Index";
+const Index = lazy(() => import("./pages/Index"));
 import { CookieConsent } from "@/components/CookieConsent";
 import { EmailSubscribePopup } from "@/components/EmailSubscribePopup";
 

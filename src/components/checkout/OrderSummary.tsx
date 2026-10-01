@@ -97,7 +97,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
       setCouponError(t.invalidCoupon);
     } else {
       setCouponInput("");
-      toast.success("Coupon applied!");
+      toast.success(language === "es" ? "Cupón aplicado" : language === "pt" ? "Cupom aplicado" : language === "fr" ? "Code promo appliqué" : "Coupon applied!");
     }
   };
 
@@ -167,7 +167,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <div className="flex gap-2.5 items-start">
               <Truck className="w-4 h-4 text-destructive shrink-0 mt-0.5" aria-hidden="true" />
               <p className="text-xs text-destructive font-medium leading-snug">
-                <strong className="font-bold uppercase tracking-tight">{t.physical}.</strong> Required: Name, Email, Phone and Shipping Address required.
+                <strong className="font-bold uppercase tracking-tight">{t.physical}.</strong> {language === "es" ? "Necesitamos nombre, correo, teléfono y dirección de envío." : language === "pt" ? "Precisamos de nome, email, telefone e endereço de entrega." : language === "fr" ? "Nom, e-mail, téléphone et adresse de livraison requis." : "Name, email, phone and shipping address required."}
               </p>
             </div>
             <div className="text-[10px] space-y-1 pl-6 opacity-90 italic">
@@ -189,11 +189,11 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <div className="flex gap-2.5 items-start">
               <Zap className="w-4 h-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
               <p className="text-xs text-muted-foreground leading-snug">
-                <strong className="text-foreground font-semibold">{t.digital}.</strong> Required: Name, Email and Phone required for access.
+                <strong className="text-foreground font-semibold">{t.digital}.</strong> {language === "es" ? "Necesitamos nombre, correo y teléfono para darte acceso." : language === "pt" ? "Nome, email e telefone necessários para o acesso." : language === "fr" ? "Nom, e-mail et téléphone requis pour l'accès." : "Name, email and phone required for access."}
               </p>
             </div>
             <p className="text-[10px] pl-6 text-muted-foreground/80 italic">
-              Immediate access via email after payment.
+              {language === "es" ? "Acceso por correo después del pago." : language === "pt" ? "Acesso por email após o pagamento." : language === "fr" ? "Accès par e-mail après le paiement." : "Access by email after payment."}
             </p>
           </div>
         )}

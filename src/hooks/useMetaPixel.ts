@@ -448,35 +448,6 @@ export const useHotmartPixelContact = () => {
   }, []);
 };
 
-// Une al visitante (navegador + sesión) con el correo que escribió en el
-// checkout, para que /admin/orders pueda reconstruir su recorrido completo
-// (primera visita, sesiones, vistas del producto, país, origen). Solo guarda el
-// correo en nuestro embudo propio; en la UE exige que haya aceptado cookies y
-// nunca se envía desde tráfico interno (admin / pruebas).
-export const linkVisitorEmail = (email: string) => {
-  if (typeof window === "undefined") return;
-  const clean = String(email || "").trim().toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean) || clean.length > 254) return;
-  if (isInternalTraffic() || !hasPixelConsent()) return;
-  try {
-    const key = `ilr_linked_${getSessionId()}`;
-    if (sessionStorage.getItem(key) === clean) return;
-    sessionStorage.setItem(key, clean);
-  } catch { /* noop */ }
-  void supabase.functions.invoke("log-funnel-event", {
-    body: {
-      event_name: "Lead",
-      email: clean,
-      session_id: getSessionId(),
-      client_id: getClientId(),
-      page_path: window.location.pathname,
-      country: getCountry(),
-      referrer: getAttributionReferrer(),
-      provider: "checkout_email",
-    },
-  });
-};
-
 // Track Lead (newsletter / coupon email subscriptions). Fires browser Pixel + CAPI with hashed email.
 export const trackLead = (
   email: string,

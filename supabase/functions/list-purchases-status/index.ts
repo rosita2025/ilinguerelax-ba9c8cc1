@@ -27,9 +27,6 @@ interface Row {
   failed_step: string | null;
   payload: any;
   is_merged?: boolean;
-  // true si este correo tiene atribución guardada de Meta Ads (fbc/fbp) —
-  // o sea, llegó haciendo clic en un anuncio de Facebook/Instagram.
-  from_meta_ads?: boolean;
 }
 
 // Mercado Pago status_detail → Spanish reason
@@ -465,24 +462,7 @@ Deno.serve(async (req) => {
       return acc;
     }, {});
 
-    const pageRows = filtered.slice(0, take);
-
-    // Marca cada pedido con si viene de un clic real en un anuncio de Meta
-    // (Facebook/Instagram) — usando la misma tabla que ya alimenta el
-    // píxel de conversión, sin necesitar guardar nada nuevo.
-    const pageEmails = Array.from(new Set(pageRows.map((r) => r.email).filter(Boolean))) as string[];
-    if (pageEmails.length) {
-      const { data: attrRows } = await admin
-        .from("meta_attribution")
-        .select("email")
-        .in("email", pageEmails.map((e) => e.toLowerCase()));
-      const withMetaAds = new Set((attrRows ?? []).map((r: { email: string }) => r.email));
-      for (const r of pageRows) {
-        r.from_meta_ads = r.email ? withMetaAds.has(r.email.toLowerCase()) : false;
-      }
-    }
-
-    return new Response(JSON.stringify({ rows: pageRows, summary, total: filtered.length }), {
+    return new Response(JSON.stringify({ rows: filtered.slice(0, take), summary, total: filtered.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

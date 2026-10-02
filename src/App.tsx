@@ -86,7 +86,6 @@ const AdminEmailTest = lazy(() => import("./pages/AdminEmailTest"));
 const AdminPhysicalOrders = lazy(() => import("./pages/AdminPhysicalOrders"));
 
 const AdminPurchasesStatus = lazy(() => import("./pages/AdminPurchasesStatus"));
-const AdminOrderDetail = lazy(() => import("./pages/AdminOrderDetail"));
 const AdminCheckoutAbuse = lazy(() => import("./pages/AdminCheckoutAbuse"));
 const AdminPaymentErrors = lazy(() => import("./pages/AdminPaymentErrors"));
 
@@ -210,55 +209,7 @@ const RouteTracker = () => {
   return null;
 };
 
-// En /admin no se muestra un círculo de carga: se pinta un esqueleto con la
-// forma de la pantalla (menú lateral + bloques) mientras baja el código.
-const AdminSkeleton = () => (
-  <div className="min-h-dvh bg-background flex">
-    <aside className="hidden md:block w-[200px] shrink-0 border-r p-4 space-y-3 animate-pulse">
-      {Array.from({ length: 14 }).map((_, i) => (
-        <div key={i} className="h-4 rounded bg-muted" />
-      ))}
-    </aside>
-    <main className="flex-1 p-4 md:p-6 space-y-4 animate-pulse">
-      <div className="h-8 w-56 rounded bg-muted" />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-24 rounded-xl bg-muted" />
-        ))}
-      </div>
-      <div className="h-64 rounded-xl bg-muted" />
-    </main>
-  </div>
-);
-
-// Dentro del admin, baja en segundo plano el código de las pantallas más usadas
-// para que al hacer clic en el menú abran al instante.
-const ADMIN_PREFETCH = [
-  () => import("./pages/AdminHome"),
-  () => import("./pages/AdminLive"),
-  () => import("./pages/AdminPurchasesStatus"),
-  () => import("./pages/AdminPhysicalOrders"),
-  () => import("./pages/AdminProducts"),
-  () => import("./pages/AdminManualPayments"),
-  () => import("./pages/AdminAudiences"),
-  () => import("./pages/AdminCheckoutAbuse"),
-  () => import("./pages/AdminPaymentErrors"),
-  () => import("./pages/AdminMarketingDrips"),
-];
-const AdminPrefetch = () => {
-  const isAdmin = useLocation().pathname.startsWith("/admin");
-  useEffect(() => {
-    if (!isAdmin) return;
-    const w = window as typeof window & { requestIdleCallback?: (cb: () => void) => number };
-    const run = () => { ADMIN_PREFETCH.forEach((f, i) => window.setTimeout(() => { void f().catch(() => {}); }, i * 300)); };
-    if (typeof w.requestIdleCallback === "function") w.requestIdleCallback(run);
-    else window.setTimeout(run, 1500);
-  }, [isAdmin]);
-  return null;
-};
-
 const PageFallback = () => {
-  if (typeof window !== "undefined" && window.location.pathname.startsWith("/admin")) return <AdminSkeleton />;
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
@@ -291,7 +242,6 @@ const App = () => (
               <CartSyncWrapper>
                 <AdminSubdomainGate />
                 <RouteTracker />
-                <AdminPrefetch />
                 <PublicOnly><ProductViewTracker /></PublicOnly>
                 <AutoTranslate />
                 <PublicOnly><BrevoChatToggle /></PublicOnly>
@@ -379,8 +329,7 @@ const App = () => (
                   <Route path="/admin/manual-payments" element={<AdminGate><AdminManualPayments /></AdminGate>} />
                   <Route path="/admin/productos" element={<AdminGate><AdminProducts /></AdminGate>} />
                   <Route path="/admin/productos/:sku" element={<AdminGate><AdminProductEdit /></AdminGate>} />
-                  <Route path="/admin/orders" element={<AdminGate><AdminPurchasesStatus /></AdminGate>} />
-                  <Route path="/admin/orders/:id" element={<AdminGate><AdminOrderDetail /></AdminGate>} />
+                  <Route path="/admin/orders" element={<AdminGate><AdminEmailTest /></AdminGate>} />
                   <Route path="/admin/orders-physical" element={<AdminGate><AdminPhysicalOrders /></AdminGate>} />
                   
                   <Route path="/admin/purchases-status" element={<AdminGate><AdminPurchasesStatus /></AdminGate>} />

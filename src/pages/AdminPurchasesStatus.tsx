@@ -33,7 +33,6 @@ interface Row {
   failed_step: string | null;
   payload: any;
   is_merged?: boolean;
-  from_meta_ads?: boolean;
 }
 
 const PROVIDER_META: Record<Provider, { label: string; icon: typeof CreditCard; color: string }> = {
@@ -67,13 +66,6 @@ const fmtDate = (iso: string) => {
 const AdminPurchasesStatus = () => {
   const { adminKey } = useAdminKey();
   const [rows, setRows] = useState<Row[]>([]);
-  // Detalle desplegable dentro de la misma fila — en vez de navegar a otra
-  // página (que se sentía más lenta por la carga completa de página), el
-  // detalle se abre hacia abajo, justo debajo del pedido que se tocó.
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [orderDetails, setOrderDetails] = useState<Record<string, any>>({});
-  const [loadingDetailId, setLoadingDetailId] = useState<string | null>(null);
-  const [detailErrors, setDetailErrors] = useState<Record<string, string>>({});
   const [summary, setSummary] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
@@ -112,33 +104,6 @@ const AdminPurchasesStatus = () => {
     setEditing(id); setEmailDraft(current ?? ""); setResendOnSave(true);
   };
   const cancelEdit = () => { setEditing(null); setEmailDraft(""); };
-
-  const toggleDetail = async (id: string) => {
-    if (expandedId === id) {
-      setExpandedId(null);
-      return;
-    }
-    // El panel se abre al instante con los datos que ya tiene la fila; el
-    // resumen de conversión llega después y no bloquea nada.
-    setExpandedId(id);
-    if (orderDetails[id]) return; // ya en caché, no se vuelve a pedir
-    setLoadingDetailId(id);
-    setDetailErrors((prev) => { const n = { ...prev }; delete n[id]; return n; });
-    try {
-      const { data, error } = await adminInvoke("get-order-detail", { body: { adminKey, id } });
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
-      setOrderDetails((prev) => ({ ...prev, [id]: data }));
-    } catch (e) {
-      setDetailErrors((prev) => ({ ...prev, [id]: (e as Error).message }));
-    } finally {
-      setLoadingDetailId(null);
-    }
-  };
-  const retryDetail = (id: string) => {
-    setExpandedId(null);
-    setTimeout(() => { void toggleDetail(id); }, 0);
-  };
   const saveEdit = async (id: string) => {
     const email = emailDraft.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -236,28 +201,6 @@ const AdminPurchasesStatus = () => {
           ))}
         </div>
 
-        {/* Pestañas grandes: Compras vs Carritos abandonados (estilo Shopify) */}
-        <div className="flex gap-2 border-b border-border">
-          {([
-            { key: "approved", label: "✅ Compras" },
-            { key: "abandoned", label: "🛒 Carritos abandonados" },
-            { key: "all", label: "Todos" },
-          ] as const).map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setMapped(tab.key as Mapped | "all")}
-              className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
-                mapped === tab.key
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
         {/* Filters */}
         <Card className="p-3">
           <div className="grid gap-2 md:grid-cols-4">
@@ -346,22 +289,13 @@ const AdminPurchasesStatus = () => {
                           </span>
                         )}
                       </div>
-                      <div className="text-sm font-semibold flex items-center gap-2 flex-wrap">
+                      <div className="text-sm font-semibold flex items-center gap-2">
                         <span className="truncate max-w-[150px]">
                           {r.name || r.payload?.buyer_name || r.payload?.buyer?.name || r.payload?.customer_name || "Sin Nombre"}
                         </span>
                         <span className="text-muted-foreground font-normal truncate opacity-70">
                           &lt;{r.email || r.payload?.buyer_email || r.payload?.buyer?.email || r.payload?.customer_email || "—"}&gt;
                         </span>
-                        {r.from_meta_ads ? (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-600 border border-blue-500/30 shrink-0">
-                            📣 Meta Ads
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border shrink-0">
-                            Directo / Orgánico
-                          </span>
-                        )}
                       </div>
                       <div className="text-xs text-muted-foreground truncate">
                         {r.product ?? "—"} {r.transaction && <span className="opacity-60">· {r.transaction}</span>}
@@ -382,11 +316,16 @@ const AdminPurchasesStatus = () => {
                       )}
                     </div>
                   </button>
+                  {isOpen && (
+                    <div className="px-3 pb-3 pl-9 space-y-2 text-xs">
+                      <div>
+                        <span className="text-muted-foreground">Estado raw:</span>{" "}
+                        <code className="bg-muted px-1 rounded">{r.raw_status}</code>
+                      </div>
 
-                  {/* Botones de acción — siempre visibles en cualquier pedido,
-                      sin importar el método de pago ni si el acordeón de
-                      "Estado raw" de abajo está abierto. */}
-                  <div className="px-3 pb-3 pl-9 space-y-2 text-xs">
+
+
+
                       {editing === r.id ? (
                         <div className="rounded-md border p-2 space-y-2 bg-muted/30">
                           <label className="block text-[11px] font-medium">Corregir correo del cliente</label>
@@ -407,165 +346,11 @@ const AdminPurchasesStatus = () => {
                           </div>
                         </div>
                       ) : (
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline" onClick={() => startEdit(r.id, r.email)} className="h-7 text-xs">
-                            <Pencil className="w-3 h-3 mr-1" /> Editar correo / Reenviar
-                          </Button>
-                          <Button size="sm" variant="outline" onClick={() => toggleDetail(r.id)} className="h-7 text-xs">
-                            {loadingDetailId === r.id ? "Cargando…" : expandedId === r.id ? "▲ Ocultar detalle" : "▼ Ver detalle"}
-                          </Button>
-                        </div>
+                        <Button size="sm" variant="outline" onClick={() => startEdit(r.id, r.email)} className="h-7 text-xs">
+                          <Pencil className="w-3 h-3 mr-1" /> Editar correo / Reenviar
+                        </Button>
                       )}
 
-                      {expandedId === r.id && (() => {
-                        const d = orderDetails[r.id];
-                        const cs = d?.conversion_summary;
-                        const err = detailErrors[r.id];
-                        const channel: "meta" | "organic" | "direct" | "other" =
-                          cs?.channel ?? (d?.from_meta_ads || r.from_meta_ads ? "meta" : "direct");
-                        const CHANNEL = {
-                          meta:    { label: "📣 Meta Ads (Pixel)", cls: "bg-blue-500/15 text-blue-700 border-blue-500/30" },
-                          organic: { label: "🔎 Orgánico",        cls: "bg-emerald-500/15 text-emerald-700 border-emerald-500/30" },
-                          direct:  { label: "➡️ Directo",         cls: "bg-muted text-muted-foreground border-border" },
-                          other:   { label: "🔗 Otro origen",     cls: "bg-amber-500/15 text-amber-700 border-amber-500/30" },
-                        }[channel];
-                        const fmtLong = (iso?: string | null) =>
-                          iso ? new Date(iso).toLocaleString("es-PE", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
-                        const country = r.country || d?.country || r.payload?.customer_country || r.payload?.country || r.payload?.buyer_country || "—";
-                        const items: any[] = d?.items ?? [];
-                        return (
-                          <div className="mt-3 pt-3 border-t border-dashed space-y-3 text-sm bg-muted/30 rounded-lg p-3">
-                            {/* Datos del pedido: salen de la fila, sin esperar al servidor */}
-                            <div className="grid grid-cols-2 gap-2">
-                              <div>
-                                <span className="text-xs text-muted-foreground block">Cliente</span>
-                                <span className="font-medium">{d?.name || r.name || "—"}</span>
-                              </div>
-                              <div>
-                                <span className="text-xs text-muted-foreground block">Correo</span>
-                                <span className="font-medium break-all">{d?.email || r.email || "—"}</span>
-                              </div>
-                              <div>
-                                <span className="text-xs text-muted-foreground block">Método de pago</span>
-                                <span className="font-medium">{d?.payment_method || d?.provider_label || PROVIDER_META[r.provider].label}</span>
-                              </div>
-                              <div>
-                                <span className="text-xs text-muted-foreground block">País</span>
-                                <span className="font-medium">{country}</span>
-                              </div>
-                            </div>
-
-                            {/* Conversion summary */}
-                            <div>
-                              <div className="flex items-center gap-2 mb-1.5">
-                                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Conversion summary</span>
-                                <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full border ${CHANNEL.cls}`}>{CHANNEL.label}</span>
-                              </div>
-                              {!d && !err && (
-                                <div className="space-y-1.5 animate-pulse">
-                                  <div className="h-4 w-2/3 rounded bg-muted" />
-                                  <div className="h-4 w-1/2 rounded bg-muted" />
-                                  <div className="h-4 w-3/5 rounded bg-muted" />
-                                </div>
-                              )}
-                              {err && (
-                                <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded p-2 flex items-center justify-between gap-2">
-                                  <span>No se pudo cargar el detalle: {err}</span>
-                                  <Button size="sm" variant="outline" className="h-6 text-[11px]" onClick={() => retryDetail(r.id)}>Reintentar</Button>
-                                </div>
-                              )}
-                              {d && !cs && (
-                                <p className="text-xs text-muted-foreground bg-background rounded p-2 border">
-                                  Sin visitas vinculadas a este correo. El recorrido se registra desde que el cliente
-                                  escribe su correo en el checkout; los pedidos anteriores solo muestran el origen.
-                                </p>
-                              )}
-                              {cs && (
-                                <div className="space-y-2">
-                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                    {[
-                                      { k: "Sesiones", v: cs.session_count },
-                                      { k: "Páginas vistas", v: cs.page_views },
-                                      { k: "Vio el producto", v: `${cs.product_views} ${cs.product_views === 1 ? "vez" : "veces"}` },
-                                      { k: "País", v: (cs.countries?.length ? cs.countries.join(", ") : country) },
-                                    ].map((x) => (
-                                      <div key={x.k} className="bg-background rounded border p-2">
-                                        <span className="text-[10px] uppercase text-muted-foreground block">{x.k}</span>
-                                        <span className="font-semibold">{x.v}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                  <div className="bg-background rounded border p-2 text-xs space-y-1">
-                                    <p><b>1ª visita:</b> {fmtLong(cs.first_visit_at)}{cs.first_page ? ` · ${cs.first_page}` : ""}</p>
-                                    <p><b>Última visita:</b> {fmtLong(cs.last_visit_at)}{cs.last_page ? ` · ${cs.last_page}` : ""}</p>
-                                    <p><b>Compró:</b> {fmtLong(d.created_at)}</p>
-                                    <p className="text-muted-foreground">
-                                      {cs.days_before_purchase === 0
-                                        ? "Compró el mismo día de su primera visita."
-                                        : `Compró ${cs.days_before_purchase} día(s) después de su primera visita${cs.days_since_last_visit ? ` y ${cs.days_since_last_visit} día(s) después de la última` : ""}.`}
-                                    </p>
-                                    <p className="text-muted-foreground">
-                                      Primer origen: <b>{cs.first_source}</b> · Último origen: <b>{cs.last_source}</b>
-                                    </p>
-                                  </div>
-                                  {cs.sessions?.length > 0 && (
-                                    <details className="text-xs">
-                                      <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Ver sesiones ({cs.sessions.length})</summary>
-                                      <div className="mt-1.5 space-y-1">
-                                        {cs.sessions.map((ss: any, i: number) => (
-                                          <div key={i} className="flex justify-between gap-2 bg-background rounded border px-2 py-1">
-                                            <span>{fmtLong(ss.at)}</span>
-                                            <span className="text-muted-foreground truncate">{ss.first_page || "—"}</span>
-                                            <span>{ss.views} vista(s)</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </details>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Productos */}
-                            <div>
-                              <span className="text-xs text-muted-foreground block mb-1">Productos</span>
-                              {items.length > 0 ? (
-                                <div className="space-y-1">
-                                  {items.map((it: any, i: number) => (
-                                    <div key={i} className="flex items-center justify-between text-xs">
-                                      <span>{it.name || it.sku}</span>
-                                      <span className={i === 0 ? "text-primary font-medium" : "text-muted-foreground"}>
-                                        {i === 0 ? "Principal" : "Upsell"}
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              ) : (
-                                <span className="text-xs">{d?.product || r.product || "—"}</span>
-                              )}
-                            </div>
-                            {(d?.amount ?? r.amount) != null && (
-                              <div className="flex justify-between text-xs pt-1 border-t">
-                                <span className="text-muted-foreground">Precio</span>
-                                <span className="font-semibold">
-                                  {d?.currency || r.currency || "USD"} {Number(d?.amount ?? r.amount).toFixed(2)}
-                                </span>
-                              </div>
-                            )}
-                            {d?.delivery?.status === "sent" && d?.delivery?.updated_at && (
-                              <p className="text-xs text-emerald-600 font-medium">📬 Enviado el {fmtLong(d.delivery.updated_at)}</p>
-                            )}
-                          </div>
-                        );
-                      })()}
-                  </div>
-
-                  {isOpen && (
-                    <div className="px-3 pb-3 pl-9 space-y-2 text-xs">
-                      <div>
-                        <span className="text-muted-foreground">Estado raw:</span>{" "}
-                        <code className="bg-muted px-1 rounded">{r.raw_status}</code>
-                      </div>
                       <details>
                         <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
                           Ver payload completo

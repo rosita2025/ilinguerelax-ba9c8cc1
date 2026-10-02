@@ -1,3 +1,4 @@
+import { fetchAdminOrders } from "@/lib/adminOrdersFeed";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminNav from "@/components/admin/AdminNav";
@@ -198,12 +199,10 @@ const AdminEmailTest = () => {
     }, wait);
   };
 
-  const load = async (silent = false) => {
+  const load = async (silent = false, maxAgeMs = 0) => {
     if (!silent) setLoading(true);
     try {
-      const { data, error } = await adminInvoke("list-admin-orders", {
-        body: { adminKey },
-      });
+      const { data, error } = await fetchAdminOrders(adminKey, maxAgeMs);
       if (error) throw error;
       const manualRes = { data: (data as any)?.manual ?? [] };
       const digitalRes = { data: (data as any)?.digital ?? [] };
@@ -412,7 +411,7 @@ const AdminEmailTest = () => {
 
   useEffect(() => {
     if (!adminKey) return;
-    load(rows.length > 0);
+    load(rows.length > 0, 10000);
     const t = setInterval(() => { if (!document.hidden) load(true); }, 15000);
 
     // Realtime: recompute validación cuando llega/actualiza un envío digital,

@@ -1,4 +1,3 @@
-import { linkVisitorEmail } from "@/hooks/useMetaPixel";
 import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCheckoutPruebaStore, type PruebaItem } from "@/stores/checkoutStore";
@@ -69,7 +68,6 @@ export async function trackAbandonedCheckoutNow(input: TrackAbandonedCheckoutInp
   // Vincula el correo con la atribución de Meta Ads (solo si vino de anuncio),
   // para que el webhook de compra pueda reportar el Purchase a la CAPI.
   void saveMetaAttribution(email, input.country);
-  linkVisitorEmail(email);
 
   if (!input.force && alreadySent(email, productType)) return true;
 

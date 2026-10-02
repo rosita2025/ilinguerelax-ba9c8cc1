@@ -36,16 +36,19 @@
     <link rel="dns-prefetch" href="https://www.facebook.com" />
 
     <!-- Preload critical assets -->
-    <link rel="preload" href="/src/assets/hero-bg.jpg" as="image" fetchpriority="high" />
-    <link
-      rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-      as="style"
-    />
+    <!-- La fuente ya no bloquea el primer pintado: carga en segundo plano (display=swap) -->
     <link
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
 
     <!-- Primary Meta Tags - Optimized for global English SEO -->
     <title>iLingue Relax | Learn Languages with Books & Ebooks</title>

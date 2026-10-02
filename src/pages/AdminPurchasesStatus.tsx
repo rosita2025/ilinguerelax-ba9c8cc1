@@ -33,6 +33,7 @@ interface Row {
   failed_step: string | null;
   payload: any;
   is_merged?: boolean;
+  from_meta_ads?: boolean;
 }
 
 const PROVIDER_META: Record<Provider, { label: string; icon: typeof CreditCard; color: string }> = {
@@ -289,13 +290,22 @@ const AdminPurchasesStatus = () => {
                           </span>
                         )}
                       </div>
-                      <div className="text-sm font-semibold flex items-center gap-2">
+                      <div className="text-sm font-semibold flex items-center gap-2 flex-wrap">
                         <span className="truncate max-w-[150px]">
                           {r.name || r.payload?.buyer_name || r.payload?.buyer?.name || r.payload?.customer_name || "Sin Nombre"}
                         </span>
                         <span className="text-muted-foreground font-normal truncate opacity-70">
                           &lt;{r.email || r.payload?.buyer_email || r.payload?.buyer?.email || r.payload?.customer_email || "—"}&gt;
                         </span>
+                        {r.from_meta_ads ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-600 border border-blue-500/30 shrink-0">
+                            📣 Meta Ads
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border shrink-0">
+                            Directo / Orgánico
+                          </span>
+                        )}
                       </div>
                       <div className="text-xs text-muted-foreground truncate">
                         {r.product ?? "—"} {r.transaction && <span className="opacity-60">· {r.transaction}</span>}

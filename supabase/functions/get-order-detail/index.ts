@@ -48,6 +48,7 @@ Deno.serve(async (req) => {
     let providerLabel = "";
     let paymentMethod: string | null = null;
     let rawDetail: Record<string, unknown> = {};
+    let items: Array<{ name?: string; sku?: string }> = [];
     let found = false;
 
     if (prefix === "man") {
@@ -64,6 +65,7 @@ Deno.serve(async (req) => {
         providerLabel = "Pago manual";
         paymentMethod = data.method ?? null;
         rawDetail = data;
+        items = Array.isArray(data.items) ? data.items : [];
       }
     } else if (prefix === "cart") {
       const { data } = await admin.from("persistent_carts").select("*").eq("id", rawId).maybeSingle();
@@ -77,6 +79,7 @@ Deno.serve(async (req) => {
         providerLabel = "Carrito interno (sin pago confirmado)";
         paymentMethod = null;
         rawDetail = data;
+        items = Array.isArray(data.items) ? data.items : [];
       }
     } else if (prefix === "sh") {
       const { data } = await admin.from("shopify_sales").select("*").eq("id", rawId).maybeSingle();
@@ -180,6 +183,7 @@ Deno.serve(async (req) => {
         currency,
         country,
         product,
+        items,
         created_at: createdAt,
         from_meta_ads: fromMetaAds,
         meta_attribution: metaAttr,

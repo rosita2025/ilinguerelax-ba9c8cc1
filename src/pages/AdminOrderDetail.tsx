@@ -18,6 +18,7 @@ interface OrderDetail {
   currency: string | null;
   country: string | null;
   product: string | null;
+  items: Array<{ name?: string; sku?: string }>;
   created_at: string | null;
   from_meta_ads: boolean;
   meta_attribution: { country?: string; updated_at?: string } | null;
@@ -121,8 +122,32 @@ export default function AdminOrderDetail() {
               )}
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Pedido {order.order_number || order.id} · {order.product || "—"}
+              Pedido {order.order_number || order.id}
             </p>
+          </Card>
+
+          <Card className="p-5">
+            <h2 className="font-semibold mb-3 flex items-center gap-2">
+              <Package className="w-4 h-4" /> Productos
+            </h2>
+            {order.items && order.items.length > 0 ? (
+              <div className="space-y-2">
+                {order.items.map((it, i) => (
+                  <div key={i} className="flex items-center justify-between text-sm py-1.5 border-b last:border-0">
+                    <span>{it.name || it.sku || "Producto"}</span>
+                    {i === 0 ? (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">Principal</span>
+                    ) : (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-medium">Upsell</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {order.product || "Sin detalle de producto disponible para este tipo de pago."}
+              </p>
+            )}
           </Card>
 
           {/* Resumen de conversión — estilo "Conversion summary" */}

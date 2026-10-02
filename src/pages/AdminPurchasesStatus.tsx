@@ -375,16 +375,11 @@ const AdminPurchasesStatus = () => {
                       )}
                     </div>
                   </button>
-                  {isOpen && (
-                    <div className="px-3 pb-3 pl-9 space-y-2 text-xs">
-                      <div>
-                        <span className="text-muted-foreground">Estado raw:</span>{" "}
-                        <code className="bg-muted px-1 rounded">{r.raw_status}</code>
-                      </div>
 
-
-
-
+                  {/* Botones de acción — siempre visibles en cualquier pedido,
+                      sin importar el método de pago ni si el acordeón de
+                      "Estado raw" de abajo está abierto. */}
+                  <div className="px-3 pb-3 pl-9 space-y-2 text-xs">
                       {editing === r.id ? (
                         <div className="rounded-md border p-2 space-y-2 bg-muted/30">
                           <label className="block text-[11px] font-medium">Corregir correo del cliente</label>
@@ -495,6 +490,14 @@ const AdminPurchasesStatus = () => {
                         </div>
                       )}
 
+                  </div>
+
+                  {isOpen && (
+                    <div className="px-3 pb-3 pl-9 space-y-2 text-xs">
+                      <div>
+                        <span className="text-muted-foreground">Estado raw:</span>{" "}
+                        <code className="bg-muted px-1 rounded">{r.raw_status}</code>
+                      </div>
                       <details>
                         <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
                           Ver payload completo

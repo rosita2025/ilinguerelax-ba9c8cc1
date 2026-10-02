@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { adminInvoke } from "@/lib/adminInvoke";
+import { fetchAdminOrders } from "@/lib/adminOrdersFeed";
 import { normalizeTracking, SHIPPING_CARRIERS } from "@/lib/tracking";
 import { 
   Package, 
@@ -56,12 +57,10 @@ const AdminPhysicalOrders = () => {
   const [query, setQuery] = useState("");
   const [saving, setSaving] = useState<string | null>(null);
 
-  const loadOrders = async (silent = false) => {
+  const loadOrders = async (silent = false, maxAgeMs = 0) => {
     if (!silent) setLoading(true);
     try {
-      const { data, error } = await adminInvoke("list-admin-orders", {
-        body: { adminKey },
-      });
+      const { data, error } = await fetchAdminOrders(adminKey, maxAgeMs);
       if (error) throw error;
 
       const products = (data as any)?.products || [];
@@ -159,7 +158,7 @@ const AdminPhysicalOrders = () => {
   };
 
   useEffect(() => {
-    if (adminKey) loadOrders();
+    if (adminKey) loadOrders(false, 10000);
   }, [adminKey]);
 
   const updateTracking = async (order: PhysicalOrder, tracking: string, provider: string, proofUrl?: string) => {

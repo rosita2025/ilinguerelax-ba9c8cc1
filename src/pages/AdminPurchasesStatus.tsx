@@ -203,6 +203,28 @@ const AdminPurchasesStatus = () => {
           ))}
         </div>
 
+        {/* Pestañas grandes: Compras vs Carritos abandonados (estilo Shopify) */}
+        <div className="flex gap-2 border-b border-border">
+          {([
+            { key: "approved", label: "✅ Compras" },
+            { key: "abandoned", label: "🛒 Carritos abandonados" },
+            { key: "all", label: "Todos" },
+          ] as const).map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setMapped(tab.key as Mapped | "all")}
+              className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                mapped === tab.key
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         {/* Filters */}
         <Card className="p-3">
           <div className="grid gap-2 md:grid-cols-4">

@@ -1,5 +1,5 @@
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
@@ -52,6 +52,7 @@ import resenaMx2 from "@/assets/resena-mx2.webp.asset.json";
 import resenaMx3 from "@/assets/resena-mx3.webp.asset.json";
 import resenaMx4 from "@/assets/resena-mx4.webp.asset.json";
 import { PinterestSave } from "@/components/PinterestSave";
+import { lightCoverUrl, disableImageTransform, readCachedCover, writeCachedCover } from "@/lib/coverImage";
 
 const previews = [
   { src: patronesPreview1.url, alt: "20 patrones nuevos de pronunciación en inglés", caption: "20 patrones nuevos" },
@@ -120,8 +121,17 @@ const PatronesContent = () => {
   // si aún no carga o no existe, cae a la imagen local por defecto.
   // Mientras el admin responde no mostramos la imagen local pesada para
   // evitar descargar dos imágenes distintas (parpadeo y carga lenta).
-  const heroImage = pricingAdmin.coverImageUrl
-    ?? (pricingAdmin.loaded ? productImage : null);
+  // La última portada vista se recuerda en el navegador: así, quien ya visitó
+  // la página empieza a bajar la imagen sin esperar la respuesta del admin.
+  const cachedCover = useMemo(() => readCachedCover(ADMIN_SKU), []);
+  useEffect(() => {
+    if (pricingAdmin.loaded) writeCachedCover(ADMIN_SKU, pricingAdmin.coverImageUrl);
+  }, [pricingAdmin.loaded, pricingAdmin.coverImageUrl]);
+  const heroImage = pricingAdmin.loaded
+    ? (pricingAdmin.coverImageUrl ?? productImage)
+    : cachedCover;
+  const [heroFailed, setHeroFailed] = useState(false);
+  const heroLight = heroFailed ? heroImage : lightCoverUrl(heroImage);
   const heroImageAbsolute = heroImage
     ? (heroImage.startsWith("http") ? heroImage : `https://ilinguerelax.com${heroImage}`)
     : `https://ilinguerelax.com${productImage}`;
@@ -301,7 +311,11 @@ const PatronesContent = () => {
               <div className="relative">
                 {heroImage ? (
                   <img
-                    src={heroImage}
+                    src={heroLight ?? heroImage}
+                    onError={() => {
+                      // Si el servidor no soporta imágenes livianas, usa la original.
+                      if (heroLight && heroLight !== heroImage) { disableImageTransform(); setHeroFailed(true); }
+                    }}
                     alt="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
                     className="w-full h-auto rounded-2xl shadow-hero"
                     width={1000}

@@ -3,8 +3,12 @@
 // cart-) que ya usa list-purchases-status y correct-purchase-email.
 import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 
 const corsHeaders = adminCorsHeaders;
+
+const rowItemName = (items: Array<{ name?: string; sku?: string }>, sku: string): string | null =>
+  items.find((i) => i.sku === sku)?.name ?? null;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -49,6 +53,8 @@ Deno.serve(async (req) => {
     let paymentMethod: string | null = null;
     let rawDetail: Record<string, unknown> = {};
     let items: Array<{ name?: string; sku?: string }> = [];
+    let metaSkus: string[] = [];
+    let itemsSummary: string | null = null;
     let found = false;
 
     if (prefix === "man") {
@@ -122,7 +128,16 @@ Deno.serve(async (req) => {
       if (data) {
         found = true;
         let meta: any = {};
-        try { meta = JSON.parse(data.referrer || "{}"); } catch { meta = {}; }
+        try { meta = JSON.parse(data.referrer || "{}"); } catch {
+          // El referrer se corta a 2000 caracteres: si el JSON quedó incompleto,
+          // se rescatan los SKUs y el resumen con una búsqueda directa.
+          meta = {};
+          const rawRef = String(data.referrer || "");
+          const mSkus = rawRef.match(/"skus":"([^"]*)"/);
+          const mSum = rawRef.match(/"items_summary":"([^"]*)"/);
+          if (mSkus) meta.skus = mSkus[1];
+          if (mSum) meta.items_summary = mSum[1];
+        }
         email = data.email || meta.email || meta.buyer_email || meta.payer_email || meta.buyer?.email || null;
         name = data.name || meta.name || meta.buyer_name || meta.payer_name || meta.buyer?.name || null;
         amount = Number(data.value ?? 0) || null;
@@ -131,7 +146,12 @@ Deno.serve(async (req) => {
         // El producto puede venir en varios lugares distintos según el
         // proveedor — se intenta cada uno antes de caer en un nombre
         // genérico, para que esta sección NUNCA se vea vacía.
-        product = data.product_id || meta.product_name || meta.product || meta.sku || meta.content_name || "Producto digital (sin nombre registrado)";
+        // "stripe-checkout", "dlocal-…" y similares son nombres de pasarela, no de
+        // producto: se ignoran para que se use el producto real (SKUs del pedido).
+        const genericId = /checkout|^stripe|^dlocal|^mp$|^hotmart$|^paypal/i.test(String(data.product_id || ""));
+        product = (genericId ? null : data.product_id) || meta.product_name || meta.product || meta.sku || meta.content_name || meta.items_summary || null;
+        metaSkus = splitSkuList(meta.skus);
+        itemsSummary = typeof meta.items_summary === "string" ? meta.items_summary : null;
         orderNumber = meta.order_number || meta.transaction || meta.transaction_code || meta.external_reference || data.session_id || rawId;
         createdAt = data.created_at ?? null;
         providerLabel = prefix === "hm" ? "Hotmart" : prefix === "mp" ? "Mercado Pago" : prefix === "st" ? "Stripe" : "dLocal Go";
@@ -140,9 +160,7 @@ Deno.serve(async (req) => {
         // Si el proveedor registró una lista de productos (poco común para
         // estos 4, pero puede pasar), se usa; si no, al menos 1 item con el
         // producto principal que ya resolvimos arriba.
-        items = Array.isArray(meta.items) && meta.items.length > 0
-          ? meta.items
-          : [{ name: product }];
+        items = Array.isArray(meta.items) && meta.items.length > 0 ? meta.items : [];
       }
     }
 
@@ -153,19 +171,14 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Red de seguridad final: ningún pedido debe mostrar la sección de
-    // productos vacía, sin importar de qué tabla vino.
-    if (!product) product = "Producto digital (sin nombre registrado)";
-    if (!items || items.length === 0) items = [{ name: product }];
-
     // Las tres consultas son independientes: se hacen a la vez para que el
     // detalle abra rápido (antes iban una detrás de otra).
     const emailLc = email ? email.toLowerCase() : null;
-    const [deliveryRes, attrRes, byEmailRes] = await Promise.all([
+    const [deliveryRes, attrRes, byEmailRes, orderEventsRes] = await Promise.all([
       // Estado real de entrega del material digital.
       orderNumber
-        ? admin.from("digital_email_sends").select("status, last_event, created_at, updated_at").eq("order_id", orderNumber).maybeSingle()
-        : Promise.resolve({ data: null }),
+        ? admin.from("digital_email_sends").select("status, last_event, created_at, updated_at, skus").eq("order_id", orderNumber).order("created_at", { ascending: false }).limit(1)
+        : Promise.resolve({ data: [] }),
       // ¿Hay atribución guardada de un clic en un anuncio de Meta?
       emailLc
         ? admin.from("meta_attribution").select("email, fbc, fbp, country, updated_at").eq("email", emailLc).maybeSingle()
@@ -174,10 +187,74 @@ Deno.serve(async (req) => {
       emailLc
         ? admin.from("funnel_events").select("client_id, session_id").eq("email", emailLc).limit(200)
         : Promise.resolve({ data: [] }),
+      // SKUs que registró la pasarela al aprobar el pago (Stripe, dLocal…).
+      orderNumber
+        ? admin.from("order_events").select("metadata").eq("order_number", orderNumber).eq("event", "payment_paid").limit(5)
+        : Promise.resolve({ data: [] }),
     ]);
-    const delivery = (deliveryRes.data ?? null) as { status: string | null; last_event: string | null; created_at: string | null; updated_at: string | null } | null;
+    const deliveryRow = ((deliveryRes.data ?? []) as Array<{ status: string | null; last_event: string | null; created_at: string | null; updated_at: string | null; skus?: unknown }>)[0] ?? null;
+    const delivery = deliveryRow
+      ? { status: deliveryRow.status, last_event: deliveryRow.last_event, created_at: deliveryRow.created_at, updated_at: deliveryRow.updated_at }
+      : null;
     const metaAttr = (attrRes.data ?? null) as { country?: string; updated_at?: string } | null;
     const fromMetaAds = !!metaAttr;
+
+    // ── Productos comprados (principal, upsells y bonos) ─────────────────
+    // Se juntan los SKUs de todas las fuentes que los guardan: la fila del
+    // pedido, el pago aprobado (order_events), el envío digital y el propio
+    // evento del embudo; luego se traducen al nombre real del catálogo.
+    const evSkus = ((orderEventsRes.data ?? []) as Array<{ metadata: { skus?: unknown } | null }>)
+      .flatMap((r) => splitSkuList(r.metadata?.skus));
+    const rowSkus = items.map((i) => i.sku || (i as { id?: string }).id).filter((v): v is string => !!v);
+    const allSkus = normalizeSkus([...rowSkus, ...metaSkus, ...evSkus, ...splitSkuList(deliveryRow?.skus)]).slice(0, 12);
+
+    type CatalogRow = { sku: string; name: string | null; bonus_name: string | null; bonuses: unknown; is_physical: boolean | null };
+    let catalog: CatalogRow[] = [];
+    let upsellLinks: Array<{ product_sku: string; upsell_sku: string }> = [];
+    if (allSkus.length) {
+      const [catRes, upRes] = await Promise.all([
+        admin.from("digital_products").select("sku, name, bonus_name, bonuses, is_physical").in("sku", allSkus),
+        admin.from("product_upsells").select("product_sku, upsell_sku").in("product_sku", allSkus),
+      ]);
+      catalog = (catRes.data ?? []) as CatalogRow[];
+      upsellLinks = (upRes.data ?? []) as typeof upsellLinks;
+    }
+    const catBySku = new Map(catalog.map((c) => [c.sku, c]));
+    // Un SKU es upsell si otro SKU del mismo pedido lo ofrece como upsell.
+    const upsellSet = new Set(upsellLinks.filter((l) => allSkus.includes(l.upsell_sku)).map((l) => l.upsell_sku));
+    const mainSku = allSkus.find((k) => !upsellSet.has(k)) ?? allSkus[0] ?? null;
+
+    const bonusNames = (c: CatalogRow | undefined): string[] => {
+      if (!c) return [];
+      const out: string[] = [];
+      if (Array.isArray(c.bonuses)) {
+        for (const b of c.bonuses as Array<{ name?: string }>) if (b?.name) out.push(String(b.name));
+      }
+      if (c.bonus_name && !out.includes(c.bonus_name)) out.push(c.bonus_name);
+      return out;
+    };
+
+    let resolvedItems: Array<{ sku: string | null; name: string; role: "main" | "upsell"; bonuses: string[]; is_physical: boolean }> = [];
+    if (allSkus.length) {
+      resolvedItems = allSkus
+        .map((k) => ({ k, c: catBySku.get(k) }))
+        .sort((a, b) => (a.k === mainSku ? -1 : b.k === mainSku ? 1 : 0))
+        .map(({ k, c }) => ({
+          sku: k,
+          name: c?.name || rowItemName(items, k) || k,
+          role: (k === mainSku ? "main" : "upsell") as "main" | "upsell",
+          bonuses: bonusNames(c),
+          is_physical: !!c?.is_physical,
+        }));
+    } else {
+      // Sin SKUs registrados: se usa el nombre que haya dejado la pasarela.
+      const fallbackNames = items.map((i) => i.name).filter((v): v is string => !!v);
+      const names = fallbackNames.length ? fallbackNames : [itemsSummary || product || "Producto no registrado por la pasarela"];
+      resolvedItems = names.map((n, i) => ({ sku: null, name: n, role: (i === 0 ? "main" : "upsell") as "main" | "upsell", bonuses: [], is_physical: false }));
+    }
+    items = resolvedItems as unknown as typeof items;
+    product = resolvedItems[0]?.name ?? product ?? "Producto no registrado por la pasarela";
+    const hasUpsell = resolvedItems.some((i) => i.role === "upsell");
 
     // ── Recorrido completo del cliente ────────────────────────────────────
     // El correo se une con el navegador (client_id) cuando lo escribe en el
@@ -307,6 +384,7 @@ Deno.serve(async (req) => {
         country,
         product,
         items,
+        has_upsell: hasUpsell,
         created_at: createdAt,
         from_meta_ads: fromMetaAds,
         meta_attribution: metaAttr,

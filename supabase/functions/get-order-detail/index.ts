@@ -128,12 +128,21 @@ Deno.serve(async (req) => {
         amount = Number(data.value ?? 0) || null;
         currency = data.currency ?? null;
         country = data.country ?? null;
-        product = data.product_id ?? null;
+        // El producto puede venir en varios lugares distintos según el
+        // proveedor — se intenta cada uno antes de caer en un nombre
+        // genérico, para que esta sección NUNCA se vea vacía.
+        product = data.product_id || meta.product_name || meta.product || meta.sku || meta.content_name || "Producto digital (sin nombre registrado)";
         orderNumber = meta.order_number || meta.transaction || meta.transaction_code || meta.external_reference || data.session_id || rawId;
         createdAt = data.created_at ?? null;
         providerLabel = prefix === "hm" ? "Hotmart" : prefix === "mp" ? "Mercado Pago" : prefix === "st" ? "Stripe" : "dLocal Go";
         paymentMethod = providerLabel;
         rawDetail = { ...data, parsed_referrer: meta };
+        // Si el proveedor registró una lista de productos (poco común para
+        // estos 4, pero puede pasar), se usa; si no, al menos 1 item con el
+        // producto principal que ya resolvimos arriba.
+        items = Array.isArray(meta.items) && meta.items.length > 0
+          ? meta.items
+          : [{ name: product }];
       }
     }
 
@@ -143,6 +152,11 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Red de seguridad final: ningún pedido debe mostrar la sección de
+    // productos vacía, sin importar de qué tabla vino.
+    if (!product) product = "Producto digital (sin nombre registrado)";
+    if (!items || items.length === 0) items = [{ name: product }];
 
     // Estado real de entrega del material digital (tabla compartida por
     // todos los métodos de pago, cuando el pedido lo generó).
@@ -171,6 +185,40 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Resumen de conversión completo (estilo Shopify "Conversion summary"):
+    // todas las visitas (PageView) de este correo, para saber cuántas
+    // sesiones tuvo y cuándo fue la primera, no solo si vino de Meta.
+    let conversionSummary: {
+      session_count: number;
+      first_visit_at: string | null;
+      first_page: string | null;
+      days_before_purchase: number | null;
+    } | null = null;
+    if (email) {
+      const { data: visits } = await admin
+        .from("funnel_events")
+        .select("session_id, page_path, created_at")
+        .eq("email", email.toLowerCase())
+        .eq("event_name", "PageView")
+        .order("created_at", { ascending: true })
+        .limit(200);
+      if (visits && visits.length > 0) {
+        const sessionIds = new Set(visits.map((v: { session_id: string }) => v.session_id));
+        const first = visits[0];
+        let days: number | null = null;
+        if (createdAt && first.created_at) {
+          const ms = new Date(createdAt).getTime() - new Date(first.created_at).getTime();
+          days = Math.max(0, Math.round(ms / (1000 * 60 * 60 * 24)));
+        }
+        conversionSummary = {
+          session_count: sessionIds.size,
+          first_visit_at: first.created_at,
+          first_page: first.page_path,
+          days_before_purchase: days,
+        };
+      }
+    }
+
     return new Response(
       JSON.stringify({
         id,
@@ -187,6 +235,7 @@ Deno.serve(async (req) => {
         created_at: createdAt,
         from_meta_ads: fromMetaAds,
         meta_attribution: metaAttr,
+        conversion_summary: conversionSummary,
         delivery,
         raw_detail: rawDetail,
       }),

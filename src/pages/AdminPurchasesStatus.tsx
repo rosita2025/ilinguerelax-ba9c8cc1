@@ -430,11 +430,36 @@ const AdminPurchasesStatus = () => {
                               <span className="text-xs text-muted-foreground block">Método de pago</span>
                               <span className="font-medium">{orderDetails[r.id].payment_method || orderDetails[r.id].provider_label}</span>
                             </div>
-                            <div>
-                              <span className="text-xs text-muted-foreground block">Conversion rate (origen)</span>
-                              <span className="font-medium">
-                                {orderDetails[r.id].from_meta_ads ? "📣 Meta Ads (vio un anuncio)" : "Directo / Orgánico"}
-                              </span>
+                          </div>
+
+                          <div className="pt-1">
+                            <span className="text-xs text-muted-foreground block mb-1">Conversion summary</span>
+                            <div className="text-xs space-y-1 bg-background rounded p-2 border">
+                              <p>
+                                {orderDetails[r.id].from_meta_ads ? "📣 1ª sesión desde Meta (Facebook/Instagram)" : "Directo / orgánico (sin clic en anuncio de Meta)"}
+                              </p>
+                              {orderDetails[r.id].conversion_summary && (
+                                <>
+                                  <p>
+                                    {orderDetails[r.id].conversion_summary.session_count} sesión(es) registrada(s)
+                                    {orderDetails[r.id].conversion_summary.days_before_purchase != null && (
+                                      orderDetails[r.id].conversion_summary.days_before_purchase === 0
+                                        ? " — compró el mismo día de su primera visita"
+                                        : ` a lo largo de ${orderDetails[r.id].conversion_summary.days_before_purchase} día(s)`
+                                    )}
+                                  </p>
+                                  {orderDetails[r.id].conversion_summary.first_page && (
+                                    <p className="text-muted-foreground">
+                                      Primera página vista: {orderDetails[r.id].conversion_summary.first_page}
+                                    </p>
+                                  )}
+                                  {orderDetails[r.id].conversion_summary.first_visit_at && (
+                                    <p className="text-muted-foreground">
+                                      Primera visita: {new Date(orderDetails[r.id].conversion_summary.first_visit_at).toLocaleString("es-PE", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                                    </p>
+                                  )}
+                                </>
+                              )}
                             </div>
                           </div>
                           <div>

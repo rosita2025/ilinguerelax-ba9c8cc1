@@ -73,7 +73,7 @@ export default function AdminGa4Compare() {
 
   useEffect(() => { void load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [adminKey, windowMinutes]);
   useEffect(() => {
-    const id = setInterval(() => { void load(); }, 20000);
+    const id = setInterval(() => { if (!document.hidden) void load(); }, 20000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminKey, windowMinutes]);

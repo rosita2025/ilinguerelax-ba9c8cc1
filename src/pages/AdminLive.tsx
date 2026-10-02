@@ -122,7 +122,7 @@ const AdminLive = () => {
   useEffect(() => { void load(); }, [adminKey, windowMin]);
   useEffect(() => {
     if (!data) return;
-    const id = setInterval(() => { void load(); }, 5000);
+    const id = setInterval(() => { if (!document.hidden) void load(); }, 5000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, adminKey, windowMin]);

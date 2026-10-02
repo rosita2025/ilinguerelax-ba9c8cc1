@@ -179,7 +179,7 @@ export default function AdminCheckoutAbuse() {
 
   useEffect(() => {
     void load();
-    const iv = setInterval(() => { void load(); }, 30000);
+    const iv = setInterval(() => { if (!document.hidden) void load(); }, 30000);
     return () => clearInterval(iv);
   }, []);
 

@@ -38,6 +38,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "patrones-ingles": {
     id: "patrones-especiales-ingles",
     name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés (PDF)",
+    learnerLanguage: "es",
     price: 15,
     pricePen: 25,
     regionPrices: { latam: 10, global: 15, tienda: 7 },
@@ -71,6 +72,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "1000-verbos": {
     id: "1000-verbos-ingles",
     name: "Inglés Relax · 1,000 Verbos Esenciales (Digital PDF)",
+    learnerLanguage: "es",
     price: 10,
     image: "/images/product-1000-verbos.webp",
     description: "1,000 verbos en presente, pasado y futuro con pronunciación",
@@ -101,6 +103,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "5000-spanish-words": {
     id: "5000-spanish-words",
     name: "Spanish Mastery System - 5,000 Spanish Words (Digital PDF)",
+    learnerLanguage: "en",
     price: 72.99,
     originalPrice: 97,
     regionPrices: { latam: 72.99, global: 72.99, tienda: 72.99 },
@@ -112,6 +115,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "1000-palabras-coreano": {
     id: "coreano-1000-palabras",
     name: "Coreano Sin Complicaciones · 1,000 Palabras Esenciales (PDF)",
+    learnerLanguage: "es",
     price: 12,
     pricePen: 28.90,
     regionPrices: { latam: 9, global: 12, tienda: 5 },
@@ -134,6 +138,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "coreano-100-mapas": {
     id: "coreano-100-mapas",
     name: "100 Mapas Mentales para Aprender Coreano (PDF)",
+    learnerLanguage: "es",
     price: 12,
     pricePen: 28.90,
     regionPrices: { latam: 9, global: 12, tienda: 5 },
@@ -145,6 +150,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "500-preguntas": {
     id: "500-preguntas-ingles",
     name: "iLingue Relax · 500 Preguntas en Inglés (Digital PDF)",
+    learnerLanguage: "es",
     price: 9,
     pricePen: 33,
     regionPrices: { latam: 9, global: 9, tienda: 9 },
@@ -157,6 +163,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "5000-palabras": {
     id: "5000-palabras-ingles",
     name: "Inglés Relax · 5,000 Palabras (Digital PDF)",
+    learnerLanguage: "es",
     price: 20,
     pricePen: 35,
     regionPrices: { latam: 15, global: 20, tienda: 20 },
@@ -169,6 +176,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "8000-palabras": {
     id: "8000-palabras-ingles",
     name: "Inglés Relax · 8,000 Palabras Esenciales (Digital PDF)",
+    learnerLanguage: "es",
     price: 25,
     pricePen: 45,
     regionPrices: { latam: 15, global: 25, tienda: 25 },
@@ -180,6 +188,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "500-questions-spanish": {
     id: "500-questions-spanish",
     name: "Spanish Relax · 500 Questions in Spanish (Digital PDF)",
+    learnerLanguage: "en",
     price: 12,
     pricePen: 35,
     regionPrices: { latam: 12, global: 12, tienda: 12 },
@@ -191,6 +200,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "1000-verbs-spanish": {
     id: "1000-verbs-spanish",
     name: "Spanish Relax · 1,000 Verbs in Spanish (Digital PDF)",
+    learnerLanguage: "en",
     price: 12,
     pricePen: 39,
     regionPrices: { latam: 12, global: 12, tienda: 12 },
@@ -202,6 +212,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "1000-palabras-hispano": {
     id: "1000-palabras-hispano",
     name: "Inglés Relax · 1,000 Palabras Esenciales (Digital PDF)",
+    learnerLanguage: "es",
     price: 6,
     pricePen: 14,
     regionPrices: { latam: 4.5, global: 6, tienda: 6 },

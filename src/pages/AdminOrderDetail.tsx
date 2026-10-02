@@ -194,18 +194,24 @@ export default function AdminOrderDetail() {
                 <span className="text-muted-foreground">Fecha y hora del pedido</span>
                 <span className="font-medium">{formatDateTime(order.created_at)}</span>
               </div>
-              <div className="flex justify-between items-center pt-1">
+              <div className="flex justify-between items-start pt-1">
                 <span className="text-muted-foreground flex items-center gap-1.5">
                   <Package className="w-3.5 h-3.5" /> Entrega digital
                 </span>
-                <DeliveryBadge status={order.delivery?.status ?? null} />
-              </div>
-              {order.delivery?.updated_at && (
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">Última actualización de envío</span>
-                  <span>{formatDateTime(order.delivery.updated_at)}</span>
+                <div className="text-right">
+                  <DeliveryBadge status={order.delivery?.status ?? null} />
+                  {order.delivery?.status === "sent" && order.delivery?.updated_at && (
+                    <p className="text-xs font-medium text-emerald-600 mt-1">
+                      📬 Enviado el {formatDateTime(order.delivery.updated_at)}
+                    </p>
+                  )}
+                  {order.delivery?.status === "processing" && order.delivery?.created_at && (
+                    <p className="text-xs text-amber-600 mt-1">
+                      Iniciado el {formatDateTime(order.delivery.created_at)}
+                    </p>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           </Card>
         </>

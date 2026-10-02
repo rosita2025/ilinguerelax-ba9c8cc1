@@ -158,65 +158,140 @@ Deno.serve(async (req) => {
     if (!product) product = "Producto digital (sin nombre registrado)";
     if (!items || items.length === 0) items = [{ name: product }];
 
-    // Estado real de entrega del material digital (tabla compartida por
-    // todos los métodos de pago, cuando el pedido lo generó).
-    let delivery: { status: string | null; last_event: string | null; created_at: string | null; updated_at: string | null } | null = null;
-    if (orderNumber) {
-      const { data: deliveryRow } = await admin
-        .from("digital_email_sends")
-        .select("status, last_event, created_at, updated_at")
-        .eq("order_id", orderNumber)
-        .maybeSingle();
-      delivery = deliveryRow ?? null;
+    // Las tres consultas son independientes: se hacen a la vez para que el
+    // detalle abra rápido (antes iban una detrás de otra).
+    const emailLc = email ? email.toLowerCase() : null;
+    const [deliveryRes, attrRes, byEmailRes] = await Promise.all([
+      // Estado real de entrega del material digital.
+      orderNumber
+        ? admin.from("digital_email_sends").select("status, last_event, created_at, updated_at").eq("order_id", orderNumber).maybeSingle()
+        : Promise.resolve({ data: null }),
+      // ¿Hay atribución guardada de un clic en un anuncio de Meta?
+      emailLc
+        ? admin.from("meta_attribution").select("email, fbc, fbp, country, updated_at").eq("email", emailLc).maybeSingle()
+        : Promise.resolve({ data: null }),
+      // Eventos que ya traen este correo (checkout, compras por webhook…).
+      emailLc
+        ? admin.from("funnel_events").select("client_id, session_id").eq("email", emailLc).limit(200)
+        : Promise.resolve({ data: [] }),
+    ]);
+    const delivery = (deliveryRes.data ?? null) as { status: string | null; last_event: string | null; created_at: string | null; updated_at: string | null } | null;
+    const metaAttr = (attrRes.data ?? null) as { country?: string; updated_at?: string } | null;
+    const fromMetaAds = !!metaAttr;
+
+    // ── Recorrido completo del cliente ────────────────────────────────────
+    // El correo se une con el navegador (client_id) cuando lo escribe en el
+    // checkout; con eso traemos TODAS sus visitas, también las de días antes.
+    type Ev = { event_name: string; session_id: string | null; page_path: string | null; product_id: string | null; country: string | null; referrer: string | null; created_at: string; is_bot: boolean | null };
+    const linked = (byEmailRes.data ?? []) as { client_id: string | null; session_id: string | null }[];
+    const clientIds = [...new Set(linked.map((r) => r.client_id).filter((v): v is string => !!v))].slice(0, 10);
+    const sessionIdsLinked = [...new Set(linked.map((r) => r.session_id).filter((v): v is string => !!v))].slice(0, 20);
+
+    const events: Ev[] = [];
+    if (clientIds.length || sessionIdsLinked.length) {
+      const cols = "event_name, session_id, page_path, product_id, country, referrer, created_at, is_bot";
+      const [byClient, bySession] = await Promise.all([
+        clientIds.length
+          ? admin.from("funnel_events").select(cols).in("client_id", clientIds).order("created_at", { ascending: true }).limit(1500)
+          : Promise.resolve({ data: [] }),
+        sessionIdsLinked.length
+          ? admin.from("funnel_events").select(cols).in("session_id", sessionIdsLinked).order("created_at", { ascending: true }).limit(500)
+          : Promise.resolve({ data: [] }),
+      ]);
+      const seen = new Set<string>();
+      for (const e of [...((byClient.data ?? []) as Ev[]), ...((bySession.data ?? []) as Ev[])]) {
+        const k = `${e.created_at}|${e.event_name}|${e.session_id}|${e.page_path}`;
+        if (seen.has(k)) continue;
+        seen.add(k);
+        events.push(e);
+      }
+      events.sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
     }
 
-    // Resumen de conversión: ¿vino de un anuncio de Meta o fue directo/orgánico?
-    let fromMetaAds = false;
-    let metaAttr: { country?: string; updated_at?: string } | null = null;
-    if (email) {
-      const { data: attr } = await admin
-        .from("meta_attribution")
-        .select("email, fbc, fbp, country, updated_at")
-        .eq("email", email.toLowerCase())
-        .maybeSingle();
-      if (attr) {
-        fromMetaAds = true;
-        metaAttr = attr;
+    // Origen de una visita según su "referrer" guardado (utm:origen:campaña,
+    // enlace externo o vacío).
+    const classify = (ref: string | null): { source: string; channel: "meta" | "organic" | "direct" | "other" } => {
+      if (!ref) return { source: "Directo", channel: "direct" };
+      const r = ref.toLowerCase();
+      if (r.startsWith("utm:")) {
+        const src = r.split(":")[1] || "";
+        if (["facebook", "fb", "instagram", "ig", "meta", "facebook_ads", "instagram_ads", "meta_ads", "an", "audience_network", "messenger"].includes(src)) return { source: "Meta Ads", channel: "meta" };
+        if (["google", "bing", "yahoo", "duckduckgo"].includes(src)) return { source: "Google / buscadores", channel: "organic" };
+        return { source: src ? src[0].toUpperCase() + src.slice(1) : "Campaña", channel: "other" };
       }
-    }
+      try {
+        const host = new URL(ref).hostname.replace(/^www\./, "");
+        if (/(^|\.)(facebook|instagram|fb|l\.facebook|m\.facebook)\./.test(host + ".")) return { source: "Meta (orgánico/enlace)", channel: "other" };
+        if (/google|bing|yahoo|duckduckgo|baidu|yandex|naver/.test(host)) return { source: "Google / buscadores", channel: "organic" };
+        return { source: host, channel: "other" };
+      } catch {
+        return { source: "Directo", channel: "direct" };
+      }
+    };
 
-    // Resumen de conversión completo (estilo Shopify "Conversion summary"):
-    // todas las visitas (PageView) de este correo, para saber cuántas
-    // sesiones tuvo y cuándo fue la primera, no solo si vino de Meta.
-    let conversionSummary: {
-      session_count: number;
-      first_visit_at: string | null;
-      first_page: string | null;
-      days_before_purchase: number | null;
-    } | null = null;
-    if (email) {
-      const { data: visits } = await admin
-        .from("funnel_events")
-        .select("session_id, page_path, created_at")
-        .eq("email", email.toLowerCase())
-        .eq("event_name", "PageView")
-        .order("created_at", { ascending: true })
-        .limit(200);
-      if (visits && visits.length > 0) {
-        const sessionIds = new Set(visits.map((v: { session_id: string }) => v.session_id));
-        const first = visits[0];
-        let days: number | null = null;
-        if (createdAt && first.created_at) {
-          const ms = new Date(createdAt).getTime() - new Date(first.created_at).getTime();
-          days = Math.max(0, Math.round(ms / (1000 * 60 * 60 * 24)));
-        }
-        conversionSummary = {
-          session_count: sessionIds.size,
-          first_visit_at: first.created_at,
-          first_page: first.page_path,
-          days_before_purchase: days,
-        };
+    const purchaseMs = createdAt ? new Date(createdAt).getTime() : Date.now();
+    // Solo visitas humanas anteriores (o iguales) a la compra.
+    const humans = events.filter((e) => e.is_bot !== true && new Date(e.created_at).getTime() <= purchaseMs + 60_000);
+    const visits = humans.filter((e) => e.event_name === "PageView" || e.event_name === "ViewContent");
+    const DAY = 1000 * 60 * 60 * 24;
+
+    let conversionSummary: Record<string, unknown> | null = null;
+    if (visits.length > 0) {
+      const first = visits[0];
+      const last = visits[visits.length - 1];
+      const sessions = new Set(visits.map((v) => v.session_id).filter(Boolean));
+      const firstMs = new Date(first.created_at).getTime();
+      const lastMs = new Date(last.created_at).getTime();
+
+      // Vistas del producto comprado: se compara con el producto del pedido.
+      const productKey = String(items[0]?.sku || product || "").toLowerCase();
+      const norm = (v: string | null) => String(v || "").toLowerCase();
+      const viewsOfProduct = humans.filter((e) =>
+        e.event_name === "ViewContent" && !!productKey && !!e.product_id &&
+        (norm(e.product_id).includes(productKey) || (norm(e.product_id).length > 3 && productKey.includes(norm(e.product_id)))),
+      ).length;
+      const viewsTotal = humans.filter((e) => e.event_name === "ViewContent").length;
+
+      // Países vistos (el más frecuente primero).
+      const countryCount = new Map<string, number>();
+      for (const v of visits) if (v.country) countryCount.set(v.country, (countryCount.get(v.country) ?? 0) + 1);
+      const countries = [...countryCount.entries()].sort((a, b) => b[1] - a[1]).map(([c]) => c);
+
+      const firstTouch = classify(first.referrer);
+      const lastTouch = classify(last.referrer);
+      // Canal final de la venta: Meta si hay clic guardado o si el primer/último
+      // contacto fue de Meta; si no, orgánico o directo.
+      const channel: "meta" | "organic" | "direct" | "other" =
+        fromMetaAds || firstTouch.channel === "meta" || lastTouch.channel === "meta"
+          ? "meta"
+          : firstTouch.channel !== "direct" ? firstTouch.channel : lastTouch.channel;
+
+      // Sesiones: una fila por sesión con fecha, primera página y vistas.
+      const bySession = new Map<string, { at: string; first_page: string | null; views: number }>();
+      for (const v of visits) {
+        const sid = v.session_id || "sin-sesion";
+        const cur = bySession.get(sid);
+        if (!cur) bySession.set(sid, { at: v.created_at, first_page: v.page_path, views: 1 });
+        else cur.views += 1;
       }
+
+      conversionSummary = {
+        session_count: sessions.size,
+        first_visit_at: first.created_at,
+        first_page: first.page_path,
+        last_visit_at: last.created_at,
+        last_page: last.page_path,
+        days_before_purchase: Math.max(0, Math.round((purchaseMs - firstMs) / DAY)),
+        days_since_last_visit: Math.max(0, Math.round((purchaseMs - lastMs) / DAY)),
+        page_views: visits.length,
+        product_views: viewsOfProduct,
+        product_views_total: viewsTotal,
+        countries,
+        first_source: firstTouch.source,
+        last_source: lastTouch.source,
+        channel,
+        sessions: [...bySession.values()].slice(0, 12),
+      };
     }
 
     return new Response(

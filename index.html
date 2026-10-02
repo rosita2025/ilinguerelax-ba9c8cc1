@@ -273,7 +273,7 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-0RJ3QZNYKJ');
+      if (location.pathname.indexOf('/admin') !== 0) gtag('config', 'G-0RJ3QZNYKJ');
     </script>
     <!-- End Google tag -->
     <link

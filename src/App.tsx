@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { LivePricesProvider } from "@/lib/livePrices";
 import { getClientId, initClientIdSync } from "@/lib/clientId";
 import { captureMetaClickId } from "@/lib/metaAttribution";
+import { isInternalTraffic } from "@/hooks/useMetaPixel";
 
 const Index = lazy(() => import("./pages/Index"));
 import { CookieConsent } from "@/components/CookieConsent";
@@ -190,6 +191,8 @@ const RouteTracker = () => {
   useEffect(() => {
 
     if (location.pathname.startsWith("/admin")) return;
+    // Visitas del propio admin / pruebas: no cuentan como visitante en Live.
+    if (isInternalTraffic()) return;
     try {
       void supabase.functions.invoke("log-funnel-event", {
         body: {

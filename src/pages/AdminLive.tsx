@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { Card } from "@/components/ui/card";
-import { Activity, Bot, CreditCard, Eye, Globe, Loader2, MousePointerClick, ShoppingBag, Users } from "lucide-react";
+import { Activity, Bot, CreditCard, Eye, Globe, MousePointerClick, ShoppingBag, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -100,12 +100,20 @@ const eventLabel: Record<string, string> = {
 
 const money = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
+const EMPTY_LIVE: LiveData = {
+  windowMinutes: 1, total: 0, activeNow: 0, productViews: 0, checkouts: 0,
+  checkoutSessions: 0, purchases: 0, purchaseSessions: 0, revenue: 0,
+  byCountry: {}, byPage: {}, byPageLabel: {}, byProduct: {}, bySource: {},
+  byChannel: {}, byCampaign: {}, bySourceCountry: {}, byEvent: {},
+  revenueByCountry: {}, visitors: [], recentEvents: [], generatedAt: "",
+};
+
 const AdminLive = () => {
   const { adminKey } = useAdminKey();
   const [windowMin, setWindowMin] = useState<1 | 5 | 15 | 60>(1);
   // Último resultado guardado: la pantalla abre al instante con datos recientes
   // y se actualiza en segundo plano en vez de quedarse en un círculo de carga.
-  const [data, setData] = useState<LiveData | null>(() => {
+  const [liveData, setData] = useState<LiveData | null>(() => {
     try {
       const raw = sessionStorage.getItem("ilr_live_cache_1");
       return raw ? (JSON.parse(raw) as LiveData) : null;
@@ -141,7 +149,7 @@ const AdminLive = () => {
       const msg = e instanceof Error ? e.message : "Error";
       setLoadError(msg);
       // Con datos ya en pantalla solo se avisa; sin datos se muestra el error abajo.
-      if (data) toast.error(msg);
+      if (liveData) toast.error(msg);
     } finally { setLoading(false); }
   };
 
@@ -151,30 +159,10 @@ const AdminLive = () => {
     const id = setInterval(() => { if (!document.hidden) void load(); }, 15000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [adminKey, windowMin, data]);
+  }, [adminKey, windowMin, liveData]);
 
-  if (!data) {
-    return (
-      <>
-        <AdminNav />
-        <main className="min-h-dvh bg-background flex items-center justify-center">
-          {loadError ? (
-            <div className="text-center space-y-3 px-4">
-              <p className="text-sm text-muted-foreground">{loadError}</p>
-              <Button size="sm" onClick={() => void load()} disabled={loading}>
-                {loading ? "Cargando…" : "Reintentar"}
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              Cargando visitas en vivo…
-            </div>
-          )}
-        </main>
-      </>
-    );
-  }
+  // La pantalla se pinta al instante con ceros; los datos entran cuando llegan.
+  const data: LiveData = liveData ?? EMPTY_LIVE;
 
   const countries = Object.entries(data.byCountry).sort(([, a], [, b]) => b - a);
   const maxCount = Math.max(1, ...countries.map(([, v]) => v));
@@ -206,7 +194,7 @@ const AdminLive = () => {
                 <Globe className="w-5 h-5 md:w-7 md:h-7 text-primary shrink-0" /> Plataforma en vivo
               </h1>
               <p className="text-[11px] md:text-sm text-muted-foreground leading-snug mt-0.5">
-                Humanos · ventana {windowMin < 60 ? `${windowMin} min` : "1 hora"} · {timeAgo(data.generatedAt)} atrás
+                Humanos · ventana {windowMin < 60 ? `${windowMin} min` : "1 hora"} · {liveData ? `${timeAgo(data.generatedAt)} atrás` : (loadError ? "sin conexión" : "cargando…")}
               </p>
             </div>
             <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
@@ -219,6 +207,11 @@ const AdminLive = () => {
                 <span className="text-base md:text-lg font-bold tabular-nums">{data.activeNow || data.total}</span>
                 <span className="text-[10px] md:text-xs text-muted-foreground">en vivo</span>
               </div>
+              {loadError && !liveData && (
+                <Button size="sm" variant="outline" onClick={() => void load()} disabled={loading}>
+                  Reintentar
+                </Button>
+              )}
               <div className="inline-flex rounded-md border bg-background overflow-hidden">
                 {([1, 5, 15, 60] as const).map((m) => (
                   <button
@@ -235,7 +228,6 @@ const AdminLive = () => {
                   </button>
                 ))}
               </div>
-              {loading && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
             </div>
           </div>
 

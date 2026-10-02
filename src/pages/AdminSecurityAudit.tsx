@@ -65,9 +65,8 @@ const AdminSecurityAudit = () => {
 
           <Card className="overflow-hidden">
             {loading ? (
-              <div className="p-12 flex flex-col items-center justify-center gap-3">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                <p className="text-sm text-muted-foreground">Cargando registros...</p>
+              <div className="p-6 space-y-3 animate-pulse">
+                <div className="h-10 rounded bg-muted" /><div className="h-10 rounded bg-muted" /><div className="h-10 rounded bg-muted" /><div className="h-10 rounded bg-muted" />
               </div>
             ) : error ? (
               <div className="p-12 text-center space-y-4">

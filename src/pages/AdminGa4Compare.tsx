@@ -126,7 +126,7 @@ export default function AdminGa4Compare() {
           </header>
 
           {!data ? (
-            <div className="flex items-center justify-center py-24"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+            <div className="space-y-3 py-6 animate-pulse"><div className="h-24 rounded-xl bg-muted" /><div className="h-24 rounded-xl bg-muted" /><div className="h-48 rounded-xl bg-muted" /></div>
           ) : (
             <>
               {!data.ga4Available && (

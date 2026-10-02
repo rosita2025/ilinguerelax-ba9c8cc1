@@ -94,7 +94,7 @@ export default function AdminBotReport() {
 
         {!data ? (
           <Card className="p-12 text-center text-muted-foreground">
-            {loading ? <Loader2 className="h-8 w-8 animate-spin mx-auto" /> : "Sin datos"}
+            {loading ? <span className="block h-16 rounded bg-muted animate-pulse" /> : "Sin datos"}
           </Card>
         ) : (
           <>

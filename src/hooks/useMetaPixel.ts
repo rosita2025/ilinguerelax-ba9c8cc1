@@ -76,7 +76,7 @@ const isEuUser = (): boolean => {
 // ---------------------------------------------------------------------------
 const INTERNAL_KEY = "ilr_internal_traffic";
 
-const isInternalTraffic = (): boolean => {
+export const isInternalTraffic = (): boolean => {
   if (typeof window === "undefined") return true;
   try {
     const params = new URLSearchParams(window.location.search);
@@ -238,6 +238,8 @@ const logFunnelEvent = (eventName: string, params: Record<string, unknown>) => {
       } catch { /* noop */ }
     }
 
+    // Tu propio uso (admin, pruebas) no debe aparecer como visitante en /admin/live.
+    if (isInternalTraffic()) return;
     void supabase.functions.invoke("log-funnel-event", {
       body: {
         event_name: eventName,

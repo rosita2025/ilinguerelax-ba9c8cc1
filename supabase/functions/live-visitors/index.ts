@@ -225,7 +225,9 @@ serve(async (req) => {
         .gte("created_at", since)
         .order("created_at", { ascending: false })
         .limit(5000),
-      fetchGa4Live(),
+      // Live muestra solo visitas reales del pixel interno (sin bots ni admin).
+      // GA4 Realtime incluye bots y tu propio uso del admin, así que ya no se mezcla.
+      Promise.resolve(null as Ga4Live | null),
     ]);
     if (error) throw error;
 

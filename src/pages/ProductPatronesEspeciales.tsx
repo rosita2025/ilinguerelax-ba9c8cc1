@@ -367,7 +367,7 @@ const PatronesContent = () => {
                     className="w-full aspect-video object-cover"
                     controls
                     playsInline
-                    preload="metadata"
+                    preload="none"
                     controlsList="nodownload noplaybackrate noremoteplayback"
                     disablePictureInPicture
                     onContextMenu={(e) => e.preventDefault()}

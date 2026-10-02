@@ -119,7 +119,7 @@ export const TikTokVideos = () => {
                     controlsList="nodownload noplaybackrate noremoteplayback"
                     disablePictureInPicture
                     playsInline
-                    preload="metadata"
+                    preload="none"
                     onPlay={() => setPlayingIndex(index)}
                     onPause={() => setPlayingIndex((prev) => (prev === index ? null : prev))}
                     onEnded={() => setPlayingIndex((prev) => (prev === index ? null : prev))}

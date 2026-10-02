@@ -184,9 +184,18 @@ const AdminEmailTest = () => {
   // sku -> updated_at, para detectar productos nuevos o material actualizado
   const catalogSnapshot = useRef<Map<string, string> | null>(null);
 
+  // Cada evento del embudo (cualquier visita) dispara este aviso. Para no
+  // recalcular toda la lista de pedidos sin parar, se espera al menos 10 s
+  // entre recargas; el sondeo de 15 s y el foco de la pestaña siguen al día.
+  const lastReloadAt = useRef(0);
   const scheduleReload = () => {
     if (reloadTimer.current) clearTimeout(reloadTimer.current);
-    reloadTimer.current = setTimeout(() => load(true), 1200);
+    const wait = Math.max(1200, 10000 - (Date.now() - lastReloadAt.current));
+    reloadTimer.current = setTimeout(() => {
+      if (document.hidden) return;
+      lastReloadAt.current = Date.now();
+      load(true);
+    }, wait);
   };
 
   const load = async (silent = false) => {
@@ -404,7 +413,7 @@ const AdminEmailTest = () => {
   useEffect(() => {
     if (!adminKey) return;
     load(rows.length > 0);
-    const t = setInterval(() => load(true), 15000);
+    const t = setInterval(() => { if (!document.hidden) load(true); }, 15000);
 
     // Realtime: recompute validación cuando llega/actualiza un envío digital,
     // un evento del funnel (webhook Stripe/PayPal/MP) o un pago manual.
@@ -735,7 +744,7 @@ const AdminEmailTest = () => {
       } catch {}
     };
     loadAudit();
-    const t = setInterval(loadAudit, 60000);
+    const t = setInterval(() => { if (!document.hidden) loadAudit(); }, 60000);
     return () => { alive = false; clearInterval(t); };
   }, []);
 

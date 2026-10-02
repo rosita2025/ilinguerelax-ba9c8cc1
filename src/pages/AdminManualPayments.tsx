@@ -145,7 +145,7 @@ const AdminManualPayments = () => {
 
   useEffect(() => {
     void fetchOrders();
-    const iv = setInterval(() => { void fetchOrders(); }, 20000);
+    const iv = setInterval(() => { if (!document.hidden) void fetchOrders(); }, 20000);
     const onVis = () => { if (document.visibilityState === "visible") void fetchOrders(); };
     document.addEventListener("visibilitychange", onVis);
     // Realtime: new manual payments appear instantly at the top (Shopify-style)

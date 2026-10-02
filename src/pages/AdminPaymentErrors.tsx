@@ -119,7 +119,7 @@ export default function AdminPaymentErrors() {
 
   useEffect(() => {
     void load();
-    const iv = setInterval(() => { void load(); }, 20000);
+    const iv = setInterval(() => { if (!document.hidden) void load(); }, 20000);
     return () => clearInterval(iv);
   }, [load]);
 

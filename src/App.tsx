@@ -120,10 +120,24 @@ const OrderStatus = lazy(() => import("./pages/OrderStatus"));
 
 const queryClient = new QueryClient();
 
-const CartSyncWrapper = ({ children }: { children: React.ReactNode }) => {
+const CartSyncEffects = () => {
   useCartSync();
   useCartCatalogValidator();
-  return <>{children}</>;
+  return null;
+};
+
+// El panel /admin no usa carrito, chat ni popups de la tienda: no se montan allí
+// para que el admin abra más rápido y no haga consultas de más.
+const useIsAdminPath = () => useLocation().pathname.startsWith("/admin");
+
+const CartSyncWrapper = ({ children }: { children: React.ReactNode }) => {
+  const isAdmin = useIsAdminPath();
+  return <>{!isAdmin && <CartSyncEffects />}{children}</>;
+};
+
+const PublicOnly = ({ children }: { children: React.ReactNode }) => {
+  const isAdmin = useIsAdminPath();
+  return isAdmin ? null : <>{children}</>;
 };
 
 const FUNNEL_SESSION_KEY = "ilr_funnel_sid";
@@ -225,11 +239,11 @@ const App = () => (
               <CartSyncWrapper>
                 <AdminSubdomainGate />
                 <RouteTracker />
-                <ProductViewTracker />
+                <PublicOnly><ProductViewTracker /></PublicOnly>
                 <AutoTranslate />
-                <BrevoChatToggle />
-                <CookieConsent />
-                <EmailSubscribePopup />
+                <PublicOnly><BrevoChatToggle /></PublicOnly>
+                <PublicOnly><CookieConsent /></PublicOnly>
+                <PublicOnly><EmailSubscribePopup /></PublicOnly>
                 
                 <Suspense fallback={<PageFallback />}>
                   <Routes>

@@ -178,7 +178,7 @@ export default function AdminAudiences() {
         <Card className="p-5">
           <p className="text-xs uppercase tracking-wide text-muted-foreground">Personas únicas alcanzables</p>
           <p className="text-4xl font-bold mt-1">
-            {loading && total === null ? <Loader2 className="w-7 h-7 animate-spin" /> : total ?? 0}
+            {loading && total === null ? <span className="inline-block h-9 w-20 rounded bg-muted animate-pulse align-middle" /> : total ?? 0}
           </p>
           {updatedAt && (
             <p className="text-xs text-muted-foreground mt-2">

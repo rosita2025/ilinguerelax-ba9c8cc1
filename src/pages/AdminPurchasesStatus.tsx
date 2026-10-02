@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { adminInvoke } from "@/lib/adminInvoke";
@@ -356,9 +357,16 @@ const AdminPurchasesStatus = () => {
                           </div>
                         </div>
                       ) : (
-                        <Button size="sm" variant="outline" onClick={() => startEdit(r.id, r.email)} className="h-7 text-xs">
-                          <Pencil className="w-3 h-3 mr-1" /> Editar correo / Reenviar
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" onClick={() => startEdit(r.id, r.email)} className="h-7 text-xs">
+                            <Pencil className="w-3 h-3 mr-1" /> Editar correo / Reenviar
+                          </Button>
+                          <Link to={`/admin/orders/${r.id}`}>
+                            <Button size="sm" variant="outline" className="h-7 text-xs">
+                              Ver detalle →
+                            </Button>
+                          </Link>
+                        </div>
                       )}
 
                       <details>

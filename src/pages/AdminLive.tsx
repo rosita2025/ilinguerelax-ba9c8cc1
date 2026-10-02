@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Activity, Bot, CreditCard, Eye, Globe, Loader2, MousePointerClick, ShoppingBag, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { getCountryInfo } from "@/lib/countryInfo";
@@ -101,9 +102,17 @@ const money = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigi
 
 const AdminLive = () => {
   const { adminKey } = useAdminKey();
-  const [data, setData] = useState<LiveData | null>(null);
-  const [loading, setLoading] = useState(false);
   const [windowMin, setWindowMin] = useState<1 | 5 | 15 | 60>(1);
+  // Último resultado guardado: la pantalla abre al instante con datos recientes
+  // y se actualiza en segundo plano en vez de quedarse en un círculo de carga.
+  const [data, setData] = useState<LiveData | null>(() => {
+    try {
+      const raw = sessionStorage.getItem("ilr_live_cache_1");
+      return raw ? (JSON.parse(raw) as LiveData) : null;
+    } catch { return null; }
+  });
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   // Cerrado por defecto — es informativo (confirma que los bots ya se
   // filtran), no esencial de ver todo el tiempo. Mantiene la vista
   // principal más simple, como pediste.
@@ -112,31 +121,56 @@ const AdminLive = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const { data: res, error } = await supabase.functions.invoke("live-visitors", {
-        body: { adminKey, windowMinutes: windowMin },
-      });
+      // Si el servidor tarda demasiado, se corta y se muestra un error con
+      // botón de reintento (antes quedaba un círculo girando para siempre).
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("El servidor tardó demasiado. Reintenta.")), 25000),
+      );
+      const { data: res, error } = await Promise.race([
+        supabase.functions.invoke("live-visitors", { body: { adminKey, windowMinutes: windowMin } }),
+        timeout,
+      ]);
       if (error) throw error;
-      if ((res as { error?: string })?.error) { toast.error((res as { error: string }).error); return; }
+      if ((res as { error?: string })?.error) throw new Error((res as { error: string }).error);
       setData(res as LiveData);
+      setLoadError(null);
+      if (windowMin === 1) {
+        try { sessionStorage.setItem("ilr_live_cache_1", JSON.stringify(res)); } catch { /* sin espacio */ }
+      }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Error");
+      const msg = e instanceof Error ? e.message : "Error";
+      setLoadError(msg);
+      // Con datos ya en pantalla solo se avisa; sin datos se muestra el error abajo.
+      if (data) toast.error(msg);
     } finally { setLoading(false); }
   };
 
   useEffect(() => { void load(); }, [adminKey, windowMin]);
+  // El sondeo corre siempre (también tras un error) para recuperarse solo.
   useEffect(() => {
-    if (!data) return;
     const id = setInterval(() => { if (!document.hidden) void load(); }, 15000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, adminKey, windowMin]);
+  }, [adminKey, windowMin, data]);
 
   if (!data) {
     return (
       <>
         <AdminNav />
         <main className="min-h-dvh bg-background flex items-center justify-center">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          {loadError ? (
+            <div className="text-center space-y-3 px-4">
+              <p className="text-sm text-muted-foreground">{loadError}</p>
+              <Button size="sm" onClick={() => void load()} disabled={loading}>
+                {loading ? "Cargando…" : "Reintentar"}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              Cargando visitas en vivo…
+            </div>
+          )}
         </main>
       </>
     );

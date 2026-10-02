@@ -224,6 +224,7 @@ export const CHECKOUT_CATALOG: Record<string, CatalogItem> = {
   "patrones-espanol": {
     id: "prueba-patrones-es",
     name: "Patrones en Español · Precio por región",
+    learnerLanguage: "es",
     price: 15,
     regionPrices: { latam: 10, global: 15, tienda: 7 },
     image: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=200&h=200&fit=crop",

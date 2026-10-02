@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { adminInvoke } from "@/lib/adminInvoke";
@@ -68,6 +67,12 @@ const fmtDate = (iso: string) => {
 const AdminPurchasesStatus = () => {
   const { adminKey } = useAdminKey();
   const [rows, setRows] = useState<Row[]>([]);
+  // Detalle desplegable dentro de la misma fila — en vez de navegar a otra
+  // página (que se sentía más lenta por la carga completa de página), el
+  // detalle se abre hacia abajo, justo debajo del pedido que se tocó.
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [orderDetails, setOrderDetails] = useState<Record<string, any>>({});
+  const [loadingDetailId, setLoadingDetailId] = useState<string | null>(null);
   const [summary, setSummary] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
@@ -106,6 +111,27 @@ const AdminPurchasesStatus = () => {
     setEditing(id); setEmailDraft(current ?? ""); setResendOnSave(true);
   };
   const cancelEdit = () => { setEditing(null); setEmailDraft(""); };
+
+  const toggleDetail = async (id: string) => {
+    if (expandedId === id) {
+      setExpandedId(null);
+      return;
+    }
+    setExpandedId(id);
+    if (orderDetails[id]) return; // ya en caché, no se vuelve a pedir
+    setLoadingDetailId(id);
+    try {
+      const { data, error } = await adminInvoke("get-order-detail", { body: { adminKey, id } });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      setOrderDetails((prev) => ({ ...prev, [id]: data }));
+    } catch (e) {
+      toast.error("No se pudo cargar el detalle", { description: (e as Error).message });
+      setExpandedId(null);
+    } finally {
+      setLoadingDetailId(null);
+    }
+  };
   const saveEdit = async (id: string) => {
     const email = emailDraft.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -383,11 +409,64 @@ const AdminPurchasesStatus = () => {
                           <Button size="sm" variant="outline" onClick={() => startEdit(r.id, r.email)} className="h-7 text-xs">
                             <Pencil className="w-3 h-3 mr-1" /> Editar correo / Reenviar
                           </Button>
-                          <Link to={`/admin/orders/${r.id}`}>
-                            <Button size="sm" variant="outline" className="h-7 text-xs">
-                              Ver detalle →
-                            </Button>
-                          </Link>
+                          <Button size="sm" variant="outline" onClick={() => toggleDetail(r.id)} className="h-7 text-xs">
+                            {loadingDetailId === r.id ? "Cargando…" : expandedId === r.id ? "▲ Ocultar detalle" : "▼ Ver detalle"}
+                          </Button>
+                        </div>
+                      )}
+
+                      {expandedId === r.id && orderDetails[r.id] && (
+                        <div className="mt-3 pt-3 border-t border-dashed space-y-2.5 text-sm bg-muted/30 rounded-lg p-3">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <span className="text-xs text-muted-foreground block">Cliente</span>
+                              <span className="font-medium">{orderDetails[r.id].name || "—"}</span>
+                            </div>
+                            <div>
+                              <span className="text-xs text-muted-foreground block">Correo</span>
+                              <span className="font-medium">{orderDetails[r.id].email || "—"}</span>
+                            </div>
+                            <div>
+                              <span className="text-xs text-muted-foreground block">Método de pago</span>
+                              <span className="font-medium">{orderDetails[r.id].payment_method || orderDetails[r.id].provider_label}</span>
+                            </div>
+                            <div>
+                              <span className="text-xs text-muted-foreground block">Conversion rate (origen)</span>
+                              <span className="font-medium">
+                                {orderDetails[r.id].from_meta_ads ? "📣 Meta Ads (vio un anuncio)" : "Directo / Orgánico"}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground block mb-1">Productos</span>
+                            {orderDetails[r.id].items && orderDetails[r.id].items.length > 0 ? (
+                              <div className="space-y-1">
+                                {orderDetails[r.id].items.map((it: any, i: number) => (
+                                  <div key={i} className="flex items-center justify-between text-xs">
+                                    <span>{it.name || it.sku}</span>
+                                    <span className={i === 0 ? "text-primary font-medium" : "text-muted-foreground"}>
+                                      {i === 0 ? "Principal" : "Upsell"}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">{orderDetails[r.id].product || "Sin detalle de producto"}</span>
+                            )}
+                          </div>
+                          {orderDetails[r.id].amount != null && (
+                            <div className="flex justify-between text-xs pt-1 border-t">
+                              <span className="text-muted-foreground">Precio</span>
+                              <span className="font-semibold">
+                                {orderDetails[r.id].currency || "USD"} {Number(orderDetails[r.id].amount).toFixed(2)}
+                              </span>
+                            </div>
+                          )}
+                          {orderDetails[r.id].delivery?.status === "sent" && orderDetails[r.id].delivery?.updated_at && (
+                            <p className="text-xs text-emerald-600 font-medium">
+                              📬 Enviado el {new Date(orderDetails[r.id].delivery.updated_at).toLocaleString("es-PE", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                            </p>
+                          )}
                         </div>
                       )}
 

@@ -62,6 +62,7 @@ const groups: Group[] = [
     label: "Ventas",
     items: [
       { to: "/admin/orders", label: "Órdenes / Pedidos", icon: Mail },
+      { to: "/admin/orders-entrega", label: "Órdenes · Productos y entrega", icon: Package },
       { to: "/admin/orders-physical", label: "Pedidos físicos", icon: Package },
       { to: "/admin/purchases-status", label: "Pagos · Estado", icon: CreditCard },
       { to: "/admin/checkout-methods", label: "Métodos de pago Stripe", icon: CreditCard },

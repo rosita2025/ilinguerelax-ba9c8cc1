@@ -381,6 +381,7 @@ const App = () => (
                   <Route path="/admin/productos/:sku" element={<AdminGate><AdminProductEdit /></AdminGate>} />
                   <Route path="/admin/orders" element={<AdminGate><AdminPurchasesStatus /></AdminGate>} />
                   <Route path="/admin/orders/:id" element={<AdminGate><AdminOrderDetail /></AdminGate>} />
+                  <Route path="/admin/orders-entrega" element={<AdminGate><AdminEmailTest /></AdminGate>} />
                   <Route path="/admin/orders-physical" element={<AdminGate><AdminPhysicalOrders /></AdminGate>} />
                   
                   <Route path="/admin/purchases-status" element={<AdminGate><AdminPurchasesStatus /></AdminGate>} />

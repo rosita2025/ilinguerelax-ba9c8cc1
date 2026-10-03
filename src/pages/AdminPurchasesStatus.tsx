@@ -526,17 +526,47 @@ const AdminPurchasesStatus = () => {
                               )}
                             </div>
 
-                            {/* Productos */}
+                            {/* Productos: principal, upsells y bonos */}
                             <div>
-                              <span className="text-xs text-muted-foreground block mb-1">Productos</span>
-                              {items.length > 0 ? (
-                                <div className="space-y-1">
+                              <div className="flex items-center gap-2 mb-1.5">
+                                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Qué compró</span>
+                                {d && (
+                                  <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full border ${
+                                    d.has_upsell
+                                      ? "bg-violet-500/15 text-violet-700 border-violet-500/30"
+                                      : "bg-muted text-muted-foreground border-border"
+                                  }`}>
+                                    {d.has_upsell ? "Con upsell" : "Sin upsell"}
+                                  </span>
+                                )}
+                              </div>
+                              {!d && !err ? (
+                                <div className="space-y-1.5 animate-pulse">
+                                  <div className="h-4 w-3/4 rounded bg-muted" />
+                                  <div className="h-4 w-1/2 rounded bg-muted" />
+                                </div>
+                              ) : items.length > 0 ? (
+                                <div className="space-y-2">
                                   {items.map((it: any, i: number) => (
-                                    <div key={i} className="flex items-center justify-between text-xs">
-                                      <span>{it.name || it.sku}</span>
-                                      <span className={i === 0 ? "text-primary font-medium" : "text-muted-foreground"}>
-                                        {i === 0 ? "Principal" : "Upsell"}
-                                      </span>
+                                    <div key={i} className="bg-background rounded border p-2">
+                                      <div className="flex items-start justify-between gap-2">
+                                        <div className="min-w-0">
+                                          <div className="font-medium text-sm">{it.name || it.sku}</div>
+                                          {it.sku && <code className="text-[10px] text-muted-foreground break-all">/{it.sku}</code>}
+                                        </div>
+                                        <span className={`shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded ${
+                                          it.role === "upsell" ? "bg-violet-500/15 text-violet-700" : "bg-primary/10 text-primary"
+                                        }`}>
+                                          {it.role === "upsell" ? "Upsell" : "Principal"}
+                                        </span>
+                                      </div>
+                                      {Array.isArray(it.bonuses) && it.bonuses.length > 0 && (
+                                        <ul className="mt-1.5 text-xs text-muted-foreground space-y-0.5">
+                                          {it.bonuses.map((b: string, bi: number) => (
+                                            <li key={bi}>🎁 Bono incluido: {b}</li>
+                                          ))}
+                                        </ul>
+                                      )}
                                     </div>
                                   ))}
                                 </div>

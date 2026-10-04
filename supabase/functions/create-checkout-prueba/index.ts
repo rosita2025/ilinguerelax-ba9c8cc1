@@ -73,6 +73,17 @@ Deno.serve(async (req) => {
 
   try {
     const raw = await req.json();
+    // Red de seguridad: limpia el correo igual que el formulario antes de validar.
+    const cleanEmail = (v: unknown): unknown => {
+      if (typeof v !== "string") return v;
+      let e = v.trim().toLowerCase().replace(/\s+/g, "");
+      e = e.replace(/[.,;]+$/, "");
+      if (/@(gmail|hotmail|outlook|yahoo)$/.test(e)) e += ".com";
+      return e;
+    };
+    if (raw && typeof raw === "object" && (raw as any).contact && typeof (raw as any).contact === "object") {
+      (raw as any).contact.email = cleanEmail((raw as any).contact.email);
+    }
     const parsed = BodySchema.safeParse(raw);
     if (!parsed.success) {
       const flat = parsed.error.flatten();

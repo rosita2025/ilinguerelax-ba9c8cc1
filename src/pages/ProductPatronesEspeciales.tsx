@@ -414,10 +414,6 @@ const PatronesContent = () => {
                 o agregar al carrito
               </button>
 
-               <a href="#vista-previa" className="block text-center text-sm text-primary underline underline-offset-4 mb-6">
-                 Ver vista previa real antes de comprar
-               </a>
-
 
             </div>
           </div>

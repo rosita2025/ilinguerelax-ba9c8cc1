@@ -108,12 +108,21 @@ async function resolveMaterials(
   return { materials: out, missing, resolvedSkus: Array.from(seen) };
 }
 
-async function sendTemplate(admin: any, templateName: string, recipientEmail: string, idempotencyKey: string, templateData: Record<string, unknown>) {
+async function sendTemplate(admin: any, templateName: string, recipientEmail: string, idempotencyKey: string, templateData: Record<string, unknown>): Promise<{ ok: boolean; reason: string }> {
   try {
-    const { error } = await sendInternalEmail({ templateName, recipientEmail, idempotencyKey, templateData });
-    if (error) console.error(`[manual-payments] ${templateName} failed`, error);
+    const { error, data } = await sendInternalEmail({ templateName, recipientEmail, idempotencyKey, templateData });
+    if (error) {
+      console.error(`[manual-payments] ${templateName} failed`, error);
+      return { ok: false, reason: error.message };
+    }
+    const d = (data ?? {}) as { success?: boolean; sent?: boolean; duplicate?: boolean; reason?: string };
+    // 200 no significa enviado: suprimido o duplicado también responden 200.
+    if (d.sent === true) return { ok: true, reason: "sent" };
+    if (d.duplicate) return { ok: false, reason: "duplicate_or_recent_pending" };
+    return { ok: false, reason: d.reason || "not_sent" };
   } catch (e) {
     console.error(`[manual-payments] ${templateName} exception`, e);
+    return { ok: false, reason: e instanceof Error ? e.message : String(e) };
   }
 }
 
@@ -256,7 +265,7 @@ Deno.serve(async (req) => {
           const downloadUrl = await ensureDownloadUrl(
             admin, order.order_number, order.buyer_email, resolvedSkus,
           );
-          return sendTemplate(admin, "material-delivery", order.buyer_email, deliveryIdemKey, {
+          return await sendTemplate(admin, "material-delivery", order.buyer_email, deliveryIdemKey, {
             customerName: order.buyer_name,
             orderNumber: order.order_number,
             materials: materials.map((m) => ({
@@ -264,7 +273,11 @@ Deno.serve(async (req) => {
               downloadUrl: downloadUrl ?? "https://ilinguerelax.com/mi-pedido",
             })),
           });
-        })().then(() => upsertDelivery({ status: "sent", last_event: "material-delivery" })),
+        })().then((r) =>
+          r.ok
+            ? upsertDelivery({ status: "sent", last_event: "material-delivery" })
+            : upsertDelivery({ status: r.reason === "duplicate_or_recent_pending" ? "sent" : "failed", last_event: `material-delivery:${r.reason}`.slice(0, 200) })
+        ),
         upsertBrevoContact({
           email: order.buyer_email,
           name: order.buyer_name,

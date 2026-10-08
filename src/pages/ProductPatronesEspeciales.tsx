@@ -1,7 +1,6 @@
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
 import { useMemo, useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { toast } from "sonner";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";

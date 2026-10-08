@@ -147,10 +147,9 @@ const PatronesContent = () => {
 
   const goToTienda = () => {
     if (!pricingReady) return;
-    // No llama a handleAddToCart() — ese dispara AddToCart del pixel, y si
-    // el usuario llegó aquí vía StickyBuyBar, esa barra ya disparó AddToCart.
-    // Llamar addItem() directo evita el duplicado. El botón "Agregar al
-    // carrito" (no sticky) sí usa handleAddToCart() y dispara AddToCart.
+    // El botón "LO QUIERO" y esta barra ya disparan AddToCart del pixel, así
+    // que aquí se llama addItem() directo para no contar dos veces.
+
     addItem({
       id: "patrones-ingles",
       name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés (PDF)",
@@ -189,40 +188,6 @@ const PatronesContent = () => {
     goToTienda();
   };
 
-  const handleAddToCart = () => {
-    if (!pricingReady) return;
-    trackHotmartEvent("AddToCart", {
-      content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
-      content_category: "Digital Book",
-      content_ids: [ADMIN_SKU],
-      content_type: "product",
-      value: PRICE_USD,
-      currency: "USD",
-      num_items: 1,
-    });
-    addItem({
-      id: "patrones-ingles",
-      name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés (PDF)",
-      price: PRICE_USD,
-      regionPrices: { 
-        latam: LATAM_USD, 
-        global: GLOBAL_USD, 
-        tienda: TIENDA_USD 
-      },
-      pricePen: pricingAdmin.pricePen ?? undefined,
-      localUsdPrices: pricingAdmin.localUsdPrices ?? undefined,
-      image: cartImage,
-      description: "Alfabeto y combinaciones secretas de sonidos en inglés",
-      quantity: 1,
-    });
-    toast.success("Producto agregado al carrito", {
-      description: "Puedes seguir explorando o ir al checkout.",
-      action: {
-        label: "Ir al checkout",
-        onClick: () => navigate("/checkouts/patrones-ingles"),
-      },
-    });
-  };
 
   const productReviews = [
     {
@@ -402,17 +367,11 @@ const PatronesContent = () => {
                 </Button>
               </motion.div>
 
-              <p className="text-center text-xs text-muted-foreground mb-3">
+              <p className="text-center text-xs text-muted-foreground mb-6">
                 🔒 Pago seguro • ⬇️ Descarga inmediata • 🛡️ Garantía 7 días
               </p>
 
-              <button
-                type="button"
-                onClick={handleAddToCart}
-                className="w-full mb-4 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors"
-              >
-                o agregar al carrito
-              </button>
+
 
 
             </div>

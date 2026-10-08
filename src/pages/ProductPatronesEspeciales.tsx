@@ -18,8 +18,6 @@ import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { motion } from "framer-motion";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { SpotifyLaunchBanner } from "@/components/SpotifyLaunchBanner";
-import { CompradoresReales } from "@/components/CompradoresReales";
-import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
 import { TercerBonoExamen } from "@/components/TercerBonoExamen";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
@@ -285,7 +283,7 @@ const PatronesContent = () => {
           { question: `¿Por qué cuesta solo ${tier.priceLabel}?`, answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba." },
           { question: "¿Qué incluye este ebook?", answer: "Patrones especiales de pronunciación, alfabeto inglés letra por letra, combinaciones secretas, letras mudas, contracciones y mini retos prácticos con respuestas." },
           { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Recibes la descarga inmediata después del pago. Puedes leerlo en móvil, tablet, computadora o imprimirlo." },
-          { question: "¿Cómo realizo el pago?", answer: "Según tu país: tienda interna de iLingue Relax o pago directo con tarjeta/transferencia." },
+          { question: "¿Cómo realizo el pago?", answer: "Eliges tu método de pago en el checkout seguro, según tu país." },
         ]}
       />
 
@@ -347,8 +345,11 @@ const PatronesContent = () => {
                 {pricingAdmin.name ?? "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"}
               </h1>
 
+              <p className="text-lg md:text-xl font-bold text-foreground mb-2">
+                Deja de pronunciar el inglés como se escribe.
+              </p>
               <p className="text-base text-muted-foreground mb-4">
-                {pricingAdmin.description ?? "Domina la pronunciación en inglés con patrones secretos, letras mudas, combinaciones especiales y ejercicios prácticos. Método fácil para hispanohablantes paso a paso."}
+                Descubre los patrones, letras mudas y combinaciones secretas que cambian el sonido de las palabras, y empieza a hablar con seguridad desde la primera lectura. Método paso a paso hecho para hispanohablantes.
               </p>
 
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-4">
@@ -368,28 +369,16 @@ const PatronesContent = () => {
                 </span>
               </div>
 
-              <PrecioEconomicoBanner />
-
-              <div className="mb-6">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
-                  <Music2 className="w-4 h-4" /> Presentación del producto
-                </div>
-                <div className="relative rounded-2xl overflow-hidden border border-border/50 bg-black">
-                  <video
-                    src={introVideo.url}
-                    poster={introPoster.url}
-                    className="w-full aspect-video object-cover"
-                    controls
-                    playsInline
-                    preload="none"
-                    controlsList="nodownload noplaybackrate noremoteplayback"
-                    disablePictureInPicture
-                    onContextMenu={(e) => e.preventDefault()}
-                  />
-                </div>
+              <div className="mb-5 rounded-2xl border-2 border-yellow-400 bg-gradient-to-r from-yellow-400/15 to-amber-400/15 p-4 text-center shadow-lg">
+                <p className="text-foreground font-extrabold text-base md:text-lg">
+                  🎁 Hoy recibes el PDF + 3 BONOS GRATIS
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Pago único · Sin suscripciones · Descarga inmediata
+                </p>
               </div>
 
-              <TikTokVideos />
+
 
               <div className="mb-6 flex items-center justify-between bg-muted/30 p-3 rounded-xl border border-border/50">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Pagos Seguros:</span>
@@ -431,6 +420,150 @@ const PatronesContent = () => {
 
 
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Subhero: qué recibes */}
+      <section className="py-6 md:py-8 bg-primary/5 border-y border-primary/10">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-2">
+              Un solo pago. <span className="text-gradient">4 materiales en tu correo.</span>
+            </h2>
+            <p className="text-muted-foreground mb-5">Todo en PDF, listo para leer en tu celular o imprimir.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left">
+              {[
+                { t: "Patrones Especiales", d: "El ebook principal con alfabeto, combinaciones y letras mudas" },
+                { t: "Bono 1 · GRATIS", d: "1,000 palabras con pronunciación y fonética" },
+                { t: "Bono 2 · GRATIS", d: "Estructuras gramaticales de cero a A2" },
+                { t: "Bono 3 · GRATIS", d: "Examen de 98 preguntas con respuestas" },
+              ].map((x) => (
+                <div key={x.t} className="rounded-xl border border-border bg-card p-4 shadow-card">
+                  <p className="text-sm font-extrabold text-foreground flex items-center gap-2"><Check className="w-4 h-4 text-primary shrink-0" />{x.t}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{x.d}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Dolores */}
+      <section className="py-10 md:py-14">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-2">
+              ¿Te pasa esto cuando <span className="text-gradient">hablas inglés</span>?
+            </h2>
+            <p className="text-center text-muted-foreground mb-6">Si dijiste sí a una sola, este ebook es para ti.</p>
+            <div className="space-y-3">
+              {[
+                "Lees una palabra y no sabes cómo suena. Escribes una cosa y se pronuncia otra.",
+                "Te da vergüenza hablar porque sientes que vas a pronunciar mal.",
+                "No entiendes a los nativos: hablan rápido y se \"comen\" las palabras.",
+                "Llevas meses o años estudiando y la pronunciación sigue sin mejorar.",
+                "Las letras mudas y las combinaciones raras (gh, ough, tion) te confunden siempre.",
+                "Has probado cursos largos y caros, pero nadie te explica el porqué de los sonidos.",
+              ].map((x) => (
+                <div key={x} className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4">
+                  <span className="text-lg leading-none mt-0.5">❌</span>
+                  <p className="text-foreground text-sm md:text-base">{x}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-center text-foreground font-bold text-lg mt-6">
+              No es falta de talento. <span className="text-gradient">Es que nadie te enseñó los patrones.</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Beneficios */}
+      <section className="py-8 md:py-10 bg-muted/30">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-2">
+              Lo que vas a <span className="text-gradient">lograr</span>
+            </h2>
+            <p className="text-center text-muted-foreground mb-6">Con los patrones correctos, pronunciar bien deja de ser suerte.</p>
+            <div className="bg-card rounded-3xl border border-border shadow-card p-6 md:p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {features.map((feature) => (
+                  <div key={feature} className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-4 h-4 text-primary-foreground" />
+                    </div>
+                    <span className="text-foreground">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="text-center mt-8">
+              <Button variant="hero" size="xl" onClick={handleBuy} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
+                <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
+                {pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
+                <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonios 1: reseñas reales por WhatsApp */}
+      <section className="py-10 md:py-14">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-bold mb-2">
+                <Check className="w-3.5 h-3.5" /> Compras verificadas · WhatsApp 🇲🇽 🇵🇪
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                Reseñas <span className="text-gradient">reales</span> de clientes
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              {photoReviews.map((r, i) => (
+                <figure key={`${r.src}-${i}`} className="relative rounded-xl overflow-hidden border border-border shadow-card bg-card">
+                  <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-background/90 text-foreground text-[11px] font-bold border border-border">
+                    {r.flag} {r.country}
+                  </div>
+                  <img src={r.src} alt={r.alt} loading="lazy" className="w-full h-auto block" />
+                </figure>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Presentación del producto */}
+      <section className="py-8 md:py-10 bg-muted/30">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-5">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
+                <Music2 className="w-4 h-4" /> Presentación del producto
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                Mira cómo <span className="text-gradient">funciona por dentro</span>
+              </h2>
+            </div>
+            <div className="mb-6">
+                <div className="relative rounded-2xl overflow-hidden border border-border/50 bg-black">
+                  <video
+                    src={introVideo.url}
+                    poster={introPoster.url}
+                    className="w-full aspect-video object-cover"
+                    controls
+                    playsInline
+                    preload="none"
+                    controlsList="nodownload noplaybackrate noremoteplayback"
+                    disablePictureInPicture
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                </div>
+            </div>
+            <TikTokVideos />
           </div>
         </div>
       </section>
@@ -559,30 +692,7 @@ const PatronesContent = () => {
         </div>
       </section>
 
-      {/* What's included */}
-      <section className="py-8 md:py-10 bg-muted/30">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
-              Lo que vas a <span className="text-gradient">aprender</span>
-            </h2>
-            <div className="bg-card rounded-3xl border border-border shadow-card p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {features.map((feature) => (
-                  <div key={feature} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-4 h-4 text-primary-foreground" />
-                    </div>
-                    <span className="text-foreground">{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonios y reseñas */}
+      {/* Testimonios 2 */}
       <section className="py-10 md:py-14">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
@@ -594,42 +704,9 @@ const PatronesContent = () => {
                 Lo que dicen <span className="text-gradient">nuestros lectores</span>
               </h2>
               <p className="text-muted-foreground">
-                Miles de hispanohablantes ya usan el método Inglés Relax
+                Lo que dicen quienes ya aprendieron los patrones
               </p>
             </div>
-
-            {/* Reseñas reales por WhatsApp (México y Perú) */}
-            <div className="mb-10">
-              <div className="text-center mb-5">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-bold mb-2">
-                  <Check className="w-3.5 h-3.5" /> Compras verificadas · WhatsApp 🇲🇽 🇵🇪
-                </div>
-                <h3 className="text-xl md:text-2xl font-bold text-foreground">
-                  Reseñas reales de clientes
-                </h3>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                {photoReviews.map((r, i) => (
-                  <figure
-                    key={`${r.src}-${i}`}
-                    className="relative rounded-xl overflow-hidden border border-border shadow-card bg-card"
-                  >
-                    <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-background/90 text-foreground text-[11px] font-bold border border-border">
-                      {r.flag} {r.country}
-                    </div>
-                    <img
-                      src={r.src}
-                      alt={r.alt}
-                      loading="lazy"
-                      className="w-full h-auto block"
-                    />
-                  </figure>
-                ))}
-              </div>
-            </div>
-
-            <CompradoresReales />
-
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {[
@@ -713,10 +790,11 @@ const PatronesContent = () => {
 
       <FAQ
         items={[
-          { question: t.productFaq.specialTitle, answer: t.productFaq.specialAnswer, icon: Sparkles },
-          { question: t.productFaq.receiveTitle, answer: t.productFaq.receiveAnswer, icon: Download },
-          { question: t.productFaq.secureTitle, answer: t.productFaq.secureAnswer, icon: Shield },
-          { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Recibes la descarga inmediata después del pago. Puedes leerlo en móvil, tablet, computadora o imprimirlo.", icon: Smartphone },
+          { question: "¿Qué recibo exactamente al comprar?", answer: "El ebook Patrones Especiales + 3 bonos GRATIS: 1,000 palabras con pronunciación, Estructuras Gramaticales de cero a A2 y un Examen de 98 preguntas con respuestas. Todo en PDF.", icon: Sparkles },
+          { question: "¿Cómo recibo el material?", answer: "Inmediatamente después de pagar recibes un correo con tu enlace de descarga. Si no lo ves, revisa Spam o Promociones o escríbenos por WhatsApp y te ayudamos al momento.", icon: Download },
+          { question: "¿Es seguro pagar aquí?", answer: "Sí. El pago se procesa en un checkout seguro y tienes garantía de 7 días.", icon: Shield },
+          { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Puedes leerlo en móvil, tablet o computadora, o imprimirlo.", icon: Smartphone },
+          { question: "¿Sirve si soy principiante?", answer: "Sí. Está explicado paso a paso para hispanohablantes, con ejemplos claros y mini retos con respuestas.", icon: BookOpen },
         ]}
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas"

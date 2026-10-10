@@ -218,7 +218,9 @@ export default function CheckoutSuccess() {
         setDelivery(deliveredItems);
         setDownloadUrl((data?.downloadUrl ?? null) as string | null);
         setStripeCustomerId((data?.stripeCustomerId ?? null) as string | null);
-        if (deliveredItems.length > 0) setServerVerifiedPaid(true);
+        // El servidor confirma el pago (paid:true) aunque el pedido no traiga
+        // archivos descargables todavía (p. ej. entrega retenida o solo físico).
+        if (data?.paid === true || deliveredItems.length > 0) setServerVerifiedPaid(true);
       })
       .catch((e) => console.error("order-delivery failed", e))
       .finally(() => setDeliveryLoading(false));

@@ -341,17 +341,28 @@ Deno.serve(async (req) => {
     // crear el pedido (16.65 PEN, 3.70 PEN, …). Un pago de MENOS no se entrega.
     const { data: expectedRows } = await supabase
       .from("order_events")
-      .select("amount, currency, created_at")
+      .select("amount, currency, metadata, created_at")
       .eq("order_number", orderNumber)
       .in("event", ["order_created", "payment_pending", "payment_instructions"])
       .order("created_at", { ascending: true })
       .limit(10);
     const expectedRow = (expectedRows ?? []).find((r) => typeof r.amount === "number" && r.amount > 0);
+    // order_created guarda el precio en USD en `amount` y el importe que se le
+    // cobra al cliente (CLP, MXN...) en metadata.localAmount/localCurrency.
+    // Hay que comparar contra el importe LOCAL; si no, un pago correcto en
+    // moneda local se marcaba como "moneda distinta" y se retenía la entrega.
+    const expMeta = (expectedRow?.metadata ?? {}) as Record<string, unknown>;
+    const expLocalAmt = Number(expMeta.localAmount);
+    const expLocalCur = typeof expMeta.localCurrency === "string" ? expMeta.localCurrency.toUpperCase() : null;
+    const useLocalExpected = Number.isFinite(expLocalAmt) && expLocalAmt > 0 && !!expLocalCur;
     const amountCheck = checkAmount(
-      (expectedRow?.amount as number | undefined) ?? null,
-      (expectedRow?.currency as string | undefined) ?? currency,
+      useLocalExpected ? expLocalAmt : ((expectedRow?.amount as number | undefined) ?? null),
+      useLocalExpected ? expLocalCur : ((expectedRow?.currency as string | undefined) ?? currency),
       { amount: amount ?? null, currency },
     );
+    // Valor para Meta: precio en USD del pedido (no el importe local).
+    const usdExpected = expectedRow && String(expectedRow.currency || "").toUpperCase() === "USD" && Number(expectedRow.amount) > 0
+      ? Number(expectedRow.amount) : null;
     if (amountCheck.mismatch) {
       console.warn("[dlocal-webhook] discrepancia de monto", orderNumber, amountCheck.reason);
       await logOrderEvent({
@@ -404,8 +415,8 @@ Deno.serve(async (req) => {
       eventId: `Purchase_${orderNumber}`,
       email: customerEmail,
       country: country ?? null,
-      value: amount ?? null,
-      currency,
+      value: usdExpected ?? amount ?? null,
+      currency: usdExpected ? "USD" : currency,
       contentIds: skus,
       contentName: summary,
       orderId: orderNumber,

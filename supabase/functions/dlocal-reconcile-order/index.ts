@@ -51,6 +51,7 @@ const BodySchema = z.object({
   adminKey: z.string().min(4).max(200).optional(),
   reason: z.string().trim().max(300).optional(),
   operator: z.string().trim().max(120).optional(),
+  force: z.boolean().optional(),
 });
 
 
@@ -165,7 +166,7 @@ Deno.serve(async (req) => {
   try {
     const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) return json({ error: "Datos inválidos" }, 400);
-    const { action, reason, operator } = parsed.data;
+    const { action, reason, operator, force } = parsed.data;
 
     // La autenticación fuerte ya la hizo assertAdminCsrf (origen + CSRF + 2FA
     // por correo). ADMIN_REVIEW_KEY solo se valida si el cliente la envía, para
@@ -460,6 +461,35 @@ Deno.serve(async (req) => {
     }
     if (alreadyPaid && alreadyDelivered) return json({ ok: true, applied: "already_delivered", summary });
     if (!email) return json({ error: "El pedido no tiene correo del comprador" }, 400);
+
+    // Freno anti-errores: aceptar a mano exige confirmación si dLocal aún lo ve
+    // pendiente (voucher sin pagar) o si la misma clienta ya pagó otro pedido
+    // en los últimos 7 días (probable duplicado).
+    if (!force && !alreadyPaid) {
+      if (remoteStatus && isPendingStatus(remoteStatus)) {
+        return json({
+          code: "still_pending",
+          error: `dLocal aún lo ve como ${remoteStatus}: el cliente todavía no pagó (p. ej. voucher OXXO).`,
+          summary,
+        }, 409);
+      }
+      const since7 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: other } = await supabase
+        .from("order_events")
+        .select("order_number")
+        .eq("customer_email", email.toLowerCase())
+        .eq("event", "payment_paid")
+        .neq("order_number", orderNumber)
+        .gte("created_at", since7)
+        .limit(1);
+      if (other && other.length > 0) {
+        return json({
+          code: "possible_duplicate",
+          error: `Esta clienta ya pagó el pedido ${other[0].order_number} en los últimos 7 días: este parece un duplicado.`,
+          summary,
+        }, 409);
+      }
+    }
 
     if (!alreadyPaid) {
       await logOrderEvent({

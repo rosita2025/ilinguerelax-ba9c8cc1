@@ -104,14 +104,20 @@ export default function OrderReconcilePanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function run(action: "inspect" | "sync" | "approve" | "reject" | "retry_delivery") {
+  async function run(action: "inspect" | "sync" | "approve" | "reject" | "retry_delivery", force = false) {
     const order = orderNumber.trim().toUpperCase();
     if (!order) { toast.error("Escribe el número de pedido"); return; }
+    if (action === "approve" && !force && !window.confirm(`¿Aceptar ${order} como PAGADO y enviar el material al cliente?`)) return;
     setBusy(action);
     try {
       const { data, error } = await adminInvoke<any>("dlocal-reconcile-order", {
-        body: { action, orderNumber: order, reason: reason.trim() || undefined },
+        body: { action, orderNumber: order, reason: reason.trim() || undefined, force: force || undefined },
       });
+      if (action === "approve" && (data?.code === "still_pending" || data?.code === "possible_duplicate")) {
+        setBusy(null);
+        if (window.confirm(`${data.error}\n\n¿Aceptar igual?`)) { await run("approve", true); }
+        return;
+      }
       if (error || data?.error) {
         toast.error(data?.error || error?.message || "No se pudo procesar");
         if (data?.summary) setSummary(data.summary);

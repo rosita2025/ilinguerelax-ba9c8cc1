@@ -278,6 +278,21 @@ Deno.serve(async (req) => {
     const shipmentByOrder = new Map<string, Record<string, unknown>>(
       ((shipments.data ?? []) as { order_number: string }[]).map((s) => [String(s.order_number).toUpperCase(), s as never]),
     );
+    // dLocal: mostrar el precio en USD del pedido (guardado en order_created),
+    // no el importe local (CLP, MXN...) ni una conversión con tipo de cambio.
+    const dlocalNums = [...new Set(((paidEvents.data ?? []) as { order_number: string | null; provider: string | null }[])
+      .filter((e) => String(e.provider ?? "").toLowerCase().startsWith("dlocal"))
+      .map((e) => String(e.order_number ?? "")).filter(Boolean))];
+    const dlocalUsd = new Map<string, number>();
+    if (dlocalNums.length > 0) {
+      const { data: created } = await admin.from("order_events")
+        .select("order_number,amount,currency").eq("event", "order_created").in("order_number", dlocalNums);
+      for (const r of (created ?? []) as { order_number: string; amount: number | null; currency: string | null }[]) {
+        if (String(r.currency ?? "").toUpperCase() === "USD" && Number(r.amount) > 0 && !dlocalUsd.has(r.order_number)) {
+          dlocalUsd.set(r.order_number, Number(r.amount));
+        }
+      }
+    }
     const seenGateway = new Set<string>();
     const gateway = ((paidEvents.data ?? []) as {
       order_number: string | null; customer_email: string | null; provider: string | null;
@@ -301,8 +316,10 @@ Deno.serve(async (req) => {
           customer_name: ship?.customer_name ?? null,
           provider: e.provider,
           method: e.method,
-          amount: e.amount,
-          currency: e.currency,
+          amount: dlocalUsd.get(String(e.order_number)) ?? e.amount,
+          currency: dlocalUsd.has(String(e.order_number)) ? "USD" : e.currency,
+          amount_local: e.amount,
+          currency_local: e.currency,
           skus: Array.isArray(e.metadata?.skus) ? e.metadata!.skus : [],
           tracking_number: ship?.tracking_number ?? null,
           shipping_provider: ship?.shipping_provider ?? null,

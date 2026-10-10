@@ -258,8 +258,21 @@ Deno.serve(async (req) => {
         });
       }
 
+      // Un pendiente antiguo deja de mostrarse si la MISMA clienta (mismo correo)
+      // ya pagó un pedido posterior: era un reintento, no una venta perdida.
+      const lastPaidByEmail = new Map<string, string>();
+      for (const o of byOrder.values()) {
+        const em = (o.email || "").toLowerCase().trim();
+        if (!o.paid || o.failed || !em) continue;
+        if ((lastPaidByEmail.get(em) ?? "") < o.lastAt) lastPaidByEmail.set(em, o.lastAt);
+      }
+      const replacedByLaterPayment = (o: { email: string; createdAt: string }) => {
+        const paidAt = lastPaidByEmail.get((o.email || "").toLowerCase().trim());
+        return !!paidAt && paidAt > o.createdAt;
+      };
+
       const pending = [...byOrder.values()]
-        .filter((o) => o.pending && !o.paid && !o.failed && !isTestEmail(o.email))
+        .filter((o) => o.pending && !o.paid && !o.failed && !isTestEmail(o.email) && !replacedByLaterPayment(o))
         .sort((a, b) => (a.lastAt < b.lastAt ? 1 : -1))
         .slice(0, 200);
       return json({ ok: true, pending });

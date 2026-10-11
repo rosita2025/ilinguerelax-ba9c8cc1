@@ -357,7 +357,7 @@ export default function MiDescarga() {
                     ) : (
                       <Download className="mr-2 h-4 w-4" />
                     )}
-                    {item.available === false ? "Archivo en preparación" : "Descargar"}
+                    {item.available === false ? "Archivo en preparación" : `Descargar: ${item.name}`}
                   </Button>
 
                   {item.bonuses.map((b) => (

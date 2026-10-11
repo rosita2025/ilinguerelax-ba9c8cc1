@@ -5,8 +5,18 @@
     <link>https://ilinguerelax.com/products</link>
     <description>Libros digitales y físicos de iLingue Relax: vocabulario, pronunciación y fonética para aprender idiomas sin estrés.</description>
     <language>es</language>
-    <lastBuildDate>Fri, 09 Oct 2026 04:37:53 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 11 Oct 2026 09:43:06 GMT</lastBuildDate>
     <atom:link href="https://ilinguerelax.com/rss-productos.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>100 Mapas Mentales para Aprender Coreano (Hangul → C1)</title>
+      <link>https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1</link>
+      <guid isPermaLink="true">https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1</guid>
+      <pubDate>Sun, 11 Oct 2026 09:43:06 GMT</pubDate>
+      <description>Guía completa con 100 mapas mentales para dominar el coreano de forma visual.</description>
+      <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/100-mapas-mentales-para-aprender-coreano-hangul-c1/1790892305079-v8304.webp" type="image/jpeg" length="0" />
+      <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/100-mapas-mentales-para-aprender-coreano-hangul-c1/1790892305079-v8304.webp" medium="image" />
+      <media:thumbnail url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/100-mapas-mentales-para-aprender-coreano-hangul-c1/1790892305079-v8304.webp" />
+    </item>
     <item>
       <title>Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés</title>
       <link>https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</link>
@@ -26,16 +36,6 @@
       <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/structural-spanish-grammar-a1-c1-spanish-relax-book-physical-4s22/1786919150278-47chd.webp" type="image/jpeg" length="0" />
       <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/structural-spanish-grammar-a1-c1-spanish-relax-book-physical-4s22/1786919150278-47chd.webp" medium="image" />
       <media:thumbnail url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/structural-spanish-grammar-a1-c1-spanish-relax-book-physical-4s22/1786919150278-47chd.webp" />
-    </item>
-    <item>
-      <title>100 Mapas Mentales para Aprender Coreano (Hangul → C1)</title>
-      <link>https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1</link>
-      <guid isPermaLink="true">https://ilinguerelax.com/products/100-mapas-mentales-para-aprender-coreano-hangul-c1</guid>
-      <pubDate>Thu, 01 Oct 2026 22:05:11 GMT</pubDate>
-      <description>Guía completa con 100 mapas mentales para dominar el coreano de forma visual.</description>
-      <enclosure url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/100-mapas-mentales-para-aprender-coreano-hangul-c1/1790892305079-v8304.webp" type="image/jpeg" length="0" />
-      <media:content url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/100-mapas-mentales-para-aprender-coreano-hangul-c1/1790892305079-v8304.webp" medium="image" />
-      <media:thumbnail url="https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/100-mapas-mentales-para-aprender-coreano-hangul-c1/1790892305079-v8304.webp" />
     </item>
     <item>
       <title>500 Preguntas en Inglés con Pronunciación</title>

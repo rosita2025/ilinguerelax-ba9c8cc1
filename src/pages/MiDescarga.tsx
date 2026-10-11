@@ -433,6 +433,33 @@ export default function MiDescarga() {
 
             <Card>
               <CardContent className="space-y-3 py-6">
+                <p className="text-sm font-medium text-foreground">¿Ya compraste y tienes problemas para descargar?</p>
+                <p className="text-xs text-muted-foreground">
+                  Cada vez que tocas “Descargar” se cuenta 1 descarga (tienes {maxDownloads || 20} en total). Si te falla desde
+                  WhatsApp, Instagram o Facebook, abre este enlace en Chrome o Safari. Si sigue fallando, escríbenos con tus datos ya listos:
+                </p>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    const productos = items
+                      .map((i) => `• ${i.name} (${i.isUpsell ? "complemento / upsell" : "producto principal"})`)
+                      .join("\n");
+                    const msg =
+                      `Hola, ya compré y tengo problema para descargar.\n` +
+                      `Pedido: ${state.orderNumber}\n` +
+                      `Correo: ${state.emailMasked}\n` +
+                      `Productos:\n${productos}`;
+                    window.open(`https://wa.me/12512724704?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+                  }}
+                >
+                  Escribir por WhatsApp con mi pedido
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="space-y-3 py-6">
                 <p className="text-sm text-muted-foreground">
                   ¿Quieres guardar este enlace? Te lo reenviamos al correo del pedido ({state.emailMasked}).
                 </p>

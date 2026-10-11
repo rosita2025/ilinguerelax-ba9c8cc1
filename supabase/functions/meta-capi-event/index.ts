@@ -65,6 +65,13 @@ serve(async (req) => {
         if (email && typeof email === "string") {
           user_data.em = [await sha256(email.toLowerCase().trim())];
         }
+        // Parámetros extra para que Meta pueda emparejar el evento (hash SHA-256).
+        if (typeof body.external_id === "string" && body.external_id) {
+          user_data.external_id = [await sha256(body.external_id.trim())];
+        }
+        if (typeof body.country === "string" && body.country.trim().length === 2) {
+          user_data.country = [await sha256(body.country.toLowerCase().trim())];
+        }
 
         const payload = {
           data: [

@@ -2027,6 +2027,45 @@ export type Database = {
         }
         Relationships: []
       }
+      postpurchase_upsell_sends: {
+        Row: {
+          created_at: string
+          customer_email: string
+          day: number
+          error: string | null
+          id: string
+          offered_skus: string[]
+          sent_at: string | null
+          source_order_id: string | null
+          source_sku: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          customer_email: string
+          day: number
+          error?: string | null
+          id?: string
+          offered_skus?: string[]
+          sent_at?: string | null
+          source_order_id?: string | null
+          source_sku: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string
+          day?: number
+          error?: string | null
+          id?: string
+          offered_skus?: string[]
+          sent_at?: string | null
+          source_order_id?: string | null
+          source_sku?: string
+          status?: string
+        }
+        Relationships: []
+      }
       product_launch_notices: {
         Row: {
           audience: string

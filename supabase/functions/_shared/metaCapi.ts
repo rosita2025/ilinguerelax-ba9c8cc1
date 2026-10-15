@@ -56,8 +56,8 @@ async function lookupAttribution(email?: string | null): Promise<{ fbc: string |
 
 /**
  * Fire-and-forget: never throws, never blocks the webhook's 200 response.
- * Solo envía el evento cuando la compra tiene atribución de Meta Ads;
- * las ventas orgánicas, por email marketing o enlaces externos se omiten.
+ * Envía la compra siempre que haya correo; usa fbc/fbp si existen para mejorar
+ * la coincidencia con el anuncio.
  */
 export async function sendPurchaseCapi(input: CapiPurchaseInput): Promise<void> {
   try {
@@ -67,15 +67,22 @@ export async function sendPurchaseCapi(input: CapiPurchaseInput): Promise<void> 
       return;
     }
 
+    // Antes se omitía la compra si no había fbc/fbp guardados (pasaba con dLocal:
+    // el cliente paga minutos después, por otro dispositivo o sin pasar por la
+    // página de gracias). Ahora se envía igual con el correo cifrado (SHA-256):
+    // Meta decide si esa compra viene de un anuncio. Sin correo no hay con qué enviar.
     const attribution = await lookupAttribution(input.email);
-    if (!attribution || (!attribution.fbc && !attribution.fbp)) {
-      console.log("meta-capi: sin atribución de Meta Ads, evento omitido", input.eventId);
-      return;
+    if (!attribution?.fbc && !attribution?.fbp) {
+      if (!input.email) {
+        console.log("meta-capi: sin correo ni atribución, evento omitido", input.eventId);
+        return;
+      }
+      console.log("meta-capi: sin fbc/fbp, se envía solo con correo cifrado", input.eventId);
     }
 
     const user_data: Record<string, unknown> = {};
-    if (attribution.fbc) user_data.fbc = attribution.fbc;
-    if (attribution.fbp) user_data.fbp = attribution.fbp;
+    if (attribution?.fbc) user_data.fbc = attribution.fbc;
+    if (attribution?.fbp) user_data.fbp = attribution.fbp;
     if (input.email) user_data.em = [await sha256(String(input.email).toLowerCase().trim())];
     if (input.firstName) user_data.fn = [await sha256(String(input.firstName).toLowerCase().trim())];
     if (input.lastName) user_data.ln = [await sha256(String(input.lastName).toLowerCase().trim())];

@@ -23,6 +23,7 @@ import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { deliverLikeManual } from "../_shared/manualDelivery.ts";
+import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 
 import {
   dlocalApiBase,
@@ -442,6 +443,14 @@ Deno.serve(async (req) => {
         }, 200);
       }
       if (!email) return json({ ok: true, applied: "paid_no_email", summary });
+      // Meta: pago recuperado por consulta a la API (el webhook no llegó): se avisa a Meta
+      // igual que hace dlocal-webhook. Mismo eventId → Meta no lo duplica.
+      if (!alreadyPaid) {
+        await sendPurchaseCapi({
+          eventId: `Purchase_${orderNumber}`, email, country: country ?? null,
+          value: amount ?? null, currency, contentIds: skus, contentName: "Pedido iLingue Relax", orderId: orderNumber,
+        }).catch((e) => console.error("reconcile CAPI failed:", e));
+      }
       const res = await deliver({
         orderNumber, email, name, country, skus, amount, currency, provider,
         productName: "Pedido iLingue Relax", reference,
@@ -505,6 +514,12 @@ Deno.serve(async (req) => {
         currency,
         metadata: { skus, source: "admin-reconcile", manual: true, operator: operator ?? null, remoteStatus },
       });
+    }
+    if (!alreadyPaid) {
+      await sendPurchaseCapi({
+        eventId: `Purchase_${orderNumber}`, email, country: country ?? null,
+        value: amount ?? null, currency, contentIds: skus, contentName: "Pedido iLingue Relax", orderId: orderNumber,
+      }).catch((e) => console.error("reconcile CAPI failed:", e));
     }
     const res = await deliver({
       orderNumber, email, name, country, skus, amount, currency, provider,

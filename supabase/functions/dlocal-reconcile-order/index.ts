@@ -446,10 +446,10 @@ Deno.serve(async (req) => {
       // Meta: pago recuperado por consulta a la API (el webhook no llegó): se avisa a Meta
       // igual que hace dlocal-webhook. Mismo eventId → Meta no lo duplica.
       if (!alreadyPaid) {
-          await sendPurchaseCapi({
-            eventId: `Purchase_${orderNumber}`, email, country: country ?? null,
-            value: amount ?? null, currency, contentIds: skus, contentName: "Pedido iLingue Relax", orderId: orderNumber,
-          }).catch((e) => console.error("reconcile CAPI failed:", e));
+        await sendPurchaseCapi({
+          eventId: `Purchase_${orderNumber}`, email, country: country ?? null,
+          value: amount ?? null, currency, contentIds: skus, contentName: "Pedido iLingue Relax", orderId: orderNumber,
+        }).catch((e) => console.error("reconcile CAPI failed:", e));
       }
       const res = await deliver({
         orderNumber, email, name, country, skus, amount, currency, provider,

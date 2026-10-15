@@ -8,6 +8,13 @@
       "when": 1789415762569,
       "tag": "0000_create_abandoned_sync_claims",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792093201963,
+      "tag": "0001_postpurchase_upsell_table",
+      "breakpoints": true
     }
   ]
 }

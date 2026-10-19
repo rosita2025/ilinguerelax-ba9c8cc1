@@ -36,6 +36,9 @@ import { extractEdgeErrorMessage, looksTechnical } from "@/lib/edgeError";
 import { getPaymentPayload } from "@/lib/paymentGatewayRouter";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useCheckoutTotal } from "@/hooks/useCheckoutTotal";
+import { UpsellPopup } from "@/components/checkout/UpsellPopup";
+import { loadCheckoutProduct } from "@/lib/checkoutProductCache";
+import type { UpsellItem } from "@/config/checkoutCatalog";
 
 
 type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
@@ -972,6 +975,106 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
 
+  // ── Aviso "¿Te gustaría agregar…?" para métodos que no son tarjeta ──────────
+  // Se ofrece UNA vez por sesión ANTES de pagar, con el descuento configurado
+  // en el admin para cada upsell: en Stripe al presionar "Continuar de pago",
+  // en dLocal / Mercado Pago al presionar "Comprar ahora", y en Yape / Binance /
+  // CLABE / dLocal tarjeta al elegir el método (ahí no hay botón previo y el
+  // cliente no debe ver un monto que luego cambie después de pagar).
+  // Si algo falla al mostrarlo, nunca bloquea el pago.
+  const [offerUpsells, setOfferUpsells] = useState<UpsellItem[]>([]);
+  const [upsellPopup, setUpsellPopup] = useState<{ offer: UpsellItem; resume: (() => void) | null } | null>(null);
+
+  useEffect(() => {
+    if (!parentSku) return;
+    let alive = true;
+    loadCheckoutProduct(parentSku)
+      .then(({ upsells }) => { if (alive) setOfferUpsells((upsells ?? []) as UpsellItem[]); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [parentSku]);
+
+  const upsellCheckBusy = useRef(false);
+
+  /**
+   * Abre el aviso si corresponde y devuelve true (el pago espera la respuesta).
+   * Nunca ofrece un upsell que ya está en el carrito NI uno que el cliente ya
+   * compró antes (se consulta por correo). Si el aviso falla o tarda más de
+   * 1.5 s, devuelve false y el pago sigue normal.
+   */
+  const offerUpsellThen = async (resume: (() => void) | null): Promise<boolean> => {
+    if (upsellCheckBusy.current) return true; // doble clic mientras se revisa
+    try {
+      if (!parentSku || !offerUpsells.length) return false;
+      const key = `ilr_upsell_popup_${parentSku}`;
+      if (sessionStorage.getItem(key)) return false;
+      const st = useCheckoutPruebaStore.getState();
+      const cart = st.items;
+      // Solo si el producto principal sigue en el carrito (el descuento depende de eso).
+      if (!cart.some((i) => !offerUpsells.some((u) => u.id === i.id))) return false;
+      // Nunca ofrecer algo que ya está en el carrito.
+      const pending = offerUpsells.filter((u) => !cart.some((i) => i.id === u.id));
+      if (!pending.length) return false;
+      sessionStorage.setItem(key, "1");
+
+      // Nunca ofrecer algo que el cliente ya compró antes (cualquier método de pago).
+      upsellCheckBusy.current = true;
+      let candidates = pending;
+      const email = String(st.buyer.email || "").trim().toLowerCase();
+      if (email) {
+        const ownedFlags = await Promise.race([
+          Promise.all(
+            pending.map((u) =>
+              supabase.functions
+                .invoke("check-existing-purchase", { body: { email, sku: u.id } })
+                .then(({ data }) => !!(data as { alreadyPurchased?: boolean } | null)?.alreadyPurchased)
+                .catch(() => false),
+            ),
+          ),
+          new Promise<boolean[]>((resolve) => setTimeout(() => resolve(pending.map(() => false)), 1500)),
+        ]);
+        candidates = pending.filter((_, i) => !ownedFlags[i]);
+      }
+      if (!candidates.length) return false;
+      setUpsellPopup({ offer: candidates[0], resume });
+      return true;
+    } catch {
+      return false;
+    } finally {
+      upsellCheckBusy.current = false;
+    }
+  };
+
+  const acceptUpsellPopup = () => {
+    if (!upsellPopup) return;
+    const { offer, resume } = upsellPopup;
+    useCheckoutPruebaStore.getState().addItem({
+      id: offer.id,
+      name: offer.name,
+      price: offer.price,
+      pricePen: offer.pricePen,
+      image: offer.image,
+      description: offer.description,
+      quantity: 1,
+    });
+    trackHotmartEvent("AddToCart", {
+      content_name: offer.name,
+      content_ids: [offer.id],
+      content_type: "product",
+      value: offer.price,
+      currency: "USD",
+      num_items: 1,
+    });
+    setUpsellPopup(null);
+    if (resume) resume();
+  };
+
+  const skipUpsellPopup = () => {
+    const resume = upsellPopup?.resume ?? null;
+    setUpsellPopup(null);
+    if (resume) resume();
+  };
+
   const handleSelect = (m: Method) => {
     // No usar el `valid` capturado en el render: si el comprador acaba de
     // escribir su email y toca un método de pago de inmediato, el blur que
@@ -993,6 +1096,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     if (m !== selected) setShowStripe(false);
     setSelected(m);
     setSelectedMethod(m);
+    // Yape / Binance / CLABE / dLocal tarjeta: el pago se confirma en su propio
+    // panel (sin botón "Comprar ahora"), así que el aviso sale al elegirlos.
+    if (["yape", "binance", "clabe", "dlocal_card"].includes(m)) void offerUpsellThen(null);
     if (!["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m)) setShowStripe(false);
     // Hotmart: no redirige al seleccionar; espera al botón "Comprar ahora".
     // Al colapsar el iframe de Stripe la página se encoge y el scroll salta
@@ -1037,8 +1143,15 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       // Cada método vuelve a capturar el carrito en segundo plano, así que aquí
       // no esperamos: el clic en "Continuar" ya no paga la espera de la auditoría.
       void captureAbandonedCheckout(selected, true);
-      
-      if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { 
+
+      // Aviso "¿Te gustaría agregar…?" ANTES de abrir Stripe o crear el pago en
+      // dLocal / Mercado Pago. Si algo falla al mostrarlo, el pago sigue normal.
+      if (
+        ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "dlocal_transfer", "dlocal_cash", "dlocal_wallet", "transfer", "cash"].includes(selected) &&
+        (await offerUpsellThen(() => { void handleBuyNow(); }))
+      ) return;
+
+      if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) {
         setShowStripe(true); 
         // Force fresh fetch on "Continuar" to handle stale sessions
         useCheckoutPruebaStore.getState().setClientSecret(null);
@@ -2782,6 +2895,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           )}
         </button>
       )}
+
+      <UpsellPopup
+        offer={upsellPopup?.offer ?? null}
+        language={language}
+        onAdd={acceptUpsellPopup}
+        onSkip={skipUpsellPopup}
+        onClose={() => setUpsellPopup(null)}
+      />
     </div>
   );
 });

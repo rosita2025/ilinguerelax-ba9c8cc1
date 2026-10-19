@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { extractHotmartUsd } from "../_shared/hotmartUsd.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -122,9 +123,13 @@ async function sendFacebookPurchaseEvent(
   sourceUrl: string,
   clientIpAddress?: string,
   clientUserAgent?: string,
+  transactionCode?: string,
 ) {
   const eventTime = Math.floor(Date.now() / 1000);
-  const eventId = `hotmart_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  // Id determinista por transacción: si Hotmart reenvía el aviso, Meta lo deduplica.
+  const eventId = transactionCode
+    ? `hotmart_${transactionCode}`
+    : `hotmart_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
   // Hash email for matching (SHA256)
   const emailHash = await sha256(buyerEmail.toLowerCase().trim());
@@ -261,40 +266,41 @@ serve(async (req) => {
       );
     }
 
-    // Map to internal product
-    const product = mapHotmartProduct(productName);
-    if (!product) {
-      console.warn(`Could not map product: "${productName}" - skipping CAPI event`);
-      return new Response(
-        JSON.stringify({ success: true, message: `Unknown product: ${productName}` }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    // Producto del catálogo. Si no se reconoce NO se descarta la venta:
+    // se registra igual en el funnel con los datos que manda Hotmart.
+    const mapped = mapHotmartProduct(productName);
+    const hotmartProductId = String(body.data?.product?.id ?? body.product?.id ?? "").trim();
+    const product = mapped ?? {
+      id: hotmartProductId ? `hotmart-${hotmartProductId}` : "hotmart-desconocido",
+      name: productName,
+      category: "Digital Book",
+      value: 0,
+    };
+    if (!mapped) console.warn(`Unknown Hotmart product "${productName}" - se registra igual en el funnel`);
 
-    // Skip free products
-    if (product.value === 0) {
+    // Importe real en USD: comisión USD del productor (misma regla que el resto del panel);
+    // si no viene, el precio si Hotmart lo cobró en USD; si no, el precio de catálogo.
+    const priceObj = body.data?.purchase?.price ?? body.purchase?.price ?? {};
+    const priceUsd =
+      String(priceObj.currency_code || priceObj.currency_value || "").toUpperCase() === "USD" && Number(priceObj.value) > 0
+        ? Number(priceObj.value)
+        : null;
+    const realValue = extractHotmartUsd(body).amount ?? priceUsd ?? (product.value > 0 ? product.value : null);
+
+    // Producto gratuito conocido y sin importe: no es una venta.
+    if (mapped && product.value === 0 && !realValue) {
       console.log(`Skipping free product: ${product.name}`);
       return new Response(
         JSON.stringify({ success: true, message: "Free product - no Purchase event" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+    const value = realValue ?? 0;
+    const eventName = isApproved ? "Purchase" : `hotmart_${mappedStatus}`;
 
-    // Only send Purchase event to Facebook CAPI if approved
-    let facebookResult = null;
-    if (isApproved) {
-      const sourceUrl = "https://ilinguerelax.com/hotmart-success";
-      facebookResult = await sendFacebookPurchaseEvent(
-        accessToken,
-        product,
-        buyerEmail,
-        buyerName,
-        sourceUrl,
-        clientIp,
-        userAgent,
-      );
-    }
-
+    // 1) PRIMERO se guarda la venta en el funnel/admin, pase lo que pase con Meta.
+    //    (Antes, si Meta fallaba, la venta no se guardaba.) Idempotente por transacción.
+    let funnelSaved = false;
     try {
       const supabase = createClient(
         Deno.env.get("SUPABASE_URL")!,
@@ -308,34 +314,67 @@ serve(async (req) => {
         email: buyerEmail,
         name: buyerName,
         product_name: productName,
-        hottok: receivedToken,
       };
-
-      await supabase.from("funnel_events").insert({
-        event_name: isApproved ? "Purchase" : `hotmart_${mappedStatus}`,
-        product_id: product.id,
-        value: product.value || body.data?.purchase?.price?.value || body.purchase?.price?.value || 0,
-        currency: body.data?.purchase?.price?.currency_code || body.purchase?.price?.currency_code || "USD",
-        session_id: transactionCode || body.data?.purchase?.transaction || body.purchase?.transaction || body.transaction,
-        page_path: "/hotmart-success",
-        country: buyerCountry,
-        provider: "hotmart",
-        email: buyerEmail,
-        name: buyerName,
-        referrer: JSON.stringify(meta).slice(0, 2000),
-        event_data: meta
-      });
+      const { data: existing } = await supabase
+        .from("funnel_events")
+        .select("id")
+        .eq("provider", "hotmart")
+        .eq("session_id", transactionCode)
+        .eq("event_name", eventName)
+        .limit(1);
+      if (existing && existing.length > 0) {
+        funnelSaved = true; // reenvío del mismo aviso: ya estaba
+      } else {
+        const { error: insErr } = await supabase.from("funnel_events").insert({
+          event_name: eventName,
+          product_id: product.id,
+          value,
+          currency: "USD",
+          session_id: transactionCode,
+          page_path: "/hotmart-success",
+          country: buyerCountry,
+          provider: "hotmart",
+          email: buyerEmail,
+          name: buyerName,
+          referrer: JSON.stringify(meta).slice(0, 2000),
+        });
+        if (insErr) throw insErr;
+        funnelSaved = true;
+      }
     } catch (trackingError) {
       console.error("funnel purchase tracking error:", trackingError);
+    }
+
+    // 2) Después se avisa a Meta (solo compras aprobadas con importe). Un fallo aquí no pierde la venta.
+    let facebookResult = null;
+    let facebookError: string | null = null;
+    if (isApproved && value > 0) {
+      try {
+        facebookResult = await sendFacebookPurchaseEvent(
+          accessToken,
+          { ...product, value },
+          buyerEmail,
+          buyerName,
+          "https://ilinguerelax.com/hotmart-success",
+          clientIp,
+          userAgent,
+          transactionCode,
+        );
+      } catch (e) {
+        facebookError = e instanceof Error ? e.message : String(e);
+        console.error("Hotmart CAPI failed:", facebookError);
+      }
     }
 
     return new Response(
       JSON.stringify({
         success: true,
         product: product.name,
-        value: product.value,
+        value,
         status: mappedStatus,
+        funnel_saved: funnelSaved,
         facebook_response: facebookResult,
+        facebook_error: facebookError,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

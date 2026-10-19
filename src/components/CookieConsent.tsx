@@ -84,7 +84,7 @@ export const CookieConsent = () => {
     <div
       role="dialog"
       aria-label="Cookies"
-      className="fixed bottom-52 left-2 right-2 md:left-auto md:right-4 md:bottom-4 z-[60] md:max-w-sm"
+      className="fixed bottom-52 left-2 right-2 md:left-auto md:right-4 lg:bottom-28 z-[60] md:max-w-sm"
     >
       <div className="bg-card/95 backdrop-blur-md border border-border rounded-xl shadow-xl p-3">
         <div className="flex items-start gap-2.5">

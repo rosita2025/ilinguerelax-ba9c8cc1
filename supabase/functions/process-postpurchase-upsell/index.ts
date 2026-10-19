@@ -28,19 +28,25 @@ Deno.serve(async (req) => {
   const blocked = await assertInternalCall(req);
   if (blocked) return blocked;
 
-  const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  const url = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !serviceKey) return json({ ok: false, error: "Missing internal configuration" }, 500);
+  const supabase = createClient(url, serviceKey);
   const dryRun = new URL(req.url).searchParams.get("dry_run") === "1";
   const result = { checked: 0, sent: 0, wouldSend: [] as unknown[], skippedFullBundle: 0, skippedNoUpsells: 0, skippedNotDue: 0, errors: 0 };
 
   try {
     // Catálogo: productos activos + upsells configurados por producto.
     const [{ data: prods }, { data: ups }] = await Promise.all([
-      supabase.from("digital_products").select("sku, name, sku_aliases, active").eq("active", true),
+      supabase.from("digital_products").select("sku, name, sku_aliases, active, learner_language").eq("active", true),
       supabase.from("product_upsells").select("product_sku, upsell_sku, sort_order").order("sort_order", { ascending: true }),
     ]);
-    const prodBySku = new Map<string, { sku: string; name: string; aliases: string[] }>();
+    const prodBySku = new Map<string, { sku: string; name: string; aliases: string[]; lang: "es" | "en" }>();
     for (const p of prods ?? []) {
-      prodBySku.set(p.sku, { sku: p.sku, name: p.name, aliases: (p.sku_aliases ?? []) as string[] });
+      // Idioma del público del producto: "en" = angloparlantes que aprenden español;
+      // cualquier otro (es, vacío) = hispanohablantes que aprenden inglés.
+      const lang = String((p as { learner_language?: string | null }).learner_language ?? "").toLowerCase().startsWith("en") ? "en" : "es";
+      prodBySku.set(p.sku, { sku: p.sku, name: p.name, aliases: (p.sku_aliases ?? []) as string[], lang });
     }
     const upsellsOf = new Map<string, string[]>();
     for (const u of ups ?? []) {
@@ -87,7 +93,8 @@ Deno.serve(async (req) => {
 
       // Lo que ya tiene (todas las compras históricas, cualquier método de pago).
       const owned = new Set([...(await getPurchasedSkus(supabase, email))].map(canon));
-      const pending = configured.filter((k) => !owned.has(k));
+      // Nunca ofrecer el mismo producto que originó el correo, ni nada que ya tenga.
+      const pending = configured.filter((k) => k !== info.mainSku && !owned.has(k));
       if (pending.length === 0) { result.skippedFullBundle++; continue; }
 
       const { data: prev } = await supabase
@@ -98,13 +105,17 @@ Deno.serve(async (req) => {
       const lastSent = Math.max(0, ...(prev ?? []).map((p: any) => (p.sent_at ? new Date(p.sent_at).getTime() : 0)));
       if (lastSent && Date.now() - lastSent < GAP_MS) continue;
 
-      const offers = pending.map((k) => ({
-        name: prodBySku.get(k)!.name,
-        url: `${SITE}/products/${k}?utm_source=email&utm_medium=postpurchase&utm_campaign=upsell-d${day}`,
-      }));
+      const offers = pending.flatMap((k) => {
+        const product = prodBySku.get(k);
+        if (!product) return [];
+        return [{
+          name: product.name,
+          url: `${SITE}/products/${k}?utm_source=email&utm_medium=postpurchase&utm_campaign=upsell-d${day}`,
+        }];
+      });
 
       if (dryRun) {
-        result.wouldSend.push({ email, day, main: info.mainSku, offers: pending });
+        result.wouldSend.push({ email, day, main: info.mainSku, lang: prodBySku.get(info.mainSku)?.lang ?? "es", offers: pending });
         continue;
       }
 
@@ -120,6 +131,7 @@ Deno.serve(async (req) => {
         templateData: {
           customerName: (info.name || "").split(" ")[0] || "",
           sourceName: prodBySku.get(info.mainSku)?.name ?? "",
+          lang: prodBySku.get(info.mainSku)?.lang ?? "es",
           offers, day,
         },
       });

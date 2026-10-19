@@ -5,6 +5,8 @@ import type { TemplateEntry } from './registry.ts'
 /**
  * Upsell post-compra (día 1 y día 3). Se envía SOLO con los upsells configurados
  * en admin para el producto comprado que el cliente todavía NO tiene.
+ * Idioma: el del público del producto comprado (es = hispanohablantes que
+ * aprenden inglés · en = angloparlantes que aprenden español).
  */
 interface Offer { name: string; url: string; image?: string }
 interface Props {
@@ -12,31 +14,62 @@ interface Props {
   sourceName?: string
   offers?: Offer[]
   day?: number
+  lang?: 'es' | 'en'
 }
 
-const Email = ({ customerName, sourceName, offers = [], day }: Props) => {
+const COPY = {
+  es: {
+    htmlLang: 'es',
+    previewLast: 'Te falta 1 material para completar tu colección',
+    previewMany: (s?: string) => `Complementa ${s || 'tu compra'}`,
+    h1Last: '🎯 Solo te falta 1 para completarlo',
+    h1Many: '🚀 Complementa tu aprendizaje',
+    hello: (n?: string) => `Hola${n ? ` ${n}` : ''},`,
+    day3: (s?: string) =>
+      `Ya pasaron unos días desde ${s ? `que recibiste ${s}` : 'tu compra'}. Estos materiales combinan muy bien con lo que ya tienes:`,
+    day1: (s?: string) =>
+      `Gracias por tu compra${s ? ` de ${s}` : ''}. Si tuviste algún problema para descargarla, responde este correo o escríbenos por WhatsApp. Cuando quieras, estos materiales la complementan:`,
+    view: (name: string) => `Ver ${name}`,
+    subjectLast: (s?: string) => `Te falta 1 material para completar ${s || 'tu colección'}`,
+    subjectMany: (s?: string) => `Complementa ${s || 'tu compra'} con estos materiales`,
+  },
+  en: {
+    htmlLang: 'en',
+    previewLast: "You're 1 material away from completing your collection",
+    previewMany: (s?: string) => `Complement ${s || 'your purchase'}`,
+    h1Last: '🎯 Just 1 left to complete it',
+    h1Many: '🚀 Complement your learning',
+    hello: (n?: string) => `Hi${n ? ` ${n}` : ''},`,
+    day3: (s?: string) =>
+      `A few days have passed since ${s ? `you received ${s}` : 'your purchase'}. These materials pair really well with what you already have:`,
+    day1: (s?: string) =>
+      `Thank you for your purchase${s ? ` of ${s}` : ''}. If you had any trouble downloading it, reply to this email or message us on WhatsApp. Whenever you're ready, these materials complement it:`,
+    view: (name: string) => `View ${name}`,
+    subjectLast: (s?: string) => `You're 1 material away from completing ${s || 'your collection'}`,
+    subjectMany: (s?: string) => `Complement ${s || 'your purchase'} with these materials`,
+  },
+} as const
+
+const Email = ({ customerName, sourceName, offers = [], day, lang }: Props) => {
+  const c = COPY[lang === 'en' ? 'en' : 'es']
   const last = offers.length === 1
   return (
-    <Html lang="es" dir="ltr">
+    <Html lang={c.htmlLang} dir="ltr">
       <Head />
-      <Preview>{last ? 'Te falta 1 material para completar tu colección' : `Complementa ${sourceName || 'tu compra'}`}</Preview>
+      <Preview>{last ? c.previewLast : c.previewMany(sourceName)}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={header}>
             <Text style={brand}>iLingue Relax</Text>
-            <Heading style={h1}>{last ? '🎯 Solo te falta 1 para completarlo' : '🚀 Complementa tu aprendizaje'}</Heading>
+            <Heading style={h1}>{last ? c.h1Last : c.h1Many}</Heading>
           </Section>
-          <Text style={p}>Hola{customerName ? ` ${customerName}` : ''},</Text>
-          <Text style={p}>
-            {day === 3
-              ? `Ya pasaron unos días desde ${sourceName ? `que recibiste ${sourceName}` : 'tu compra'}. Estos materiales combinan muy bien con lo que ya tienes:`
-              : `Gracias por tu compra${sourceName ? ` de ${sourceName}` : ''}. Si tuviste algún problema para descargarla, responde este correo o escríbenos por WhatsApp. Cuando quieras, estos materiales la complementan:`}
-          </Text>
+          <Text style={p}>{c.hello(customerName)}</Text>
+          <Text style={p}>{day === 3 ? c.day3(sourceName) : c.day1(sourceName)}</Text>
           {offers.map((o) => (
             <Section key={o.url} style={card}>
               <Text style={offerName}>{o.name}</Text>
               <Text style={{ margin: '8px 0 0' }}>
-                <a href={o.url} style={btn}>Ver {o.name}</a>
+                <a href={o.url} style={btn}>{c.view(o.name)}</a>
               </Text>
             </Section>
           ))}
@@ -49,14 +82,15 @@ const Email = ({ customerName, sourceName, offers = [], day }: Props) => {
 
 export const template = {
   component: Email,
-  subject: (d: Props) =>
-    (d.offers?.length ?? 0) === 1
-      ? `Te falta 1 material para completar ${d.sourceName || 'tu colección'}`
-      : `Complementa ${d.sourceName || 'tu compra'} con estos materiales`,
+  subject: (d: Props) => {
+    const c = COPY[d.lang === 'en' ? 'en' : 'es']
+    return (d.offers?.length ?? 0) === 1 ? c.subjectLast(d.sourceName) : c.subjectMany(d.sourceName)
+  },
   displayName: 'Upsell post-compra (cliente)',
   previewData: {
     customerName: 'María',
     sourceName: 'Patrones Especiales en Inglés',
+    lang: 'es',
     offers: [
       { name: '1,000 Verbos Esenciales en Inglés', url: 'https://www.ilinguerelax.com/products/1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion' },
       { name: '500 Preguntas en Inglés', url: 'https://www.ilinguerelax.com/products/500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes' },

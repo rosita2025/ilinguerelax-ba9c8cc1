@@ -5,3 +5,8 @@
 - [x] Align checkout email validation with the payment server and clear rejected emails visibly before retry.
 - [x] Keep checkout components, cart reminders, and digital delivery emails in the main product's audience language regardless of buyer country.
 - [x] Keep the Patrones product page and its checkout in Spanish for Spanish-to-English learners abroad, without changing regional prices.
+- [x] Reuse the existing postpurchase upsell table without repeating its already-applied creation.
+- [ ] Apply the attached email language and source-product exclusion updates and deploy only the two requested functions.
+- [ ] Run authenticated dry_run=1 without sending and report wouldSend; blocked if internal-only credentials are unavailable.
+- [ ] Enable the three-hour email schedule only after the user permits real automatic sends.
+- [x] Query the last 30 days of delivery records grouped by provider.

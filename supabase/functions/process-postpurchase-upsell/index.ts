@@ -1,6 +1,7 @@
 // Upsell post-compra, genérico por producto y por método de pago.
 //  · Fuente de compras: digital_email_sends (toda entrega digital, sea Stripe, dLocal Go,
-//    Mercado Pago, Yape/Plin, transferencia/SPEI México, PayPal...) + getPurchasedSkus()
+//    Mercado Pago, Yape/Plin, transferencia/SPEI México, PayPal...) + compras de Hotmart
+//    (funnel_events provider=hotmart, aprobadas y no reembolsadas) + getPurchasedSkus()
 //    (manual_payments aprobados, funnel_events, carritos convertidos).
 //  · Upsells de cada producto: los que el admin configuró en product_upsells (por SKU).
 //  · Se ofrecen SOLO los que el cliente aún no tiene:
@@ -23,15 +24,23 @@ const MAX_AGE_MS = 6 * DAY_MS;
 const GAP_MS = 20 * 60 * 60 * 1000;
 const SITE = "https://www.ilinguerelax.com";
 
+// Ids con los que hotmart-purchase-pixel guarda cada producto en funnel_events → SKU real del catálogo.
+const HOTMART_SKU: Record<string, string> = {
+  "product-5000": "5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+  "product-8000": "8-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa",
+  "product-spanish-5000": "5-000-spanish-words-with-english-pronunciation-digital",
+  "product-1000-verbos": "1-000-verbos-esenciales-en-ingles-presente-pasado-futuro-con-pronunciacion",
+  "product-500-preguntas": "500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes",
+  "product-coreano-100-mapas": "100-mapas-mentales-para-aprender-coreano-hangul-c1",
+  "patrones-especiales": "patrones-especiales-alfabeto-combinaciones-secretas-ingles",
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: internalCors });
   const blocked = await assertInternalCall(req);
   if (blocked) return blocked;
 
-  const url = Deno.env.get("SUPABASE_URL");
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!url || !serviceKey) return json({ ok: false, error: "Missing internal configuration" }, 500);
-  const supabase = createClient(url, serviceKey);
+  const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const dryRun = new URL(req.url).searchParams.get("dry_run") === "1";
   const result = { checked: 0, sent: 0, wouldSend: [] as unknown[], skippedFullBundle: 0, skippedNoUpsells: 0, skippedNotDue: 0, errors: 0 };
 
@@ -57,7 +66,7 @@ Deno.serve(async (req) => {
     }
     // alias → sku real, para reconocer lo ya comprado aunque venga con alias de carrito.
     const canon = (k: string) => {
-      const n = normalizeSku(k) ?? k;
+      const n = normalizeSku(HOTMART_SKU[String(k).toLowerCase()] ?? k) ?? k;
       for (const p of prodBySku.values()) if (p.sku === n || p.aliases.includes(n) || p.aliases.includes(k)) return p.sku;
       return n;
     };
@@ -70,16 +79,49 @@ Deno.serve(async (req) => {
       .order("created_at", { ascending: true })
       .limit(500);
 
-    // Por cliente: primera entrega reciente que incluya un producto con upsells configurados.
-    const byEmail = new Map<string, { name: string | null; orderId: string | null; at: number; mainSku: string }>();
+    // Compras de Hotmart (las entrega Hotmart, no pasan por digital_email_sends):
+    // Purchase aprobadas de los últimos días, sin reembolso ni contracargo.
+    const { data: hm } = await supabase
+      .from("funnel_events")
+      .select("email, name, product_id, session_id, event_name, created_at")
+      .eq("provider", "hotmart")
+      .in("event_name", ["Purchase", "hotmart_refunded", "hotmart_chargeback"])
+      .gte("created_at", since)
+      .order("created_at", { ascending: true })
+      .limit(500);
+    const reversed = new Set((hm ?? []).filter((r: any) => r.event_name !== "Purchase").map((r: any) => String(r.session_id)));
+
+    // Todas las entregas/compras recientes en una sola lista, ordenadas por fecha.
+    const purchases: { email: string; name: string | null; orderId: string | null; at: number; skus: string[] }[] = [];
     for (const s of sends ?? []) {
       if (s.status === "failed") continue;
-      const email = String(s.customer_email || "").trim().toLowerCase();
-      if (!email || byEmail.has(email)) continue;
-      const skus = (Array.isArray(s.skus) ? s.skus : []).map((k: string) => canon(k));
-      const mainSku = skus.find((k: string) => upsellsOf.has(k));
+      purchases.push({
+        email: String(s.customer_email || "").trim().toLowerCase(),
+        name: s.customer_name ?? null,
+        orderId: s.order_id ?? null,
+        at: new Date(s.created_at).getTime(),
+        skus: (Array.isArray(s.skus) ? s.skus : []).map((k: string) => canon(k)),
+      });
+    }
+    for (const r of hm ?? []) {
+      if (r.event_name !== "Purchase" || reversed.has(String(r.session_id))) continue;
+      purchases.push({
+        email: String(r.email || "").trim().toLowerCase(),
+        name: r.name ?? null,
+        orderId: r.session_id ?? null,
+        at: new Date(r.created_at).getTime(),
+        skus: [canon(String(r.product_id || ""))],
+      });
+    }
+    purchases.sort((x, y) => x.at - y.at);
+
+    // Por cliente: primera compra reciente que incluya un producto con upsells configurados.
+    const byEmail = new Map<string, { name: string | null; orderId: string | null; at: number; mainSku: string }>();
+    for (const pu of purchases) {
+      if (!pu.email || byEmail.has(pu.email)) continue;
+      const mainSku = pu.skus.find((k: string) => upsellsOf.has(k));
       if (!mainSku) continue;
-      byEmail.set(email, { name: s.customer_name ?? null, orderId: s.order_id ?? null, at: new Date(s.created_at).getTime(), mainSku });
+      byEmail.set(pu.email, { name: pu.name, orderId: pu.orderId, at: pu.at, mainSku });
     }
 
     for (const [email, info] of byEmail) {
@@ -105,14 +147,10 @@ Deno.serve(async (req) => {
       const lastSent = Math.max(0, ...(prev ?? []).map((p: any) => (p.sent_at ? new Date(p.sent_at).getTime() : 0)));
       if (lastSent && Date.now() - lastSent < GAP_MS) continue;
 
-      const offers = pending.flatMap((k) => {
-        const product = prodBySku.get(k);
-        if (!product) return [];
-        return [{
-          name: product.name,
-          url: `${SITE}/products/${k}?utm_source=email&utm_medium=postpurchase&utm_campaign=upsell-d${day}`,
-        }];
-      });
+      const offers = pending.map((k) => ({
+        name: prodBySku.get(k)!.name,
+        url: `${SITE}/products/${k}?utm_source=email&utm_medium=postpurchase&utm_campaign=upsell-d${day}`,
+      }));
 
       if (dryRun) {
         result.wouldSend.push({ email, day, main: info.mainSku, lang: prodBySku.get(info.mainSku)?.lang ?? "es", offers: pending });

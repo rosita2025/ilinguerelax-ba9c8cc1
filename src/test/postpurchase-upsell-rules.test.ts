@@ -7,7 +7,7 @@ const languageExpression = source.match(/const lang = ([^\n]+);/)?.[1];
 if (!pendingExpression || !languageExpression) throw new Error("Upsell rules not found");
 const pending = new Function("configured", "info", "owned", `return ${pendingExpression}`) as
   (configured: string[], info: {mainSku: string}, owned: Set<string>) => string[];
-const language = new Function("p", `return ${languageExpression.replace(/\(p as \{ learner_language\?: string \| null \}\)/, "p")}`) as
+const language = new Function("p", `return ${languageExpression.replace(/\(p as \{ learner_language\?: string \| null \}\)/g, "p")}`) as
   (p: {learner_language: string}) => string;
 
 describe("postpurchase offer rules", () => {
@@ -32,5 +32,9 @@ describe("postpurchase offer rules", () => {
   it("uses Spanish for other learner audiences", () => {
     expect(language({learner_language: "es"})).toBe("es");
     expect(language({learner_language: "fr"})).toBe("es");
+  });
+  it("uses Italian for Italian learner audiences", () => {
+    expect(language({learner_language: "it"})).toBe("it");
+    expect(language({learner_language: "it-IT"})).toBe("it");
   });
 });

@@ -14,7 +14,7 @@ interface Props {
   sourceName?: string
   offers?: Offer[]
   day?: number
-  lang?: 'es' | 'en'
+  lang?: 'es' | 'en' | 'it'
 }
 
 const COPY = {
@@ -48,10 +48,25 @@ const COPY = {
     subjectLast: (s?: string) => `You're 1 material away from completing ${s || 'your collection'}`,
     subjectMany: (s?: string) => `Complement ${s || 'your purchase'} with these materials`,
   },
+  it: {
+    htmlLang: 'it',
+    previewLast: 'Ti manca 1 materiale per completare la tua collezione',
+    previewMany: (s?: string) => `Completa ${s || 'il tuo acquisto'}`,
+    h1Last: '🎯 Te ne manca solo 1 per completarla',
+    h1Many: '🚀 Completa il tuo apprendimento',
+    hello: (n?: string) => `Ciao${n ? ` ${n}` : ''},`,
+    day3: (s?: string) =>
+      `Sono passati alcuni giorni da quando ${s ? `hai ricevuto ${s}` : 'hai fatto il tuo acquisto'}. Questi materiali si abbinano molto bene a quello che hai già:`,
+    day1: (s?: string) =>
+      `Grazie per il tuo acquisto${s ? ` di ${s}` : ''}. Se hai avuto qualche problema a scaricarlo, rispondi a questa email o scrivici su WhatsApp. Quando vuoi, questi materiali lo completano:`,
+    view: (name: string) => `Vedi ${name}`,
+    subjectLast: (s?: string) => `Ti manca 1 materiale per completare ${s || 'la tua collezione'}`,
+    subjectMany: (s?: string) => `Completa ${s || 'il tuo acquisto'} con questi materiali`,
+  },
 } as const
 
 const Email = ({ customerName, sourceName, offers = [], day, lang }: Props) => {
-  const c = COPY[lang === 'en' ? 'en' : 'es']
+  const c = COPY[lang === 'en' ? 'en' : lang === 'it' ? 'it' : 'es']
   const last = offers.length === 1
   return (
     <Html lang={c.htmlLang} dir="ltr">
@@ -83,7 +98,7 @@ const Email = ({ customerName, sourceName, offers = [], day, lang }: Props) => {
 export const template = {
   component: Email,
   subject: (d: Props) => {
-    const c = COPY[d.lang === 'en' ? 'en' : 'es']
+    const c = COPY[d.lang === 'en' ? 'en' : d.lang === 'it' ? 'it' : 'es']
     return (d.offers?.length ?? 0) === 1 ? c.subjectLast(d.sourceName) : c.subjectMany(d.sourceName)
   },
   displayName: 'Upsell post-compra (cliente)',

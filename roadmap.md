@@ -12,3 +12,5 @@
 - [x] Query the last 30 days of delivery records grouped by provider.
 - [x] Add Italian site and product-audience checkout text without changing payments, prices or coupons.
 - [x] Verify Italian language isolation and existing Spanish checkout; 23 tests passed, compilation successful, no Italian-audience catalog products exist yet. No test purchases or emails.
+- [ ] Add Italian email templates and audience selection while retaining delivery and payment behavior.
+- [ ] Verify email language rules locally and deploy the ten requested functions without test sends.

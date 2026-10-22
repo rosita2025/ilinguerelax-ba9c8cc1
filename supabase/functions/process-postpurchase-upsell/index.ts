@@ -50,11 +50,11 @@ Deno.serve(async (req) => {
       supabase.from("digital_products").select("sku, name, sku_aliases, active, learner_language").eq("active", true),
       supabase.from("product_upsells").select("product_sku, upsell_sku, sort_order").order("sort_order", { ascending: true }),
     ]);
-    const prodBySku = new Map<string, { sku: string; name: string; aliases: string[]; lang: "es" | "en" }>();
+    const prodBySku = new Map<string, { sku: string; name: string; aliases: string[]; lang: "es" | "en" | "it" }>();
     for (const p of prods ?? []) {
       // Idioma del público del producto: "en" = angloparlantes que aprenden español;
-      // cualquier otro (es, vacío) = hispanohablantes que aprenden inglés.
-      const lang = String((p as { learner_language?: string | null }).learner_language ?? "").toLowerCase().startsWith("en") ? "en" : "es";
+      // "it" = italianos que aprenden español; los demás mantienen español.
+      const lang = String((p as { learner_language?: string | null }).learner_language ?? "").toLowerCase().startsWith("en") ? "en" : String((p as { learner_language?: string | null }).learner_language ?? "").toLowerCase().startsWith("it") ? "it" : "es";
       prodBySku.set(p.sku, { sku: p.sku, name: p.name, aliases: (p.sku_aliases ?? []) as string[], lang });
     }
     const upsellsOf = new Map<string, string[]>();

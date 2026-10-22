@@ -10,3 +10,5 @@
 - [x] Run authenticated dry_run=1 without sending and report wouldSend: HTTP 200, seven candidates, zero sends.
 - [ ] Enable the three-hour email schedule only after the user permits real automatic sends.
 - [x] Query the last 30 days of delivery records grouped by provider.
+- [ ] Add Italian site and product-audience checkout text without changing payments, prices or coupons.
+- [ ] Verify Italian compatibility and report existing Italian-audience products without test purchases or emails.

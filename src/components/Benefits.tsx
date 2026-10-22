@@ -135,7 +135,7 @@ export const Benefits = () => {
     },
   };
 
-  const c = content[language];
+  const c = (content as any)[language] ?? content.es;
 
   return (
     <section id="beneficios" className="py-20 md:py-28 bg-background relative overflow-hidden">

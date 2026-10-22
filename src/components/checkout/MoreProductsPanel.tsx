@@ -30,6 +30,7 @@ const T = {
   en: { title: "Exclusive offers for this order", sub: "Today only with automatic discount", add: "Add", added: "In cart", toast: "Product added with discount", auto: "Discount" },
   fr: { title: "Offres exclusives pour cette commande", sub: "Aujourd'hui seulement avec remise automatique", add: "Ajouter", added: "Dans le panier", toast: "Produit ajouté avec remise", auto: "Remise" },
   pt: { title: "Ofertas exclusivas para este pedido", sub: "Só hoje com desconto automático", add: "Adicionar", added: "No carrinho", toast: "Produto adicionado com desconto", auto: "Desconto" },
+  it: { title: "Offerte esclusive per questo ordine", sub: "Solo oggi con sconto automatico", add: "Aggiungi", added: "Nel carrello", toast: "Prodotto aggiunto con sconto", auto: "Sconto" },
 } as const;
 
 interface Props {

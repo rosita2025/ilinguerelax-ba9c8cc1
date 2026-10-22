@@ -31,7 +31,7 @@ const LANG_META: Record<LangCode, { flag: string; label: string }> = {
 const Products = () => {
   const { language: uiLang } = useI18n();
   // "Hablo" auto-defaults to the visitor's detected UI language (IP/subdomain-based).
-  const defaultLearner: LangCode = (["es","en","fr","pt"].includes(uiLang) ? uiLang : "es") as LangCode;
+  const defaultLearner: LangCode = (["es","en","fr","pt","it"].includes(uiLang) ? uiLang : "es") as LangCode;
   const [type, setType] = useState<"all" | "digital" | "physical">("all");
   const [learnerLang, setLearnerLang] = useState<LangCode | "all">(defaultLearner);
   const [targetLang, setTargetLang] = useState<LangCode | "all">("all");

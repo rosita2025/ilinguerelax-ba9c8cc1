@@ -56,6 +56,15 @@ const COPY: Record<string, { title: string; subtitle: string; placeholder: strin
     close: "Não, obrigado",
     invalid: "Digite um email válido",
   },
+  it: {
+    title: "Aspetta! Ottieni il 10% di sconto",
+    subtitle: "Lasciaci la tua email e te lo inviamo subito, senza impegno.",
+    placeholder: "tu@email.com",
+    submit: "Inviami lo sconto",
+    success: "Fatto! Il tuo sconto del 10% è già applicato.",
+    close: "No grazie",
+    invalid: "Inserisci un'email valida",
+  },
 };
 
 /**

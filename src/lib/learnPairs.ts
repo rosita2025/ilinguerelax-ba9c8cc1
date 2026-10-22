@@ -23,6 +23,7 @@ export const LEARN_PAIRS: Array<[LangCode, LangCode]> = [
   ["es", "pt"],
   ["es", "nl"],
   ["en", "es"],
+  ["it", "es"],
 ];
 
 export const LEARN_PAIR_SLUGS = LEARN_PAIRS.map(([f, t]) => `${f}-${t}`);
@@ -40,6 +41,7 @@ export function defaultPairFor(uiLang: string): [LangCode, LangCode] {
     case "en": return ["en", "es"];
     case "fr": return ["fr", "es"] as any; // fr→es not yet, falls back
     case "pt": return ["pt", "es"] as any;
+    case "it": return ["it", "es"];
     case "es":
     default:  return ["es", "en"];
   }

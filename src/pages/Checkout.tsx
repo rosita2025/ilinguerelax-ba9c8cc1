@@ -298,7 +298,7 @@ export default function Checkout() {
   // Mientras el producto no ha cargado, o si el valor guardado no es uno de
   // los 4 idiomas de interfaz soportados, usa el idioma del sitio como
   // respaldo (evita pasarle a getCheckoutUI un valor inválido).
-  const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt"];
+  const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
   const learnerLang = catalogItem?.learnerLanguage;
   const language = (
     slug === "patrones-ingles" || catalogItem?.adminSku === "patrones-especiales-alfabeto-combinaciones-secretas-ingles"
@@ -693,7 +693,7 @@ export default function Checkout() {
                     temprano genera confianza antes de llenar el formulario. */}
                 <div className="flex flex-col items-center gap-1.5 py-1">
                   <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-                    {language === "en" ? "Accepted payment methods" : "Métodos de pago aceptados"}
+                    {language === "en" ? "Accepted payment methods" : language === "it" ? "Metodi di pagamento accettati" : "Métodos de pago aceptados"}
                   </p>
                   <PaymentLogos />
                 </div>

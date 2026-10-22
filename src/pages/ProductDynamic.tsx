@@ -21,7 +21,7 @@ import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
 import { StockAlert } from "@/components/StockAlert";
 import { SocialProofPill } from "@/components/SocialProofPill";
 import { ProductTypeBadge } from "@/components/ProductTypeBadge";
-import { useI18n } from "@/i18n/I18nContext";
+import { CheckoutLanguageProvider, useI18n } from "@/i18n/I18nContext";
 import { formatCurrencyAmount, type Currency } from "@/i18n";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
@@ -278,8 +278,19 @@ const ProductDynamic = () => {
   const canonical = `https://ilinguerelax.com/products/${product.sku}`;
   
   const isEs = product.learner_language === "es";
+  const isIt = product.learner_language === "it";
+  // Textos cortos en 3 idiomas: español (es), italiano (it) y, para el resto, inglés.
+  const tx = (es: string, en: string, it: string) => (isIt ? it : isEs ? es : en);
 
-  const features = isEs ? [
+  const features = isIt ? [
+    `${product.name} + Pronuncia`,
+    "Versione PDF digitale",
+    "Pianificatore di studio (6 mesi)",
+    "Flashcard digitali (Anki/Quizlet)",
+    "Pacchetto di esami di livello",
+    "Download immediato · Pagamento sicuro",
+    "Garanzia di 7 giorni"
+  ] : isEs ? [
     `${product.name} + Pronunciación`,
     "Versión PDF digital",
     "Planificador de estudio (6 meses)",
@@ -297,7 +308,12 @@ const ProductDynamic = () => {
     "7-Day Money-Back Guarantee"
   ];
 
-  const benefits = isEs ? [
+  const benefits = isIt ? [
+    { icon: Headphones, title: "Audio e App in arrivo", description: "Bonus GRATUITO: audio MP3 con pronuncia nativa e accesso all'App." },
+    { icon: Layers, title: "Flashcard digitali", description: "Mazzi pronti per memorizzare il vocabolario 3 volte più velocemente." },
+    { icon: Zap, title: "Studia ovunque", description: "Dal tuo cellulare, tablet o PC. Sempre con te." },
+    { icon: FilePlus, title: "Conversazioni rapide", description: "Guida pratica con 100 conversazioni frequenti." },
+  ] : isEs ? [
     { icon: Headphones, title: "Audio y App próximamente", description: "Bono GRATIS: audios MP3 con pronunciación nativa y acceso a la App." },
     { icon: Layers, title: "Tarjetas digitales", description: "Mazos listos para memorizar vocabulario 3 veces más rápido." },
     { icon: Zap, title: "Estudia donde sea", description: "Desde tu celular, tablet o PC. Siempre contigo." },
@@ -401,6 +417,7 @@ const ProductDynamic = () => {
   };
 
   return (
+    <CheckoutLanguageProvider language={isIt ? "it" : language}>
     <div className="min-h-screen bg-background">
       <SEO
         title={product.name}
@@ -428,7 +445,7 @@ const ProductDynamic = () => {
                   <Star key={i} className="w-2 h-2 fill-emerald-500 text-emerald-500" strokeWidth={0} />
                 ))}
               </div>
-              <span className="text-[9px] font-bold text-slate-800">{isEs ? "Excelente" : "Excellent"}</span>
+              <span className="text-[9px] font-bold text-slate-800">{tx("Excelente", "Excellent", "Eccellente")}</span>
               <span className="text-[9px] font-bold text-emerald-600">★ Trustpilot</span>
             </div>
           </div>
@@ -481,7 +498,7 @@ const ProductDynamic = () => {
                     <Star key={i} className="w-3 h-3 fill-emerald-500 text-emerald-500" />
                   ))}
                 </div>
-                <span className="text-[10px] font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ {isEs ? "reseñas" : "reviews"})</span>
+                <span className="text-[10px] font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ {tx("reseñas", "reviews", "recensioni")})</span>
               </div>
 
               <h1 className="text-xl md:text-3xl font-black leading-tight text-slate-900 tracking-tight">
@@ -491,7 +508,7 @@ const ProductDynamic = () => {
               <p className="text-sm text-muted-foreground leading-snug">
                 {product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" 
                   ? "Reach C1 fluency faster with our professional 5,000 words guide, 6-month study planner, and proficiency exams."
-                  : product.description?.split('\n')[0] || (isEs ? "Domina el idioma con nuestra guía profesional en PDF." : "Master your target language with our professional PDF guide.")}
+                  : product.description?.split('\n')[0] || tx("Domina el idioma con nuestra guía profesional en PDF.", "Master your target language with our professional PDF guide.", "Padroneggia la lingua con la nostra guida professionale in PDF.")}
 
 
               </p>
@@ -509,7 +526,7 @@ const ProductDynamic = () => {
                 </div>
                 {priceReady && discountPercentage > 0 && (
                   <div className="inline-block px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-black mb-3">
-                    {product.learner_language === "es" ? `AHORRA ${discountPercentage}%` : `SAVE ${discountPercentage}%`}
+                    {tx(`AHORRA ${discountPercentage}%`, `SAVE ${discountPercentage}%`, `RISPARMIA ${discountPercentage}%`)}
                   </div>
                 )}
                 
@@ -520,8 +537,8 @@ const ProductDynamic = () => {
                   disabled={!priceReady}
                 >
                   {priceReady
-                    ? (product.learner_language === "es" ? `Lo quiero — ${displayFormatted}` : `I want it — ${displayFormatted}`)
-                    : (product.learner_language === "es" ? "Lo quiero" : "I want it")}
+                    ? tx(`Lo quiero — ${displayFormatted}`, `I want it — ${displayFormatted}`, `Lo voglio — ${displayFormatted}`)
+                    : tx("Lo quiero", "I want it", "Lo voglio")}
                 </Button>
 
                 <StockAlert count={7} className="mt-2 w-full justify-center" />
@@ -532,7 +549,7 @@ const ProductDynamic = () => {
                     <PaymentLogos />
                   </div>
                   <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500">
-                    <Shield className="w-2.5 h-2.5" /> {isEs ? "PAGO SEGURO" : "SECURE CHECKOUT"}
+                    <Shield className="w-2.5 h-2.5" /> {tx("PAGO SEGURO", "SECURE CHECKOUT", "PAGAMENTO SICURO")}
                   </div>
                 </div>
               </div>
@@ -541,14 +558,14 @@ const ProductDynamic = () => {
                 <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
                   <Globe className="w-5 h-5 text-emerald-600" />
                   <div>
-                    <div className="text-[9px] font-black uppercase text-slate-400">{isEs ? "Disponibilidad" : "Availability"}</div>
-                    <div className="text-[11px] font-bold text-slate-700">{isEs ? "Acceso global" : "Global Access"}</div>
+                    <div className="text-[9px] font-black uppercase text-slate-400">{tx("Disponibilidad", "Availability", "Disponibilità")}</div>
+                    <div className="text-[11px] font-bold text-slate-700">{tx("Acceso global", "Global Access", "Accesso globale")}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
                   <Smartphone className="w-5 h-5 text-emerald-600" />
                   <div>
-                    <div className="text-[9px] font-black uppercase text-slate-400">{isEs ? "Formato" : "Format"}</div>
+                    <div className="text-[9px] font-black uppercase text-slate-400">{tx("Formato", "Format", "Formato")}</div>
                     <div className="text-[11px] font-bold text-slate-700">PDF digital</div>
 
                   </div>
@@ -561,7 +578,7 @@ const ProductDynamic = () => {
           <section className="mt-4 py-3 border-t border-slate-100">
             <div className="grid lg:grid-cols-2 gap-6">
               <div>
-                <h2 className="text-lg md:text-xl font-black mb-3 uppercase tracking-tight">{isEs ? "Qué incluye" : "What's Inside"}</h2>
+                <h2 className="text-lg md:text-xl font-black mb-3 uppercase tracking-tight">{tx("Qué incluye", "What's Inside", "Cosa include")}</h2>
                 <div className="grid gap-2">
                   {features.map((f, i) => (
                     <div key={i} className="flex items-start gap-2 p-2 rounded-xl bg-white border border-slate-100 shadow-sm">
@@ -589,8 +606,8 @@ const ProductDynamic = () => {
           <section className="mt-4 py-3 bg-slate-900 rounded-[1.5rem] text-white overflow-hidden">
             <div className="px-4 md:px-8">
               <div className="text-center mb-4">
-                <h2 className="text-xl md:text-2xl font-black mb-1 uppercase tracking-tight">{product.learner_language === "es" ? "Vista Previa" : "Look Inside"}</h2>
-                <p className="text-slate-400 text-xs max-w-2xl mx-auto">{product.learner_language === "es" ? "Guías visuales para llegar a la fluidez más rápido." : "Visual guides to reach fluency faster."}</p>
+                <h2 className="text-xl md:text-2xl font-black mb-1 uppercase tracking-tight">{tx("Vista Previa", "Look Inside", "Anteprima")}</h2>
+                <p className="text-slate-400 text-xs max-w-2xl mx-auto">{tx("Guías visuales para llegar a la fluidez más rápido.", "Visual guides to reach fluency faster.", "Guide visive per raggiungere la fluidità più velocemente.")}</p>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
@@ -614,7 +631,7 @@ const ProductDynamic = () => {
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl p-0 overflow-hidden bg-white">
                       <DialogHeader className="p-4 bg-slate-900 text-white">
-                        <DialogTitle>{asset.title} - {product.learner_language === "es" ? "Vista previa" : "Preview"}</DialogTitle>
+                        <DialogTitle>{asset.title} - {tx("Vista previa", "Preview", "Anteprima")}</DialogTitle>
                       </DialogHeader>
                       <div className="p-1">
                         <img src={asset.image} className="w-full h-auto" alt="" loading="lazy" />
@@ -672,9 +689,14 @@ const ProductDynamic = () => {
 
           <Suspense fallback={<Skeleton className="h-48 w-full" />}>
             <FAQ 
-              title={isEs ? "Preguntas frecuentes" : "FAQ"} 
-              subtitle={isEs ? "Respuestas rápidas" : "Quick Answers"} 
-              items={[...SP5K_SKUS, "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca"].includes(product.sku) ? (isEs ? [
+              title={tx("Preguntas frecuentes", "FAQ", "Domande frequenti")} 
+              subtitle={tx("Respuestas rápidas", "Quick Answers", "Risposte rapide")} 
+              items={[...SP5K_SKUS, "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca"].includes(product.sku) ? (isIt ? [
+                { question: "Quanto tempo ci vuole per la consegna?", answer: "Arriva alla tua email in meno di 5 minuti dopo l'acquisto.", icon: Download },
+                { question: "Qual è il formato?", answer: "PDF digitale di alta qualità (marchio ufficiale iLingue Relax).", icon: FileText },
+                { question: "Quali metodi di pagamento ci sono?", answer: "Pagamenti sicuri con Stripe, carte di credito/debito e PayPal.", icon: CreditCard },
+                { question: "C'è la garanzia di 7 giorni?", answer: "Sì — rimborso totale entro 7 giorni se non hai ancora scaricato i file, o del 50% se li hai già scaricati.", icon: Shield }
+              ] : isEs ? [
                 { question: "¿Cuánto tarda la entrega?", answer: "Llega a tu correo en menos de 5 minutos después de la compra.", icon: Download },
                 { question: "¿Cuál es el formato?", answer: "PDF digital de alta calidad (marca oficial iLingue Relax).", icon: FileText },
                 { question: "¿Qué métodos de pago hay?", answer: "Pagos seguros con Stripe, tarjetas de crédito/débito y PayPal.", icon: CreditCard },
@@ -684,7 +706,11 @@ const ProductDynamic = () => {
                 { question: "What is the format?", answer: "High-quality Digital PDF (Official iLingue Relax Brand).", icon: FileText },
                 { question: "Payment methods?", answer: "Secure payments via Stripe, Credit/Debit Cards, and PayPal.", icon: CreditCard },
                 { question: "7-Day Guarantee?", answer: "Yes — full refund within 7 days if you haven't downloaded the files yet, or 50% back if you already have.", icon: Shield }
-              ]) : (isEs ? [
+              ]) : (isIt ? [
+                { question: "Consegna?", answer: "Immediata via email.", icon: Download },
+                { question: "Formato?", answer: "PDF digitale.", icon: FileText },
+                { question: "Garanzia?", answer: "Garanzia di rimborso di 7 giorni.", icon: Shield }
+              ] : isEs ? [
                 { question: "¿Entrega?", answer: "Inmediata por correo electrónico.", icon: Download },
                 { question: "¿Formato?", answer: "PDF digital.", icon: FileText },
                 { question: "¿Garantía?", answer: "7 días de garantía de devolución.", icon: Shield }
@@ -739,8 +765,8 @@ const ProductDynamic = () => {
         rating={reviewsRating}
         reviewCount={reviewsCount}
         productName={product.name}
-        lang={product.learner_language === "es" ? "es" : "en"}
-        ctaText={product.learner_language === "es" ? `Lo quiero — ${displayFormatted}` : `I want it — ${displayFormatted}`}
+        lang={isIt ? "it" : isEs ? "es" : "en"}
+        ctaText={tx(`Lo quiero — ${displayFormatted}`, `I want it — ${displayFormatted}`, `Lo voglio — ${displayFormatted}`)}
         onBuyClick={handleBuy}
         usdValue={effectiveUsd}
         localUsdPrices={product.local_usd_prices}
@@ -771,6 +797,7 @@ const ProductDynamic = () => {
       />
 
     </div>
+    </CheckoutLanguageProvider>
   );
 };
 

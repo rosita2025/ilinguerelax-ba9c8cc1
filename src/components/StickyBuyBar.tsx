@@ -21,7 +21,7 @@ interface StickyBuyBarProps {
   disabled?: boolean;
   showReviews?: boolean;
   isLoading?: boolean;
-  lang?: "es" | "en";
+  lang?: "es" | "en" | "it";
   showEmailSubscription?: boolean;
   onSubscribe?: (email: string) => Promise<void>;
   isSubscribed?: boolean;
@@ -78,6 +78,7 @@ export const StickyBuyBar = ({
   testimonials,
   goesToInternalCheckout: forceInternal = false,
 }: StickyBuyBarProps & { sku?: string }) => {
+  const tr = (en: string, es: string, it: string) => (lang === "it" ? it : lang === "en" ? en : es);
   const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
 
   useEffect(() => {
@@ -335,7 +336,7 @@ export const StickyBuyBar = ({
         <button
           type="button"
           onClick={() => setDismissed(false)}
-          aria-label={lang === "en" ? "Show buy bar" : "Mostrar barra de compra"}
+          aria-label={tr("Show buy bar", "Mostrar barra de compra", "Mostra la barra di acquisto")}
           className={`w-20 h-20 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_8px_28px_rgba(16,185,129,0.55)] flex flex-col items-center justify-center gap-0.5 font-extrabold ring-2 ring-white/40 transition-transform hover:scale-105 active:scale-95 hidden md:flex ${calmMode ? '' : 'animate-pulse'} ${priceFlash ? 'ring-4 ring-amber-300 scale-110' : ''}`}
         >
           <ShoppingCart className="w-5 h-5" />
@@ -348,7 +349,7 @@ export const StickyBuyBar = ({
         </button>
         {/* {isPhysical && (
           <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold shadow-md whitespace-nowrap animate-pulse">
-            {lang === "en" ? "Only 12 books left" : "Solo 12 libros quedan"}
+            {tr("Only 12 books left", "Solo 12 libros quedan", "Ne restano solo 12")}
           </span>
         )} */}
       </div>
@@ -361,7 +362,7 @@ export const StickyBuyBar = ({
         <button
           type="button"
           onClick={() => setDismissed(true)}
-          aria-label={lang === "en" ? "Hide buy bar" : "Ocultar barra"}
+          aria-label={tr("Hide buy bar", "Ocultar barra", "Nascondi la barra")}
           className="absolute top-1 right-1 z-40 w-7 h-7 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground flex items-center justify-center"
         >
           <X className="w-3.5 h-3.5" />
@@ -398,7 +399,7 @@ export const StickyBuyBar = ({
             </div>
             {savingsLabel && (
               <span className="inline-flex items-center text-[9px] sm:text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">
-                {lang === "en" ? `Save ${savingsLabel}` : `Ahorras ${savingsLabel}`}
+                {tr(`Save ${savingsLabel}`, `Ahorras ${savingsLabel}`, `Risparmi ${savingsLabel}`)}
               </span>
             )}
           </div>
@@ -415,7 +416,7 @@ export const StickyBuyBar = ({
                 </span>
                 <span className="ml-1 inline-flex items-center gap-0.5 text-[9px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/25">
                   <TrendingUp className="w-2.5 h-2.5" />
-                  {lang === "en" ? "Most popular" : "Más popular"}
+                  {tr("Most popular", "Más popular", "Il più popolare")}
                 </span>
               </div>
               <AnimatePresence mode="wait">
@@ -439,7 +440,7 @@ export const StickyBuyBar = ({
                 {rating != null ? rating.toFixed(2) : "4.65"}
               </span>
               <span className="text-muted-foreground">
-                ({reviewCount != null ? reviewCount : 800} {lang === "en" ? "reviews" : "reseñas"})
+                ({reviewCount != null ? reviewCount : 800} {tr("reviews", "reseñas", "recensioni")})
               </span>
             </div>
           )}
@@ -492,18 +493,18 @@ export const StickyBuyBar = ({
                 <div className="flex items-center justify-center gap-3 text-[10px] text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Shield className="w-3 h-3 text-emerald-600" />
-                    {lang === "en" ? "Secure" : "Pago Seguro"}
+                    {tr("Secure", "Pago Seguro", "Pagamento sicuro")}
                   </span>
                   <span className="flex items-center gap-1">
                     <Check className="w-3 h-3 text-emerald-600" />
                     {isPhysical
-                      ? (lang === "en" ? "Printed book" : "Libro impreso")
-                      : (lang === "en" ? "PDF · not a live course" : "PDF · no son clases")}
+                      ? (tr("Printed book", "Libro impreso", "Libro stampato"))
+                      : (tr("PDF · not a live course", "PDF · no son clases", "PDF · non è un corso dal vivo"))}
                   </span>
 
                   <span className="flex items-center gap-1">
                     <TrendingUp className="w-3 h-3 text-emerald-600" />
-                    {lang === "en" ? "7-day guarantee" : "Garantía 7 días"}
+                    {tr("7-day guarantee", "Garantía 7 días", "Garanzia di 7 giorni")}
                   </span>
                 </div>
               )}
@@ -545,13 +546,13 @@ export const StickyBuyBar = ({
               <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
                 <Check className="w-3 h-3 text-white" />
               </div>
-              <span className="text-muted-foreground">{lang === "en" ? "Verified Purchase" : "Compra Verificada"}</span>
+              <span className="text-muted-foreground">{tr("Verified Purchase", "Compra Verificada", "Acquisto verificato")}</span>
             </div>
 
             {/* Secure Badge */}
             <div className="flex items-center gap-1.5 text-sm">
               <Shield className="w-4 h-4 text-primary" />
-              <span className="text-muted-foreground">{lang === "en" ? "Secure Payment" : "Pago Seguro"}</span>
+              <span className="text-muted-foreground">{tr("Secure Payment", "Pago Seguro", "Pagamento sicuro")}</span>
             </div>
 
             {/* Reviews or Mini-Testimonials */}
@@ -576,7 +577,7 @@ export const StickyBuyBar = ({
                     <span>({reviewCount != null ? reviewCount : 800}+)</span>
                     <span className="ml-1 inline-flex items-center gap-0.5 text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/25">
                       <TrendingUp className="w-3 h-3" />
-                      {lang === "en" ? "Most popular" : "Más popular"}
+                      {tr("Most popular", "Más popular", "Il più popolare")}
                     </span>
                   </div>
                 )}
@@ -589,7 +590,7 @@ export const StickyBuyBar = ({
                   {rating != null ? rating.toFixed(2) : "4.65"}
                 </span>
                 <span className="text-muted-foreground">
-                  ({reviewCount != null ? reviewCount : 800} {lang === "en" ? "reviews" : "reseñas"})
+                  ({reviewCount != null ? reviewCount : 800} {tr("reviews", "reseñas", "recensioni")})
                 </span>
               </div>
             )}
@@ -610,7 +611,7 @@ export const StickyBuyBar = ({
                     )}
                     {savingsLabel && (
                       <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
-                        {lang === "en" ? `Save ${savingsLabel}` : `Ahorras ${savingsLabel}`}
+                        {tr(`Save ${savingsLabel}`, `Ahorras ${savingsLabel}`, `Risparmi ${savingsLabel}`)}
                       </span>
                     )}
                     {flagBadge}

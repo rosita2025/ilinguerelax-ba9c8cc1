@@ -161,7 +161,7 @@ export const Languages = () => {
     },
   };
 
-  const c = content[language];
+  const c = (content as any)[language] ?? content.es;
 
   // Merge static products with admin (DB) products, dedup by slug.
   // Static entry keeps rich metadata (discount, features), but admin's cover

@@ -17,6 +17,7 @@ const copy = {
   en: { title: "Follow us on Instagram", sub: "Pronunciation tips and news every week", cta: "View profile" },
   fr: { title: "Suivez-nous sur Instagram", sub: "Conseils de prononciation et nouveautés chaque semaine", cta: "Voir le profil" },
   pt: { title: "Siga-nos no Instagram", sub: "Dicas de pronúncia e novidades toda semana", cta: "Ver perfil" },
+  it: { title: "Seguici su Instagram", sub: "Consigli di pronuncia e novità ogni settimana", cta: "Vedi il profilo" },
 };
 
 export const InstagramFeed = () => {

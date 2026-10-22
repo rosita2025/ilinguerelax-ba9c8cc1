@@ -1,53 +1,56 @@
 import { useEffect, useRef, useState } from "react";
-import { Copy, Check, X, Gift } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { X, MessageCircle } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
-import { toast } from "sonner";
 
-const COUPON_CODE = "NEW10";
 const SESSION_KEY = "exit-coupon-shown-v1";
-// 30s de espera cuando el correo sigue vacío, sin usar el gesto de scroll
+// 45s de espera cuando el correo sigue vacío, sin usar el gesto de scroll
 // (causaba falsas alarmas con desplazamiento normal, no solo intención real
 // de irse).
-const MOBILE_TIMEOUT_MS = 30000;
+const MOBILE_TIMEOUT_MS = 45000;
 
 interface Props {
   language: string;
 }
 
-const COPY: Record<string, { title: string; subtitle: string; apply: string; copied: string; close: string }> = {
+const WHATSAPP_NUMBER = "12512724704";
+
+// El idioma llega desde el checkout y ya sigue la categoría del producto
+// (español = hispanohablantes que aprenden inglés · inglés = angloparlantes que aprenden español).
+const COPY: Record<string, { title: string; sub: string; cta: string; close: string; waMsg: (product: string) => string }> = {
   es: {
-    title: "¡Espera, no te vayas!",
-    subtitle: "Llévate 10% de descuento en tu pedido — solo aplica este código antes de pagar.",
-    apply: "Aplicar descuento",
-    copied: "¡Copiado!",
-    close: "No gracias, continuar",
+    title: "Espera, no cierres la pantalla",
+    sub: "¿Tienes dudas? Te ayudamos por WhatsApp",
+    cta: "Escríbenos ahora",
+    close: "No gracias",
+    waMsg: (p) => `Hola, me interesa ${p || "este producto"} y quiero pagar / tengo una duda.`,
   },
   en: {
-    title: "Wait, don't go!",
-    subtitle: "Take 10% off your order — just apply this code before you check out.",
-    apply: "Apply discount",
-    copied: "Copied!",
-    close: "No thanks, continue",
+    title: "Wait, don't close the screen",
+    sub: "Any questions? We'll help you on WhatsApp",
+    cta: "Message us now",
+    close: "No thanks",
+    waMsg: (p) => `Hi, I'm interested in ${p || "this product"} and I want to pay / I have a question.`,
   },
   fr: {
-    title: "Attendez, ne partez pas !",
-    subtitle: "Profitez de 10 % de réduction — appliquez ce code avant de payer.",
-    apply: "Appliquer la réduction",
-    copied: "Copié !",
-    close: "Non merci, continuer",
+    title: "Attendez, ne fermez pas l'écran",
+    sub: "Des questions ? Nous vous aidons sur WhatsApp",
+    cta: "Écrivez-nous maintenant",
+    close: "Non merci",
+    waMsg: (p) => `Bonjour, je suis intéressé(e) par ${p || "ce produit"} et je veux payer / j'ai une question.`,
   },
   pt: {
-    title: "Espera, não vá embora!",
-    subtitle: "Ganhe 10% de desconto no seu pedido — é só aplicar este código antes de pagar.",
-    apply: "Aplicar desconto",
-    copied: "Copiado!",
-    close: "Não, obrigado, continuar",
+    title: "Espere, não feche a tela",
+    sub: "Tem dúvidas? Ajudamos você pelo WhatsApp",
+    cta: "Fale conosco agora",
+    close: "Não, obrigado",
+    waMsg: (p) => `Olá, tenho interesse em ${p || "este produto"} e quero pagar / tenho uma dúvida.`,
   },
 };
 
 /**
- * Popup de "no te vayas": aparece una sola vez por sesión cuando el
+ * Popup de "no cierres esta pantalla" (ya NO ofrece cupón: el 10% se entrega por el popup de
+ * suscripción por correo). Muestra un botón de ayuda por WhatsApp con el mensaje ya escrito.
+ * Aparece una sola vez por sesión cuando el
  * comprador da una señal razonable de estar por abandonar Y todavía no
  * llenó su correo (si ya lo llenó, el sistema de recuperación de carrito
  * ya puede contactarlo por email, así que este popup no hace falta).
@@ -56,7 +59,7 @@ const COPY: Record<string, { title: string; subtitle: string; apply: string; cop
  * - Escritorio: el mouse sale por arriba de la ventana.
  * - Todos los dispositivos: vuelve a la pestaña después de estar en otra
  *   (cambiar de app/pestaña y regresar es una señal común de duda).
- * - Todos los dispositivos (respaldo): pasan 30s sin llenar el correo.
+ * - Todos los dispositivos (respaldo): pasan 45s sin llenar el correo.
  *
  * NOTA: no es posible interceptar el cierre real de la pestaña/navegador
  * para mostrar un popup propio — los navegadores lo bloquean por seguridad
@@ -64,10 +67,8 @@ const COPY: Record<string, { title: string; subtitle: string; apply: string; cop
  */
 export function ExitIntentCouponPopup({ language }: Props) {
   const buyerEmail = useCheckoutPruebaStore((s) => s.buyer.email);
-  const applyCoupon = useCheckoutPruebaStore((s) => s.applyCoupon);
-  const coupon = useCheckoutPruebaStore((s) => s.coupon);
+  const items = useCheckoutPruebaStore((s) => s.items);
   const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
   const shownRef = useRef(false);
 
   useEffect(() => {
@@ -114,25 +115,13 @@ export function ExitIntentCouponPopup({ language }: Props) {
     };
   }, [buyerEmail]);
 
-  if (!open || coupon) return null;
+  if (!open) return null;
 
   const t = COPY[language] || COPY.es;
-
-  const handleApply = () => {
-    const ok = applyCoupon(COUPON_CODE);
-    if (ok) {
-      toast.success(t.apply + " ✓");
-      setOpen(false);
-    }
-  };
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(COUPON_CODE);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch { /* clipboard unavailable, still show the code visually */ }
-  };
+  // Producto principal del pedido (el primero que no sea un upsell).
+  const productName =
+    (items.find((i) => !String(i.id).toLowerCase().startsWith("upsell-")) ?? items[0])?.name ?? "";
+  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t.waMsg(productName))}`;
 
   return (
     <div
@@ -151,25 +140,22 @@ export function ExitIntentCouponPopup({ language }: Props) {
           <X className="h-4 w-4" />
         </button>
 
-        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-          <Gift className="h-6 w-6 text-primary" />
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366]/15">
+          <MessageCircle className="h-6 w-6 text-[#128C7E]" />
         </div>
 
         <h3 className="text-lg font-bold">{t.title}</h3>
-        <p className="mt-2 text-sm text-muted-foreground">{t.subtitle}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t.sub}</p>
 
-        <div className="mt-4 flex items-center justify-center gap-2">
-          <span className="rounded-lg border border-dashed px-4 py-2 font-mono text-base font-bold tracking-widest">
-            {COUPON_CODE}
-          </span>
-          <Button variant="outline" size="icon" onClick={handleCopy} aria-label={t.copied}>
-            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-          </Button>
-        </div>
-
-        <Button className="mt-4 w-full" onClick={handleApply}>
-          {t.apply}
-        </Button>
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#25D366] px-4 py-3 text-sm font-semibold text-white hover:bg-[#20bd5a]"
+        >
+          <MessageCircle className="h-4 w-4" />
+          {t.cta}
+        </a>
 
         <button
           onClick={() => setOpen(false)}

@@ -21,7 +21,7 @@ import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
 import { StockAlert } from "@/components/StockAlert";
 import { SocialProofPill } from "@/components/SocialProofPill";
 import { ProductTypeBadge } from "@/components/ProductTypeBadge";
-import { useI18n } from "@/i18n/I18nContext";
+import { CheckoutLanguageProvider, useI18n } from "@/i18n/I18nContext";
 import { formatCurrencyAmount, type Currency } from "@/i18n";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
@@ -417,6 +417,7 @@ const ProductDynamic = () => {
   };
 
   return (
+    <CheckoutLanguageProvider language={isIt ? "it" : language}>
     <div className="min-h-screen bg-background">
       <SEO
         title={product.name}
@@ -796,6 +797,7 @@ const ProductDynamic = () => {
       />
 
     </div>
+    </CheckoutLanguageProvider>
   );
 };
 

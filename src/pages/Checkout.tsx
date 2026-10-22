@@ -693,7 +693,7 @@ export default function Checkout() {
                     temprano genera confianza antes de llenar el formulario. */}
                 <div className="flex flex-col items-center gap-1.5 py-1">
                   <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-                    {language === "en" ? "Accepted payment methods" : "Métodos de pago aceptados"}
+                    {language === "en" ? "Accepted payment methods" : language === "it" ? "Metodi di pagamento accettati" : "Métodos de pago aceptados"}
                   </p>
                   <PaymentLogos />
                 </div>

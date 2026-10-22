@@ -192,7 +192,7 @@ const CONTENT: Record<"es" | "en" | "fr" | "pt", PageContent> = {
 
 const ShippingPage = () => {
   const { language } = useI18n();
-  const c = CONTENT[language];
+  const c = (CONTENT as any)[language] ?? CONTENT.es;
 
   return (
     <div className="min-h-screen bg-background">

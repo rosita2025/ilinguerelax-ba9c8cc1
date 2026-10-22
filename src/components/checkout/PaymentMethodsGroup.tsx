@@ -156,11 +156,11 @@ function methodSection(id: string): MethodSection {
 }
 
 const SECTION_LABELS: Record<MethodSection, Record<string, string>> = {
-  cards: { es: "Tarjetas", en: "Cards", pt: "Cartões", fr: "Cartes" },
-  transfer: { es: "Transferencias bancarias", en: "Bank Transfers", pt: "Transferências bancárias", fr: "Virements bancaires" },
-  cash: { es: "Pago en efectivo", en: "Cash Payments", pt: "Pagamento em dinheiro", fr: "Paiement en espèces" },
-  wallet: { es: "Billeteras digitales", en: "Digital Wallets", pt: "Carteiras digitais", fr: "Portefeuilles numériques" },
-  other: { es: "O paga por otra plataforma", en: "Or pay via another platform", pt: "Ou pague por outra plataforma", fr: "Ou payez via une autre plateforme" },
+  cards: { es: "Tarjetas", en: "Cards", pt: "Cartões", fr: "Cartes", it: "Carte" },
+  transfer: { es: "Transferencias bancarias", en: "Bank Transfers", pt: "Transferências bancárias", fr: "Virements bancaires", it: "Bonifici bancari" },
+  cash: { es: "Pago en efectivo", en: "Cash Payments", pt: "Pagamento em dinheiro", fr: "Paiement en espèces", it: "Pagamento in contanti" },
+  wallet: { es: "Billeteras digitales", en: "Digital Wallets", pt: "Carteiras digitais", fr: "Portefeuilles numériques", it: "Portafogli digitali" },
+  other: { es: "O paga por otra plataforma", en: "Or pay via another platform", pt: "Ou pague por outra plataforma", fr: "Ou payez via une autre plateforme", it: "Oppure paga con un'altra piattaforma" },
 };
 
 function sectionLabel(section: MethodSection, language: string) {
@@ -198,7 +198,7 @@ const DLOCAL_COUNTRIES = DLOCAL_COUNTRY_CODES;
 type MethodBadge = { label: string; bg: string; color: string };
 
 
-const getStripeVisibleMethods = (language: string): Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> => ({
+const getStripeVisibleMethodsBase = (language: string): Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> => ({
   stripe_apple_pay: {
     icon: Smartphone,
     title: "Apple Pay",
@@ -362,6 +362,53 @@ const getStripeVisibleMethods = (language: string): Record<string, Omit<PaymentM
     badges: [{ label: "Konbini", bg: "#D32F2F", color: "#ffffff" }],
   },
 });
+
+// Italian presentation only; payment methods and availability remain unchanged.
+
+// (la base se genera en inglés y aquí se pasa a italiano).
+const IT_METHOD_TEXT: Record<string, string> = {
+  "Pay with Touch ID / Face ID from your iPhone, iPad or Mac (Safari).": "Paga con Touch ID / Face ID da iPhone, iPad o Mac (Safari).",
+  "Pay with your Google account from Android or Chrome.": "Paga con il tuo account Google da Android o Chrome.",
+  "Pay at OXXO stores (Mexico) through Stripe's secure form.": "Paga nei negozi OXXO (Messico) tramite il modulo sicuro di Stripe.",
+  "Bank voucher for Brazil inside Stripe.": "Voucher bancario per il Brasile tramite Stripe.",
+  "Instant bank transfer for Brazil inside Stripe.": "Bonifico istantaneo per il Brasile tramite Stripe.",
+  "Online banking from Netherlands inside Stripe.": "Home banking dei Paesi Bassi tramite Stripe.",
+  "Local payment from Belgium inside Stripe.": "Pagamento locale del Belgio tramite Stripe.",
+  "SEPA débito directo": "Addebito diretto SEPA",
+  "Bank debit for Eurozone inside Stripe.": "Addebito bancario per l'area euro tramite Stripe.",
+  "Online banking from Germany inside Stripe.": "Home banking della Germania tramite Stripe.",
+  "Instant transfer inside Stripe.": "Bonifico istantaneo tramite Stripe.",
+  "Online banking from Austria inside Stripe.": "Home banking dell'Austria tramite Stripe.",
+  "Online banking from Poland inside Stripe.": "Home banking della Polonia tramite Stripe.",
+  "Mobile payment from Poland inside Stripe.": "Pagamento mobile della Polonia tramite Stripe.",
+  "Local payment from Portugal inside Stripe.": "Pagamento locale del Portogallo tramite Stripe.",
+  "Mobile payment from Portugal inside Stripe.": "Pagamento mobile del Portogallo tramite Stripe.",
+  "Mobile payment from Switzerland inside Stripe.": "Pagamento mobile della Svizzera tramite Stripe.",
+  "Mobile payment from Denmark/Finland inside Stripe.": "Pagamento mobile di Danimarca/Finlandia tramite Stripe.",
+  "Bacs débito directo": "Addebito diretto Bacs",
+  "Bank debit from United Kingdom inside Stripe.": "Addebito bancario del Regno Unito tramite Stripe.",
+  "Canada Bank Debit": "Addebito bancario Canada",
+  "Pre-authorized debit from Canada inside Stripe.": "Addebito preautorizzato del Canada tramite Stripe.",
+  "Buy now and pay in installments inside Stripe.": "Acquista ora e paga a rate tramite Stripe.",
+  "Buy now and pay later inside Stripe.": "Acquista ora e paga dopo tramite Stripe.",
+  "PayPal processed within Stripe's secure form.": "PayPal elaborato nel modulo sicuro di Stripe.",
+  "Local payment from Asia inside Stripe.": "Pagamento locale dall'Asia tramite Stripe.",
+  "Local payment from China inside Stripe.": "Pagamento locale dalla Cina tramite Stripe.",
+  "Local payment from Southeast Asia inside Stripe.": "Pagamento locale dal Sud-est asiatico tramite Stripe.",
+  "Local payment from Singapore inside Stripe.": "Pagamento locale da Singapore tramite Stripe.",
+  "Payment at convenience stores in Japan inside Stripe.": "Pagamento nei convenience store del Giappone tramite Stripe.",
+};
+
+const getStripeVisibleMethods = (language: string): Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> => {
+  const base = getStripeVisibleMethodsBase(language === "it" ? "en" : language);
+  if (language !== "it") return base;
+  return Object.fromEntries(
+    Object.entries(base).map(([k, v]) => [
+      k,
+      { ...v, title: typeof v.title === "string" ? (IT_METHOD_TEXT[v.title] ?? v.title) : v.title, sub: typeof v.sub === "string" ? (IT_METHOD_TEXT[v.sub] ?? v.sub) : v.sub },
+    ]),
+  ) as Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">>;
+};
 
 export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null } = {}) {
   const navigate = useNavigate();
@@ -827,7 +874,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         method: dlMethod,
         message: language === "en"
           ? "Please enter your ID document above to continue."
-          : "Ingresa tu documento de identidad arriba para continuar.",
+          : language === "it" ? "Inserisci qui sopra il tuo documento d'identità per continuare." : "Ingresa tu documento de identidad arriba para continuar.",
       });
       return;
     }
@@ -839,10 +886,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     const coverage = validateDlocalMethod(ctry, dlMethod);
     if (!coverage.ok) {
       setSelected(null);
-      setMethodError({ method: dlMethod, message: coverage.reason || (language === "en" ? "Method not available in your country." : "Método no disponible en tu país.") });
+      setMethodError({ method: dlMethod, message: coverage.reason || (language === "en" ? "Method not available in your country." : language === "it" ? "Metodo non disponibile nel tuo paese." : "Método no disponible en tu país.") });
       toast({
-        title: language === "en" ? "Method not available" : "Método no disponible",
-        description: coverage.reason || (language === "en" ? "Choose another payment method for your country." : "Elige otro método de pago para tu país."),
+        title: language === "en" ? "Method not available" : language === "it" ? "Metodo non disponibile" : "Método no disponible",
+        description: coverage.reason || (language === "en" ? "Choose another payment method for your country." : language === "it" ? "Scegli un altro metodo di pagamento per il tuo paese." : "Elige otro método de pago para tu país."),
         variant: "destructive",
       });
       return;
@@ -946,7 +993,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         method: "hotmart",
         message:
           language === "en" ? "We couldn't open the Hotmart checkout. Please try again."
-          : language === "pt" ? "Não conseguimos abrir o checkout da Hotmart. Tente nuevamente."
+          : language === "it" ? "Impossibile aprire il pagamento con Hotmart. Riprova." : language === "pt" ? "Não conseguimos abrir o checkout da Hotmart. Tente nuevamente."
           : language === "fr" ? "Impossible d'ouvrir le paiement Hotmart. Réessaie."
           : "No pudimos abrir el pago con Hotmart. Inténtalo de nuevo.",
       });
@@ -1124,7 +1171,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     const isAsia = ["CN", "JP", "KR", "IN", "SG", "MY", "TH", "VN", "PH", "ID"].includes(countryCode);
     if (hasPhysicalItems && isAsia) {
       toast({
-        title: language === "en" ? "Shipping Unavailable" : "Envío no disponible",
+        title: language === "en" ? "Shipping Unavailable" : language === "it" ? "Spedizione non disponibile" : "Envío no disponible",
         description: `${t.shippingNoticeAsia} ${t.digitalAlternativeSuggest}`,
         variant: "destructive",
       });
@@ -1648,7 +1695,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const country = (region.country || "").toUpperCase();
   const cardSubtitle = isPeru
     ? t.cardSubtitlePeru(localBadge)
-    : t.cardSubtitleGlobal(local.currency || (language === "en" ? "your local currency" : language === "pt" ? "sua moeda local" : language === "fr" ? "votre monnaie locale" : "tu moneda local"), localBadge);
+    : t.cardSubtitleGlobal(local.currency || (language === "en" ? "your local currency" : language === "it" ? "la tua valuta locale" : language === "pt" ? "sua moeda local" : language === "fr" ? "votre monnaie locale" : "tu moneda local"), localBadge);
 
   const isUsa = country === "US";
   const methodsConfig = useCheckoutMethodsConfig(country);
@@ -1802,7 +1849,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   })();
   const hotmartTaxNote = language === "en"
     ? "includes local taxes (10-20%)"
-    : language === "pt"
+    : language === "it" ? "include le imposte locali (10-20%)" : language === "pt"
     ? "inclui impostos locais (10-20%)"
     : language === "fr"
     ? "taxes locales incluses (10-20 %)"
@@ -1828,7 +1875,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       icon: CreditCard, 
       title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, 
       sub: isFallingBackToUsd 
-        ? (language === "en" ? "Paying in USD for compatibility (International transaction)." : "Pagando en USD por compatibilidad (Transacción internacional).")
+        ? (language === "en" ? "Paying in USD for compatibility (International transaction)." : language === "it" ? "Pagamento in USD per compatibilità (transazione internazionale)." : "Pagando en USD por compatibilidad (Transacción internacional).")
         : cardSubtitle, 
       badge: isFallingBackToUsd ? `USD $${totalUsd}` : finalPriceLabel 
     },

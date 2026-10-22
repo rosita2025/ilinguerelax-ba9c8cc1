@@ -42,6 +42,12 @@ const COPY: Record<string, { title: string; sub: string; add: string; skip: stri
     add: "Oui, ajouter à ma commande",
     skip: "Non merci, continuer",
   },
+  it: {
+    title: "Vuoi aggiungere questo materiale al tuo ordine?",
+    sub: "Approfitta di questo prezzo speciale, solo sull'ordine di oggi.",
+    add: "Sì, aggiungi al mio ordine",
+    skip: "No grazie, continua",
+  },
 };
 
 function Amount({ usd, className }: { usd: number; className?: string }) {

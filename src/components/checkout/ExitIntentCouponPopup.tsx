@@ -45,6 +45,13 @@ const COPY: Record<string, { title: string; sub: string; cta: string; close: str
     close: "Não, obrigado",
     waMsg: (p) => `Olá, tenho interesse em ${p || "este produto"} e quero pagar / tenho uma dúvida.`,
   },
+  it: {
+    title: "Aspetta, non chiudere la schermata",
+    sub: "Hai dubbi? Ti aiutiamo su WhatsApp",
+    cta: "Scrivici ora",
+    close: "No grazie",
+    waMsg: (p) => `Ciao, sono interessato/a a ${p || "questo prodotto"} e voglio pagare / ho un dubbio.`,
+  },
 };
 
 /**

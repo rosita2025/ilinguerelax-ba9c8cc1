@@ -36,44 +36,46 @@ interface Props {
   currency?: string
   provider?: string
   orderDate?: string
+  /** 'it' para clientes italianos; cualquier otro valor = español (comportamiento anterior). */
+  lang?: string
 }
 
-const fmtMoney = (amount?: number, currency?: string) => {
+const fmtMoney = (amount?: number, currency?: string, locale = 'es') => {
   if (amount == null) return null
   const c = (currency || 'USD').toUpperCase()
   try {
-    return new Intl.NumberFormat('es', { style: 'currency', currency: c }).format(Number(amount))
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: c }).format(Number(amount))
   } catch {
     return `${Number(amount).toFixed(2)} ${c}`
   }
 }
 
-const fmtDate = (iso?: string) => {
+const fmtDate = (iso?: string, locale = 'es') => {
   const d = iso ? new Date(iso) : new Date()
   try {
-    return d.toLocaleDateString('es', { day: '2-digit', month: 'short', year: 'numeric' })
+    return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })
   } catch {
     return d.toDateString()
   }
 }
 
-const providerLabel = (p?: string) => {
+const providerLabel = (p?: string, it = false) => {
   const k = (p || '').toLowerCase().replace(/[-\s]/g, '_')
-  if (k === 'stripe') return 'Tarjeta (Stripe)'
+  if (k === 'stripe') return it ? 'Carta (Stripe)' : 'Tarjeta (Stripe)'
   if (k === 'paypal') return 'PayPal'
   if (k === 'mercadopago') return 'Mercado Pago'
   if (k === 'yape') return 'Yape'
   if (k === 'plin') return 'Plin'
   if (k === 'yape_plin') return 'Yape / Plin'
   if (k === 'binance' || k === 'binance_pay') return 'Binance Pay'
-  if (k === 'manual') return 'Pago manual'
+  if (k === 'manual') return it ? 'Pagamento manuale' : 'Pago manual'
   return p || '—'
 }
 
-const badge = (kind?: string) => {
-  if (kind === 'upsell') return { label: 'ADICIONAL', bg: '#fef3c7', color: '#92400e' }
-  if (kind === 'bonus') return { label: 'BONO GRATIS', bg: '#dcfce7', color: '#166534' }
-  return { label: 'PRINCIPAL', bg: '#e0f2fe', color: '#075985' }
+const badge = (kind?: string, it = false) => {
+  if (kind === 'upsell') return { label: it ? 'AGGIUNTIVO' : 'ADICIONAL', bg: '#fef3c7', color: '#92400e' }
+  if (kind === 'bonus') return { label: it ? 'BONUS GRATUITO' : 'BONO GRATIS', bg: '#dcfce7', color: '#166534' }
+  return { label: it ? 'PRINCIPALE' : 'PRINCIPAL', bg: '#e0f2fe', color: '#075985' }
 }
 
 const Email = ({
@@ -90,9 +92,61 @@ const Email = ({
   currency,
   provider,
   orderDate,
+  lang,
 }: Props) => {
-  const money = fmtMoney(amount, currency)
-  const name = customerName?.trim() || 'Cliente'
+  const it = lang === 'it'
+  const locale = it ? 'it' : 'es'
+  const money = fmtMoney(amount, currency, locale)
+  const name = customerName?.trim() || (it ? 'Cliente' : 'Cliente')
+  const X = it
+    ? {
+        preview: 'confermato — iLingue Relax',
+        order: 'ORDINE',
+        thanks: 'Grazie per il tuo acquisto',
+        sub: 'Abbiamo ricevuto correttamente il tuo ordine. Tra pochi minuti riceverai una seconda email con i link per il download.',
+        products: "Prodotti dell'ordine",
+        noDetail: 'Nessun dettaglio dei prodotti.',
+        qty: 'Quantità',
+        free: 'GRATIS',
+        subtotal: 'Subtotale',
+        shipping: 'Spedizione',
+        freeDigital: 'Gratis (digitale)',
+        total: 'Totale',
+        customer: 'Informazioni sul cliente',
+        nameL: 'Nome',
+        emailL: 'Email',
+        phoneL: 'Telefono',
+        countryL: 'Paese',
+        addressL: 'Indirizzo',
+        noAddress: 'Consegna digitale — non serve alcun indirizzo',
+        methodL: 'Metodo di pagamento',
+        dateL: "Data dell'ordine",
+        doubts: 'Hai dubbi? Rispondi a questa email o scrivici a',
+      }
+    : {
+        preview: 'confirmado — iLingue Relax',
+        order: 'PEDIDO',
+        thanks: '¡Gracias por tu compra',
+        sub: 'Hemos recibido tu pedido correctamente. En unos minutos recibirás un segundo correo con los enlaces de descarga.',
+        products: 'Productos del pedido',
+        noDetail: 'Sin detalle de productos.',
+        qty: 'Cantidad',
+        free: 'GRATIS',
+        subtotal: 'Subtotal',
+        shipping: 'Envío',
+        freeDigital: 'Gratis (digital)',
+        total: 'Total',
+        customer: 'Información del cliente',
+        nameL: 'Nombre',
+        emailL: 'Correo',
+        phoneL: 'Teléfono',
+        countryL: 'País',
+        addressL: 'Dirección',
+        noAddress: 'Entrega digital — no requiere dirección',
+        methodL: 'Método de pago',
+        dateL: 'Fecha del pedido',
+        doubts: '¿Alguna duda? Responde este correo o escríbenos a',
+      }
 
   // Build the line-items list. If caller passed `items`, use them.
   // Otherwise synthesize from productName + bonuses[].
@@ -104,20 +158,20 @@ const Email = ({
       ]
 
   return (
-    <Html lang="es" dir="ltr">
+    <Html lang={it ? 'it' : 'es'} dir="ltr">
       <Head />
-      <Preview>Pedido {orderNumber || ''} confirmado — iLingue Relax</Preview>
+      <Preview>{it ? 'Ordine' : 'Pedido'} {orderNumber || ''} {X.preview}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={brandBar}>
             <Text style={brand}>iLingue Relax</Text>
-            <Text style={orderTag}>PEDIDO #{orderNumber || '—'}</Text>
+            <Text style={orderTag}>{X.order} #{orderNumber || '—'}</Text>
           </Section>
 
           <Section style={hero}>
-            <Heading style={h1}>¡Gracias por tu compra, {name}!</Heading>
+            <Heading style={h1}>{X.thanks}, {name}!</Heading>
             <Text style={heroSub}>
-              Hemos recibido tu pedido correctamente. En unos minutos recibirás un segundo correo con los enlaces de descarga.
+              {X.sub}
             </Text>
           </Section>
 
@@ -125,23 +179,23 @@ const Email = ({
 
           {/* PRODUCTS */}
           <Section>
-            <Heading as="h2" style={h2}>Productos del pedido</Heading>
+            <Heading as="h2" style={h2}>{X.products}</Heading>
             {lineItems.length === 0 ? (
-              <Text style={itemMeta}>Sin detalle de productos.</Text>
+              <Text style={itemMeta}>{X.noDetail}</Text>
             ) : (
-              lineItems.map((it, i) => {
-                const b = badge(it.kind)
-                const p = fmtMoney(it.price, currency)
+              lineItems.map((li, i) => {
+                const b = badge(li.kind, it)
+                const p = fmtMoney(li.price, currency, locale)
                 return (
                   <Row key={i} style={itemRow}>
                     <Column>
-                      <Text style={itemName}>{it.name}</Text>
+                      <Text style={itemName}>{li.name}</Text>
                       <Text style={badgePill(b.bg, b.color)}>{b.label}</Text>
-                      <Text style={itemMeta}>Cantidad: {it.qty ?? 1}</Text>
+                      <Text style={itemMeta}>{X.qty}: {li.qty ?? 1}</Text>
                     </Column>
                     <Column align="right">
                       <Text style={itemPrice}>
-                        {it.kind === 'bonus' ? 'GRATIS' : (p || '—')}
+                        {li.kind === 'bonus' ? X.free : (p || '—')}
                       </Text>
                     </Column>
                   </Row>
@@ -152,15 +206,15 @@ const Email = ({
             <Hr style={hrLight} />
 
             <Row>
-              <Column><Text style={totalLabel}>Subtotal</Text></Column>
+              <Column><Text style={totalLabel}>{X.subtotal}</Text></Column>
               <Column align="right"><Text style={totalVal}>{money || '—'}</Text></Column>
             </Row>
             <Row>
-              <Column><Text style={totalLabel}>Envío</Text></Column>
-              <Column align="right"><Text style={totalVal}>Gratis (digital)</Text></Column>
+              <Column><Text style={totalLabel}>{X.shipping}</Text></Column>
+              <Column align="right"><Text style={totalVal}>{X.freeDigital}</Text></Column>
             </Row>
             <Row>
-              <Column><Text style={grandLabel}>Total</Text></Column>
+              <Column><Text style={grandLabel}>{X.total}</Text></Column>
               <Column align="right"><Text style={grandVal}>{money || '—'}</Text></Column>
             </Row>
           </Section>
@@ -169,29 +223,29 @@ const Email = ({
 
           {/* CUSTOMER */}
           <Section>
-            <Heading as="h2" style={h2}>Información del cliente</Heading>
+            <Heading as="h2" style={h2}>{X.customer}</Heading>
             <Row>
               <Column style={infoCol}>
-                <Text style={infoLabel}>Nombre</Text>
+                <Text style={infoLabel}>{X.nameL}</Text>
                 <Text style={infoVal}>{name}</Text>
-                <Text style={infoLabel}>Correo</Text>
+                <Text style={infoLabel}>{X.emailL}</Text>
                 <Text style={infoVal}>{customerEmail || '—'}</Text>
-                <Text style={infoLabel}>Teléfono</Text>
+                <Text style={infoLabel}>{X.phoneL}</Text>
                 <Text style={infoVal}>{customerPhone || '—'}</Text>
               </Column>
               <Column style={infoCol}>
-                <Text style={infoLabel}>País</Text>
+                <Text style={infoLabel}>{X.countryL}</Text>
                 <Text style={infoVal}>{customerCountry || '—'}</Text>
-                <Text style={infoLabel}>Dirección</Text>
-                <Text style={infoVal}>{customerAddress || 'Entrega digital — no requiere dirección'}</Text>
-                <Text style={infoLabel}>Método de pago</Text>
-                <Text style={infoVal}>{providerLabel(provider)}</Text>
+                <Text style={infoLabel}>{X.addressL}</Text>
+                <Text style={infoVal}>{customerAddress || X.noAddress}</Text>
+                <Text style={infoLabel}>{X.methodL}</Text>
+                <Text style={infoVal}>{providerLabel(provider, it)}</Text>
               </Column>
             </Row>
             <Row>
               <Column>
-                <Text style={infoLabel}>Fecha del pedido</Text>
-                <Text style={infoVal}>{fmtDate(orderDate)}</Text>
+                <Text style={infoLabel}>{X.dateL}</Text>
+                <Text style={infoVal}>{fmtDate(orderDate, locale)}</Text>
               </Column>
             </Row>
           </Section>
@@ -200,7 +254,7 @@ const Email = ({
 
           <Section>
             <Text style={support}>
-              ¿Alguna duda? Responde este correo o escríbenos a{' '}
+              {X.doubts}{' '}
               <Link href="mailto:hola@ilinguerelax.com" style={link}>hola@ilinguerelax.com</Link>{' '}
               · WhatsApp{' '}
               <Link href="https://wa.me/12512724704" style={link}>+1 251 272 4704</Link>.
@@ -217,7 +271,9 @@ const Email = ({
 
 export const template = {
   component: Email,
-  subject: (d: Props) => `Pedido #${d.orderNumber || 'ILR'} confirmado — iLingue Relax`,
+  subject: (d: Props) => d.lang === 'it'
+    ? `Ordine #${d.orderNumber || 'ILR'} confermato — iLingue Relax`
+    : `Pedido #${d.orderNumber || 'ILR'} confirmado — iLingue Relax`,
   displayName: 'Gracias por tu compra',
   previewData: {
     orderNumber: 'ILR-ST-20260710-ABC123',

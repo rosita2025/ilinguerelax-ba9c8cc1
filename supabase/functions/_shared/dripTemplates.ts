@@ -86,9 +86,15 @@ const CARDS_ENGLISH: Card[] = [
   },
 ];
 
-// Spanish-native languages get hispano cards; everyone else gets english-native cards.
-const HISPANO_LANGS: DripLang[] = ['es', 'pt', 'it'];
+// Productos para italianos que aprenden español (it → es). Se llena cuando existan
+// esos productos en el admin: { name, slug, cover }. Mientras esté vacío, los correos
+// en italiano salen sin la cuadrícula de productos (solo texto + botón al catálogo).
+const CARDS_ITALIAN: Card[] = [];
+
+// Spanish-native languages get hispano cards; Italian gets its own list; everyone else gets english-native cards.
+const HISPANO_LANGS: DripLang[] = ['es', 'pt'];
 function cardsFor(lang: DripLang): Card[] {
+  if (lang === 'it') return CARDS_ITALIAN;
   return HISPANO_LANGS.includes(lang) ? CARDS_HISPANO : CARDS_ENGLISH;
 }
 
@@ -113,6 +119,15 @@ const STEPS: Record<DripStepKey, Bundle> = {
       ctaUrl: `${BASE}/products`,
       footer: 'Quick menu: Home · Products · Blog · Contact',
     },
+    it: {
+      subject: 'Scopri iLingue Relax — il tuo metodo rilassato per imparare le lingue 🌱',
+      hello: (n) => n ? `Ciao ${n} 👋` : 'Ciao 👋',
+      intro: 'Siamo iLingue Relax, un metodo bilingue per imparare le lingue senza stress, con audio, immagini e contesto reale.',
+      body: 'Scopri tutto quello che abbiamo per te:',
+      ctaText: 'Vedi tutti i prodotti',
+      ctaUrl: `${BASE}/products`,
+      footer: 'Menu rapido: Home · Prodotti · Blog · Contatti',
+    },
   },
 
   // --- CATALOG (day 3): full grid, no prices ---
@@ -135,6 +150,16 @@ const STEPS: Record<DripStepKey, Bundle> = {
       ctaText: 'See full catalog',
       ctaUrl: `${BASE}/products`,
       footer: `Any questions: ${HELP_EMAIL}`,
+      showcase: 'all',
+    },
+    it: {
+      subject: '📚 Il nostro catalogo — scopri tutti i nostri prodotti',
+      hello: (n) => n ? `${n}, guarda il nostro catalogo 👇` : 'Guarda il nostro catalogo 👇',
+      intro: 'Questi sono i prodotti digitali più amati da migliaia di studenti.',
+      body: 'Scegli quello che ti interessa di più — tutti con accesso a vita.',
+      ctaText: 'Vedi il catalogo completo',
+      ctaUrl: `${BASE}/products`,
+      footer: `Per qualsiasi dubbio: ${HELP_EMAIL}`,
       showcase: 'all',
     },
   },
@@ -161,6 +186,16 @@ const STEPS: Record<DripStepKey, Bundle> = {
       footer: 'Instant, lifetime access.',
       showcase: 'all',
     },
+    it: {
+      subject: '🚀 Scegli la tua prossima lingua — guarda i nostri prodotti',
+      hello: (n) => n ? `Ciao ${n} 👋` : 'Ciao 👋',
+      intro: 'Ogni studente parte da dove vuole: vocabolario, verbi, domande o coreano.',
+      body: 'Dai un\'occhiata ai prodotti e scegli quello più adatto a te:',
+      ctaText: 'Vedi tutti i prodotti',
+      ctaUrl: `${BASE}/products`,
+      footer: 'Accesso immediato e a vita.',
+      showcase: 'all',
+    },
   },
 
   // --- DAY 15 (was product-5000-en): catalog grid, generic ---
@@ -183,6 +218,16 @@ const STEPS: Record<DripStepKey, Bundle> = {
       ctaText: 'See catalog',
       ctaUrl: `${BASE}/products`,
       footer: 'Relaxed method, no stress.',
+      showcase: 'all',
+    },
+    it: {
+      subject: '📘 Amplia il tuo vocabolario — scopri i nostri prodotti',
+      hello: (n) => n ? `${n}, guarda il nostro catalogo` : 'Guarda il nostro catalogo',
+      intro: 'Vocabolario, verbi, domande, schemi e coreano — tutto in un unico posto.',
+      body: 'Questi sono i nostri prodotti più popolari:',
+      ctaText: 'Vedi il catalogo',
+      ctaUrl: `${BASE}/products`,
+      footer: 'Metodo rilassato, senza stress.',
       showcase: 'all',
     },
   },
@@ -209,6 +254,16 @@ const STEPS: Record<DripStepKey, Bundle> = {
       footer: 'Valid for 48 hours.',
       showcase: 'all',
     },
+    it: {
+      subject: '🎁 Offerta speciale: 15% extra — scegli il tuo prodotto',
+      hello: (n) => n ? `${n}, questo è per te 🎁` : 'Questo è per te 🎁',
+      intro: 'Per ringraziarti di seguirci, ecco un coupon extra del 15% valido 48 ore.',
+      body: 'Codice: FRIEND15. Vale su tutti i nostri prodotti:',
+      ctaText: 'Acquista con lo sconto',
+      ctaUrl: `${BASE}/products`,
+      footer: 'Valido per 48 ore.',
+      showcase: 'all',
+    },
   },
 
   // --- DAY 40 (pain-patterns): now catalog-focused ---
@@ -231,6 +286,16 @@ const STEPS: Record<DripStepKey, Bundle> = {
       ctaText: 'See products',
       ctaUrl: `${BASE}/products`,
       footer: 'A real shift in how you learn.',
+      showcase: 'all',
+    },
+    it: {
+      subject: '💡 Cerchi risultati reali? Scegli il tuo prodotto',
+      hello: (n) => n ? `${n}, abbiamo qualcosa per te 💬` : 'Abbiamo qualcosa per te 💬',
+      intro: 'Imparare una lingua non dipende da scuole costose, ma da metodo e pratica costante.',
+      body: 'Questi sono i materiali che stanno cambiando il modo di imparare:',
+      ctaText: 'Vedi i prodotti',
+      ctaUrl: `${BASE}/products`,
+      footer: 'Un cambiamento reale nel tuo modo di imparare.',
       showcase: 'all',
     },
   },
@@ -257,6 +322,16 @@ const STEPS: Record<DripStepKey, Bundle> = {
       footer: 'Free bonuses with every purchase.',
       showcase: 'all',
     },
+    it: {
+      subject: '🌏 Le lingue del mondo — inglese, coreano e altro',
+      hello: (n) => n ? `${n}, esplora le nostre lingue` : 'Esplora le nostre lingue',
+      intro: 'Migliaia di studenti stanno già imparando con il nostro metodo visivo e bilingue.',
+      body: 'Questi sono i prodotti più amati:',
+      ctaText: 'Vedi tutti i prodotti',
+      ctaUrl: `${BASE}/products`,
+      footer: 'Con bonus gratuiti a ogni acquisto.',
+      showcase: 'all',
+    },
   },
 
   // --- DAY 90 (testimonials): keep clean, no cards ---
@@ -278,6 +353,15 @@ const STEPS: Record<DripStepKey, Bundle> = {
       ctaText: 'See reviews and products',
       ctaUrl: `${BASE}/products`,
       footer: 'Join our community.',
+    },
+    it: {
+      subject: '⭐ Cosa dicono i nostri studenti',
+      hello: (n) => n ? `${n}, guarda queste recensioni` : 'Guarda queste recensioni',
+      intro: 'Migliaia di studenti da Perù, Messico, Colombia, Spagna, USA e altri paesi usano già iLingue Relax.',
+      body: 'Recensioni reali, testimonianze video e acquirenti verificati.',
+      ctaText: 'Vedi recensioni e prodotti',
+      ctaUrl: `${BASE}/products`,
+      footer: 'Entra nella nostra comunità.',
     },
   },
 
@@ -303,13 +387,23 @@ const STEPS: Record<DripStepKey, Bundle> = {
       footer: 'Thank you for trusting iLingue Relax.',
       showcase: 'all',
     },
+    it: {
+      subject: '💎 Coupon VIP di benvenuto — scegli il tuo prodotto',
+      hello: (n) => n ? `${n}, grazie di essere qui 💎` : 'Grazie di essere qui 💎',
+      intro: 'Dopo questi mesi insieme, vogliamo farti un ultimo regalo.',
+      body: 'Coupon VIP: VIP20 (20% di sconto, valido 7 giorni). Scegli il prodotto che vuoi:',
+      ctaText: 'Usa il coupon VIP',
+      ctaUrl: `${BASE}/products`,
+      footer: 'Grazie per aver scelto iLingue Relax.',
+      showcase: 'all',
+    },
   },
 };
 
 // ---------------- Rendering ----------------
 function renderCards(lang: DripLang): string {
   const cards = cardsFor(lang);
-  const label = HISPANO_LANGS.includes(lang) ? 'Ver producto' : 'View product';
+  const label = lang === 'it' ? 'Vedi prodotto' : HISPANO_LANGS.includes(lang) ? 'Ver producto' : 'View product';
   const rows: string[] = [];
   for (let i = 0; i < cards.length; i += 2) {
     const pair = cards.slice(i, i + 2)
@@ -337,7 +431,10 @@ export function getDripCopy(step: DripStepKey, lang: DripLang, name?: string): {
   const bundle = STEPS[step];
   const c: Copy = bundle[lang] ?? bundle.es ?? bundle.en!;
   const hello = c.hello(name);
-  const cardsHtml = c.showcase ? renderCards(lang) : '';
+  const cardsHtml = c.showcase && cardsFor(lang).length ? renderCards(lang) : '';
+  const nav = lang === 'it'
+    ? { products: 'Prodotti', contact: 'Contatti', unsub: 'Annulla l\'iscrizione' }
+    : { products: 'Productos', contact: 'Contacto', unsub: 'Darse de baja' };
 
   const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#f5f7fa;font-family:'Helvetica Neue','Segoe UI',Arial,sans-serif;color:#1a1a1a;">
@@ -347,11 +444,11 @@ export function getDripCopy(step: DripStepKey, lang: DripLang, name?: string): {
       <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">
         <a href="${BASE}" style="color:#ffffff;text-decoration:none;opacity:0.85;">Home</a>
         <span style="color:#555;padding:0 8px;">·</span>
-        <a href="${BASE}/products" style="color:#ffffff;text-decoration:none;opacity:0.85;">Productos</a>
+        <a href="${BASE}/products" style="color:#ffffff;text-decoration:none;opacity:0.85;">${nav.products}</a>
         <span style="color:#555;padding:0 8px;">·</span>
         <a href="${BASE}/blog" style="color:#ffffff;text-decoration:none;opacity:0.85;">Blog</a>
         <span style="color:#555;padding:0 8px;">·</span>
-        <a href="${BASE}/contact" style="color:#ffffff;text-decoration:none;opacity:0.85;">Contacto</a>
+        <a href="${BASE}/contact" style="color:#ffffff;text-decoration:none;opacity:0.85;">${nav.contact}</a>
       </p>
     </div>
     <div style="padding:32px 28px;line-height:1.6;">
@@ -366,20 +463,20 @@ export function getDripCopy(step: DripStepKey, lang: DripLang, name?: string): {
         <p style="font-size:13px;color:#6b7280;margin:0 0 8px;">${c.footer}</p>
         <p style="font-size:12px;color:#6b7280;margin:8px 0 0;">
           <a href="${BASE}" style="color:#1a1a1a;text-decoration:none;font-weight:500;">Home</a> ·
-          <a href="${BASE}/products" style="color:#1a1a1a;text-decoration:none;font-weight:500;">Productos</a> ·
+          <a href="${BASE}/products" style="color:#1a1a1a;text-decoration:none;font-weight:500;">${nav.products}</a> ·
           <a href="${BASE}/blog" style="color:#1a1a1a;text-decoration:none;font-weight:500;">Blog</a> ·
-          <a href="${BASE}/contact" style="color:#1a1a1a;text-decoration:none;font-weight:500;">Contacto</a>
+          <a href="${BASE}/contact" style="color:#1a1a1a;text-decoration:none;font-weight:500;">${nav.contact}</a>
         </p>
         <p style="font-size:11px;color:#9ca3af;margin:12px 0 0;">
           ${BRAND} · <a href="mailto:${HELP_EMAIL}" style="color:#9ca3af;">${HELP_EMAIL}</a><br>
-          <a href="${BASE}/unsubscribe" style="color:#9ca3af;">Darse de baja</a>
+          <a href="${BASE}/unsubscribe" style="color:#9ca3af;">${nav.unsub}</a>
         </p>
       </div>
     </div>
   </div>
 </body></html>`;
 
-  const cardsText = c.showcase
+  const cardsText = c.showcase && cardsFor(lang).length
     ? '\n\n' + cardsFor(lang).map((cd) => `- ${cd.name}: ${BASE}/products/${cd.slug}`).join('\n')
     : '';
   const text = `${hello}\n\n${c.intro}\n\n${c.body}${cardsText}\n\n${c.ctaText}: ${c.ctaUrl}\n\n${c.footer}\n\n${BRAND} · ${HELP_EMAIL}`;

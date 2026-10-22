@@ -49,8 +49,8 @@ interface Product {
 }
 
 // ---------- i18n ----------
-type Lang = "es" | "en" | "fr" | "pt";
-const SUPPORTED: Lang[] = ["es", "en", "fr", "pt"];
+type Lang = "es" | "en" | "fr" | "pt" | "it";
+const SUPPORTED: Lang[] = ["es", "en", "fr", "pt", "it"];
 
 const FALLBACK_COUNTRY_LANG: Record<string, Lang> = {
   ES: "es", MX: "es", AR: "es", CL: "es", CO: "es", PE: "es", VE: "es", UY: "es",
@@ -60,6 +60,7 @@ const FALLBACK_COUNTRY_LANG: Record<string, Lang> = {
   PH: "en", SG: "en",
   FR: "fr", BE: "fr", CH: "fr", LU: "fr", MC: "fr", SN: "fr", CI: "fr", CM: "fr",
   BR: "pt", PT: "pt", AO: "pt", MZ: "pt",
+  IT: "it", SM: "it", VA: "it",
 };
 
 const T: Record<Lang, {
@@ -174,6 +175,29 @@ const T: Record<Lang, {
     checklistTitle: `✅ Seu pedido inclui:`,
     mainLabel: `Produto principal`,
   },
+  it: {
+    subject: (ref, multi) => `Grazie per il tuo acquisto${ref ? ` — ${ref}` : ""} · link per il download${multi ? " (include prodotto aggiuntivo)" : ""}`,
+    headline: (n) => `Grazie per il tuo acquisto, ${n}! 🎉`,
+    introSingle: `Ecco il link per scaricare il tuo prodotto.`,
+    introMulti: (n) => `Il tuo ordine include <strong>${n} prodotti</strong> (principale + aggiuntivo). Qui sotto trovi il link per il download e la chiave di accesso di ciascuno.`,
+    preheader: (ref) => `Link per il download del tuo ordine ${ref}`,
+    stepsTitle: (m) => `📖 <strong>Come scaricare${m ? " ogni prodotto" : ""}:</strong>`,
+    step1: `Clicca su <strong>"Scarica / Apri su Drive"</strong> per ogni prodotto.`,
+    step2: `Si aprirà Google Drive → tocca ⬇ in alto a destra per salvare il PDF.`,
+    step3: `Se il prodotto richiede una <strong>chiave di accesso</strong>, copiala da questa email.`,
+    step4: `Ripeti con il <strong>prodotto aggiuntivo</strong> — ognuno ha il proprio link e la propria chiave.`,
+    downloadBtn: `⬇ Scarica / Apri su Drive`,
+    bonusBtn: `⬇ Scarica il bonus`,
+    keyLabel: `Chiave di accesso`,
+    bonusesTitle: `🎁 Bonus inclusi`,
+    bonusFallback: (n) => `Bonus n.${n}`,
+    noBonuses: `Nessun bonus aggiuntivo per questo prodotto.`,
+    categoryLabel: `Categoria`,
+    pending: `Ti invieremo il link entro pochi minuti.`,
+    tip: `💡 <strong>Consiglio:</strong> salva i PDF sul telefono o sul computer per averli sempre a disposizione, anche senza internet.`,
+    checklistTitle: `✅ Il tuo ordine include:`,
+    mainLabel: `Prodotto principale`,
+  },
 };
 
 const LANG_NAME: Record<Lang, Record<string, string>> = {
@@ -181,6 +205,7 @@ const LANG_NAME: Record<Lang, Record<string, string>> = {
   en: { es: "Spanish", en: "English", fr: "French", pt: "Portuguese", ko: "Korean", it: "Italian", de: "German", ja: "Japanese", zh: "Chinese" },
   fr: { es: "Espagnol", en: "Anglais", fr: "Français", pt: "Portugais", ko: "Coréen", it: "Italien", de: "Allemand", ja: "Japonais", zh: "Chinois" },
   pt: { es: "Espanhol", en: "Inglês", fr: "Francês", pt: "Português", ko: "Coreano", it: "Italiano", de: "Alemão", ja: "Japonês", zh: "Chinês" },
+  it: { es: "Spagnolo", en: "Inglese", fr: "Francese", pt: "Portoghese", ko: "Coreano", it: "Italiano", de: "Tedesco", ja: "Giapponese", zh: "Cinese" },
 };
 
 function langName(code: string | null, lang: Lang): string {
@@ -601,7 +626,7 @@ serve(async (req) => {
     );
     const t = T[lang];
 
-    const firstName = (customerName || (lang === "es" ? "amig@" : lang === "fr" ? "ami(e)" : lang === "pt" ? "amig@" : "there")).split(" ")[0];
+    const firstName = (customerName || (lang === "es" ? "amig@" : lang === "fr" ? "ami(e)" : lang === "pt" ? "amig@" : lang === "it" ? "amico/a" : "there")).split(" ")[0];
     const orderRef = orderId ? String(orderId) : "";
     const hasMultiple = products.length > 1;
 

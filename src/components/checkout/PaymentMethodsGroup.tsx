@@ -2979,7 +2979,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         </span>
       </div>
 
-      {selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "dlocal_card" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
+      {!!selected && selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "dlocal_card" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
         <button
           type="button"
           onClick={handleBuyNow}
@@ -2995,14 +2995,16 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
           ) : selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) ? (
             <><Lock className="w-4 h-4" /> {language === "en"
-              ? `Checkout Securely · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`
+              ? "Checkout Securely"
               : language === "pt"
-                ? `Continuar para pagamento · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`
+                ? "Continuar para pagamento"
                 : language === "fr"
-                  ? `Continuer vers le paiement · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`
-                  : `Continuar de Pago · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`}</>
+                  ? "Continuer vers le paiement"
+                  : language === "it"
+                    ? "Continua al pagamento"
+                    : "Continuar de Pago"}</>
           ) : (
-            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? `Checkout with Hotmart · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}` : `Pagar con Hotmart · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`) : `${t.buyNow} · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`}</>
+            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? "Checkout with Hotmart" : "Pagar con Hotmart") : t.buyNow}</>
           )}
         </button>
       )}

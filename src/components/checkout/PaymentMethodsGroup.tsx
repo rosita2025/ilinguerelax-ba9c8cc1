@@ -2572,16 +2572,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
             {isStripeRow && valid && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && !peActive && (
               <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 scroll-mt-24">
-                {/* Aviso claro: falta 1 paso más (llenar tarjeta y pagar dentro de Stripe) */}
-                <div className="px-3 sm:px-4 py-2.5 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900 text-[12px] sm:text-sm text-amber-900 dark:text-amber-200 font-medium text-center">
-                  ⬇️ {language === "en"
-                    ? "Last step: complete payment securely below."
-                    : language === "pt"
-                      ? "Último passo: conclua o pagamento seguro abaixo."
-                      : language === "fr"
-                        ? "Dernière étape : termine le paiement sécurisé ci-dessous."
-                        : "Último paso: completa el pago seguro aquí abajo."}
-                </div>
                 <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
                   {isFallingBackToUsd && (
                     <Alert className="mb-4 bg-teal-50 border-teal-200 dark:bg-teal-950/30 dark:border-teal-900/50">

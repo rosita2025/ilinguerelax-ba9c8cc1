@@ -23,7 +23,7 @@ import { type Currency } from "@/i18n";
 import { useI18n } from "@/i18n/I18nContext";
 import { UrgencyTimerBar } from "@/components/UrgencyTimerBar";
 import { PinterestSave } from "@/components/PinterestSave";
-import { getRealReviewStats } from "@/components/landing/magliaRelaxData";
+import { getRealReviewStats, getStickyTestimonials } from "@/components/landing/magliaRelaxData";
 
 const MagliaRelaxLanding = lazy(() => import("@/components/landing/MagliaRelaxLanding").then(m => ({ default: m.MagliaRelaxLanding })));
 
@@ -571,6 +571,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         reviewCount={isCourse ? courseReviewCount : (pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6)}
         lang={isCourse ? "it" : undefined}
         productKind={isCourse ? "course" : "pdf"}
+        testimonials={isCourse && courseReviewCount > 0 ? getStickyTestimonials() : undefined}
         showReviews={!isCourse || courseReviewCount > 0}
         onBuyClick={handleBuy}
         ctaText={pricingReady ? `${ctaBase} • ${priceLabel}` : ctaBase}

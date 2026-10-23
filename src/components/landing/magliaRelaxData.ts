@@ -47,6 +47,18 @@ export const getRealReviewStats = () => {
   return { count, average };
 };
 
+/**
+ * Frases cortas para rotar en la barra pegajosa. Salen AUTOMÁTICAMENTE de REAL_REVIEWS
+ * (solo reseñas de 4 o 5 estrellas), recortadas a ~90 caracteres. Vacío si no hay reseñas.
+ */
+export const getStickyTestimonials = (): string[] =>
+  REAL_REVIEWS.filter((r) => r.stars >= 4).map((r) => {
+    const who = r.city ? `${r.name}, ${r.city}` : r.name;
+    const clean = r.text.replace(/\s+/g, " ").trim();
+    const short = clean.length > 90 ? `${clean.slice(0, 90).replace(/\s+\S*$/, "")}…` : clean;
+    return `${who}: ${short}`;
+  });
+
 // ── Videos (reels) de Rosa ────────────────────────────────────────────────────
 // Vacío = la sección no aparece. Máximo 3.
 // `src`: link directo a un .mp4 (vertical 9:16) o link de YouTube.

@@ -284,9 +284,11 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
                 {productName}
               </h1>
 
-              <p className="text-base text-muted-foreground mb-4">
-                {productDescription}
-              </p>
+              {!isCourse && (
+                <p className="text-base text-muted-foreground mb-4">
+                  {productDescription}
+                </p>
+              )}
 
               {(!isCourse || courseReviewCount > 0) && (
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-4">

@@ -328,6 +328,8 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
   })();
   const language = (
     slug === "patrones-ingles" || catalogItem?.adminSku === "patrones-especiales-alfabeto-combinaciones-secretas-ingles"
+      // El idioma lo define la CATEGORÍA del producto (a quién enseña), no el país del comprador:
+      // Patrones = hispanohablantes que aprenden inglés → español, también si viven en EE. UU.
       ? "es"
       : learnerLang && SUPPORTED_UI_LANGS.includes(learnerLang)
         ? learnerLang
@@ -711,7 +713,9 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
                       // Mismo cuadro, mismo alto — solo cambia el texto según
                       // el país real del visitante (sin agregar scroll). Si
                       // todavía no se detecta el país, se usa el genérico.
-                      const countryName = getCountryInfo(region.country)?.name;
+                      const countryName = (() => {
+                        try { return new Intl.DisplayNames([language], { type: "region" }).of((region.country || "").toUpperCase()); } catch { return undefined; }
+                      })() || getCountryInfo(region.country)?.name;
                       if (!countryName) return t.verifiedReviewNotice;
                       return language === "en"
                         ? `Verified buyers in ${countryName}: ⭐⭐⭐⭐⭐ 5.0/5.0. Fast digital delivery, no delays.`
@@ -719,6 +723,8 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
                         ? `Compradores verificados no(a) ${countryName}: ⭐⭐⭐⭐⭐ 5.0/5.0. Entrega digital rápida, sem atrasos.`
                         : language === "fr"
                         ? `Acheteurs vérifiés en ${countryName} : ⭐⭐⭐⭐⭐ 5.0/5.0. Livraison numérique rapide, sans délai.`
+                        : language === "it"
+                        ? `Acquirenti verificati in ${countryName}: ⭐⭐⭐⭐⭐ 5.0/5.0. Consegna digitale rapida, senza ritardi.`
                         : `Compradores verificados en ${countryName}: ⭐⭐⭐⭐⭐ 5.0/5.0. Envío digital rápido, sin demoras.`;
                     })()}
                   </p>

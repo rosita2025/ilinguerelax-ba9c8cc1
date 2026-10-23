@@ -127,6 +127,10 @@ function LinkBadge() {
   );
 }
 
+// Texto por idioma (es por defecto).
+const pick = (language: string, es: string, en: string, fr: string, it: string, pt: string) =>
+  language === "en" ? en : language === "fr" ? fr : language === "it" ? it : language === "pt" ? pt : es;
+
 const LATAM_COUNTRIES = new Set(["AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "NI", "PA", "PE", "PY", "PR", "UY", "VE"]);
 
 /**
@@ -1931,7 +1935,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     ...dynamicStripeRows,
     { id: "stripe_ach", icon: Building2, title: language === "en" ? "ACH Bank Transfer" : "Transferencia bancaria ACH", sub: language === "en" ? "Pay from a US bank account inside Stripe." : "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe.", badge: finalPriceLabel },
     { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: language === "en" ? "Pay with Cash App within Stripe's secure form." : "Paga con Cash App dentro del formulario seguro de Stripe.", badge: finalPriceLabel },
-    { id: "stripe_klarna", icon: Wallet, title: language === "en" ? "Klarna — Pay in 4" : "Klarna — Paga en 4", sub: language === "en" ? "Split your purchase into 4 interest-free installments inside Stripe." : "Divide tu compra en 4 cuotas sin interés dentro de Stripe.", badge: finalPriceLabel },
+    { id: "stripe_klarna", icon: Wallet, title: pick(language, "Klarna — Paga en 4", "Klarna — Pay in 4", "Klarna — Payez en 4", "Klarna — Paga in 4", "Klarna — Pague em 4"), sub: pick(language, "Divide tu compra en 4 cuotas sin interés dentro de Stripe.", "Split your purchase into 4 interest-free installments inside Stripe.", "Divisez votre achat en 4 fois sans frais avec Stripe.", "Dividi l'acquisto in 4 rate senza interessi con Stripe.", "Divida sua compra em 4 parcelas sem juros no Stripe."), badge: finalPriceLabel },
     
     { id: "transfer", icon: Building2, title: t.bankTransfer, sub: t.bankTransferSub(localBadge), badge: finalPriceLabel },
     { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: finalPriceLabel },
@@ -1939,13 +1943,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     {
       id: "binance",
       icon: Wallet,
-      title: language === "en" ? "Binance Pay (USDT · Crypto)"
-        : language === "pt" ? "Binance Pay (USDT · Cripto)"
-        : language === "fr" ? "Binance Pay (USDT · Crypto)"
-        : "Binance Pay (USDT · Cripto)",
+      title: language === "en" || language === "fr" ? "Binance Pay (USDT · Crypto)" : "Binance Pay (USDT · Cripto)",
       sub: language === "en" ? "USDT / Binance Pay · 1-24h verification by Supervisor Rosa"
         : language === "pt" ? "USDT / Binance Pay · Verificação 1-24h pela Supervisora Rosa"
         : language === "fr" ? "USDT / Binance Pay · Vérification 1-24h par la Superviseure Rosa"
+        : language === "it" ? "USDT / Binance Pay · Verifica in 1-24h dalla Supervisora Rosa"
         : "USDT / Binance Pay · Verificación 1-24h por Supervisora Rosa",
       badge: finalPriceLabel,
     },
@@ -2355,11 +2357,15 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       {!isFree && !isInvalidZero && (
         <div className="flex items-center gap-2 mb-4 px-1 text-xs font-semibold">
           <span className={valid ? "text-emerald-600 dark:text-emerald-400" : "text-teal-600 dark:text-teal-400"}>
-            {valid ? "✓ Paso 1: Tus datos" : "● Paso 1 de 2: Tus datos"}
+            {valid
+              ? pick(language, "✓ Paso 1: Tus datos", "✓ Step 1: Your details", "✓ Étape 1 : Vos informations", "✓ Passo 1: I tuoi dati", "✓ Passo 1: Seus dados")
+              : pick(language, "● Paso 1 de 2: Tus datos", "● Step 1 of 2: Your details", "● Étape 1 sur 2 : Vos informations", "● Passo 1 di 2: I tuoi dati", "● Passo 1 de 2: Seus dados")}
           </span>
           <span className="text-neutral-300 dark:text-neutral-600">—</span>
           <span className={valid ? "text-teal-600 dark:text-teal-400" : "text-neutral-400 dark:text-neutral-600"}>
-            {valid ? "● Paso 2 de 2: Pago" : "Paso 2: Pago"}
+            {valid
+              ? pick(language, "● Paso 2 de 2: Pago", "● Step 2 of 2: Payment", "● Étape 2 sur 2 : Paiement", "● Passo 2 di 2: Pagamento", "● Passo 2 de 2: Pagamento")
+              : pick(language, "Paso 2: Pago", "Step 2: Payment", "Étape 2 : Paiement", "Passo 2: Pagamento", "Passo 2: Pagamento")}
           </span>
         </div>
       )}
@@ -2498,7 +2504,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 ) : m.id === "stripe_klarna" ? (
                   <div className="mt-1 flex items-center gap-1 flex-wrap">
                     <BankBadge label="Klarna" bg="#FFA8CD" color="#0A0A0A" />
-                    <BankBadge label="4 cuotas" bg="#1F2937" color="#ffffff" />
+                    <BankBadge label={pick(language, "4 cuotas", "4 payments", "4 fois", "4 rate", "4 parcelas")} bg="#1F2937" color="#ffffff" />
                   </div>
                 ) : m.id === "hotmart" ? (
                   <div className="mt-1.5">
@@ -2638,7 +2644,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 dark:bg-neutral-900/80 z-10 rounded-xl backdrop-blur-sm">
                           <Loader2 className="h-8 w-8 animate-spin text-teal-600 mb-3" />
                           <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-                            {stripeElapsed > 5 ? "Configurando conexión segura..." : "Abriendo formulario de Stripe..."}
+                            {stripeElapsed > 5
+                              ? pick(language, "Configurando conexión segura...", "Setting up secure connection...", "Connexion sécurisée en cours...", "Connessione sicura in corso...", "Configurando conexão segura...")
+                              : pick(language, "Abriendo formulario de Stripe...", "Opening Stripe form...", "Ouverture du formulaire Stripe...", "Apertura del modulo Stripe...", "Abrindo formulário do Stripe...")}
                           </p>
                         </div>
                       )}

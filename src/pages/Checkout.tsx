@@ -31,7 +31,6 @@ import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { CheckoutLanguageProvider, useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
-import { detectLanguageFromCountry } from "@/i18n";
 import { getCatalogItem, resolveCheckoutSlug, CHECKOUT_CATALOG, type CatalogItem } from "@/config/checkoutCatalog";
 import { readCheckoutCache, loadCheckoutProduct } from "@/lib/checkoutProductCache";
 import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker";
@@ -327,17 +326,11 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
       return v && SUPPORTED_UI_LANGS.includes(v) ? v : null;
     } catch { return null; }
   })();
-  const ipLanguage = (() => {
-    const c = (region.country || "").toUpperCase();
-    if (c.length !== 2) return null;
-    const l = detectLanguageFromCountry(c);
-    return SUPPORTED_UI_LANGS.includes(l) ? l : null;
-  })();
   const language = (
     slug === "patrones-ingles" || catalogItem?.adminSku === "patrones-especiales-alfabeto-combinaciones-secretas-ingles"
-      // Idioma según el país por IP (Italia → italiano, Francia → francés, Brasil → portugués,
-      // países de habla inglesa → inglés, resto de Latinoamérica y España → español).
-      ? (ipLanguage ?? rememberedLang ?? "es")
+      // El idioma lo define la CATEGORÍA del producto (a quién enseña), no el país del comprador:
+      // Patrones = hispanohablantes que aprenden inglés → español, también si viven en EE. UU.
+      ? "es"
       : learnerLang && SUPPORTED_UI_LANGS.includes(learnerLang)
         ? learnerLang
         : (rememberedLang ?? siteLanguage)

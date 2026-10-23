@@ -1158,7 +1158,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       }
     }
     void captureAbandonedCheckout(m, true);
-    autoOpenBusy.current = false;
     if (m !== selected) setShowStripe(false);
     setSelected(m);
     setSelectedMethod(m);
@@ -1887,9 +1886,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   ];
   const STRIPE_VISIBLE_METHODS = getStripeVisibleMethods(language);
   const dynamicStripeRows: PaymentMethodRow[] = methodsConfig.enabledMethodKeys
-    // Apple Pay / Google Pay / Link ya salen DENTRO del formulario de tarjeta de Stripe;
-    // una fila aparte hacía dos botones para lo mismo.
-    .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link" && key !== "stripe_apple_pay" && key !== "stripe_google_pay")
+    .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link")
     .map((key) => ({ id: "card", methodKey: key, badge: finalPriceLabel, ...STRIPE_VISIBLE_METHODS[key] }));
   const allMethods: PaymentMethodRow[] = [
     { 
@@ -2141,32 +2138,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       if (isStripeSel && valid && stripePromise && !showStripe) setShowStripe(true);
     }
   }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
-
-  // Perú: al elegir tarjeta, el formulario de Stripe se abre solo, sin tener que pulsar
-  // "Continuar de Pago" (fuera de Perú esto ya ocurre arriba). Se conserva el aviso
-  // "¿Te gustaría agregar…?" una sola vez por sesión, igual que antes del botón.
-  const autoOpenBusy = useRef(false);
-  useEffect(() => {
-    if (!isPeru) return;
-    const isStripeSel = !!selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected);
-    if (!isStripeSel || !valid || !stripePromise || showStripe || autoOpenBusy.current) return;
-    if (total <= 0 && items.length > 0) return;
-    autoOpenBusy.current = true;
-    const openNow = () => {
-      autoOpenBusy.current = false;
-      useCheckoutPruebaStore.getState().setClientSecret(null);
-      setShowStripe(true);
-    };
-    void (async () => {
-      try {
-        const popupShown = await offerUpsellThen(openNow);
-        if (!popupShown) openNow();
-      } catch {
-        openNow();
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPeru, selected, valid, stripePromise, showStripe, total, items.length]);
 
   // Validación automática: el método dLocal seleccionado y sus etiquetas deben
   // coincidir siempre con la cobertura activa de /admin/dlocal para el país

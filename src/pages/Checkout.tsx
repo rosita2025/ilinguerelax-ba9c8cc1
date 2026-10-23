@@ -300,7 +300,16 @@ export default function Checkout() {
   // Mientras el producto no ha cargado, o si el valor guardado no es uno de
   // los 4 idiomas de interfaz soportados, usa el idioma del sitio como
   // respaldo (evita pasarle a getCheckoutUI un valor inválido).
-  const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
+  // Bloque de confianza del pie del checkout (igual para todos los países).
+const TRUST_COPY = {
+  es: { secureTitle: "Pago cifrado", secureSub: "Protegido por Stripe", guaranteeTitle: "7 días", guaranteeSub: "Garantía de devolución", supportTitle: "Soporte", supportSub: "WhatsApp 24h" },
+  en: { secureTitle: "Encrypted", secureSub: "Protected by Stripe", guaranteeTitle: "7 days", guaranteeSub: "Money-back guarantee", supportTitle: "Support", supportSub: "WhatsApp 24h" },
+  pt: { secureTitle: "Pagamento criptografado", secureSub: "Protegido pela Stripe", guaranteeTitle: "7 dias", guaranteeSub: "Garantia de reembolso", supportTitle: "Suporte", supportSub: "WhatsApp 24h" },
+  fr: { secureTitle: "Paiement chiffré", secureSub: "Protégé par Stripe", guaranteeTitle: "7 jours", guaranteeSub: "Satisfait ou remboursé", supportTitle: "Support", supportSub: "WhatsApp 24h" },
+  it: { secureTitle: "Pagamento cifrato", secureSub: "Protetto da Stripe", guaranteeTitle: "7 giorni", guaranteeSub: "Garanzia rimborso", supportTitle: "Assistenza", supportSub: "WhatsApp 24h" },
+};
+
+const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
   const learnerLang = catalogItem?.learnerLanguage;
   // Último idioma resuelto para este producto: se usa de inmediato en la próxima
   // visita mientras carga el catálogo, para que los textos no cambien de idioma
@@ -764,27 +773,30 @@ export default function Checkout() {
                   </SectionErrorBoundary>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-2">
-                  <span className="flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> {t.sslEncryption}
-                  </span>
-                  {isPeru && (
-                    <>
-                      <span>·</span>
-                      <span className="flex items-center gap-1">
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> {t.mercadoPagoPeru}
-                      </span>
-                    </>
-                  )}
-                  <span>·</span>
-                  <a
-                    href="https://wa.me/112512724704"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 hover:text-primary"
-                  >
-                    <MessageCircle className="w-3.5 h-3.5" /> {t.whatsappSupport}
-                  </a>
+                <div className="grid grid-cols-3 gap-2 pt-1">
+                  {(() => {
+                    const L = TRUST_COPY[language as keyof typeof TRUST_COPY] ?? TRUST_COPY.es;
+                    const cell = "flex flex-col items-center gap-0.5 rounded-xl border border-emerald-200/70 bg-emerald-50/60 px-1.5 py-2 text-center dark:border-emerald-900/50 dark:bg-emerald-950/20";
+                    return (
+                      <>
+                        <div className={cell}>
+                          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                          <span className="text-[11px] font-bold leading-tight text-foreground">{L.secureTitle}</span>
+                          <span className="text-[10px] leading-tight text-muted-foreground">{L.secureSub}</span>
+                        </div>
+                        <div className={cell}>
+                          <BadgeCheck className="w-4 h-4 text-emerald-600" />
+                          <span className="text-[11px] font-bold leading-tight text-foreground">{L.guaranteeTitle}</span>
+                          <span className="text-[10px] leading-tight text-muted-foreground">{L.guaranteeSub}</span>
+                        </div>
+                        <a href="https://wa.me/112512724704" target="_blank" rel="noopener noreferrer" className={cn(cell, "hover:border-emerald-400")}>
+                          <MessageCircle className="w-4 h-4 text-emerald-600" />
+                          <span className="text-[11px] font-bold leading-tight text-foreground">{L.supportTitle}</span>
+                          <span className="text-[10px] leading-tight text-muted-foreground">{L.supportSub}</span>
+                        </a>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 

@@ -28,6 +28,19 @@ import { trackPaymentError, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import { usePurchaseTracking } from "@/hooks/usePurchaseTracking";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
+
+// Formulario de pago nuevo (tipo Payment Element). APAGADO por defecto: se prueba con ?pe=1.
+// Cuando esté probado, cambiar PAYMENT_ELEMENT_ENABLED a true.
+export const PAYMENT_ELEMENT_ENABLED = false;
+const isPaymentElementMode = (): boolean => {
+  if (PAYMENT_ELEMENT_ENABLED) return true;
+  try {
+    return new URLSearchParams(window.location.search).get("pe") === "1";
+  } catch {
+    return false;
+  }
+};
+const StripePaymentElementBox = React.lazy(() => import("@/components/checkout/StripePaymentElementBox"));
 import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";
 import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
 import { mapDlocalStatus } from "@/lib/dlocalErrorMap";
@@ -543,6 +556,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
   const redirectingRef = useRef(false);
   const stripeAnchorRef = useRef<HTMLDivElement | null>(null);
+  const paymentElementMode = useMemo(isPaymentElementMode, []);
+  const [peUnavailable, setPeUnavailable] = useState(false);
+  // Si el formulario nuevo no carga, se vuelve solo al anterior.
+  const peActive = paymentElementMode && !peUnavailable;
   const stripeContainerRef = useRef<HTMLDivElement | null>(null);
   const hasPhysicalItems = items.some(i => i.isPhysical);
   const valid = isBuyerValid(buyer, hasPhysicalItems);
@@ -1304,6 +1321,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   }, [stripeError, retryStripe]);
 
   useEffect(() => {
+    if (peActive) return; // el formulario nuevo no usa el iframe de Embedded Checkout
     if (!(showStripe && selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected))) return;
     setStripeFrameMounted(false);
     setStripeElapsed(0);
@@ -1358,7 +1376,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       observer.disconnect();
       window.clearInterval(tick);
     };
-  }, [showStripe, selected, stripeRetryKey, language, stripeAutoRetried]);
+  }, [showStripe, selected, stripeRetryKey, language, stripeAutoRetried, peActive]);
 
   const handleManualPaid = async () => {
     if (!valid) { requestBuyerInfo(); return; }
@@ -2484,7 +2502,23 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
 
-            {isStripeRow && valid && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && (
+            {isStripeRow && valid && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && peActive && (
+              <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-3 sm:p-4 scroll-mt-24">
+                <React.Suspense fallback={null}>
+                  <StripePaymentElementBox
+                    language={language}
+                    country={(country || "").toUpperCase().slice(0, 2)}
+                    currency={String(currency)}
+                    canPay={valid}
+                    onNeedBuyerInfo={requestBuyerInfo}
+                    onBeforePay={() => { void captureAbandonedCheckout(selected || "stripe", true); }}
+                    onUnavailable={() => setPeUnavailable(true)}
+                  />
+                </React.Suspense>
+              </div>
+            )}
+
+            {isStripeRow && valid && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && !peActive && (
               <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 scroll-mt-24">
                 {/* Aviso claro: falta 1 paso más (llenar tarjeta y pagar dentro de Stripe) */}
                 <div className="px-3 sm:px-4 py-2.5 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900 text-[12px] sm:text-sm text-amber-900 dark:text-amber-200 font-medium text-center">

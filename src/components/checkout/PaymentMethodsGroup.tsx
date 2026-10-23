@@ -366,12 +366,6 @@ const getStripeVisibleMethodsBase = (language: string): Record<string, Omit<Paym
     sub: language === "en" ? "Buy now and pay later inside Stripe." : "Compra ahora y paga después dentro de Stripe.",
     badges: [{ label: "Affirm", bg: "#4A4AF4", color: "#ffffff" }],
   },
-  stripe_paypal: {
-    icon: Wallet,
-    title: "PayPal (Stripe)",
-    sub: language === "en" ? "PayPal processed within Stripe's secure form." : "PayPal procesado dentro del formulario seguro de Stripe.",
-    badges: [{ label: "PayPal", bg: "#003087", color: "#ffffff" }],
-  },
   stripe_alipay: {
     icon: Smartphone,
     title: "Alipay",

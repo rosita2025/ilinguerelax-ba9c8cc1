@@ -16,3 +16,4 @@
 - [x] Verify email language rules locally (19 tests passed and all six changed server files passed syntax compilation) and deploy the ten requested functions without test sends.
 - [x] Apply Maglia Relax course-only adjustments and add three videos and presentation image; seven tests passed, mobile/desktop presentation and Spanish product isolation checked, CDN video access confirmed. Playback could not be verified in the local browser; no purchases or emails.
 - [x] Apply attached course-only sticky testimonial diff; ten tests passed and the real empty-review page hides testimonials. No purchases or emails.
+- [x] Connect Maglia Relax purchase-bar stars and count to its SKU's existing admin values, without adding written reviews or changing other products.

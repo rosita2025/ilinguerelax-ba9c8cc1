@@ -1,7 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { getRealReviewStats, getStickyTestimonials, REAL_REVIEWS, REELS } from "@/components/landing/magliaRelaxData";
+import { getCourseStickyReviewStats, getRealReviewStats, getStickyTestimonials, REAL_REVIEWS, REELS } from "@/components/landing/magliaRelaxData";
 
 describe("Maglia Relax real review and video rules", () => {
+  it("uses the product admin rating and count for sticky stars without creating testimonials", () => {
+    expect(getCourseStickyReviewStats(4.8, 120)).toEqual({ average: 4.8, count: 120 });
+    expect(getStickyTestimonials()).toEqual([]);
+  });
+
+  it("does not substitute invented stars or counts when admin values are missing or invalid", () => {
+    for (const [rating, count] of [[null, null], [4.8, 0], [0, 120], [6, 120], [NaN, 120], [4.8, 1.5]]) {
+      expect(getCourseStickyReviewStats(rating, count)).toEqual({ average: 0, count: 0 });
+    }
+  });
+
   it("does not invent sticky testimonials when reviews are empty", () => {
     expect(getStickyTestimonials()).toEqual([]);
   });

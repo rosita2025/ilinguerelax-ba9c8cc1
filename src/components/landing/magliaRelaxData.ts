@@ -47,6 +47,15 @@ export const getRealReviewStats = () => {
   return { count, average };
 };
 
+/** Aggregate stars for the purchase bar come from this product's admin fields. */
+export const getCourseStickyReviewStats = (rating: number | null, reviewCount: number | null) => {
+  if (rating != null && Number.isFinite(rating) && rating >= 1 && rating <= 5 &&
+      reviewCount != null && Number.isInteger(reviewCount) && reviewCount > 0) {
+    return { average: rating, count: reviewCount };
+  }
+  return getRealReviewStats();
+};
+
 /**
  * Frases cortas para rotar en la barra pegajosa. Salen AUTOMÁTICAMENTE de REAL_REVIEWS
  * (solo reseñas de 4 o 5 estrellas), recortadas a ~90 caracteres. Vacío si no hay reseñas.

@@ -745,6 +745,7 @@ const ProductDynamic = () => {
             />
 
           </Suspense>
+          )}
 
           {product.sku === "5-000-spanish-words-with-english-pronunciation-digital" && (
             <div className="max-w-4xl mx-auto px-4 mb-4">

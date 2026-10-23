@@ -2456,13 +2456,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     <span className="min-w-0 truncate">{m.title}</span>
                   )}
                   {isPrimaryCard && !isSelected && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
+                    <span className="text-[11px] font-bold px-1.5 py-0.5 rounded shrink-0 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
                       {language === "en" ? "Recommended" : language === "fr" ? "Recommandé" : language === "it" ? "Consigliato" : "Recomendado"}
                     </span>
                   )}
                   {!isPrimaryCard && !isSelected && (() => {
                     const h = methodHint(m.id, language);
-                    return h ? <span className={cn("text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0", h.cls)}>{h.text}</span> : null;
+                    return h ? <span className={cn("text-[11px] font-bold px-1.5 py-0.5 rounded shrink-0", h.cls)}>{h.text}</span> : null;
                   })()}
                   {m.badge && isSelected && (
                     <span className={cn(
@@ -2581,24 +2581,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                       : language === "fr"
                         ? "Dernière étape : termine le paiement sécurisé ci-dessous."
                         : "Último paso: completa el pago seguro aquí abajo."}
-                </div>
-                {/* Trust row encima del embed */}
-                <div className="grid grid-cols-3 gap-1 px-3 sm:px-4 py-2.5 border-b border-neutral-100 dark:border-neutral-800 text-[10px] sm:text-[11px] text-neutral-600 dark:text-neutral-300">
-                  <div className="flex items-center gap-1.5">
-                    <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span className="font-medium">{t.ssl256}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-3.5 h-3.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 text-[8px] font-bold shrink-0">✓</span>
-                    <span className="font-medium">{t.stripeVerified}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 justify-end">
-                    <MessageCircle className="w-3.5 h-3.5 text-[#25D366] shrink-0" />
-                    <span className="font-medium">{t.support24h}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-500 dark:text-neutral-400">
-                  <Lock className="w-3.5 h-3.5" /> {t.processedBy}
                 </div>
                 <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
                   {isFallingBackToUsd && (

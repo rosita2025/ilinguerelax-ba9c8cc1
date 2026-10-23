@@ -53,7 +53,7 @@ export function CheckoutOfferCountdown({ productSlug, language }: Props) {
   // Avisa al resto de la página cuánto mide la barra para que el menú y el resumen fijos queden debajo.
   useEffect(() => {
     if (!visible) return;
-    document.documentElement.style.setProperty("--offer-bar-h", "40px");
+    document.documentElement.style.setProperty("--offer-bar-h", "44px");
     return () => { document.documentElement.style.setProperty("--offer-bar-h", "0px"); };
   }, [visible]);
 
@@ -63,7 +63,7 @@ export function CheckoutOfferCountdown({ productSlug, language }: Props) {
 
   return (
     <div
-      className="sticky top-0 z-40 flex h-10 w-full items-center justify-between gap-2 whitespace-nowrap border-b border-amber-300 bg-amber-50 px-3 text-amber-950 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100"
+      className="sticky top-0 z-40 flex h-11 w-full items-center justify-between gap-2 whitespace-nowrap border-b border-amber-300 bg-amber-50 px-3 text-amber-950 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100"
       role="timer"
       aria-live="off"
     >
@@ -84,7 +84,7 @@ export function CheckoutOfferCountdown({ productSlug, language }: Props) {
         <button
           type="button"
           onClick={() => applyCoupon(COUPON_CODE)}
-          className="shrink-0 rounded-lg bg-amber-500 px-3 py-1.5 text-[12px] font-bold text-white hover:bg-amber-600 sm:text-sm"
+          className="shrink-0 rounded-lg bg-amber-500 px-3.5 h-9 text-[13px] font-bold text-white hover:bg-amber-600 sm:text-sm"
         >
           {t.apply}
         </button>

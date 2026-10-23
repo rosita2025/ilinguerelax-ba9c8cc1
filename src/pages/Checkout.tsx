@@ -662,7 +662,7 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
                   {catalogItem?.productPath && (
                     <Link
                       to={catalogItem.productPath}
-                      className="flex items-center gap-1 text-[11px] sm:text-xs text-muted-foreground hover:text-primary whitespace-nowrap"
+                      className="flex items-center justify-center gap-1 min-h-11 min-w-11 -ml-2 pl-2 text-[11px] sm:text-xs text-muted-foreground hover:text-primary whitespace-nowrap"
                       aria-label={t.returnToProduct || "Volver al producto"}
                     >
                       <ArrowLeft className="w-3.5 h-3.5" />
@@ -781,18 +781,18 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
                       <>
                         <div className={cell}>
                           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                          <span className="text-[11px] font-bold leading-tight text-foreground">{L.secureTitle}</span>
-                          <span className="text-[10px] leading-tight text-muted-foreground">{L.secureSub}</span>
+                          <span className="text-xs font-bold leading-tight text-foreground">{L.secureTitle}</span>
+                          <span className="text-[11px] leading-tight text-muted-foreground">{L.secureSub}</span>
                         </div>
                         <div className={cell}>
                           <BadgeCheck className="w-4 h-4 text-emerald-600" />
-                          <span className="text-[11px] font-bold leading-tight text-foreground">{L.guaranteeTitle}</span>
-                          <span className="text-[10px] leading-tight text-muted-foreground">{L.guaranteeSub}</span>
+                          <span className="text-xs font-bold leading-tight text-foreground">{L.guaranteeTitle}</span>
+                          <span className="text-[11px] leading-tight text-muted-foreground">{L.guaranteeSub}</span>
                         </div>
                         <a href="https://wa.me/112512724704" target="_blank" rel="noopener noreferrer" className={cn(cell, "hover:border-emerald-400")}>
                           <MessageCircle className="w-4 h-4 text-emerald-600" />
-                          <span className="text-[11px] font-bold leading-tight text-foreground">{L.supportTitle}</span>
-                          <span className="text-[10px] leading-tight text-muted-foreground">{L.supportSub}</span>
+                          <span className="text-xs font-bold leading-tight text-foreground">{L.supportTitle}</span>
+                          <span className="text-[11px] leading-tight text-muted-foreground">{L.supportSub}</span>
                         </a>
                       </>
                     );

@@ -82,8 +82,32 @@ const INITIAL: AdminPricing = {
  * Reads pricing, title, description, hotmart URL and store toggle from
  * `digital_products` (managed via `/admin/products/:sku`) for the given SKU.
  */
+// Última respuesta del admin por producto: en la segunda visita la página arranca
+// con precio y datos al instante y se actualiza en segundo plano (sin "Processing…").
+// No se guarda el enlace de Hotmart.
+const CACHE_PREFIX = "admin_pricing_v1:";
+const CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+
+function readPricingCache(sku: string): AdminPricing | null {
+  try {
+    const raw = localStorage.getItem(CACHE_PREFIX + sku);
+    if (!raw) return null;
+    const { at, data } = JSON.parse(raw) as { at: number; data: AdminPricing };
+    if (!data || Date.now() - at > CACHE_MAX_AGE_MS || data.priceGlobalUsd == null) return null;
+    return { ...data, hotmartUrl: null, loaded: true, missing: false };
+  } catch {
+    return null;
+  }
+}
+
+function writePricingCache(sku: string, data: AdminPricing) {
+  try {
+    localStorage.setItem(CACHE_PREFIX + sku, JSON.stringify({ at: Date.now(), data: { ...data, hotmartUrl: null } }));
+  } catch { /* sin almacenamiento */ }
+}
+
 export function useAdminPricing(sku: string): AdminPricing {
-  const [state, setState] = useState<AdminPricing>(INITIAL);
+  const [state, setState] = useState<AdminPricing>(() => (sku ? readPricingCache(sku) : null) ?? INITIAL);
 
   useEffect(() => {
     if (!sku) {
@@ -146,7 +170,7 @@ export function useAdminPricing(sku: string): AdminPricing {
       const compareTienda = data.compare_at_price_usd_tienda != null ? Number(data.compare_at_price_usd_tienda) : compareLatam;
       const comparePen = data.compare_at_price_pen != null ? Number(data.compare_at_price_pen) : null;
 
-      setState({
+      const next: AdminPricing = {
         priceGlobalUsd: global,
         priceLatamUsd: latam,
         priceTiendaUsd: tienda,
@@ -170,7 +194,9 @@ export function useAdminPricing(sku: string): AdminPricing {
         learnerLanguage: (data as any).learner_language ?? null,
         loaded: true,
         missing: false,
-      });
+      };
+      writePricingCache(sku, next);
+      setState(next);
     };
 
     fetchOne();

@@ -38,7 +38,14 @@ export interface RealReview {
   text: string;
   freeAccess?: boolean;
 }
-export const REAL_REVIEWS: RealReview[] = [];
+export const REAL_REVIEWS: RealReview[] = [
+  {
+    name: "Aurora",
+    city: "Roma",
+    stars: 5,
+    text: "Grazie per la spiegazione riguardo ai video tutorial.",
+  },
+];
 
 export const getRealReviewStats = () => {
   const count = REAL_REVIEWS.length;

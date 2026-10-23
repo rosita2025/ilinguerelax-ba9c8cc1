@@ -310,7 +310,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
                   {isCourse ? realReviews.average.toFixed(1) : (pricingAdmin.rating != null ? pricingAdmin.rating.toFixed(1) : "4.9")}/5
                 </span>
                 <span className="text-xs sm:text-sm text-muted-foreground">
-                  ({isCourse ? courseReviewCount : (pricingAdmin.reviewCount ?? 6)} {isCourse ? "recensioni" : t.product.verifiedReviews})
+                  ({isCourse ? courseReviewCount : (pricingAdmin.reviewCount ?? 6)} {isCourse ? (courseReviewCount === 1 ? "recensione" : "recensioni") : t.product.verifiedReviews})
                 </span>
               </div>
               )}

@@ -1,7 +1,17 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { getCourseStickyReviewStats, getRealReviewStats, getStickyTestimonials, REAL_REVIEWS, REELS } from "@/components/landing/magliaRelaxData";
 
 describe("Maglia Relax real review and video rules", () => {
+  const suppliedReviews = [...REAL_REVIEWS];
+  beforeEach(() => REAL_REVIEWS.splice(0, REAL_REVIEWS.length));
+  afterEach(() => REAL_REVIEWS.splice(0, REAL_REVIEWS.length, ...suppliedReviews));
+
+  it("contains exactly one supplied five-star review", () => {
+    REAL_REVIEWS.push(...suppliedReviews);
+    expect(getRealReviewStats()).toEqual({ count: 1, average: 5 });
+    expect(getStickyTestimonials()).toHaveLength(1);
+  });
+
   it("uses the product admin rating and count for sticky stars without creating testimonials", () => {
     expect(getCourseStickyReviewStats(4.8, 120)).toEqual({ average: 4.8, count: 120 });
     expect(getStickyTestimonials()).toEqual([]);

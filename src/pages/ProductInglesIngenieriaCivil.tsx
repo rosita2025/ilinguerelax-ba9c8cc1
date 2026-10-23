@@ -77,6 +77,9 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
   }, []);
 
   const pricingAdmin = useAdminPricing(ADMIN_SKU);
+  // Curso de video de tejido (Maglia Relax): usa la landing italiana propia en lugar de las secciones de PDF.
+  const isCourse = pricingAdmin.learnerLanguage === "it" && ADMIN_SKU.startsWith("maglia-relax");
+  const courseReviewCount = pricingAdmin.reviewCount ?? 0;
   const tier = useCountryTierRouting(ADMIN_SKU, {
     tiendaPath: TIENDA_CHECKOUT_PATH,
   });
@@ -213,13 +216,13 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         image={heroImageAbsolute}
         type="product"
         price={PRICE_USD.toString()}
-        originalPrice={(PRICE_USD * 2.5).toString()}
-        rating={pricingAdmin.rating?.toString() ?? "4.9"}
-        reviewCount={pricingAdmin.reviewCount?.toString() ?? "6"}
+        originalPrice={isCourse ? undefined : (PRICE_USD * 2.5).toString()}
+        rating={isCourse && courseReviewCount === 0 ? undefined : (pricingAdmin.rating?.toString() ?? "4.9")}
+        reviewCount={isCourse && courseReviewCount === 0 ? undefined : (pricingAdmin.reviewCount?.toString() ?? "6")}
         sku={ADMIN_SKU}
         keywords="inglés para ingeniería civil, vocabulario ingeniería civil en inglés, palabras técnicas ingeniería civil, inglés técnico construcción, diccionario ingeniería civil inglés español, ebook inglés ingeniería pdf"
-        reviews={productReviews}
-        faqItems={[
+        reviews={isCourse ? undefined : productReviews}
+        faqItems={isCourse ? undefined : [
           { question: `¿Por qué cuesta solo ${tier.priceLabel}?`, answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba." },
           { question: "¿Qué incluye este ebook?", answer: "Las 1,000 palabras más utilizadas en Ingeniería Civil con traducción al español, pronunciación adaptada y ejemplos de uso en contexto real." },
           { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Recibes la descarga inmediata después del pago. Puedes leerlo en móvil, tablet, computadora o imprimirlo." },

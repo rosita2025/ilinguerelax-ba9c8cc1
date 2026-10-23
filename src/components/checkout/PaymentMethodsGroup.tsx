@@ -2117,9 +2117,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const visibleMethods = orderedByAdmin.length > 0 ? orderedByAdmin : allMethods.filter(m => m.id === 'card' || m.id === 'hotmart');
   // Orden de secciones para que el checkout se lea de arriba a abajo sin saltos:
   // tarjetas → transferencias → efectivo → billeteras → otros (Hotmart al final).
-  const methods = [...visibleMethods].sort(
-    (a, b) => SECTION_ORDER.indexOf(methodSection(a.id)) - SECTION_ORDER.indexOf(methodSection(b.id)),
-  );
+  // Checkout de un solo método: únicamente la tarjeta crédito/débito de Stripe, en todos los
+  // países. Yape/Plin, dLocal Go, transferencias, efectivo, Hotmart, Binance, etc. NO se muestran
+  // (su código sigue en el proyecto; para volver a mostrarlos basta quitar este filtro).
+  const methods = [...visibleMethods]
+    .filter((m) => m.id === "card" && !m.methodKey)
+    .sort(
+      (a, b) => SECTION_ORDER.indexOf(methodSection(a.id)) - SECTION_ORDER.indexOf(methodSection(b.id)),
+    );
   const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m.id));
 
 
@@ -2129,7 +2134,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // el formulario embebido en cuanto el comprador completa sus datos, para
   // reducir clics y maximizar conversión (adultos mayores, jóvenes, adultos).
   useEffect(() => {
-    if (!isPeru && stripeMethodAvailable && !(total <= 0 && items.length > 0)) {
+    if (stripeMethodAvailable && !(total <= 0 && items.length > 0)) {
       // Solo autoseleccionar Stripe si el comprador NO ha elegido ya otro
       // método explícitamente (ej: PayPal, Binance). Antes forzaba "card"
       // en cada render y borraba la selección de PayPal al hacer click.
@@ -2138,7 +2143,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`);
       }
       const isStripeSel = selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected);
-      if (isStripeSel && valid && stripePromise && !showStripe) setShowStripe(true);
+      // En Perú el formulario lo abre el efecto de abajo (con el aviso de upsell).
+      if (!isPeru && isStripeSel && valid && stripePromise && !showStripe) setShowStripe(true);
     }
   }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
 
@@ -2979,35 +2985,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         </span>
       </div>
 
-      {!!selected && selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "dlocal_card" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
-        <button
-          type="button"
-          onClick={handleBuyNow}
-          disabled={!selected || mpLoading !== null}
-          className={cn(
-            "w-full mt-4 py-4 rounded-xl font-bold text-white text-base transition-colors",
-            "bg-[hsl(142,72%,42%)] hover:bg-[hsl(142,72%,36%)]",
-            "flex items-center justify-center gap-2",
-            !valid && "cursor-pointer",
-          )}
-        >
-          {mpLoading ? (
-            <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
-          ) : selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) ? (
-            <><Lock className="w-4 h-4" /> {language === "en"
-              ? "Checkout Securely"
-              : language === "pt"
-                ? "Continuar para pagamento"
-                : language === "fr"
-                  ? "Continuer vers le paiement"
-                  : language === "it"
-                    ? "Continua al pagamento"
-                    : "Continuar de Pago"}</>
-          ) : (
-            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? "Checkout with Hotmart" : "Pagar con Hotmart") : t.buyNow}</>
-          )}
-        </button>
-      )}
+      {/* Sin botón "Comprar ahora": la tarjeta de Stripe se selecciona sola y su formulario
+          se abre en cuanto los datos del comprador son válidos; el botón de pagar es el de Stripe. */}
 
       <UpsellPopup
         offer={upsellPopup?.offer ?? null}

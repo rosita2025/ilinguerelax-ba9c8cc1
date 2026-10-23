@@ -11,6 +11,10 @@ import { localAmountFromUsd } from "../_shared/fxRates.ts";
  *  - "quote":  devuelve { amount, currency } que el botón necesita para abrirse.
  *  - "create": crea el PaymentIntent y devuelve { clientSecret, paymentIntentId }.
  *
+ * La usan dos pantallas: los botones de billetera (source = "express-checkout") y el
+ * formulario de pago nuevo tipo "Payment Element" (source = "payment-element", que
+ * además permite métodos con redirección como Klarna o Cash App).
+ *
  * El monto SIEMPRE lo calcula el servidor desde el catálogo (igual que
  * create-checkout-prueba): el navegador solo manda ids y cantidades.
  * Solo productos DIGITALES (sin envío). El webhook entrega el producto cuando
@@ -40,6 +44,7 @@ const json = (body: unknown, status = 200) =>
 const BodySchema = z.object({
   environment: z.enum(["sandbox", "live"]).default("sandbox"),
   action: z.enum(["quote", "create"]),
+  source: z.enum(["express-checkout", "payment-element"]).default("express-checkout"),
   items: z.array(z.object({
     id: z.string().min(1).max(180),
     quantity: z.number().int().min(1).max(50),
@@ -135,7 +140,7 @@ Deno.serve(async (req) => {
     const deliverySkus = normalizeSkus(pricing.items.map((i) => i.sku)).join(",").slice(0, 490);
 
     const metadata = {
-      source: "express-checkout",
+      source: body.source,
       customer_email: email,
       customer_name: fullName,
       customer_phone: body.contact.phone ?? "",
@@ -168,7 +173,10 @@ Deno.serve(async (req) => {
       receipt_email: email,
       description: productSummary || "iLingue Relax Digital",
       setup_future_usage: "off_session",
-      automatic_payment_methods: { enabled: true, allow_redirects: "never" },
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: body.source === "payment-element" ? "always" : "never",
+      },
       metadata,
     });
 

@@ -2994,19 +2994,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         </p>
       )}
 
-      <div className="flex items-center justify-center gap-1.5 mb-2 text-[11px] text-neutral-500 dark:text-neutral-400">
-        <Lock className="w-3 h-3" />
-        <span>
-          {language === "en"
-            ? "7-day guarantee — Secure payment."
-            : language === "pt"
-            ? "Garantia de 7 dias — Pagamento seguro."
-            : language === "fr"
-            ? "Garantie de 7 jours — Paiement sécurisé."
-            : "Garantía de 7 días — Pago seguro."}
-        </span>
-      </div>
-
       {/* Con tarjeta no hay botón aparte (el de pagar es el de Stripe) y sin método elegido tampoco.
           Para transferencia, efectivo, dLocal Go y Hotmart se mantiene, sin monto en USD. */}
       {!!selected && selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "dlocal_card" && !["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && (

@@ -1,5 +1,5 @@
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, lazy, Suspense } from "react";
 import { useNavigate, useParams, Navigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
@@ -24,6 +24,8 @@ import { type Currency } from "@/i18n";
 import { useI18n } from "@/i18n/I18nContext";
 import { UrgencyTimerBar } from "@/components/UrgencyTimerBar";
 import { PinterestSave } from "@/components/PinterestSave";
+
+const MagliaRelaxLanding = lazy(() => import("@/components/landing/MagliaRelaxLanding").then(m => ({ default: m.MagliaRelaxLanding })));
 
 const CIVIL_SKU = "1-000-palabras-ingles-mas-utilizadas-en-ingenieria-civil-n6mm";
 
@@ -75,6 +77,9 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
   }, []);
 
   const pricingAdmin = useAdminPricing(ADMIN_SKU);
+  // Curso de video de tejido (Maglia Relax): usa la landing italiana propia en lugar de las secciones de PDF.
+  const isCourse = pricingAdmin.learnerLanguage === "it" && ADMIN_SKU.startsWith("maglia-relax");
+  const courseReviewCount = pricingAdmin.reviewCount ?? 0;
   const tier = useCountryTierRouting(ADMIN_SKU, {
     tiendaPath: TIENDA_CHECKOUT_PATH,
   });
@@ -211,13 +216,13 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         image={heroImageAbsolute}
         type="product"
         price={PRICE_USD.toString()}
-        originalPrice={(PRICE_USD * 2.5).toString()}
-        rating={pricingAdmin.rating?.toString() ?? "4.9"}
-        reviewCount={pricingAdmin.reviewCount?.toString() ?? "6"}
+        originalPrice={isCourse ? undefined : (PRICE_USD * 2.5).toString()}
+        rating={isCourse && courseReviewCount === 0 ? undefined : (pricingAdmin.rating?.toString() ?? "4.9")}
+        reviewCount={isCourse && courseReviewCount === 0 ? undefined : (pricingAdmin.reviewCount?.toString() ?? "6")}
         sku={ADMIN_SKU}
         keywords="inglés para ingeniería civil, vocabulario ingeniería civil en inglés, palabras técnicas ingeniería civil, inglés técnico construcción, diccionario ingeniería civil inglés español, ebook inglés ingeniería pdf"
-        reviews={productReviews}
-        faqItems={[
+        reviews={isCourse ? undefined : productReviews}
+        faqItems={isCourse ? undefined : [
           { question: `¿Por qué cuesta solo ${tier.priceLabel}?`, answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba." },
           { question: "¿Qué incluye este ebook?", answer: "Las 1,000 palabras más utilizadas en Ingeniería Civil con traducción al español, pronunciación adaptada y ejemplos de uso en contexto real." },
           { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Recibes la descarga inmediata después del pago. Puedes leerlo en móvil, tablet, computadora o imprimirlo." },
@@ -284,6 +289,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
                 {productDescription}
               </p>
 
+              {(!isCourse || courseReviewCount > 0) && (
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-4">
                 <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
@@ -300,6 +306,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
                   ({pricingAdmin.reviewCount ?? 6} {t.product.verifiedReviews})
                 </span>
               </div>
+              )}
 
               <PrecioEconomicoBanner />
 
@@ -344,8 +351,21 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         </div>
       </section>
 
+      {isCourse && (
+        <div className="container px-4 md:px-6">
+          <Suspense fallback={<div className="h-96 w-full rounded-2xl bg-muted animate-pulse" />}>
+            <MagliaRelaxLanding
+              galleryImages={pricingAdmin.galleryImages ?? []}
+              ctaLabel={pricingReady ? `Lo voglio — ${priceLabel}` : "Lo voglio"}
+              ctaDisabled={!pricingReady}
+              onBuy={handleBuy}
+            />
+          </Suspense>
+        </div>
+      )}
+
       {/* Vista previa real (imágenes de la galería del admin de productos) */}
-      {galleryPreviews.length > 0 && (
+      {!isCourse && galleryPreviews.length > 0 && (
         <section className="py-10 md:py-14">
           <div className="container px-4 md:px-6">
             <div className="max-w-5xl mx-auto">
@@ -410,6 +430,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
       )}
 
       {/* What's included */}
+      {!isCourse && (
       <section className="py-8 md:py-10 bg-muted/30">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
@@ -431,8 +452,10 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Testimonios y reseñas */}
+      {!isCourse && (
       <section className="py-10 md:py-14">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
@@ -511,7 +534,9 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
           </div>
         </div>
       </section>
+      )}
 
+      {!isCourse && (
       <FAQ
         items={[
           { question: t.productFaq.specialTitle, answer: t.productFaq.specialAnswer, icon: Sparkles },
@@ -522,6 +547,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas"
       />
+      )}
 
       <Footer />
 
@@ -529,14 +555,14 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         sku={ADMIN_SKU}
         goesToInternalCheckout={true}
         price={priceLabel}
-        originalPrice={originalLabel}
+        originalPrice={isCourse ? undefined : originalLabel}
         currencyCode={displayCurrency}
         usdValue={PRICE_USD}
         flag={tier.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
         productName={productName}
         rating={pricingAdmin.rating != null ? pricingAdmin.rating : 4.9}
         reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}
-        showReviews={true}
+        showReviews={!isCourse || courseReviewCount > 0}
         onBuyClick={handleBuy}
         ctaText={pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
         isLoading={!pricingReady}

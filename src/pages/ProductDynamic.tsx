@@ -50,6 +50,7 @@ import koreanIndexAsset from "@/assets/previews/korean-2000-index.asset.json";
 
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
+const MagliaRelaxLanding = lazy(() => import("@/components/landing/MagliaRelaxLanding").then(m => ({ default: m.MagliaRelaxLanding })));
 const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then(m => ({ default: m.LooxStyleReviews })));
 
 
@@ -279,6 +280,8 @@ const ProductDynamic = () => {
   
   const isEs = product.learner_language === "es";
   const isIt = product.learner_language === "it";
+  // Curso de video de tejido (Maglia Relax): usa la landing italiana propia en lugar de las secciones de PDF.
+  const isCourse = isIt && product.sku.startsWith("maglia-relax");
   // Textos cortos en 3 idiomas: español (es), italiano (it) y, para el resto, inglés.
   const tx = (es: string, en: string, it: string) => (isIt ? it : isEs ? es : en);
 
@@ -427,8 +430,8 @@ const ProductDynamic = () => {
         type="product"
         price={String(effectiveUsd)}
         sku={product.sku}
-        rating={String(reviewsRating)}
-        reviewCount={String(reviewsCount)}
+        rating={isCourse && reviewsCount === 0 ? undefined : String(reviewsRating)}
+        reviewCount={isCourse && reviewsCount === 0 ? undefined : String(reviewsCount)}
         availability="InStock"
         isPhysical={false}
       />
@@ -438,6 +441,7 @@ const ProductDynamic = () => {
       <main className="pt-0 pb-2">
         <div className="container px-4 sm:px-6">
           {/* Trust Pilot Badge */}
+          {!isCourse && (
           <div className="flex justify-center mb-1">
             <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-emerald-200 shadow-sm">
               <div className="flex items-center gap-0.5">
@@ -449,6 +453,7 @@ const ProductDynamic = () => {
               <span className="text-[9px] font-bold text-emerald-600">★ Trustpilot</span>
             </div>
           </div>
+          )}
 
           <div className="grid lg:grid-cols-2 gap-4 items-start">
             {/* Left Column: Image Gallery */}
@@ -468,7 +473,7 @@ const ProductDynamic = () => {
                   description={`${product.name} — ${product.description || "PDF con pronunciación · iLingue Relax"}`}
                 />
                 <div className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black shadow-lg">
-                  <Download className="w-4 h-4" /> DIGITAL PDF — INSTANT ACCESS
+                  <Download className="w-4 h-4" /> {isCourse ? "VIDEOLEZIONI — ACCESSO IMMEDIATO" : "DIGITAL PDF — INSTANT ACCESS"}
                 </div>
               </div>
 
@@ -492,6 +497,7 @@ const ProductDynamic = () => {
 
             {/* Right Column: Copy & Pricing */}
             <div className="space-y-2">
+              {(!isCourse || reviewsCount > 0) && (
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
@@ -500,6 +506,7 @@ const ProductDynamic = () => {
                 </div>
                 <span className="text-[10px] font-bold text-slate-600">{reviewsRating}/5 ({reviewsCount}+ {tx("reseñas", "reviews", "recensioni")})</span>
               </div>
+              )}
 
               <h1 className="text-xl md:text-3xl font-black leading-tight text-slate-900 tracking-tight">
                 {product.name}
@@ -520,11 +527,11 @@ const ProductDynamic = () => {
                   ) : (
                     <span className="h-9 md:h-10 w-24 rounded-lg bg-foreground/10 animate-pulse" aria-hidden="true" />
                   )}
-                  {priceReady && discountPercentage > 0 && (
+                  {priceReady && discountPercentage > 0 && !isCourse && (
                     <span className="text-xl text-muted-foreground line-through opacity-70 mb-1">{originalFormatted}</span>
                   )}
                 </div>
-                {priceReady && discountPercentage > 0 && (
+                {priceReady && discountPercentage > 0 && !isCourse && (
                   <div className="inline-block px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-black mb-3">
                     {tx(`AHORRA ${discountPercentage}%`, `SAVE ${discountPercentage}%`, `RISPARMIA ${discountPercentage}%`)}
                   </div>
@@ -541,7 +548,7 @@ const ProductDynamic = () => {
                     : tx("Lo quiero", "I want it", "Lo voglio")}
                 </Button>
 
-                <StockAlert count={7} className="mt-2 w-full justify-center" />
+                {!isCourse && <StockAlert count={7} className="mt-2 w-full justify-center" />}
 
 
                 <div className="flex items-center justify-between pt-3 border-t border-slate-200">
@@ -566,7 +573,7 @@ const ProductDynamic = () => {
                   <Smartphone className="w-5 h-5 text-emerald-600" />
                   <div>
                     <div className="text-[9px] font-black uppercase text-slate-400">{tx("Formato", "Format", "Formato")}</div>
-                    <div className="text-[11px] font-bold text-slate-700">PDF digital</div>
+                    <div className="text-[11px] font-bold text-slate-700">{isCourse ? "Videolezioni" : "PDF digital"}</div>
 
                   </div>
                 </div>
@@ -575,6 +582,7 @@ const ProductDynamic = () => {
           </div>
 
           {/* Features Section */}
+          {!isCourse && (
           <section className="mt-4 py-3 border-t border-slate-100">
             <div className="grid lg:grid-cols-2 gap-6">
               <div>
@@ -601,8 +609,10 @@ const ProductDynamic = () => {
               </div>
             </div>
           </section>
+          )}
 
           {/* Look Inside Gallery */}
+          {!isCourse && (
           <section className="mt-4 py-3 bg-slate-900 rounded-[1.5rem] text-white overflow-hidden">
             <div className="px-4 md:px-8">
               <div className="text-center mb-4">
@@ -643,6 +653,18 @@ const ProductDynamic = () => {
               </div>
             </div>
           </section>
+          )}
+
+          {isCourse && (
+            <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+              <MagliaRelaxLanding
+                galleryImages={product.gallery_images || []}
+                ctaLabel={priceReady ? `Lo voglio — ${displayFormatted}` : "Lo voglio"}
+                ctaDisabled={!priceReady}
+                onBuy={handleBuy}
+              />
+            </Suspense>
+          )}
           
           {(product.sku === "coreano-100-mapas-mentales" || 
             product.sku === "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca") && (
@@ -651,7 +673,7 @@ const ProductDynamic = () => {
             </div>
           )}
 
-          {product.sku !== "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca" && (
+          {!isCourse && product.sku !== "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca" && (
             <Suspense fallback={<Skeleton className="h-96 w-full" />}>
               <LooxStyleReviews />
             </Suspense>
@@ -687,6 +709,7 @@ const ProductDynamic = () => {
           )}
 
 
+          {!isCourse && (
           <Suspense fallback={<Skeleton className="h-48 w-full" />}>
             <FAQ 
               title={tx("Preguntas frecuentes", "FAQ", "Domande frequenti")} 
@@ -722,6 +745,7 @@ const ProductDynamic = () => {
             />
 
           </Suspense>
+          )}
 
           {product.sku === "5-000-spanish-words-with-english-pronunciation-digital" && (
             <div className="max-w-4xl mx-auto px-4 mb-4">
@@ -759,7 +783,8 @@ const ProductDynamic = () => {
       <StickyBuyBar
         sku={product.sku}
         price={displayFormatted}
-        originalPrice={originalFormatted}
+        originalPrice={isCourse ? undefined : originalFormatted}
+        showReviews={!isCourse || reviewsCount > 0}
         currencyCode={displayCurrencyCode}
         flag={flag}
         rating={reviewsRating}

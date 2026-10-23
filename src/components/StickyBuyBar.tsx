@@ -30,6 +30,8 @@ interface StickyBuyBarProps {
   isSecondaryLoading?: boolean;
   ctaClassName?: string;
   isPhysical?: boolean;
+  /** "course" = videolecciones grabadas (no PDF). Por defecto "pdf". */
+  productKind?: "pdf" | "course";
   /** Disables pulsing/scaling animations for accessibility (e.g. older audiences) */
   calmMode?: boolean;
   /** Currency code label shown next to price (e.g. "USD", "COP", "ARS"). Defaults to "USD". */
@@ -68,6 +70,7 @@ export const StickyBuyBar = ({
   isSecondaryLoading = false,
   ctaClassName,
   isPhysical = false,
+  productKind = "pdf",
   calmMode = false,
   currencyCode = "USD",
   dismissible = false,
@@ -479,7 +482,7 @@ export const StickyBuyBar = ({
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 ml-2 animate-spin" />
-                    Processing...
+                    {productKind === "course" ? tr("Loading...", "Cargando...", "Caricamento...") : "Processing..."}
                   </>
                 ) : (
                   <>
@@ -490,7 +493,7 @@ export const StickyBuyBar = ({
               </Button>
               {/* Mobile trust microcopy */}
               {!disabled && !secondaryCtaText && (
-                <div className="flex items-center justify-center gap-3 text-[10px] text-muted-foreground">
+                <div className={`flex items-center justify-center text-[10px] text-muted-foreground ${productKind === "course" ? "flex-wrap gap-x-3 gap-y-1" : "gap-3"}`}>
                   <span className="flex items-center gap-1">
                     <Shield className="w-3 h-3 text-emerald-600" />
                     {tr("Secure", "Pago Seguro", "Pagamento sicuro")}
@@ -499,7 +502,9 @@ export const StickyBuyBar = ({
                     <Check className="w-3 h-3 text-emerald-600" />
                     {isPhysical
                       ? (tr("Printed book", "Libro impreso", "Libro stampato"))
-                      : (tr("PDF · not a live course", "PDF · no son clases", "PDF · non è un corso dal vivo"))}
+                      : productKind === "course"
+                        ? (tr("Recorded video lessons", "Videolecciones grabadas", "Videolezioni registrate"))
+                        : (tr("PDF · not a live course", "PDF · no son clases", "PDF · non è un corso dal vivo"))}
                   </span>
 
                   <span className="flex items-center gap-1">
@@ -636,7 +641,7 @@ export const StickyBuyBar = ({
               {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 ml-2 animate-spin" />
-                  Processing...
+                  {productKind === "course" ? tr("Loading...", "Cargando...", "Caricamento...") : "Processing..."}
                 </>
               ) : (
                 <>

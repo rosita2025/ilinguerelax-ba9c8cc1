@@ -23,6 +23,7 @@ import { type Currency } from "@/i18n";
 import { useI18n } from "@/i18n/I18nContext";
 import { UrgencyTimerBar } from "@/components/UrgencyTimerBar";
 import { PinterestSave } from "@/components/PinterestSave";
+import { getRealReviewStats } from "@/components/landing/magliaRelaxData";
 
 const MagliaRelaxLanding = lazy(() => import("@/components/landing/MagliaRelaxLanding").then(m => ({ default: m.MagliaRelaxLanding })));
 
@@ -80,7 +81,10 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
   const isCourse = pricingAdmin.learnerLanguage === "it" && ADMIN_SKU.startsWith("maglia-relax");
   // Italian course (maglia-relax): CTA in Italian — other products keep "LO QUIERO"
   const ctaBase = isCourse ? "LO VOGLIO" : "LO QUIERO";
-  const courseReviewCount = pricingAdmin.reviewCount ?? 0;
+  // Curso: NUNCA usamos rating/nº de reseñas del admin (pueden ser valores por defecto).
+  // Solo reseñas reales cargadas en landing/magliaRelaxData.ts.
+  const realReviews = getRealReviewStats();
+  const courseReviewCount = realReviews.count;
   const tier = useCountryTierRouting(ADMIN_SKU, {
     tiendaPath: TIENDA_CHECKOUT_PATH,
   });
@@ -120,7 +124,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
   const addToCartItem = () => {
     addItem({
       id: ADMIN_SKU,
-      name: `${productName} (PDF)`,
+      name: isCourse ? productName : `${productName} (PDF)`,
       price: PRICE_USD,
       regionPrices: {
         latam: LATAM_USD,
@@ -175,10 +179,10 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
       num_items: 1,
     });
     addToCartItem();
-    toast.success("Producto agregado al carrito", {
-      description: "Puedes seguir explorando o ir al checkout.",
+    toast.success(isCourse ? "Prodotto aggiunto al carrello" : "Producto agregado al carrito", {
+      description: isCourse ? "Puoi continuare a esplorare o andare al checkout." : "Puedes seguir explorando o ir al checkout.",
       action: {
-        label: "Ir al checkout",
+        label: isCourse ? "Vai al checkout" : "Ir al checkout",
         onClick: () => navigate(TIENDA_CHECKOUT_PATH),
       },
     });
@@ -209,7 +213,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
 
   return (
     <main className="min-h-screen bg-background">
-      <UrgencyTimerBar productSlug={ADMIN_SKU} language="es" />
+      {!isCourse && <UrgencyTimerBar productSlug={ADMIN_SKU} language="es" />}
       <SEO
         title={pricingAdmin.name ?? "1,000 Palabras en Inglés de Ingeniería Civil PDF"}
         description={pricingAdmin.description ?? (isCivil ? DEFAULT_DESCRIPTION : "")}
@@ -218,8 +222,8 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         type="product"
         price={PRICE_USD.toString()}
         originalPrice={isCourse ? undefined : (PRICE_USD * 2.5).toString()}
-        rating={isCourse && courseReviewCount === 0 ? undefined : (pricingAdmin.rating?.toString() ?? "4.9")}
-        reviewCount={isCourse && courseReviewCount === 0 ? undefined : (pricingAdmin.reviewCount?.toString() ?? "6")}
+        rating={isCourse ? (courseReviewCount === 0 ? undefined : realReviews.average.toFixed(1)) : (pricingAdmin.rating?.toString() ?? "4.9")}
+        reviewCount={isCourse ? (courseReviewCount === 0 ? undefined : String(courseReviewCount)) : (pricingAdmin.reviewCount?.toString() ?? "6")}
         sku={ADMIN_SKU}
         keywords="inglés para ingeniería civil, vocabulario ingeniería civil en inglés, palabras técnicas ingeniería civil, inglés técnico construcción, diccionario ingeniería civil inglés español, ebook inglés ingeniería pdf"
         reviews={isCourse ? undefined : productReviews}
@@ -278,7 +282,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20">
-                  🆕 Nuevo Lanzamiento
+                  {isCourse ? "🆕 Nuova uscita" : "🆕 Nuevo Lanzamiento"}
                 </span>
               </div>
 
@@ -303,16 +307,16 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
                   ))}
                 </div>
                 <span className="font-bold text-sm sm:text-base text-foreground">
-                  {pricingAdmin.rating != null ? pricingAdmin.rating.toFixed(1) : "4.9"}/5
+                  {isCourse ? realReviews.average.toFixed(1) : (pricingAdmin.rating != null ? pricingAdmin.rating.toFixed(1) : "4.9")}/5
                 </span>
                 <span className="text-xs sm:text-sm text-muted-foreground">
-                  ({pricingAdmin.reviewCount ?? 6} {t.product.verifiedReviews})
+                  ({isCourse ? courseReviewCount : (pricingAdmin.reviewCount ?? 6)} {isCourse ? "recensioni" : t.product.verifiedReviews})
                 </span>
               </div>
               )}
 
               <div className="mb-6 flex items-center justify-between bg-muted/30 p-3 rounded-xl border border-border/50">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Pagos Seguros:</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{isCourse ? "Pagamenti sicuri:" : "Pagos Seguros:"}</span>
                 <PaymentLogos />
               </div>
 
@@ -331,7 +335,9 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
               </motion.div>
 
               <p className="text-center text-xs text-muted-foreground mb-3">
-                🔒 Pago seguro • ⬇️ Descarga inmediata • 🛡️ Garantía 7 días
+                {isCourse
+                  ? "🔒 Pagamento sicuro • ▶️ Accesso immediato • 🛡️ Garanzia 7 giorni"
+                  : "🔒 Pago seguro • ⬇️ Descarga inmediata • 🛡️ Garantía 7 días"}
               </p>
 
               <button
@@ -339,10 +345,10 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
                 onClick={handleAddToCart}
                 className="w-full mb-4 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors"
               >
-                o agregar al carrito
+                {isCourse ? "oppure aggiungi al carrello" : "o agregar al carrito"}
               </button>
 
-              {galleryPreviews.length > 0 && (
+              {galleryPreviews.length > 0 && !isCourse && (
                 <p className="text-center text-sm text-muted-foreground mb-6">
                   👇 Mira la vista previa real antes de comprar
                 </p>
@@ -561,8 +567,10 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         usdValue={PRICE_USD}
         flag={tier.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
         productName={productName}
-        rating={pricingAdmin.rating != null ? pricingAdmin.rating : 4.9}
-        reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}
+        rating={isCourse ? realReviews.average : (pricingAdmin.rating != null ? pricingAdmin.rating : 4.9)}
+        reviewCount={isCourse ? courseReviewCount : (pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6)}
+        lang={isCourse ? "it" : undefined}
+        productKind={isCourse ? "course" : "pdf"}
         showReviews={!isCourse || courseReviewCount > 0}
         onBuyClick={handleBuy}
         ctaText={pricingReady ? `${ctaBase} • ${priceLabel}` : ctaBase}
@@ -572,8 +580,8 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
 
       <div className="h-20 md:h-16" />
 
-      <SalesNotification />
-      <WhatsAppButton url="https://wa.link/5ta2ea" label="¿Dudas?" />
+      {!isCourse && <SalesNotification />}
+      <WhatsAppButton url="https://wa.link/5ta2ea" label={isCourse ? "Dubbi?" : "¿Dudas?"} />
       <ScrollToTop showAfter={500} />
     </main>
   );

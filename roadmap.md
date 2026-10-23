@@ -14,3 +14,4 @@
 - [x] Verify Italian language isolation and existing Spanish checkout; 23 tests passed, compilation successful, no Italian-audience catalog products exist yet. No test purchases or emails.
 - [x] Add Italian email templates and audience selection while retaining delivery and payment behavior.
 - [x] Verify email language rules locally (19 tests passed and all six changed server files passed syntax compilation) and deploy the ten requested functions without test sends.
+- [x] Apply Maglia Relax course-only adjustments and add three videos and presentation image; seven tests passed, mobile/desktop presentation and Spanish product isolation checked, CDN video access confirmed. Playback could not be verified in the local browser; no purchases or emails.

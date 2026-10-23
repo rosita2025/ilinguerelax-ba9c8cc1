@@ -1,6 +1,7 @@
-import { Check, Play, Shield, Smartphone, Mail, Heart, HelpCircle } from "lucide-react";
+import { Check, Play, Shield, Smartphone, Mail, Heart, HelpCircle, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FAQ } from "@/components/FAQ";
+import { INCLUDES_PDF, ADDS_NEW_LESSONS, REAL_REVIEWS, REELS, PRESENTATION_IMAGE, type ReelVideo } from "./magliaRelaxData";
 
 /**
  * Landing en italiano para el curso de video "Maglia Relax".
@@ -13,20 +14,41 @@ import { FAQ } from "@/components/FAQ";
  *  - No inventar reseñas ni resultados.
  */
 
-// ── Cosas que Rosa decide (cambia true/false y listo) ─────────────────────────
-/** ¿El producto incluye una guía en PDF además de los videos? */
-const INCLUDES_PDF = false;
-/** ¿Vas a agregar videos nuevos con el tiempo? Solo pon true si lo vas a cumplir. */
-const ADDS_NEW_LESSONS = false;
+// Interruptores, reseñas reales y videos (reels) se editan en ./magliaRelaxData.ts
 
-// ── Reseñas REALES. Vacío = la sección no aparece. ───────────────────────────
-// Ejemplo: { name: "Giulia", city: "Torino", text: "..." }
-interface RealReview {
-  name: string;
-  city?: string;
-  text: string;
-}
-const REAL_REVIEWS: RealReview[] = [];
+/** Convierte un link de YouTube en link para incrustar; si no es YouTube devuelve null. */
+const youtubeEmbed = (src: string): string | null => {
+  const m = src.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([\w-]{11})/);
+  return m ? `https://www.youtube-nocookie.com/embed/${m[1]}?rel=0&playsinline=1` : null;
+};
+
+const ReelCard = ({ reel, index }: { reel: ReelVideo; index: number }) => {
+  const embed = youtubeEmbed(reel.src);
+  return (
+    <div className="relative w-[70%] sm:w-auto shrink-0 snap-center aspect-[9/16] rounded-2xl overflow-hidden bg-foreground border border-border shadow-sm">
+      {embed ? (
+        <iframe
+          src={embed}
+          title={`Video ${index + 1}`}
+          loading="lazy"
+          allow="accelerometer; encrypted-media; picture-in-picture"
+          allowFullScreen
+          className="absolute inset-0 w-full h-full"
+        />
+      ) : (
+        <video
+          src={reel.src}
+          poster={reel.poster}
+          aria-label={`Video ${index + 1} di Maglia Relax`}
+          controls
+          playsInline
+          preload="metadata"
+          className="absolute inset-0 w-full h-full object-contain"
+        />
+      )}
+    </div>
+  );
+};
 
 // ── Textos ────────────────────────────────────────────────────────────────────
 const PRESENTATION_SUBTITLE =
@@ -146,6 +168,14 @@ export const MagliaRelaxLanding = ({
           </h2>
           <p className="text-base md:text-lg font-semibold text-slate-800 mb-2">{PRESENTATION_SUBTITLE}</p>
           <p className="text-sm text-muted-foreground mb-4">{PRESENTATION_TEXT}</p>
+          <img
+            src={PRESENTATION_IMAGE}
+            alt="Videolezioni di maglia su tablet, con ferri e gomitoli"
+            width={768}
+            height={768}
+            loading="lazy"
+            className="mx-auto mb-4 w-full max-w-lg rounded-2xl"
+          />
           <ul className="grid sm:grid-cols-2 gap-2 text-left mb-5">
             {PRESENTATION_POINTS.map((p) => (
               <li
@@ -262,6 +292,22 @@ export const MagliaRelaxLanding = ({
         </div>
       </section>
 
+      {/* 5b. Video reali (solo se ci sono) */}
+      {REELS.length > 0 && (
+        <section className="py-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight mb-3 text-center">
+              Guarda come si lavora a maglia
+            </h2>
+            <div className="flex sm:grid sm:grid-cols-3 gap-3 overflow-x-auto sm:overflow-visible snap-x snap-mandatory pb-2">
+              {REELS.slice(0, 3).map((reel, i) => (
+                <ReelCard key={`${reel.src}-${i}`} reel={reel} index={i} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* 6. Lavori fatti a mano (solo foto reali) */}
       {photos.length > 0 && (
         <section className="py-4">
@@ -294,11 +340,22 @@ export const MagliaRelaxLanding = ({
             <div className="grid md:grid-cols-2 gap-3">
               {REAL_REVIEWS.map((r, i) => (
                 <figure key={i} className="p-4 rounded-2xl bg-white border border-slate-100 shadow-sm">
+                  <div className="flex items-center gap-0.5 mb-1.5" aria-label={`${r.stars} stelle su 5`}>
+                    {[...Array(5)].map((_, n) => (
+                      <Star
+                        key={n}
+                        className={`w-4 h-4 ${n < r.stars ? "fill-amber-400 text-amber-400" : "text-slate-300"}`}
+                      />
+                    ))}
+                  </div>
                   <blockquote className="text-sm text-slate-700 leading-snug mb-2">“{r.text}”</blockquote>
                   <figcaption className="text-xs font-bold text-slate-500">
                     {r.name}
                     {r.city ? `, ${r.city}` : ""}
                   </figcaption>
+                  {r.freeAccess && (
+                    <p className="text-[11px] text-slate-400 mt-1">Ha ricevuto l'accesso gratuito al corso.</p>
+                  )}
                 </figure>
               ))}
             </div>

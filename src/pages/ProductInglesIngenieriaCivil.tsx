@@ -23,7 +23,7 @@ import { type Currency } from "@/i18n";
 import { useI18n } from "@/i18n/I18nContext";
 import { UrgencyTimerBar } from "@/components/UrgencyTimerBar";
 import { PinterestSave } from "@/components/PinterestSave";
-import { getRealReviewStats, getStickyTestimonials } from "@/components/landing/magliaRelaxData";
+import { getCourseStickyReviewStats, getRealReviewStats, getStickyTestimonials } from "@/components/landing/magliaRelaxData";
 
 const MagliaRelaxLanding = lazy(() => import("@/components/landing/MagliaRelaxLanding").then(m => ({ default: m.MagliaRelaxLanding })));
 
@@ -81,10 +81,10 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
   const isCourse = pricingAdmin.learnerLanguage === "it" && ADMIN_SKU.startsWith("maglia-relax");
   // Italian course (maglia-relax): CTA in Italian — other products keep "LO QUIERO"
   const ctaBase = isCourse ? "LO VOGLIO" : "LO QUIERO";
-  // Curso: NUNCA usamos rating/nº de reseñas del admin (pueden ser valores por defecto).
-  // Solo reseñas reales cargadas en landing/magliaRelaxData.ts.
+  // Written reviews and SEO stay sourced from supplied real reviews.
   const realReviews = getRealReviewStats();
   const courseReviewCount = realReviews.count;
+  const courseStickyReviews = getCourseStickyReviewStats(pricingAdmin.rating, pricingAdmin.reviewCount);
   const tier = useCountryTierRouting(ADMIN_SKU, {
     tiendaPath: TIENDA_CHECKOUT_PATH,
   });
@@ -567,12 +567,12 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         usdValue={PRICE_USD}
         flag={tier.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
         productName={productName}
-        rating={isCourse ? realReviews.average : (pricingAdmin.rating != null ? pricingAdmin.rating : 4.9)}
-        reviewCount={isCourse ? courseReviewCount : (pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6)}
+        rating={isCourse ? courseStickyReviews.average : (pricingAdmin.rating != null ? pricingAdmin.rating : 4.9)}
+        reviewCount={isCourse ? courseStickyReviews.count : (pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6)}
         lang={isCourse ? "it" : undefined}
         productKind={isCourse ? "course" : "pdf"}
         testimonials={isCourse && courseReviewCount > 0 ? getStickyTestimonials() : undefined}
-        showReviews={!isCourse || courseReviewCount > 0}
+        showReviews={!isCourse || courseStickyReviews.count > 0}
         onBuyClick={handleBuy}
         ctaText={pricingReady ? `${ctaBase} • ${priceLabel}` : ctaBase}
         isLoading={!pricingReady}

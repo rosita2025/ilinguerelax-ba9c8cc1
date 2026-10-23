@@ -325,7 +325,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
                   disabled={!pricingReady}
                 >
                   <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-                  {pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
+                  {pricingReady ? `${ctaBase} • ${priceLabel}` : ctaBase}
                   <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
                 </Button>
               </motion.div>
@@ -565,7 +565,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}
         showReviews={!isCourse || courseReviewCount > 0}
         onBuyClick={handleBuy}
-        ctaText={pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
+        ctaText={pricingReady ? `${ctaBase} • ${priceLabel}` : ctaBase}
         isLoading={!pricingReady}
         localUsdPrices={pricingAdmin.localUsdPrices}
       />

@@ -482,7 +482,7 @@ export const StickyBuyBar = ({
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 ml-2 animate-spin" />
-                    {productKind === "course" ? tr("Loading...", "Cargando...", "Caricamento...") : "Processing..."}
+                    {productKind === "course" ? tr("Loading...", "Cargando...", "Caricamento...") : tr("Loading...", "Cargando...", "Caricamento...")}
                   </>
                 ) : (
                   <>
@@ -641,7 +641,7 @@ export const StickyBuyBar = ({
               {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 ml-2 animate-spin" />
-                  {productKind === "course" ? tr("Loading...", "Cargando...", "Caricamento...") : "Processing..."}
+                  {productKind === "course" ? tr("Loading...", "Cargando...", "Caricamento...") : tr("Loading...", "Cargando...", "Caricamento...")}
                 </>
               ) : (
                 <>

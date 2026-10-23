@@ -3,8 +3,8 @@ import { X, MessageCircle } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 
 const SESSION_KEY = "exit-coupon-shown-v1";
-// Sin temporizador: el popup solo sale cuando la persona da señal de irse
-// (mouse sale por arriba, botón "atrás" del celular, o vuelve a la pestaña).
+// Sin temporizador: el popup solo sale en escritorio cuando el mouse sale por arriba de la ventana.
+// En celular no sale (confundía a personas mayores y bloqueaba el botón "atrás").
 
 interface Props {
   language: string;
@@ -60,12 +60,10 @@ const COPY: Record<string, { title: string; sub: string; cta: string; close: str
  * llenó su correo (si ya lo llenó, el sistema de recuperación de carrito
  * ya puede contactarlo por email, así que este popup no hace falta).
  *
- * Señales de abandono usadas:
- * - Escritorio: el mouse sale por arriba de la ventana.
- * - Todos los dispositivos: vuelve a la pestaña después de estar en otra
- *   (cambiar de app/pestaña y regresar es una señal común de duda).
- * - Celular: primer botón/gesto "atrás" (se queda en el checkout y muestra el popup).
- * - SIN temporizador (decisión de Rosa): solo sale cuando hay señal de irse.
+ * Señal usada (solo escritorio con mouse): el mouse sale por arriba de la ventana.
+ * En celular no sale: volver a la pestaña es normal al pagar con la app del banco, y
+ * atrapar el botón "atrás" confundía a personas mayores.
+ * SIN temporizador (decisión de Rosa).
  *
  * NOTA: no es posible interceptar el cierre real de la pestaña/navegador
  * para mostrar un popup propio — los navegadores lo bloquean por seguridad
@@ -76,8 +74,6 @@ export function ExitIntentCouponPopup({ language }: Props) {
   const items = useCheckoutPruebaStore((s) => s.items);
   const [open, setOpen] = useState(false);
   const shownRef = useRef(false);
-  // Trampa del botón "atrás": se arma una sola vez (aunque el efecto se re-ejecute).
-  const trapArmedRef = useRef(false);
 
   useEffect(() => {
     if (shownRef.current) return;
@@ -96,53 +92,13 @@ export function ExitIntentCouponPopup({ language }: Props) {
       if (e.clientY <= 0) trigger();
     };
 
-    // 2) Vuelve a la pestaña después de estar en otra (todos los dispositivos).
-    let wasHidden = false;
-    const onVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        wasHidden = true;
-      } else if (document.visibilityState === "visible" && wasHidden) {
-        trigger();
-      }
-    };
-
-    // 3) Botón/gesto "atrás" (celular): la primera vez que la persona intenta volver
-    // atrás, NO la dejamos salir: mostramos el popup y el checkout sigue abierto.
-    // Si toca "No gracias" (o vuelve a presionar atrás), se va normal: sale con un solo gesto.
-    // Se activa después del primer toque, porque Chrome ignora entradas de historial
-    // creadas sin que la persona haya tocado la página.
-    const armBackTrap = () => {
-      if (trapArmedRef.current) return;
-      trapArmedRef.current = true;
-      try {
-        window.history.pushState({ exitTrap: true }, "", window.location.href);
-      } catch { /* sin historial disponible */ }
-    };
-    const onPopState = () => {
-      if (!trapArmedRef.current) return;
-      const emailNow = (useCheckoutPruebaStore.getState().buyer.email || "").trim();
-      if (shownRef.current || emailNow.length > 3) {
-        // Ya se mostró (o ya dejó su correo): dejarla salir con este mismo gesto.
-        trapArmedRef.current = false;
-        window.history.back();
-        return;
-      }
-      // Primera vez: quedarse en el checkout y mostrar el popup.
-      try {
-        window.history.pushState({ exitTrap: true }, "", window.location.href);
-      } catch { /* ignore */ }
-      trigger();
-    };
+    // Solo escritorio con mouse. En celular NO se muestra nada: ni al volver a la pestaña
+    // (mucha gente sale a su app del banco/Yape y regresa) ni al tocar "atrás".
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
     document.addEventListener("mouseleave", onMouseLeave);
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    window.addEventListener("pointerdown", armBackTrap, { once: true, passive: true });
-    window.addEventListener("popstate", onPopState);
     return () => {
       document.removeEventListener("mouseleave", onMouseLeave);
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener("pointerdown", armBackTrap);
-      window.removeEventListener("popstate", onPopState);
     };
   }, [buyerEmail]);
 

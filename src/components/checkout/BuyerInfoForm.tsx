@@ -346,7 +346,7 @@ export function BuyerInfoForm() {
           <button
             type="button"
             onClick={() => setShowPhoneField(true)}
-            className="text-[11px] text-primary hover:underline font-medium"
+            className="text-xs text-primary hover:underline font-medium py-2.5 -my-1"
           >
             + {t.whatsappOptional}
           </button>

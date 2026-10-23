@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Elements, ExpressCheckoutElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { Loader2, Lock } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
@@ -71,10 +71,6 @@ const Inner = ({
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // null = aún no se sabe; true = este dispositivo ofrece al menos una billetera rápida.
-  const [expressAvailable, setExpressAvailable] = useState<boolean | null>(null);
-  // Los pedidos con productos físicos no admiten pago rápido (lo rechaza el servidor).
-  const hasPhysical = useCheckoutPruebaStore((st) => st.items.some((i) => i.isPhysical));
 
   const runPayment = async (source: "payment-element" | "express-checkout") => {
     if (!stripe || !elements || busy) return;
@@ -141,8 +137,6 @@ const Inner = ({
   };
 
   const handlePay = () => runPayment("payment-element");
-  // Botones rápidos (Apple Pay / Google Pay / Link): mismo cobro, el monto lo calcula el servidor.
-  const handleExpressConfirm = () => runPayment("express-checkout");
 
   const s0 = useCheckoutPruebaStore.getState();
   return (
@@ -153,32 +147,10 @@ const Inner = ({
         </div>
       )}
       <div className={ready ? "" : "h-0 overflow-hidden opacity-0"}>
-        {!hasPhysical && (
-          <div className={expressAvailable ? "mb-3" : ""}>
-            <ExpressCheckoutElement
-              options={{
-                buttonHeight: 48,
-                layout: { maxColumns: 2, maxRows: 1 },
-                paymentMethods: { applePay: "auto", googlePay: "auto", link: "auto", amazonPay: "never", paypal: "never", klarna: "never" },
-              }}
-              onReady={({ availablePaymentMethods }) =>
-                setExpressAvailable(!!availablePaymentMethods && Object.values(availablePaymentMethods).some(Boolean))
-              }
-              onConfirm={handleExpressConfirm}
-            />
-            {expressAvailable && (
-              <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
-                <span className="h-px flex-1 bg-border" />
-                {t.or}
-                <span className="h-px flex-1 bg-border" />
-              </div>
-            )}
-          </div>
-        )}
         <PaymentElement
           options={{
             layout: { type: "tabs", defaultCollapsed: false },
-            // Las billeteras ya salen arriba como botones rápidos: no se repiten aquí.
+            // Apple Pay / Google Pay / Link ya están en "Pago rápido" (arriba de la página): no se repiten aquí.
             wallets: { applePay: "never", googlePay: "never" },
             // Nombre y correo ya los tenemos arriba: no se vuelven a pedir.
             fields: { billingDetails: { name: "never", email: "never", phone: "never" } },
@@ -293,6 +265,8 @@ export default function StripePaymentElementBox(props: Props) {
         amount: quote.amount,
         currency: quote.currency,
         setupFutureUsage: "off_session",
+        // Este formulario maneja solo tarjeta de crédito/débito; las billeteras rápidas van arriba.
+        paymentMethodTypes: ["card"],
         locale,
         appearance: { theme: "stripe" },
       }}

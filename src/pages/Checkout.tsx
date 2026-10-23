@@ -642,6 +642,11 @@ export default function Checkout() {
               <link rel="preload" as="script" href="https://js.stripe.com/v3" crossOrigin="anonymous" />
             </Helmet>
 
+            {/* Cuenta regresiva arriba de todo, encima del menú */}
+            {!items.some((i) => i.isPhysical) && (
+              <CheckoutOfferCountdown productSlug={catalogItem?.id ?? slug ?? "checkout"} language={language} />
+            )}
+
             <header className="border-b bg-background/95 backdrop-blur sticky top-0 z-30">
               <div className="max-w-6xl mx-auto px-3 sm:px-4 py-1.5 sm:py-2 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-3 min-w-0">
@@ -684,9 +689,6 @@ export default function Checkout() {
                       <p>Your cart contains physical and digital products. Digital access is instant after payment, while physical items require shipping details.</p>
                     </div>
                   </div>
-                )}
-                {!items.some((i) => i.isPhysical) && (
-                  <CheckoutOfferCountdown productSlug={catalogItem?.id ?? slug ?? "checkout"} language={language} />
                 )}
                 <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-900/30 rounded-xl p-3 flex gap-2.5 items-center mb-1">
                   <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" />

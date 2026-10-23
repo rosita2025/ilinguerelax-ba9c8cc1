@@ -1158,6 +1158,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       }
     }
     void captureAbandonedCheckout(m, true);
+    autoOpenBusy.current = false;
     if (m !== selected) setShowStripe(false);
     setSelected(m);
     setSelectedMethod(m);
@@ -2114,9 +2115,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const visibleMethods = orderedByAdmin.length > 0 ? orderedByAdmin : allMethods.filter(m => m.id === 'card' || m.id === 'hotmart');
   // Orden de secciones para que el checkout se lea de arriba a abajo sin saltos:
   // tarjetas → transferencias → efectivo → billeteras → otros (Hotmart al final).
-  const methods = [...visibleMethods].sort(
-    (a, b) => SECTION_ORDER.indexOf(methodSection(a.id)) - SECTION_ORDER.indexOf(methodSection(b.id)),
-  );
+  // Checkout de un solo método: únicamente la tarjeta crédito/débito de Stripe, en todos los
+  // países. Yape/Plin, dLocal Go, transferencias, efectivo, Hotmart, Binance, etc. NO se muestran
+  // (su código sigue en el proyecto; para volver a mostrarlos basta quitar este filtro).
+  const methods = [...visibleMethods]
+    .filter((m) => m.id === "card" && !m.methodKey)
+    .sort(
+      (a, b) => SECTION_ORDER.indexOf(methodSection(a.id)) - SECTION_ORDER.indexOf(methodSection(b.id)),
+    );
   const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m.id));
 
 
@@ -2126,7 +2132,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // el formulario embebido en cuanto el comprador completa sus datos, para
   // reducir clics y maximizar conversión (adultos mayores, jóvenes, adultos).
   useEffect(() => {
-    if (!isPeru && stripeMethodAvailable && !(total <= 0 && items.length > 0)) {
+    if (stripeMethodAvailable && !(total <= 0 && items.length > 0)) {
       // Solo autoseleccionar Stripe si el comprador NO ha elegido ya otro
       // método explícitamente (ej: PayPal, Binance). Antes forzaba "card"
       // en cada render y borraba la selección de PayPal al hacer click.
@@ -2135,9 +2141,36 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`);
       }
       const isStripeSel = selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected);
-      if (isStripeSel && valid && stripePromise && !showStripe) setShowStripe(true);
+      // En Perú el formulario lo abre el efecto de abajo (con el aviso de upsell).
+      if (!isPeru && isStripeSel && valid && stripePromise && !showStripe) setShowStripe(true);
     }
   }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
+
+  // Perú: al elegir tarjeta, el formulario de Stripe se abre solo, sin tener que pulsar
+  // ningún botón (fuera de Perú esto ya ocurre arriba). Se conserva el aviso
+  // "¿Te gustaría agregar…?" una sola vez por sesión, antes de abrir el formulario.
+  const autoOpenBusy = useRef(false);
+  useEffect(() => {
+    if (!isPeru) return;
+    const isStripeSel = !!selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected);
+    if (!isStripeSel || !valid || !stripePromise || showStripe || autoOpenBusy.current) return;
+    if (total <= 0 && items.length > 0) return;
+    autoOpenBusy.current = true;
+    const openNow = () => {
+      autoOpenBusy.current = false;
+      useCheckoutPruebaStore.getState().setClientSecret(null);
+      setShowStripe(true);
+    };
+    void (async () => {
+      try {
+        const popupShown = await offerUpsellThen(openNow);
+        if (!popupShown) openNow();
+      } catch {
+        openNow();
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPeru, selected, valid, stripePromise, showStripe, total, items.length]);
 
   // Validación automática: el método dLocal seleccionado y sus etiquetas deben
   // coincidir siempre con la cobertura activa de /admin/dlocal para el país
@@ -2950,33 +2983,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         </span>
       </div>
 
-      {selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "dlocal_card" && !(selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && showStripe) && (
-        <button
-          type="button"
-          onClick={handleBuyNow}
-          disabled={!selected || mpLoading !== null}
-          className={cn(
-            "w-full mt-4 py-4 rounded-xl font-bold text-white text-base transition-colors",
-            "bg-[hsl(142,72%,42%)] hover:bg-[hsl(142,72%,36%)]",
-            "flex items-center justify-center gap-2",
-            !valid && "cursor-pointer",
-          )}
-        >
-          {mpLoading ? (
-            <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
-          ) : selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) ? (
-            <><Lock className="w-4 h-4" /> {language === "en"
-              ? `Checkout Securely · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`
-              : language === "pt"
-                ? `Continuar para pagamento · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`
-                : language === "fr"
-                  ? `Continuer vers le paiement · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`
-                  : `Continuar de Pago · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`}</>
-          ) : (
-            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? `Checkout with Hotmart · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}` : `Pagar con Hotmart · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`) : `${t.buyNow} · ${pricingIsLoading ? "..." : `USD $${totalUsd}`}`}</>
-          )}
-        </button>
-      )}
+      {/* Sin botón "Comprar ahora": la tarjeta de Stripe se selecciona sola y su formulario
+          se abre en cuanto los datos del comprador son válidos; el botón de pagar es el de Stripe. */}
 
       <UpsellPopup
         offer={upsellPopup?.offer ?? null}

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 
 import { OrderSummary } from "@/components/checkout/OrderSummary";
+import { CheckoutOfferCountdown } from "@/components/checkout/CheckoutOfferCountdown";
 import { SectionErrorBoundary } from "@/components/SectionErrorBoundary";
 
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
@@ -301,11 +302,27 @@ export default function Checkout() {
   // respaldo (evita pasarle a getCheckoutUI un valor inválido).
   const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
   const learnerLang = catalogItem?.learnerLanguage;
+  // Último idioma resuelto para este producto: se usa de inmediato en la próxima
+  // visita mientras carga el catálogo, para que los textos no cambien de idioma
+  // a mitad de carga (inglés/español/italiano/…).
+  const langMemoryKey = `ilr_checkout_lang_${slug || "default"}`;
+  const rememberedLang = (() => {
+    try {
+      const v = localStorage.getItem(langMemoryKey);
+      return v && SUPPORTED_UI_LANGS.includes(v) ? v : null;
+    } catch { return null; }
+  })();
   const language = (
     slug === "patrones-ingles" || catalogItem?.adminSku === "patrones-especiales-alfabeto-combinaciones-secretas-ingles"
       ? "es"
-      : learnerLang && SUPPORTED_UI_LANGS.includes(learnerLang) ? learnerLang : siteLanguage
+      : learnerLang && SUPPORTED_UI_LANGS.includes(learnerLang)
+        ? learnerLang
+        : (rememberedLang ?? siteLanguage)
   ) as typeof siteLanguage;
+  useEffect(() => {
+    if (!catalogItem) return;
+    try { localStorage.setItem(langMemoryKey, language); } catch { /* sin almacenamiento */ }
+  }, [catalogItem, language, langMemoryKey]);
   const t = getCheckoutUI(language);
   const slugUnknown = !!slug && !catalogItem && !loadingDb && dbMissing;
   const upsellsFingerprint = JSON.stringify(catalogItem?.upsells?.map((u) => [u.id, u.price, u.pricePen, u.originalPrice]) ?? []);
@@ -667,6 +684,9 @@ export default function Checkout() {
                       <p>Your cart contains physical and digital products. Digital access is instant after payment, while physical items require shipping details.</p>
                     </div>
                   </div>
+                )}
+                {!items.some((i) => i.isPhysical) && (
+                  <CheckoutOfferCountdown productSlug={catalogItem?.id ?? slug ?? "checkout"} language={language} />
                 )}
                 <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-900/30 rounded-xl p-3 flex gap-2.5 items-center mb-1">
                   <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" />

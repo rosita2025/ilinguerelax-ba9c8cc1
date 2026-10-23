@@ -182,10 +182,6 @@ const Inner = ({
           </>
         )}
       </button>
-
-      <p className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
-        <Lock className="h-3 w-3" /> {t.secure}
-      </p>
     </div>
   );
 };

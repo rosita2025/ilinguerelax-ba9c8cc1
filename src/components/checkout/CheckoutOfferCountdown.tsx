@@ -10,11 +10,11 @@ type Copy = { label: string; reserved: string; apply: string; applied: string };
 
 // Un texto por idioma del checkout (el idioma sigue la categoría del producto).
 const COPY: Record<string, Copy> = {
-  es: { label: "10% OFF con el código", reserved: "reservado por", apply: "Aplicar", applied: "Cupón aplicado" },
-  en: { label: "10% OFF with code", reserved: "reserved for", apply: "Apply", applied: "Coupon applied" },
-  fr: { label: "-10 % avec le code", reserved: "réservé pendant", apply: "Appliquer", applied: "Coupon appliqué" },
-  pt: { label: "10% OFF com o código", reserved: "reservado por", apply: "Aplicar", applied: "Cupom aplicado" },
-  it: { label: "10% di sconto con il codice", reserved: "riservato per", apply: "Applica", applied: "Coupon applicato" },
+  es: { label: "10% OFF", reserved: "reservado por", apply: "Aplicar", applied: "Cupón aplicado" },
+  en: { label: "10% OFF", reserved: "reserved for", apply: "Apply", applied: "Coupon applied" },
+  fr: { label: "-10 %", reserved: "réservé pendant", apply: "Appliquer", applied: "Coupon appliqué" },
+  pt: { label: "10% OFF", reserved: "reservado por", apply: "Aplicar", applied: "Cupom aplicado" },
+  it: { label: "-10%", reserved: "riservato per", apply: "Applica", applied: "Coupon applicato" },
 };
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
@@ -49,13 +49,21 @@ export function CheckoutOfferCountdown({ productSlug, language }: Props) {
     return () => clearInterval(id);
   }, [productSlug]);
 
-  if (left === null || left <= 0) return null;
+  const visible = left !== null && left > 0;
+  // Avisa al resto de la página cuánto mide la barra para que el menú y el resumen fijos queden debajo.
+  useEffect(() => {
+    if (!visible) return;
+    document.documentElement.style.setProperty("--offer-bar-h", "40px");
+    return () => { document.documentElement.style.setProperty("--offer-bar-h", "0px"); };
+  }, [visible]);
+
+  if (!visible || left === null) return null;
   const t = COPY[language] || COPY.es;
   const isApplied = coupon === COUPON_CODE;
 
   return (
     <div
-      className="flex w-full items-center justify-between gap-2 border-b border-amber-300 bg-amber-50 px-3 py-2 text-amber-950 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100"
+      className="sticky top-0 z-40 flex h-10 w-full items-center justify-between gap-2 whitespace-nowrap border-b border-amber-300 bg-amber-50 px-3 text-amber-950 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100"
       role="timer"
       aria-live="off"
     >

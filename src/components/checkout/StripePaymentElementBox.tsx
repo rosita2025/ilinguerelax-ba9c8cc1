@@ -11,8 +11,8 @@ import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
  * (Tarjeta, Klarna, Cash App…), solo los campos de pago y un botón de pagar.
  * NO repite nombre del producto, nombre ni correo (ya se llenaron arriba).
  *
- * APAGADO por defecto (ver PAYMENT_ELEMENT_ENABLED en PaymentMethodsGroup.tsx).
- * Para probarlo: abre el checkout con  ?pe=1  al final del enlace.
+ * ACTIVO para todos (ver PAYMENT_ELEMENT_ENABLED en PaymentMethodsGroup.tsx).
+ * Para ver el formulario anterior en una prueba: ?pe=0 al final del enlace del checkout.
  *
  * El monto lo calcula el servidor (create-express-intent), nunca el navegador.
  */

@@ -13,8 +13,9 @@ import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
  * EXPRESS CHECKOUT de Stripe: botones de Apple Pay, Google Pay y Link arriba del checkout.
  * La persona paga con un toque, sin llenar el formulario.
  *
- * APAGADO por defecto. Para probarlo, abre el checkout con  ?express=1  al final del enlace.
- * Cuando esté probado, cambia EXPRESS_CHECKOUT_ENABLED a true para activarlo para todos.
+ * ACTIVO para TODOS los países (solo se ve si el dispositivo tiene Apple Pay / Google Pay / Link).
+ * Para ocultarlo en una prueba: agregar ?express=0 al enlace del checkout
+ * (o poner EXPRESS_CHECKOUT_ENABLED en false para apagarlo para todos).
  *
  * Reglas:
  *  - Solo productos digitales (sin envío).
@@ -22,7 +23,7 @@ import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
  *  - Si el dispositivo no tiene ninguna billetera disponible, no se muestra nada.
  *  - El monto lo calcula el servidor (create-express-intent), nunca el navegador.
  */
-export const EXPRESS_CHECKOUT_ENABLED = false;
+export const EXPRESS_CHECKOUT_ENABLED = true;
 
 const COPY: Record<Lang, { title: string; divider: string; genericError: string }> = {
   es: { title: "Pago rápido", divider: "o completa tus datos abajo", genericError: "No se pudo completar el pago. Intenta de nuevo." },
@@ -33,12 +34,12 @@ const COPY: Record<Lang, { title: string; divider: string; genericError: string 
 };
 
 const isEnabled = (): boolean => {
-  if (EXPRESS_CHECKOUT_ENABLED) return true;
   try {
-    return new URLSearchParams(window.location.search).get("express") === "1";
-  } catch {
-    return false;
-  }
+    const flag = new URLSearchParams(window.location.search).get("express");
+    if (flag === "0") return false;
+    if (flag === "1") return true;
+  } catch { /* sin URL: usar el valor por defecto */ }
+  return EXPRESS_CHECKOUT_ENABLED;
 };
 
 interface Quote {

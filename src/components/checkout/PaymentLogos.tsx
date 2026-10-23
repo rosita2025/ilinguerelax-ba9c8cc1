@@ -1,5 +1,5 @@
 import React from "react";
-import { VisaBadge, MastercardBadge, AmexBadge, ApplePayBadge } from "@/components/checkout/CardBrandBadges";
+import { VisaBadge, MastercardBadge, AmexBadge, ApplePayBadge, PayPalBadge } from "@/components/checkout/CardBrandBadges";
 import { useRegionTier } from "@/hooks/useRegionTier";
 
 // Antes usaban una ruta temporal de Lovable (asset borrado del CDN) que no
@@ -56,7 +56,7 @@ export function PaymentLogos({ className = "" }: { className?: string }) {
       </span>
 
       {(country === "US" || !["PE", "MX", "CO", "AR", "CL", "BR", "PA", "GT", "HN", "SV", "NI", "PY", "UY", "DO", "BO", "CR", "EC"].includes(country)) && (
-        <LogoBadge src={PAYPAL} alt="PayPal" />
+        <PayPalBadge />
       )}
       
       {/* Indicadores de métodos locales */}

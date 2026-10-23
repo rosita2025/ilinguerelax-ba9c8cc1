@@ -127,6 +127,8 @@ function LinkBadge() {
   );
 }
 
+const LATAM_COUNTRIES = new Set(["AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "NI", "PA", "PE", "PY", "PR", "UY", "VE"]);
+
 /**
  * Antes, solo la fila principal de tarjeta (Stripe) mostraba los logos
  * reales de Visa/Mastercard/Apple Pay/Google Pay/Link — el resto de las
@@ -2090,7 +2092,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         }
         if (m.id === "stripe_ach") return isUsa && methodsConfig.stripeAch;
         if (m.id === "stripe_cashapp") return isUsa && methodsConfig.stripeCashApp;
-        if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna && country !== "MX"; // Klarna no opera en México
+        if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna && !LATAM_COUNTRIES.has(country); // Klarna no opera en Latinoamérica
         
         // Rails locales de Perú (transferencia BCP/Interbank, efectivo, Yape/Plin)
         // SOLO deben verse desde Perú. Un comprador en México no puede pagar a
@@ -2098,7 +2100,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         if (m.id === "transfer") return methodsConfig.transfer && isPeru;
         if (m.id === "cash") return methodsConfig.cash && isPeru;
         if (m.id === "yape") return methodsConfig.yape && isPeru;
-        if (m.id === "binance") return methodsConfig.binance && country !== "MX";
+        if (m.id === "binance") return methodsConfig.binance && (country === "PE" || !LATAM_COUNTRIES.has(country)); // sin Binance en Latinoamérica (Perú lo conserva)
         if (m.id === "clabe") return country === "MX";
 
         // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.

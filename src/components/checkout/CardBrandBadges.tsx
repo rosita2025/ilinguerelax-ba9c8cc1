@@ -45,3 +45,15 @@ export function ApplePayBadge() {
     </span>
   );
 }
+
+export function PayPalBadge() {
+  return (
+    <span className={`${box} bg-white`} role="img" aria-label="PayPal">
+      <svg viewBox="0 0 32 12" className="w-[85%] h-auto" aria-hidden="true">
+        <text x="16" y="9.5" textAnchor="middle" fontFamily="Arial, Helvetica, sans-serif" fontWeight="900" fontStyle="italic" fontSize="8.5">
+          <tspan fill="#003087">Pay</tspan><tspan fill="#009CDE">Pal</tspan>
+        </text>
+      </svg>
+    </span>
+  );
+}

@@ -31,6 +31,7 @@ import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { CheckoutLanguageProvider, useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
+import { detectLanguageFromCountry } from "@/i18n";
 import { getCatalogItem, resolveCheckoutSlug, CHECKOUT_CATALOG, type CatalogItem } from "@/config/checkoutCatalog";
 import { readCheckoutCache, loadCheckoutProduct } from "@/lib/checkoutProductCache";
 import { useAbandonedCheckoutTracker } from "@/hooks/useAbandonedCheckoutTracker";
@@ -326,9 +327,17 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
       return v && SUPPORTED_UI_LANGS.includes(v) ? v : null;
     } catch { return null; }
   })();
+  const ipLanguage = (() => {
+    const c = (region.country || "").toUpperCase();
+    if (c.length !== 2) return null;
+    const l = detectLanguageFromCountry(c);
+    return SUPPORTED_UI_LANGS.includes(l) ? l : null;
+  })();
   const language = (
     slug === "patrones-ingles" || catalogItem?.adminSku === "patrones-especiales-alfabeto-combinaciones-secretas-ingles"
-      ? "es"
+      // Idioma según el país por IP (Italia → italiano, Francia → francés, Brasil → portugués,
+      // países de habla inglesa → inglés, resto de Latinoamérica y España → español).
+      ? (ipLanguage ?? rememberedLang ?? "es")
       : learnerLang && SUPPORTED_UI_LANGS.includes(learnerLang)
         ? learnerLang
         : (rememberedLang ?? siteLanguage)
@@ -711,7 +720,9 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
                       // Mismo cuadro, mismo alto — solo cambia el texto según
                       // el país real del visitante (sin agregar scroll). Si
                       // todavía no se detecta el país, se usa el genérico.
-                      const countryName = getCountryInfo(region.country)?.name;
+                      const countryName = (() => {
+                        try { return new Intl.DisplayNames([language], { type: "region" }).of((region.country || "").toUpperCase()); } catch { return undefined; }
+                      })() || getCountryInfo(region.country)?.name;
                       if (!countryName) return t.verifiedReviewNotice;
                       return language === "en"
                         ? `Verified buyers in ${countryName}: ⭐⭐⭐⭐⭐ 5.0/5.0. Fast digital delivery, no delays.`
@@ -719,6 +730,8 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
                         ? `Compradores verificados no(a) ${countryName}: ⭐⭐⭐⭐⭐ 5.0/5.0. Entrega digital rápida, sem atrasos.`
                         : language === "fr"
                         ? `Acheteurs vérifiés en ${countryName} : ⭐⭐⭐⭐⭐ 5.0/5.0. Livraison numérique rapide, sans délai.`
+                        : language === "it"
+                        ? `Acquirenti verificati in ${countryName}: ⭐⭐⭐⭐⭐ 5.0/5.0. Consegna digitale rapida, senza ritardi.`
                         : `Compradores verificados en ${countryName}: ⭐⭐⭐⭐⭐ 5.0/5.0. Envío digital rápido, sin demoras.`;
                     })()}
                   </p>

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { getMethodTag, getMethodTone } from "@/lib/checkoutMethodTags";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
@@ -871,9 +872,12 @@ export default function AdminCheckoutMethods() {
                       return (
                         <div key={m.id} className={`text-sm p-2 rounded border ${m.enabled ? "bg-background" : "bg-muted/50 opacity-60"}`}>
                           <div className="flex items-center gap-2">
-                            <Icon className="w-4 h-4 text-foreground/70 shrink-0" />
+                            <Icon className={`w-4 h-4 shrink-0 ${getMethodTone(m.method_key)}`} />
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium leading-tight text-xs sm:text-sm">{m.label}</div>
+                              <div className="font-medium leading-tight text-xs sm:text-sm flex flex-wrap items-center gap-1.5">
+                                <span>{m.label}</span>
+                                {(() => { const tg = getMethodTag(m.method_key); return tg ? <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${tg.cls}`}>{tg.text}</span> : null; })()}
+                              </div>
                               {(dlNote || m.note) && <div className="text-[10px] sm:text-[11px] text-muted-foreground line-clamp-2 sm:truncate" title={dlNote || m.note || ""}>{dlNote || m.note}</div>}
                             </div>
 
@@ -943,6 +947,7 @@ export default function AdminCheckoutMethods() {
                                     title={dlocalNoteForCountries(q.key, r.country_codes || []) || q.note}
                                   >
                                     {canReactivate ? "Activar " : isActive ? "✓ " : "+ "}{dlocalLabelForCountries(q.key, r.country_codes || []) || q.label}
+                                    {(() => { const tg = getMethodTag(q.key); return tg ? <span className={`ml-1.5 text-[9px] font-bold px-1 py-0.5 rounded ${tg.cls}`}>{tg.text}</span> : null; })()}
                                   </button>
                                 );
                               })}

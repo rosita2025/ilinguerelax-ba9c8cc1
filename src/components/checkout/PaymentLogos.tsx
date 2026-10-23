@@ -1,4 +1,5 @@
 import React from "react";
+import { VisaBadge, MastercardBadge, AmexBadge, ApplePayBadge } from "@/components/checkout/CardBrandBadges";
 import { useRegionTier } from "@/hooks/useRegionTier";
 
 // Antes usaban una ruta temporal de Lovable (asset borrado del CDN) que no
@@ -38,9 +39,10 @@ export function PaymentLogos({ className = "" }: { className?: string }) {
 
   return (
     <div className={`flex flex-wrap items-center gap-1 ${className}`}>
-      <LogoBadge src={VISA} alt="Visa" />
-      <LogoBadge src={MASTERCARD} alt="Mastercard" />
-      <LogoBadge src={APPLE_PAY} alt="Apple Pay" />
+      <VisaBadge />
+      <MastercardBadge />
+      <AmexBadge />
+      <ApplePayBadge />
       
       <span
         className="inline-flex items-center justify-center h-5 w-8 rounded-md border border-neutral-200 shadow-sm shrink-0 bg-white"

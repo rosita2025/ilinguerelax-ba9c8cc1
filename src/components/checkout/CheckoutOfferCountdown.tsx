@@ -55,7 +55,7 @@ export function CheckoutOfferCountdown({ productSlug, language }: Props) {
 
   return (
     <div
-      className="flex items-center justify-between gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-amber-950 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100"
+      className="flex w-full items-center justify-between gap-2 border-b border-amber-300 bg-amber-50 px-3 py-2 text-amber-950 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100"
       role="timer"
       aria-live="off"
     >

@@ -287,7 +287,64 @@ const fr: CheckoutStatusStrings = {
   confirmingPayment: "Confirmation de votre paiement…",
 };
 
-const DICT: Record<string, CheckoutStatusStrings> = { es, en, pt, fr };
+const it: CheckoutStatusStrings = {
+  metaSuccess: "Grazie per il tuo acquisto · iLingue Relax",
+  metaPending: "Pagamento in sospeso · iLingue Relax",
+  metaFailure: "Pagamento non completato · iLingue Relax",
+  metaReturn: "Elaborazione del pagamento · iLingue Relax",
+
+  orderConfirmed: "Ordine confermato",
+  orderNumber: "Ordine",
+  thanks: (name) => `Grazie${name ? `, ${name}` : ""}!`,
+  successIntro: (email) =>
+    email
+      ? `Il tuo ordine è confermato. Abbiamo inviato un'email di conferma a ${email} con i link per il download e la ricevuta.`
+      : "Il tuo ordine è confermato. Abbiamo inviato un'email con i link per il download e la ricevuta.",
+  whatsNext: "Cosa succede ora?",
+  checkInbox: "Controlla la tua email",
+  checkInboxDesc: "I link arrivano in 1-5 minuti. Controlla lo spam se non la vedi.",
+  accessProduct: "Accedi al tuo prodotto",
+  accessProductDesc: "Segui il link nell'email per sbloccare i tuoi materiali.",
+  needHelp: "Hai bisogno di aiuto?",
+  messageUsOn: "Scrivici su",
+  orderSummary: "Riepilogo dell'ordine",
+  qty: "Qtà",
+  subtotal: "Subtotale",
+  discount: "Sconto",
+  totalPaid: "Totale pagato",
+  paymentReference: "Riferimento del pagamento",
+  paymentId: "ID",
+  paymentStatus: "Stato",
+  paymentRef: "Rif",
+  continueShopping: "Continua gli acquisti",
+  contactSupport: "Contatta l'assistenza",
+  shippingEligibility: "Idoneità alla spedizione confermata",
+  shippingEligibilityDesc: "Il tuo ordine è idoneo alla spedizione internazionale in Perù, Colombia, Messico, Argentina e altri paesi.",
+  paymentMethodConfirmed: "Metodo di pagamento confermato",
+  digitalDeliveredFirst: "Materiale digitale inviato (immediato)",
+  physicalInProgress: "Spedizione fisica in preparazione",
+  trackingComingSoon: "Il codice di tracciamento sarà inviato a breve",
+
+
+  paymentPending: "Pagamento in sospeso",
+  pendingDesc:
+    "Il tuo pagamento è in elaborazione (PagoEfectivo, bonifico o altro metodo offline). Ti avviseremo via email appena verrà confermato, di solito entro 1-24 ore.",
+  confirmationEmail: "Email di conferma",
+  confirmationEmailDesc: "Riceverai automaticamente il link per il download appena confermato.",
+  fasterReceipt: "Più veloce? Inviaci la ricevuta",
+  fasterReceiptDesc: "Scrivici su",
+  backHome: "Torna alla home",
+  whatsappSupport: "Assistenza su WhatsApp",
+
+  paymentNotCompleted: "Pagamento non completato",
+  failureDesc:
+    "Il tuo pagamento è stato rifiutato o annullato. Il carrello è ancora salvato: prova con un altro metodo o contattaci.",
+  tryAgain: "Riprova",
+
+  confirmingPayment: "Conferma del pagamento in corso…",
+};
+
+const DICT: Record<string, CheckoutStatusStrings> = { es, en, pt, fr, it };
 
 export function getCheckoutStrings(lang: Language): CheckoutStatusStrings {
   return DICT[lang] || es;

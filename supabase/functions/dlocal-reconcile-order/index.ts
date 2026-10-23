@@ -23,6 +23,7 @@ import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { deliverLikeManual } from "../_shared/manualDelivery.ts";
+import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 
 import {
   dlocalApiBase,
@@ -51,6 +52,7 @@ const BodySchema = z.object({
   adminKey: z.string().min(4).max(200).optional(),
   reason: z.string().trim().max(300).optional(),
   operator: z.string().trim().max(120).optional(),
+  force: z.boolean().optional(),
 });
 
 
@@ -165,7 +167,7 @@ Deno.serve(async (req) => {
   try {
     const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) return json({ error: "Datos inválidos" }, 400);
-    const { action, reason, operator } = parsed.data;
+    const { action, reason, operator, force } = parsed.data;
 
     // La autenticación fuerte ya la hizo assertAdminCsrf (origen + CSRF + 2FA
     // por correo). ADMIN_REVIEW_KEY solo se valida si el cliente la envía, para
@@ -258,8 +260,21 @@ Deno.serve(async (req) => {
         });
       }
 
+      // Un pendiente antiguo deja de mostrarse si la MISMA clienta (mismo correo)
+      // ya pagó un pedido posterior: era un reintento, no una venta perdida.
+      const lastPaidByEmail = new Map<string, string>();
+      for (const o of byOrder.values()) {
+        const em = (o.email || "").toLowerCase().trim();
+        if (!o.paid || o.failed || !em) continue;
+        if ((lastPaidByEmail.get(em) ?? "") < o.lastAt) lastPaidByEmail.set(em, o.lastAt);
+      }
+      const replacedByLaterPayment = (o: { email: string; createdAt: string }) => {
+        const paidAt = lastPaidByEmail.get((o.email || "").toLowerCase().trim());
+        return !!paidAt && paidAt > o.createdAt;
+      };
+
       const pending = [...byOrder.values()]
-        .filter((o) => o.pending && !o.paid && !o.failed && !isTestEmail(o.email))
+        .filter((o) => o.pending && !o.paid && !o.failed && !isTestEmail(o.email) && !replacedByLaterPayment(o))
         .sort((a, b) => (a.lastAt < b.lastAt ? 1 : -1))
         .slice(0, 200);
       return json({ ok: true, pending });
@@ -428,6 +443,14 @@ Deno.serve(async (req) => {
         }, 200);
       }
       if (!email) return json({ ok: true, applied: "paid_no_email", summary });
+      // Meta: pago recuperado por consulta a la API (el webhook no llegó): se avisa a Meta
+      // igual que hace dlocal-webhook. Mismo eventId → Meta no lo duplica.
+      if (!alreadyPaid) {
+        await sendPurchaseCapi({
+          eventId: `Purchase_${orderNumber}`, email, country: country ?? null,
+          value: amount ?? null, currency, contentIds: skus, contentName: "Pedido iLingue Relax", orderId: orderNumber,
+        }).catch((e) => console.error("reconcile CAPI failed:", e));
+      }
       const res = await deliver({
         orderNumber, email, name, country, skus, amount, currency, provider,
         productName: "Pedido iLingue Relax", reference,
@@ -448,6 +471,35 @@ Deno.serve(async (req) => {
     if (alreadyPaid && alreadyDelivered) return json({ ok: true, applied: "already_delivered", summary });
     if (!email) return json({ error: "El pedido no tiene correo del comprador" }, 400);
 
+    // Freno anti-errores: aceptar a mano exige confirmación si dLocal aún lo ve
+    // pendiente (voucher sin pagar) o si la misma clienta ya pagó otro pedido
+    // en los últimos 7 días (probable duplicado).
+    if (!force && !alreadyPaid) {
+      if (remoteStatus && isPendingStatus(remoteStatus)) {
+        return json({
+          code: "still_pending",
+          error: `dLocal aún lo ve como ${remoteStatus}: el cliente todavía no pagó (p. ej. voucher OXXO).`,
+          summary,
+        }, 409);
+      }
+      const since7 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: other } = await supabase
+        .from("order_events")
+        .select("order_number")
+        .eq("customer_email", email.toLowerCase())
+        .eq("event", "payment_paid")
+        .neq("order_number", orderNumber)
+        .gte("created_at", since7)
+        .limit(1);
+      if (other && other.length > 0) {
+        return json({
+          code: "possible_duplicate",
+          error: `Esta clienta ya pagó el pedido ${other[0].order_number} en los últimos 7 días: este parece un duplicado.`,
+          summary,
+        }, 409);
+      }
+    }
+
     if (!alreadyPaid) {
       await logOrderEvent({
         orderNumber,
@@ -462,6 +514,12 @@ Deno.serve(async (req) => {
         currency,
         metadata: { skus, source: "admin-reconcile", manual: true, operator: operator ?? null, remoteStatus },
       });
+    }
+    if (!alreadyPaid) {
+      await sendPurchaseCapi({
+        eventId: `Purchase_${orderNumber}`, email, country: country ?? null,
+        value: amount ?? null, currency, contentIds: skus, contentName: "Pedido iLingue Relax", orderId: orderNumber,
+      }).catch((e) => console.error("reconcile CAPI failed:", e));
     }
     const res = await deliver({
       orderNumber, email, name, country, skus, amount, currency, provider,

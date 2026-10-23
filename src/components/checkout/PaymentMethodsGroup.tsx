@@ -28,6 +28,20 @@ import { trackPaymentError, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import { usePurchaseTracking } from "@/hooks/usePurchaseTracking";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
+
+// Formulario de pago nuevo (tipo Payment Element). ACTIVO para TODOS los países.
+// Para volver al formulario anterior en una prueba: agregar ?pe=0 al enlace del checkout
+// (o poner PAYMENT_ELEMENT_ENABLED en false para apagarlo para todos).
+export const PAYMENT_ELEMENT_ENABLED = true;
+const isPaymentElementMode = (): boolean => {
+  try {
+    const flag = new URLSearchParams(window.location.search).get("pe");
+    if (flag === "0") return false;
+    if (flag === "1") return true;
+  } catch { /* sin URL: usar el valor por defecto */ }
+  return PAYMENT_ELEMENT_ENABLED;
+};
+const StripePaymentElementBox = React.lazy(() => import("@/components/checkout/StripePaymentElementBox"));
 import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";
 import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
 import { mapDlocalStatus } from "@/lib/dlocalErrorMap";
@@ -36,6 +50,9 @@ import { extractEdgeErrorMessage, looksTechnical } from "@/lib/edgeError";
 import { getPaymentPayload } from "@/lib/paymentGatewayRouter";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useCheckoutTotal } from "@/hooks/useCheckoutTotal";
+import { UpsellPopup } from "@/components/checkout/UpsellPopup";
+import { loadCheckoutProduct } from "@/lib/checkoutProductCache";
+import type { UpsellItem } from "@/config/checkoutCatalog";
 
 
 type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
@@ -153,11 +170,11 @@ function methodSection(id: string): MethodSection {
 }
 
 const SECTION_LABELS: Record<MethodSection, Record<string, string>> = {
-  cards: { es: "Tarjetas", en: "Cards", pt: "Cartões", fr: "Cartes" },
-  transfer: { es: "Transferencias bancarias", en: "Bank Transfers", pt: "Transferências bancárias", fr: "Virements bancaires" },
-  cash: { es: "Pago en efectivo", en: "Cash Payments", pt: "Pagamento em dinheiro", fr: "Paiement en espèces" },
-  wallet: { es: "Billeteras digitales", en: "Digital Wallets", pt: "Carteiras digitais", fr: "Portefeuilles numériques" },
-  other: { es: "O paga por otra plataforma", en: "Or pay via another platform", pt: "Ou pague por outra plataforma", fr: "Ou payez via une autre plateforme" },
+  cards: { es: "Tarjetas", en: "Cards", pt: "Cartões", fr: "Cartes", it: "Carte" },
+  transfer: { es: "Transferencias bancarias", en: "Bank Transfers", pt: "Transferências bancárias", fr: "Virements bancaires", it: "Bonifici bancari" },
+  cash: { es: "Pago en efectivo", en: "Cash Payments", pt: "Pagamento em dinheiro", fr: "Paiement en espèces", it: "Pagamento in contanti" },
+  wallet: { es: "Billeteras digitales", en: "Digital Wallets", pt: "Carteiras digitais", fr: "Portefeuilles numériques", it: "Portafogli digitali" },
+  other: { es: "O paga por otra plataforma", en: "Or pay via another platform", pt: "Ou pague por outra plataforma", fr: "Ou payez via une autre plateforme", it: "Oppure paga con un'altra piattaforma" },
 };
 
 function sectionLabel(section: MethodSection, language: string) {
@@ -195,7 +212,7 @@ const DLOCAL_COUNTRIES = DLOCAL_COUNTRY_CODES;
 type MethodBadge = { label: string; bg: string; color: string };
 
 
-const getStripeVisibleMethods = (language: string): Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> => ({
+const getStripeVisibleMethodsBase = (language: string): Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> => ({
   stripe_apple_pay: {
     icon: Smartphone,
     title: "Apple Pay",
@@ -360,6 +377,53 @@ const getStripeVisibleMethods = (language: string): Record<string, Omit<PaymentM
   },
 });
 
+// Italian presentation only; payment methods and availability remain unchanged.
+
+// (la base se genera en inglés y aquí se pasa a italiano).
+const IT_METHOD_TEXT: Record<string, string> = {
+  "Pay with Touch ID / Face ID from your iPhone, iPad or Mac (Safari).": "Paga con Touch ID / Face ID da iPhone, iPad o Mac (Safari).",
+  "Pay with your Google account from Android or Chrome.": "Paga con il tuo account Google da Android o Chrome.",
+  "Pay at OXXO stores (Mexico) through Stripe's secure form.": "Paga nei negozi OXXO (Messico) tramite il modulo sicuro di Stripe.",
+  "Bank voucher for Brazil inside Stripe.": "Voucher bancario per il Brasile tramite Stripe.",
+  "Instant bank transfer for Brazil inside Stripe.": "Bonifico istantaneo per il Brasile tramite Stripe.",
+  "Online banking from Netherlands inside Stripe.": "Home banking dei Paesi Bassi tramite Stripe.",
+  "Local payment from Belgium inside Stripe.": "Pagamento locale del Belgio tramite Stripe.",
+  "SEPA débito directo": "Addebito diretto SEPA",
+  "Bank debit for Eurozone inside Stripe.": "Addebito bancario per l'area euro tramite Stripe.",
+  "Online banking from Germany inside Stripe.": "Home banking della Germania tramite Stripe.",
+  "Instant transfer inside Stripe.": "Bonifico istantaneo tramite Stripe.",
+  "Online banking from Austria inside Stripe.": "Home banking dell'Austria tramite Stripe.",
+  "Online banking from Poland inside Stripe.": "Home banking della Polonia tramite Stripe.",
+  "Mobile payment from Poland inside Stripe.": "Pagamento mobile della Polonia tramite Stripe.",
+  "Local payment from Portugal inside Stripe.": "Pagamento locale del Portogallo tramite Stripe.",
+  "Mobile payment from Portugal inside Stripe.": "Pagamento mobile del Portogallo tramite Stripe.",
+  "Mobile payment from Switzerland inside Stripe.": "Pagamento mobile della Svizzera tramite Stripe.",
+  "Mobile payment from Denmark/Finland inside Stripe.": "Pagamento mobile di Danimarca/Finlandia tramite Stripe.",
+  "Bacs débito directo": "Addebito diretto Bacs",
+  "Bank debit from United Kingdom inside Stripe.": "Addebito bancario del Regno Unito tramite Stripe.",
+  "Canada Bank Debit": "Addebito bancario Canada",
+  "Pre-authorized debit from Canada inside Stripe.": "Addebito preautorizzato del Canada tramite Stripe.",
+  "Buy now and pay in installments inside Stripe.": "Acquista ora e paga a rate tramite Stripe.",
+  "Buy now and pay later inside Stripe.": "Acquista ora e paga dopo tramite Stripe.",
+  "PayPal processed within Stripe's secure form.": "PayPal elaborato nel modulo sicuro di Stripe.",
+  "Local payment from Asia inside Stripe.": "Pagamento locale dall'Asia tramite Stripe.",
+  "Local payment from China inside Stripe.": "Pagamento locale dalla Cina tramite Stripe.",
+  "Local payment from Southeast Asia inside Stripe.": "Pagamento locale dal Sud-est asiatico tramite Stripe.",
+  "Local payment from Singapore inside Stripe.": "Pagamento locale da Singapore tramite Stripe.",
+  "Payment at convenience stores in Japan inside Stripe.": "Pagamento nei convenience store del Giappone tramite Stripe.",
+};
+
+const getStripeVisibleMethods = (language: string): Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> => {
+  const base = getStripeVisibleMethodsBase(language === "it" ? "en" : language);
+  if (language !== "it") return base;
+  return Object.fromEntries(
+    Object.entries(base).map(([k, v]) => [
+      k,
+      { ...v, title: typeof v.title === "string" ? (IT_METHOD_TEXT[v.title] ?? v.title) : v.title, sub: typeof v.sub === "string" ? (IT_METHOD_TEXT[v.sub] ?? v.sub) : v.sub },
+    ]),
+  ) as Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">>;
+};
+
 export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku }: { parentSku?: string | null } = {}) {
   const navigate = useNavigate();
   const { items, buyer, coupon, couponPercent, selectedMethod, setSelectedMethod } = useCheckoutPruebaStore();
@@ -493,6 +557,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
   const redirectingRef = useRef(false);
   const stripeAnchorRef = useRef<HTMLDivElement | null>(null);
+  const paymentElementMode = useMemo(isPaymentElementMode, []);
+  const [peUnavailable, setPeUnavailable] = useState(false);
+  // Si el formulario nuevo no carga, se vuelve solo al anterior.
+  const peActive = paymentElementMode && !peUnavailable;
   const stripeContainerRef = useRef<HTMLDivElement | null>(null);
   const hasPhysicalItems = items.some(i => i.isPhysical);
   const valid = isBuyerValid(buyer, hasPhysicalItems);
@@ -824,7 +892,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         method: dlMethod,
         message: language === "en"
           ? "Please enter your ID document above to continue."
-          : "Ingresa tu documento de identidad arriba para continuar.",
+          : language === "it" ? "Inserisci qui sopra il tuo documento d'identità per continuare." : "Ingresa tu documento de identidad arriba para continuar.",
       });
       return;
     }
@@ -836,10 +904,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     const coverage = validateDlocalMethod(ctry, dlMethod);
     if (!coverage.ok) {
       setSelected(null);
-      setMethodError({ method: dlMethod, message: coverage.reason || (language === "en" ? "Method not available in your country." : "Método no disponible en tu país.") });
+      setMethodError({ method: dlMethod, message: coverage.reason || (language === "en" ? "Method not available in your country." : language === "it" ? "Metodo non disponibile nel tuo paese." : "Método no disponible en tu país.") });
       toast({
-        title: language === "en" ? "Method not available" : "Método no disponible",
-        description: coverage.reason || (language === "en" ? "Choose another payment method for your country." : "Elige otro método de pago para tu país."),
+        title: language === "en" ? "Method not available" : language === "it" ? "Metodo non disponibile" : "Método no disponible",
+        description: coverage.reason || (language === "en" ? "Choose another payment method for your country." : language === "it" ? "Scegli un altro metodo di pagamento per il tuo paese." : "Elige otro método de pago para tu país."),
         variant: "destructive",
       });
       return;
@@ -943,7 +1011,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         method: "hotmart",
         message:
           language === "en" ? "We couldn't open the Hotmart checkout. Please try again."
-          : language === "pt" ? "Não conseguimos abrir o checkout da Hotmart. Tente nuevamente."
+          : language === "it" ? "Impossibile aprire il pagamento con Hotmart. Riprova." : language === "pt" ? "Não conseguimos abrir o checkout da Hotmart. Tente nuevamente."
           : language === "fr" ? "Impossible d'ouvrir le paiement Hotmart. Réessaie."
           : "No pudimos abrir el pago con Hotmart. Inténtalo de nuevo.",
       });
@@ -972,6 +1040,106 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
 
+  // ── Aviso "¿Te gustaría agregar…?" para métodos que no son tarjeta ──────────
+  // Se ofrece UNA vez por sesión ANTES de pagar, con el descuento configurado
+  // en el admin para cada upsell: en Stripe al presionar "Continuar de pago",
+  // en dLocal / Mercado Pago al presionar "Comprar ahora", y en Yape / Binance /
+  // CLABE / dLocal tarjeta al elegir el método (ahí no hay botón previo y el
+  // cliente no debe ver un monto que luego cambie después de pagar).
+  // Si algo falla al mostrarlo, nunca bloquea el pago.
+  const [offerUpsells, setOfferUpsells] = useState<UpsellItem[]>([]);
+  const [upsellPopup, setUpsellPopup] = useState<{ offer: UpsellItem; resume: (() => void) | null } | null>(null);
+
+  useEffect(() => {
+    if (!parentSku) return;
+    let alive = true;
+    loadCheckoutProduct(parentSku)
+      .then(({ upsells }) => { if (alive) setOfferUpsells((upsells ?? []) as UpsellItem[]); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [parentSku]);
+
+  const upsellCheckBusy = useRef(false);
+
+  /**
+   * Abre el aviso si corresponde y devuelve true (el pago espera la respuesta).
+   * Nunca ofrece un upsell que ya está en el carrito NI uno que el cliente ya
+   * compró antes (se consulta por correo). Si el aviso falla o tarda más de
+   * 1.5 s, devuelve false y el pago sigue normal.
+   */
+  const offerUpsellThen = async (resume: (() => void) | null): Promise<boolean> => {
+    if (upsellCheckBusy.current) return true; // doble clic mientras se revisa
+    try {
+      if (!parentSku || !offerUpsells.length) return false;
+      const key = `ilr_upsell_popup_${parentSku}`;
+      if (sessionStorage.getItem(key)) return false;
+      const st = useCheckoutPruebaStore.getState();
+      const cart = st.items;
+      // Solo si el producto principal sigue en el carrito (el descuento depende de eso).
+      if (!cart.some((i) => !offerUpsells.some((u) => u.id === i.id))) return false;
+      // Nunca ofrecer algo que ya está en el carrito.
+      const pending = offerUpsells.filter((u) => !cart.some((i) => i.id === u.id));
+      if (!pending.length) return false;
+      sessionStorage.setItem(key, "1");
+
+      // Nunca ofrecer algo que el cliente ya compró antes (cualquier método de pago).
+      upsellCheckBusy.current = true;
+      let candidates = pending;
+      const email = String(st.buyer.email || "").trim().toLowerCase();
+      if (email) {
+        const ownedFlags = await Promise.race([
+          Promise.all(
+            pending.map((u) =>
+              supabase.functions
+                .invoke("check-existing-purchase", { body: { email, sku: u.id } })
+                .then(({ data }) => !!(data as { alreadyPurchased?: boolean } | null)?.alreadyPurchased)
+                .catch(() => false),
+            ),
+          ),
+          new Promise<boolean[]>((resolve) => setTimeout(() => resolve(pending.map(() => false)), 1500)),
+        ]);
+        candidates = pending.filter((_, i) => !ownedFlags[i]);
+      }
+      if (!candidates.length) return false;
+      setUpsellPopup({ offer: candidates[0], resume });
+      return true;
+    } catch {
+      return false;
+    } finally {
+      upsellCheckBusy.current = false;
+    }
+  };
+
+  const acceptUpsellPopup = () => {
+    if (!upsellPopup) return;
+    const { offer, resume } = upsellPopup;
+    useCheckoutPruebaStore.getState().addItem({
+      id: offer.id,
+      name: offer.name,
+      price: offer.price,
+      pricePen: offer.pricePen,
+      image: offer.image,
+      description: offer.description,
+      quantity: 1,
+    });
+    trackHotmartEvent("AddToCart", {
+      content_name: offer.name,
+      content_ids: [offer.id],
+      content_type: "product",
+      value: offer.price,
+      currency: "USD",
+      num_items: 1,
+    });
+    setUpsellPopup(null);
+    if (resume) resume();
+  };
+
+  const skipUpsellPopup = () => {
+    const resume = upsellPopup?.resume ?? null;
+    setUpsellPopup(null);
+    if (resume) resume();
+  };
+
   const handleSelect = (m: Method) => {
     // No usar el `valid` capturado en el render: si el comprador acaba de
     // escribir su email y toca un método de pago de inmediato, el blur que
@@ -990,9 +1158,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       }
     }
     void captureAbandonedCheckout(m, true);
+    autoOpenBusy.current = false;
     if (m !== selected) setShowStripe(false);
     setSelected(m);
     setSelectedMethod(m);
+    // Yape / Binance / CLABE / dLocal tarjeta: el pago se confirma en su propio
+    // panel (sin botón "Comprar ahora"), así que el aviso sale al elegirlos.
+    if (["yape", "binance", "clabe", "dlocal_card"].includes(m)) void offerUpsellThen(null);
     if (!["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m)) setShowStripe(false);
     // Hotmart: no redirige al seleccionar; espera al botón "Comprar ahora".
     // Al colapsar el iframe de Stripe la página se encoge y el scroll salta
@@ -1018,7 +1190,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     const isAsia = ["CN", "JP", "KR", "IN", "SG", "MY", "TH", "VN", "PH", "ID"].includes(countryCode);
     if (hasPhysicalItems && isAsia) {
       toast({
-        title: language === "en" ? "Shipping Unavailable" : "Envío no disponible",
+        title: language === "en" ? "Shipping Unavailable" : language === "it" ? "Spedizione non disponibile" : "Envío no disponible",
         description: `${t.shippingNoticeAsia} ${t.digitalAlternativeSuggest}`,
         variant: "destructive",
       });
@@ -1037,8 +1209,15 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       // Cada método vuelve a capturar el carrito en segundo plano, así que aquí
       // no esperamos: el clic en "Continuar" ya no paga la espera de la auditoría.
       void captureAbandonedCheckout(selected, true);
-      
-      if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) { 
+
+      // Aviso "¿Te gustaría agregar…?" ANTES de abrir Stripe o crear el pago en
+      // dLocal / Mercado Pago. Si algo falla al mostrarlo, el pago sigue normal.
+      if (
+        ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "dlocal_transfer", "dlocal_cash", "dlocal_wallet", "transfer", "cash"].includes(selected) &&
+        (await offerUpsellThen(() => { void handleBuyNow(); }))
+      ) return;
+
+      if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) {
         setShowStripe(true); 
         // Force fresh fetch on "Continuar" to handle stale sessions
         useCheckoutPruebaStore.getState().setClientSecret(null);
@@ -1144,6 +1323,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   }, [stripeError, retryStripe]);
 
   useEffect(() => {
+    if (peActive) return; // el formulario nuevo no usa el iframe de Embedded Checkout
     if (!(showStripe && selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected))) return;
     setStripeFrameMounted(false);
     setStripeElapsed(0);
@@ -1198,7 +1378,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       observer.disconnect();
       window.clearInterval(tick);
     };
-  }, [showStripe, selected, stripeRetryKey, language, stripeAutoRetried]);
+  }, [showStripe, selected, stripeRetryKey, language, stripeAutoRetried, peActive]);
 
   const handleManualPaid = async () => {
     if (!valid) { requestBuyerInfo(); return; }
@@ -1535,7 +1715,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const country = (region.country || "").toUpperCase();
   const cardSubtitle = isPeru
     ? t.cardSubtitlePeru(localBadge)
-    : t.cardSubtitleGlobal(local.currency || (language === "en" ? "your local currency" : language === "pt" ? "sua moeda local" : language === "fr" ? "votre monnaie locale" : "tu moneda local"), localBadge);
+    : t.cardSubtitleGlobal(local.currency || (language === "en" ? "your local currency" : language === "it" ? "la tua valuta locale" : language === "pt" ? "sua moeda local" : language === "fr" ? "votre monnaie locale" : "tu moneda local"), localBadge);
 
   const isUsa = country === "US";
   const methodsConfig = useCheckoutMethodsConfig(country);
@@ -1689,7 +1869,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   })();
   const hotmartTaxNote = language === "en"
     ? "includes local taxes (10-20%)"
-    : language === "pt"
+    : language === "it" ? "include le imposte locali (10-20%)" : language === "pt"
     ? "inclui impostos locais (10-20%)"
     : language === "fr"
     ? "taxes locales incluses (10-20 %)"
@@ -1707,7 +1887,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   ];
   const STRIPE_VISIBLE_METHODS = getStripeVisibleMethods(language);
   const dynamicStripeRows: PaymentMethodRow[] = methodsConfig.enabledMethodKeys
-    .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link")
+    // Apple Pay / Google Pay / Link ya salen DENTRO del formulario de tarjeta de Stripe;
+    // una fila aparte hacía dos botones para lo mismo.
+    .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link" && key !== "stripe_apple_pay" && key !== "stripe_google_pay")
     .map((key) => ({ id: "card", methodKey: key, badge: finalPriceLabel, ...STRIPE_VISIBLE_METHODS[key] }));
   const allMethods: PaymentMethodRow[] = [
     { 
@@ -1715,7 +1897,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       icon: CreditCard, 
       title: isPeru ? t.cardTitlePeru : t.cardTitleGlobal, 
       sub: isFallingBackToUsd 
-        ? (language === "en" ? "Paying in USD for compatibility (International transaction)." : "Pagando en USD por compatibilidad (Transacción internacional).")
+        ? (language === "en" ? "Paying in USD for compatibility (International transaction)." : language === "it" ? "Pagamento in USD per compatibilità (transazione internazionale)." : "Pagando en USD por compatibilidad (Transacción internacional).")
         : cardSubtitle, 
       badge: isFallingBackToUsd ? `USD $${totalUsd}` : finalPriceLabel 
     },
@@ -1959,6 +2141,32 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       if (isStripeSel && valid && stripePromise && !showStripe) setShowStripe(true);
     }
   }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
+
+  // Perú: al elegir tarjeta, el formulario de Stripe se abre solo, sin tener que pulsar
+  // "Continuar de Pago" (fuera de Perú esto ya ocurre arriba). Se conserva el aviso
+  // "¿Te gustaría agregar…?" una sola vez por sesión, igual que antes del botón.
+  const autoOpenBusy = useRef(false);
+  useEffect(() => {
+    if (!isPeru) return;
+    const isStripeSel = !!selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected);
+    if (!isStripeSel || !valid || !stripePromise || showStripe || autoOpenBusy.current) return;
+    if (total <= 0 && items.length > 0) return;
+    autoOpenBusy.current = true;
+    const openNow = () => {
+      autoOpenBusy.current = false;
+      useCheckoutPruebaStore.getState().setClientSecret(null);
+      setShowStripe(true);
+    };
+    void (async () => {
+      try {
+        const popupShown = await offerUpsellThen(openNow);
+        if (!popupShown) openNow();
+      } catch {
+        openNow();
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPeru, selected, valid, stripePromise, showStripe, total, items.length]);
 
   // Validación automática: el método dLocal seleccionado y sus etiquetas deben
   // coincidir siempre con la cobertura activa de /admin/dlocal para el país
@@ -2324,7 +2532,23 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
 
-            {isStripeRow && valid && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && (
+            {isStripeRow && valid && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && peActive && (
+              <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-3 sm:p-4 scroll-mt-24">
+                <React.Suspense fallback={null}>
+                  <StripePaymentElementBox
+                    language={language}
+                    country={(country || "").toUpperCase().slice(0, 2)}
+                    currency={String(currency)}
+                    canPay={valid}
+                    onNeedBuyerInfo={requestBuyerInfo}
+                    onBeforePay={() => { void captureAbandonedCheckout(selected || "stripe", true); }}
+                    onUnavailable={() => setPeUnavailable(true)}
+                  />
+                </React.Suspense>
+              </div>
+            )}
+
+            {isStripeRow && valid && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && !peActive && (
               <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 scroll-mt-24">
                 {/* Aviso claro: falta 1 paso más (llenar tarjeta y pagar dentro de Stripe) */}
                 <div className="px-3 sm:px-4 py-2.5 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900 text-[12px] sm:text-sm text-amber-900 dark:text-amber-200 font-medium text-center">
@@ -2782,6 +3006,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           )}
         </button>
       )}
+
+      <UpsellPopup
+        offer={upsellPopup?.offer ?? null}
+        language={language}
+        onAdd={acceptUpsellPopup}
+        onSkip={skipUpsellPopup}
+        onClose={() => setUpsellPopup(null)}
+      />
     </div>
   );
 });

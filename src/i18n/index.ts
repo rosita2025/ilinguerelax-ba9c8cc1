@@ -2,8 +2,9 @@ import { es } from "./translations/es";
 import { en } from "./translations/en";
 import { fr } from "./translations/fr";
 import { pt } from "./translations/pt";
+import { it } from "./translations/it";
 
-export type Language = "es" | "en" | "fr" | "pt";
+export type Language = "es" | "en" | "fr" | "pt" | "it";
 export type Currency =
   | "USD" | "EUR" | "GBP" | "CAD" | "AUD"
   | "BRL" | "MXN" | "COP" | "ARS" | "PEN"
@@ -17,6 +18,7 @@ export const translations = {
   en,
   fr,
   pt,
+  it,
 };
 
 export type Translations = typeof es;
@@ -30,6 +32,7 @@ export const detectLanguage = (): Language => {
   if (browserLang === "en") return "en";
   if (browserLang === "fr") return "fr";
   if (browserLang === "pt") return "pt";
+  if (browserLang === "it") return "it";
   
   return "es"; // Default to Spanish
 };
@@ -83,7 +86,7 @@ const countryToLanguage: Record<string, Language> = {
   
   // European countries - default to English
   DE: "en", // Germany
-  IT: "en", // Italy
+  IT: "it", // Italy
   NL: "en", // Netherlands
   AT: "en", // Austria
   PL: "en", // Poland
@@ -333,6 +336,7 @@ export const languageNames: Record<Language, string> = {
   en: "English",
   fr: "Français",
   pt: "Português",
+  it: "Italiano",
 };
 
 // Language flags
@@ -341,6 +345,7 @@ export const languageFlags: Record<Language, string> = {
   en: "🇬🇧",
   fr: "🇫🇷",
   pt: "🇧🇷",
+  it: "🇮🇹",
 };
 
 export { useI18n } from "./I18nContext";

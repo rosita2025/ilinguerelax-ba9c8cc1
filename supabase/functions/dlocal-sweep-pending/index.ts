@@ -25,6 +25,7 @@ import { assertInternalCall, internalCors } from "../_shared/internalAuth.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { deliverLikeManual } from "../_shared/manualDelivery.ts";
+import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import {
   dlocalApiBase,
@@ -253,6 +254,15 @@ Deno.serve(async (req) => {
           console.warn("[dlocal-sweep] entrega retenida por discrepancia:", orderNumber, check.reason);
           heldForReview++;
           continue;
+        }
+
+        // Meta: pago recuperado por el barrido (webhook perdido) → se avisa a Meta.
+        if (email) {
+          await sendPurchaseCapi({
+            eventId: `Purchase_${orderNumber}`, email, country: country ?? null,
+            value: amount ?? null, currency, contentIds: skus,
+            contentName: skus.join(", ") || "Materiales iLingue Relax", orderId: orderNumber,
+          }).catch((e) => console.error("sweep CAPI failed:", e));
         }
 
         if (email) {

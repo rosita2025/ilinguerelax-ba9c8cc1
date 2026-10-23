@@ -428,11 +428,15 @@ async function handlePaidCheckoutSession(session: any, eventType: string) {
 
 async function handleSucceededPaymentIntent(paymentIntent: any, eventType: string) {
   const metadata = paymentIntent.metadata || {};
-  if (metadata.source !== "checkout-prueba-1" && !metadata.skus) {
+  const isPaymentIntentFlow = metadata.source === "express-checkout" || metadata.source === "payment-element";
+  if (metadata.source !== "checkout-prueba-1" && !isPaymentIntentFlow && !metadata.skus) {
     console.log("[stripe-webhook] payment_intent.succeeded ignored; no checkout metadata", { paymentIntentId: paymentIntent.id });
     return { delivered: false, reason: "not_checkout" };
   }
-  if (!hasAsyncStripeMethod(paymentIntent.payment_method_types)) {
+  // Express Checkout (Apple Pay / Google Pay / Link) y el formulario "Payment Element" NO pasan por una Checkout Session,
+  // así que su única señal de pago es este evento: se entrega siempre.
+  // Los pagos normales con tarjeta siguen entregándose por checkout.session.completed.
+  if (!isPaymentIntentFlow && !hasAsyncStripeMethod(paymentIntent.payment_method_types)) {
     console.log("[stripe-webhook] payment_intent.succeeded ignored for immediate method", { paymentIntentId: paymentIntent.id });
     return { delivered: false, reason: "immediate_method" };
   }

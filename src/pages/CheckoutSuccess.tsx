@@ -218,7 +218,9 @@ export default function CheckoutSuccess() {
         setDelivery(deliveredItems);
         setDownloadUrl((data?.downloadUrl ?? null) as string | null);
         setStripeCustomerId((data?.stripeCustomerId ?? null) as string | null);
-        if (deliveredItems.length > 0) setServerVerifiedPaid(true);
+        // El servidor confirma el pago (paid:true) aunque el pedido no traiga
+        // archivos descargables todavía (p. ej. entrega retenida o solo físico).
+        if (data?.paid === true || deliveredItems.length > 0) setServerVerifiedPaid(true);
       })
       .catch((e) => console.error("order-delivery failed", e))
       .finally(() => setDeliveryLoading(false));
@@ -303,6 +305,7 @@ export default function CheckoutSuccess() {
 
   // Localized copy for the public / unverified screen (IP-based via useI18n)
   const publicCopy = {
+    it: { title: "Conferma d'ordine privata", body: "Questa pagina mostra i dettagli di un ordine recente ed è disponibile solo per gli acquirenti verificati con un pagamento approvato su Stripe o PayPal.", cta: "Vai al negozio" },
     es: {
       title: "Página privada de confirmación",
       body: "Esta página muestra los detalles de un pedido reciente y solo está disponible para compradores verificados con un pago aprobado en Stripe o PayPal.",
@@ -543,7 +546,7 @@ export default function CheckoutSuccess() {
         {upsellOffer && stripeCustomerId && upsellState !== "done" && upsellState !== "auth_required" && (
           <section className="rounded-xl border-2 border-primary/40 bg-primary/5 p-5 space-y-4">
             <h2 className="font-semibold text-base">
-              {language === "en" ? "Add it with 1 click" : language === "pt" ? "Adicione com 1 clique" : language === "fr" ? "Ajoutez en 1 clic" : "Agrégalo con 1 clic"}
+              {language === "en" ? "Add it with 1 click" : language === "it" ? "Aggiungilo con 1 clic" : language === "pt" ? "Adicione com 1 clique" : language === "fr" ? "Ajoutez en 1 clic" : "Agrégalo con 1 clic"}
             </h2>
             <div className="flex items-center gap-4">
               <img src={upsellOffer.image} alt={upsellOffer.name} className="w-16 h-16 rounded-lg object-cover shrink-0" />
@@ -560,29 +563,29 @@ export default function CheckoutSuccess() {
             <div className="flex flex-col sm:flex-row gap-2">
               <Button onClick={chargeUpsell} disabled={upsellState === "charging"} className="w-full sm:w-auto gap-1.5">
                 {upsellState === "charging"
-                  ? (language === "en" ? "Processing…" : "Procesando…")
-                  : (language === "en" ? "Add with 1 click" : language === "pt" ? "Adicionar com 1 clique" : language === "fr" ? "Ajouter en 1 clic" : "Agregar con 1 clic")}
+                  ? (language === "en" ? "Processing…" : language === "it" ? "Elaborazione…" : "Procesando…")
+                  : (language === "en" ? "Add with 1 click" : language === "it" ? "Aggiungi con 1 clic" : language === "pt" ? "Adicionar com 1 clique" : language === "fr" ? "Ajouter en 1 clic" : "Agregar con 1 clic")}
               </Button>
               {upsellQueue.length > 1 && (
                 <Button variant="ghost" onClick={skipUpsell} disabled={upsellState === "charging"} className="w-full sm:w-auto">
-                  {language === "en" ? "No thanks, show me another" : language === "pt" ? "Não, obrigado, outro" : language === "fr" ? "Non merci, un autre" : "No gracias, ver otro"}
+                  {language === "en" ? "No thanks, show me another" : language === "it" ? "No grazie, mostrane un altro" : language === "pt" ? "Não, obrigado, outro" : language === "fr" ? "Non merci, un autre" : "No gracias, ver otro"}
                 </Button>
               )}
             </div>
             {upsellState === "error" && (
               <p className="text-xs text-destructive">
-                {language === "en" ? "We couldn't process the charge. You can buy it separately from the store." : "No pudimos procesar el cobro. Puedes comprarlo por separado desde la tienda."}
+                {language === "en" ? "We couldn't process the charge. You can buy it separately from the store." : language === "it" ? "Non siamo riusciti a elaborare l'addebito. Puoi acquistarlo separatamente dal negozio." : "No pudimos procesar el cobro. Puedes comprarlo por separado desde la tienda."}
               </p>
             )}
             <p className="text-xs text-muted-foreground">
-              {language === "en" ? "Charged to the same card you just used. No need to enter it again." : "Se cobra a la misma tarjeta que acabas de usar. Sin volver a escribirla."}
+              {language === "en" ? "Charged to the same card you just used. No need to enter it again." : language === "it" ? "Viene addebitato sulla stessa carta che hai appena usato. Non devi inserirla di nuovo." : "Se cobra a la misma tarjeta que acabas de usar. Sin volver a escribirla."}
             </p>
           </section>
         )}
         {upsellState === "done" && (
           <section className="rounded-xl border border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-500/5 p-5">
             <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
-              {language === "en" ? "Added! The download link was sent to your email." : "¡Agregado! El enlace de descarga fue enviado a tu correo."}
+              {language === "en" ? "Added! The download link was sent to your email." : language === "it" ? "Aggiunto! Il link per il download è stato inviato alla tua email." : "¡Agregado! El enlace de descarga fue enviado a tu correo."}
             </p>
           </section>
         )}
@@ -591,7 +594,7 @@ export default function CheckoutSuccess() {
             <p className="text-sm text-muted-foreground">
               {language === "en"
                 ? "Your bank requires extra verification for automatic charges. You can buy this product separately from the store."
-                : "Tu banco pide una verificación adicional para cargos automáticos. Puedes comprar este producto por separado desde la tienda."}
+                : language === "it" ? "La tua banca richiede una verifica aggiuntiva per gli addebiti automatici. Puoi acquistare questo prodotto separatamente dal negozio." : "Tu banco pide una verificación adicional para cargos automáticos. Puedes comprar este producto por separado desde la tienda."}
             </p>
           </section>
         )}

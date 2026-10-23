@@ -153,6 +153,8 @@ async function enroll(supabase: ReturnType<typeof admin>) {
 async function resolutionReason(
   supabase: ReturnType<typeof admin>,
   orderNumber: string,
+  email?: string,
+  createdAt?: string | null,
 ): Promise<string | null> {
   const { data: events } = await supabase
     .from("order_events")
@@ -171,6 +173,27 @@ async function resolutionReason(
     .maybeSingle();
   if (manual && manual.status && manual.status !== "pending") {
     return manual.status === "rejected" ? "rechazado" : "pagado";
+  }
+  // Misma clienta con un pago POSTERIOR (reintento): este pendiente ya no aplica.
+  if (email && createdAt) {
+    const { data: later } = await supabase
+      .from("order_events")
+      .select("order_number")
+      .eq("customer_email", email.toLowerCase())
+      .eq("event", "payment_paid")
+      .neq("order_number", orderNumber)
+      .gt("created_at", createdAt)
+      .limit(1);
+    if (later && later.length > 0) return "reemplazado_por_pago";
+    const { data: laterManual } = await supabase
+      .from("manual_payments")
+      .select("order_number")
+      .ilike("buyer_email", email)
+      .in("status", ["approved", "verified", "completed"])
+      .neq("order_number", orderNumber)
+      .gt("created_at", createdAt)
+      .limit(1);
+    if (laterManual && laterManual.length > 0) return "reemplazado_por_pago";
   }
   return null;
 }
@@ -196,7 +219,7 @@ Deno.serve(async (req) => {
       .limit(60);
 
     for (const r of (due ?? []) as Reminder[]) {
-      const reason = await resolutionReason(supabase, r.order_number);
+      const reason = await resolutionReason(supabase, r.order_number, r.customer_email, r.order_created_at);
       if (reason) {
         await supabase
           .from("pending_payment_reminders")

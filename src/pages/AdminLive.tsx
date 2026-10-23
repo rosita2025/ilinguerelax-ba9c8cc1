@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { Card } from "@/components/ui/card";
-import { Activity, Bot, CreditCard, Eye, Globe, MousePointerClick, ShoppingBag, Users } from "lucide-react";
+import { Activity, Bot, CreditCard, Eye, Globe, Loader2, MousePointerClick, ShoppingBag, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import AdminNav from "@/components/admin/AdminNav";
 import { useAdminKey } from "@/components/admin/AdminGate";
 import { getCountryInfo } from "@/lib/countryInfo";
@@ -100,27 +99,11 @@ const eventLabel: Record<string, string> = {
 
 const money = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
-const EMPTY_LIVE: LiveData = {
-  windowMinutes: 1, total: 0, activeNow: 0, productViews: 0, checkouts: 0,
-  checkoutSessions: 0, purchases: 0, purchaseSessions: 0, revenue: 0,
-  byCountry: {}, byPage: {}, byPageLabel: {}, byProduct: {}, bySource: {},
-  byChannel: {}, byCampaign: {}, bySourceCountry: {}, byEvent: {},
-  revenueByCountry: {}, visitors: [], recentEvents: [], generatedAt: "",
-};
-
 const AdminLive = () => {
   const { adminKey } = useAdminKey();
-  const [windowMin, setWindowMin] = useState<1 | 5 | 15 | 60>(1);
-  // Último resultado guardado: la pantalla abre al instante con datos recientes
-  // y se actualiza en segundo plano en vez de quedarse en un círculo de carga.
-  const [liveData, setData] = useState<LiveData | null>(() => {
-    try {
-      const raw = sessionStorage.getItem("ilr_live_cache_1");
-      return raw ? (JSON.parse(raw) as LiveData) : null;
-    } catch { return null; }
-  });
+  const [data, setData] = useState<LiveData | null>(null);
   const [loading, setLoading] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [windowMin, setWindowMin] = useState<1 | 5 | 15 | 60>(1);
   // Cerrado por defecto — es informativo (confirma que los bots ya se
   // filtran), no esencial de ver todo el tiempo. Mantiene la vista
   // principal más simple, como pediste.
@@ -129,40 +112,35 @@ const AdminLive = () => {
   const load = async () => {
     setLoading(true);
     try {
-      // Si el servidor tarda demasiado, se corta y se muestra un error con
-      // botón de reintento (antes quedaba un círculo girando para siempre).
-      const timeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("El servidor tardó demasiado. Reintenta.")), 25000),
-      );
-      const { data: res, error } = await Promise.race([
-        supabase.functions.invoke("live-visitors", { body: { adminKey, windowMinutes: windowMin } }),
-        timeout,
-      ]);
+      const { data: res, error } = await supabase.functions.invoke("live-visitors", {
+        body: { adminKey, windowMinutes: windowMin },
+      });
       if (error) throw error;
-      if ((res as { error?: string })?.error) throw new Error((res as { error: string }).error);
+      if ((res as { error?: string })?.error) { toast.error((res as { error: string }).error); return; }
       setData(res as LiveData);
-      setLoadError(null);
-      if (windowMin === 1) {
-        try { sessionStorage.setItem("ilr_live_cache_1", JSON.stringify(res)); } catch { /* sin espacio */ }
-      }
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Error";
-      setLoadError(msg);
-      // Con datos ya en pantalla solo se avisa; sin datos se muestra el error abajo.
-      if (liveData) toast.error(msg);
+      toast.error(e instanceof Error ? e.message : "Error");
     } finally { setLoading(false); }
   };
 
   useEffect(() => { void load(); }, [adminKey, windowMin]);
-  // El sondeo corre siempre (también tras un error) para recuperarse solo.
   useEffect(() => {
+    if (!data) return;
     const id = setInterval(() => { if (!document.hidden) void load(); }, 15000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [adminKey, windowMin, liveData]);
+  }, [data, adminKey, windowMin]);
 
-  // La pantalla se pinta al instante con ceros; los datos entran cuando llegan.
-  const data: LiveData = liveData ?? EMPTY_LIVE;
+  if (!data) {
+    return (
+      <>
+        <AdminNav />
+        <main className="min-h-dvh bg-background flex items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+        </main>
+      </>
+    );
+  }
 
   const countries = Object.entries(data.byCountry).sort(([, a], [, b]) => b - a);
   const maxCount = Math.max(1, ...countries.map(([, v]) => v));
@@ -194,7 +172,7 @@ const AdminLive = () => {
                 <Globe className="w-5 h-5 md:w-7 md:h-7 text-primary shrink-0" /> Plataforma en vivo
               </h1>
               <p className="text-[11px] md:text-sm text-muted-foreground leading-snug mt-0.5">
-                Humanos · ventana {windowMin < 60 ? `${windowMin} min` : "1 hora"} · {liveData ? `${timeAgo(data.generatedAt)} atrás` : (loadError ? "sin conexión" : "cargando…")}
+                Humanos · ventana {windowMin < 60 ? `${windowMin} min` : "1 hora"} · {timeAgo(data.generatedAt)} atrás
               </p>
             </div>
             <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
@@ -207,11 +185,6 @@ const AdminLive = () => {
                 <span className="text-base md:text-lg font-bold tabular-nums">{data.activeNow || data.total}</span>
                 <span className="text-[10px] md:text-xs text-muted-foreground">en vivo</span>
               </div>
-              {loadError && !liveData && (
-                <Button size="sm" variant="outline" onClick={() => void load()} disabled={loading}>
-                  Reintentar
-                </Button>
-              )}
               <div className="inline-flex rounded-md border bg-background overflow-hidden">
                 {([1, 5, 15, 60] as const).map((m) => (
                   <button
@@ -228,6 +201,7 @@ const AdminLive = () => {
                   </button>
                 ))}
               </div>
+              {loading && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
             </div>
           </div>
 

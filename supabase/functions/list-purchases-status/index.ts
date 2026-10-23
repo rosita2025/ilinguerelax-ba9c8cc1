@@ -27,9 +27,6 @@ interface Row {
   failed_step: string | null;
   payload: any;
   is_merged?: boolean;
-  // true si este correo tiene atribución guardada de Meta Ads (fbc/fbp) —
-  // o sea, llegó haciendo clic en un anuncio de Facebook/Instagram.
-  from_meta_ads?: boolean;
 }
 
 // Mercado Pago status_detail → Spanish reason
@@ -250,7 +247,7 @@ Deno.serve(async (req) => {
           country: r.country || d.customer_country || d.country || d.buyer_country || null,
           amount: r.value || d.amount || d.transaction_amount || null,
           currency: r.currency || d.currency || d.currency_id || null,
-          product: (/checkout|^stripe|^dlocal|^mp$|^hotmart$|^paypal/i.test(String(r.product_id || "")) ? null : r.product_id) || d.items_summary || d.product_name || d.description || null,
+          product: r.product_id || d.items_summary || d.product_name || d.description || null,
           transaction: d.payment_intent_id || d.session_id || d.id || d.payment_id || null,
           raw_status: status,
           mapped_status: mapped,
@@ -291,7 +288,7 @@ Deno.serve(async (req) => {
           country: r.country || d.country || d.buyer_address_country || d.buyer?.address?.country || d.buyer_address_country || null,
           amount: r.value || d.amount || d.value || null,
           currency: r.currency || d.currency || null,
-          product: (/checkout|^stripe|^dlocal|^mp$|^hotmart$|^paypal/i.test(String(r.product_id || "")) ? null : r.product_id) || d.product_name || d.name || d.product?.name || null,
+          product: r.product_id || d.product_name || d.name || d.product?.name || null,
           transaction: r.session_id || d.transaction || d.transaction_code || d.hottok || null,
           raw_status: status,
           mapped_status: (status === "approved" || status === "complete" || status === "succeeded" || status === "Purchase") ? "approved" : 
@@ -333,7 +330,7 @@ Deno.serve(async (req) => {
           country: r.country || d.country || d.payer_address_country || null,
           amount: d.localAmount || r.value || d.amount || null,
           currency: d.localCurrency || r.currency || d.currency || null,
-          product: (/checkout|^stripe|^dlocal|^mp$|^hotmart$|^paypal/i.test(String(r.product_id || "")) ? null : r.product_id) || d.items_summary || d.product_name || null,
+          product: r.product_id || d.items_summary || d.product_name || null,
           transaction: r.session_id || d.payment_id || d.order_id || null,
           raw_status: status,
           mapped_status: mapped,
@@ -465,24 +462,7 @@ Deno.serve(async (req) => {
       return acc;
     }, {});
 
-    const pageRows = filtered.slice(0, take);
-
-    // Marca cada pedido con si viene de un clic real en un anuncio de Meta
-    // (Facebook/Instagram) — usando la misma tabla que ya alimenta el
-    // píxel de conversión, sin necesitar guardar nada nuevo.
-    const pageEmails = Array.from(new Set(pageRows.map((r) => r.email).filter(Boolean))) as string[];
-    if (pageEmails.length) {
-      const { data: attrRows } = await admin
-        .from("meta_attribution")
-        .select("email")
-        .in("email", pageEmails.map((e) => e.toLowerCase()));
-      const withMetaAds = new Set((attrRows ?? []).map((r: { email: string }) => r.email));
-      for (const r of pageRows) {
-        r.from_meta_ads = r.email ? withMetaAds.has(r.email.toLowerCase()) : false;
-      }
-    }
-
-    return new Response(JSON.stringify({ rows: pageRows, summary, total: filtered.length }), {
+    return new Response(JSON.stringify({ rows: filtered.slice(0, take), summary, total: filtered.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

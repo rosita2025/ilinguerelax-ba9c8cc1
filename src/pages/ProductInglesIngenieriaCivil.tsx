@@ -1,5 +1,5 @@
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, lazy, Suspense } from "react";
 import { useNavigate, useParams, Navigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
@@ -17,13 +17,15 @@ import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { motion } from "framer-motion";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { CompradoresReales } from "@/components/CompradoresReales";
-import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { type Currency } from "@/i18n";
 import { useI18n } from "@/i18n/I18nContext";
 import { UrgencyTimerBar } from "@/components/UrgencyTimerBar";
 import { PinterestSave } from "@/components/PinterestSave";
+import { getCourseStickyReviewStats, getRealReviewStats, getStickyTestimonials } from "@/components/landing/magliaRelaxData";
+
+const MagliaRelaxLanding = lazy(() => import("@/components/landing/MagliaRelaxLanding").then(m => ({ default: m.MagliaRelaxLanding })));
 
 const CIVIL_SKU = "1-000-palabras-ingles-mas-utilizadas-en-ingenieria-civil-n6mm";
 
@@ -75,6 +77,14 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
   }, []);
 
   const pricingAdmin = useAdminPricing(ADMIN_SKU);
+  // Curso de video de tejido (Maglia Relax): usa la landing italiana propia en lugar de las secciones de PDF.
+  const isCourse = pricingAdmin.learnerLanguage === "it" && ADMIN_SKU.startsWith("maglia-relax");
+  // Italian course (maglia-relax): CTA in Italian — other products keep "LO QUIERO"
+  const ctaBase = isCourse ? "LO VOGLIO" : "LO QUIERO";
+  // Written reviews and SEO stay sourced from supplied real reviews.
+  const realReviews = getRealReviewStats();
+  const courseReviewCount = realReviews.count;
+  const courseStickyReviews = getCourseStickyReviewStats(pricingAdmin.rating, pricingAdmin.reviewCount);
   const tier = useCountryTierRouting(ADMIN_SKU, {
     tiendaPath: TIENDA_CHECKOUT_PATH,
   });
@@ -114,7 +124,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
   const addToCartItem = () => {
     addItem({
       id: ADMIN_SKU,
-      name: `${productName} (PDF)`,
+      name: isCourse ? productName : `${productName} (PDF)`,
       price: PRICE_USD,
       regionPrices: {
         latam: LATAM_USD,
@@ -169,10 +179,10 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
       num_items: 1,
     });
     addToCartItem();
-    toast.success("Producto agregado al carrito", {
-      description: "Puedes seguir explorando o ir al checkout.",
+    toast.success(isCourse ? "Prodotto aggiunto al carrello" : "Producto agregado al carrito", {
+      description: isCourse ? "Puoi continuare a esplorare o andare al checkout." : "Puedes seguir explorando o ir al checkout.",
       action: {
-        label: "Ir al checkout",
+        label: isCourse ? "Vai al checkout" : "Ir al checkout",
         onClick: () => navigate(TIENDA_CHECKOUT_PATH),
       },
     });
@@ -203,7 +213,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
 
   return (
     <main className="min-h-screen bg-background">
-      <UrgencyTimerBar productSlug={ADMIN_SKU} language="es" />
+      {!isCourse && <UrgencyTimerBar productSlug={ADMIN_SKU} language="es" />}
       <SEO
         title={pricingAdmin.name ?? "1,000 Palabras en Inglés de Ingeniería Civil PDF"}
         description={pricingAdmin.description ?? (isCivil ? DEFAULT_DESCRIPTION : "")}
@@ -211,13 +221,13 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         image={heroImageAbsolute}
         type="product"
         price={PRICE_USD.toString()}
-        originalPrice={(PRICE_USD * 2.5).toString()}
-        rating={pricingAdmin.rating?.toString() ?? "4.9"}
-        reviewCount={pricingAdmin.reviewCount?.toString() ?? "6"}
+        originalPrice={isCourse ? undefined : (PRICE_USD * 2.5).toString()}
+        rating={isCourse ? (courseReviewCount === 0 ? undefined : realReviews.average.toFixed(1)) : (pricingAdmin.rating?.toString() ?? "4.9")}
+        reviewCount={isCourse ? (courseReviewCount === 0 ? undefined : String(courseReviewCount)) : (pricingAdmin.reviewCount?.toString() ?? "6")}
         sku={ADMIN_SKU}
         keywords="inglés para ingeniería civil, vocabulario ingeniería civil en inglés, palabras técnicas ingeniería civil, inglés técnico construcción, diccionario ingeniería civil inglés español, ebook inglés ingeniería pdf"
-        reviews={productReviews}
-        faqItems={[
+        reviews={isCourse ? undefined : productReviews}
+        faqItems={isCourse ? undefined : [
           { question: `¿Por qué cuesta solo ${tier.priceLabel}?`, answer: "Queremos que el método llegue a más personas. El PDF es de calidad profesional, sin errores ortográficos. Puedes verificarlo con la vista previa real más arriba." },
           { question: "¿Qué incluye este ebook?", answer: "Las 1,000 palabras más utilizadas en Ingeniería Civil con traducción al español, pronunciación adaptada y ejemplos de uso en contexto real." },
           { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Recibes la descarga inmediata después del pago. Puedes leerlo en móvil, tablet, computadora o imprimirlo." },
@@ -272,7 +282,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20">
-                  🆕 Nuevo Lanzamiento
+                  {isCourse ? "🆕 Nuova uscita" : "🆕 Nuevo Lanzamiento"}
                 </span>
               </div>
 
@@ -280,10 +290,13 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
                 {productName}
               </h1>
 
-              <p className="text-base text-muted-foreground mb-4">
-                {productDescription}
-              </p>
+              {!isCourse && (
+                <p className="text-base text-muted-foreground mb-4">
+                  {productDescription}
+                </p>
+              )}
 
+              {(!isCourse || courseReviewCount > 0) && (
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-4">
                 <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
@@ -294,17 +307,16 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
                   ))}
                 </div>
                 <span className="font-bold text-sm sm:text-base text-foreground">
-                  {pricingAdmin.rating != null ? pricingAdmin.rating.toFixed(1) : "4.9"}/5
+                  {isCourse ? realReviews.average.toFixed(1) : (pricingAdmin.rating != null ? pricingAdmin.rating.toFixed(1) : "4.9")}/5
                 </span>
                 <span className="text-xs sm:text-sm text-muted-foreground">
-                  ({pricingAdmin.reviewCount ?? 6} {t.product.verifiedReviews})
+                  ({isCourse ? courseReviewCount : (pricingAdmin.reviewCount ?? 6)} {isCourse ? (courseReviewCount === 1 ? "recensione" : "recensioni") : t.product.verifiedReviews})
                 </span>
               </div>
-
-              <PrecioEconomicoBanner />
+              )}
 
               <div className="mb-6 flex items-center justify-between bg-muted/30 p-3 rounded-xl border border-border/50">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Pagos Seguros:</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{isCourse ? "Pagamenti sicuri:" : "Pagos Seguros:"}</span>
                 <PaymentLogos />
               </div>
 
@@ -317,13 +329,15 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
                   disabled={!pricingReady}
                 >
                   <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-                  {pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
+                  {pricingReady ? `${ctaBase} • ${priceLabel}` : ctaBase}
                   <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
                 </Button>
               </motion.div>
 
               <p className="text-center text-xs text-muted-foreground mb-3">
-                🔒 Pago seguro • ⬇️ Descarga inmediata • 🛡️ Garantía 7 días
+                {isCourse
+                  ? "🔒 Pagamento sicuro • ▶️ Accesso immediato • 🛡️ Garanzia 7 giorni"
+                  : "🔒 Pago seguro • ⬇️ Descarga inmediata • 🛡️ Garantía 7 días"}
               </p>
 
               <button
@@ -331,10 +345,10 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
                 onClick={handleAddToCart}
                 className="w-full mb-4 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors"
               >
-                o agregar al carrito
+                {isCourse ? "oppure aggiungi al carrello" : "o agregar al carrito"}
               </button>
 
-              {galleryPreviews.length > 0 && (
+              {galleryPreviews.length > 0 && !isCourse && (
                 <p className="text-center text-sm text-muted-foreground mb-6">
                   👇 Mira la vista previa real antes de comprar
                 </p>
@@ -344,8 +358,21 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         </div>
       </section>
 
+      {isCourse && (
+        <div className="container px-4 md:px-6">
+          <Suspense fallback={<div className="h-96 w-full rounded-2xl bg-muted animate-pulse" />}>
+            <MagliaRelaxLanding
+              galleryImages={pricingAdmin.galleryImages ?? []}
+              ctaLabel={pricingReady ? `Lo voglio — ${priceLabel}` : "Lo voglio"}
+              ctaDisabled={!pricingReady}
+              onBuy={handleBuy}
+            />
+          </Suspense>
+        </div>
+      )}
+
       {/* Vista previa real (imágenes de la galería del admin de productos) */}
-      {galleryPreviews.length > 0 && (
+      {!isCourse && galleryPreviews.length > 0 && (
         <section className="py-10 md:py-14">
           <div className="container px-4 md:px-6">
             <div className="max-w-5xl mx-auto">
@@ -410,6 +437,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
       )}
 
       {/* What's included */}
+      {!isCourse && (
       <section className="py-8 md:py-10 bg-muted/30">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
@@ -431,8 +459,10 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Testimonios y reseñas */}
+      {!isCourse && (
       <section className="py-10 md:py-14">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
@@ -511,7 +541,9 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
           </div>
         </div>
       </section>
+      )}
 
+      {!isCourse && (
       <FAQ
         items={[
           { question: t.productFaq.specialTitle, answer: t.productFaq.specialAnswer, icon: Sparkles },
@@ -522,6 +554,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas"
       />
+      )}
 
       <Footer />
 
@@ -529,24 +562,27 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         sku={ADMIN_SKU}
         goesToInternalCheckout={true}
         price={priceLabel}
-        originalPrice={originalLabel}
+        originalPrice={isCourse ? undefined : originalLabel}
         currencyCode={displayCurrency}
         usdValue={PRICE_USD}
         flag={tier.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
         productName={productName}
-        rating={pricingAdmin.rating != null ? pricingAdmin.rating : 4.9}
-        reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}
-        showReviews={true}
+        rating={isCourse ? courseStickyReviews.average : (pricingAdmin.rating != null ? pricingAdmin.rating : 4.9)}
+        reviewCount={isCourse ? courseStickyReviews.count : (pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6)}
+        lang={isCourse ? "it" : undefined}
+        productKind={isCourse ? "course" : "pdf"}
+        testimonials={isCourse && courseReviewCount > 0 ? getStickyTestimonials() : undefined}
+        showReviews={!isCourse || courseStickyReviews.count > 0}
         onBuyClick={handleBuy}
-        ctaText={pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
+        ctaText={pricingReady ? `${ctaBase} • ${priceLabel}` : ctaBase}
         isLoading={!pricingReady}
         localUsdPrices={pricingAdmin.localUsdPrices}
       />
 
       <div className="h-20 md:h-16" />
 
-      <SalesNotification />
-      <WhatsAppButton url="https://wa.link/5ta2ea" label="¿Dudas?" />
+      {!isCourse && <SalesNotification />}
+      <WhatsAppButton url="https://wa.link/5ta2ea" label={isCourse ? "Dubbi?" : "¿Dudas?"} />
       <ScrollToTop showAfter={500} />
     </main>
   );

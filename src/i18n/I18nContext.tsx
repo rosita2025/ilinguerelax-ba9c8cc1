@@ -106,7 +106,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
         // cae al default "es").
         if (!savedLang && typeof navigator !== "undefined") {
           const browserLang = navigator.language?.toLowerCase().split("-")[0];
-          const supported = browserLang === "en" || browserLang === "es" || browserLang === "fr" || browserLang === "pt";
+          const supported = browserLang === "en" || browserLang === "es" || browserLang === "fr" || browserLang === "pt" || browserLang === "it";
           if (!supported) {
             const detectedLang = detectLanguageFromCountry(country);
             setLanguageState(detectedLang);

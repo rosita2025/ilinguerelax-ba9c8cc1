@@ -84,23 +84,23 @@ const benefits = [
   icon: BookOpen,
   title: "Pronunciación en Español",
   description:
-  "Cada palabra incluye su pronunciación adaptada al español para que aprendas correctamente desde el primer día."
+  "Cada palabra con su pronunciación en español."
 },
 {
   icon: BookOpen,
   title: "8,000 Palabras Esenciales",
   description:
-  "El vocabulario más importante organizado por frecuencia de uso para máximo impacto en tu aprendizaje."
+  "El vocabulario más usado, ordenado por temas."
 },
 {
   icon: Sparkles,
   title: "Método Sin Estrés",
-  description: "Aprende a tu propio ritmo con nuestra metodología relajada que respeta tu proceso de aprendizaje."
+  description: "Aprende a tu ritmo, sin presión."
 },
 {
   icon: Brain,
   title: "Sin Diccionarios",
-  description: "Todo lo que necesitas está incluido. Significados, pronunciación y ejemplos en un solo lugar."
+  description: "Significado, pronunciación y ejemplos en un solo lugar."
 }];
 
 
@@ -240,9 +240,11 @@ const Product8000 = () => {
                 Inglés Relax - 8,000 Palabras con Pronunciación Español y Fonética UK/USA
               </h1>
 
-              <p className="text-lg text-muted-foreground mb-4">
-                El método completo para aprender inglés sin estrés, sin diccionarios, paso a paso. Diseñado
-                exclusivamente para hispanohablantes.
+              <p className="text-lg font-semibold text-foreground mb-1">
+                Aprende inglés sin estrés, sin diccionarios y paso a paso.
+              </p>
+              <p className="text-base text-muted-foreground mb-4">
+                8,000 palabras con pronunciación en español + 4 bonos GRATIS.
               </p>
 
               {/* Reviews - More Prominent */}
@@ -254,16 +256,6 @@ const Product8000 = () => {
                 </div>
                 <span className="font-bold text-foreground">4.9/5</span>
                 <span className="text-muted-foreground">(20+ Estudiantes Satisfechos)</span>
-              </div>
-
-              {/* Purchase Counter - Social Proof */}
-              <div className="mb-4">
-                <PurchaseCounter baseCount={892} lang="es" />
-              </div>
-
-              {/* Live Viewers */}
-              <div className="mb-4">
-                <LiveViewers minViewers={12} maxViewers={35} />
               </div>
 
               {/* Price Section - More Impactful */}
@@ -354,60 +346,88 @@ const Product8000 = () => {
         </div>
       </section>
 
-      {/* Partner Logos Ticker */}
-      <section className="py-6">
+      {/* Subhero */}
+      <section className="py-6 md:py-8 bg-primary/5 border-y border-primary/10">
         <div className="container px-4 md:px-6">
-          <div className="overflow-hidden bg-gray-900 py-8 md:py-10 rounded-2xl">
-            <div className="flex animate-ticker" style={{ width: "max-content" }}>
-              {[...Array(4)].map((_, setIndex) =>
-              <div key={setIndex} className="flex items-center shrink-0 gap-20 md:gap-32 px-10 md:px-16">
-                  {partnerLogos.map((logo, index) =>
-                <img
-                  key={`${setIndex}-${index}`}
-                  src={logo.src}
-                  alt={logo.alt}
-                  className={`${logo.height} w-auto object-contain shrink-0 brightness-0 invert opacity-90`} />
-
-                )}
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-4">
+              Un solo pago. <span className="text-gradient">Libro + 4 bonos GRATIS.</span>
+            </h2>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-left">
+              {[
+                { t: "8,000 palabras", d: "Por temas, de A1 a C1" },
+                { t: "Pronunciación", d: "En español + UK y USA" },
+                { t: "35 estructuras", d: "Gramática desde cero" },
+                { t: "4 bonos GRATIS", d: "Repaso, ejemplos, errores y notas" },
+              ].map((x) => (
+                <div key={x.t} className="rounded-xl border border-border bg-card p-3 shadow-card">
+                  <p className="text-sm font-extrabold text-foreground flex items-center gap-2"><Check className="w-4 h-4 text-primary shrink-0" />{x.t}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{x.d}</p>
                 </div>
-              )}
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Benefits */}
-      <section className="py-12 md:py-16 bg-secondary/30">
+      {/* Dolores */}
+      <section className="py-10 md:py-12">
         <div className="container px-4 md:px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              ¿Por qué elegir el <span className="text-gradient">Libro Digital Completo</span>?
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-6">
+              ¿Te pasa esto con el <span className="text-gradient">inglés</span>?
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Todo lo que necesitas para dominar el inglés en un solo paquete
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {benefits.map((benefit) =>
-            <div
-              key={benefit.title}
-              className="bg-card rounded-2xl border border-border shadow-card p-6 hover:shadow-hero transition-all duration-500">
-              
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl gradient-hero flex items-center justify-center flex-shrink-0">
-                    <benefit.icon className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">{benefit.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{benefit.description}</p>
-                  </div>
+            <div className="space-y-3">
+              {[
+                "Aprendes palabras sueltas y no sabes cómo se pronuncian.",
+                "Vives con el diccionario abierto y avanzas muy lento.",
+                "No sabes por dónde empezar ni qué vocabulario es el importante.",
+                "Te da vergüenza hablar por miedo a pronunciar mal.",
+              ].map((x) => (
+                <div key={x} className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4">
+                  <span className="text-lg leading-none mt-0.5">❌</span>
+                  <p className="text-foreground text-sm md:text-base">{x}</p>
                 </div>
-              </div>
-            )}
+              ))}
+            </div>
+            <p className="text-center text-foreground font-bold text-lg mt-6">
+              Con las <span className="text-gradient">8,000 palabras correctas</span> y su pronunciación, todo se vuelve fácil.
+            </p>
           </div>
         </div>
       </section>
+
+      {/* Beneficios */}
+      <section className="py-10 md:py-12 bg-secondary/30">
+        <div className="container px-4 md:px-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-8">
+            Lo que vas a <span className="text-gradient">lograr</span>
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto">
+            {benefits.map((benefit) => (
+              <div key={benefit.title} className="bg-card rounded-2xl border border-border shadow-card p-5 flex items-start gap-4">
+                <div className="w-11 h-11 rounded-xl gradient-hero flex items-center justify-center flex-shrink-0">
+                  <benefit.icon className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-foreground mb-1">{benefit.title}</h3>
+                  <p className="text-muted-foreground text-sm">{benefit.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <Button variant="hero" size="xl" onClick={handleBuyNow} className="w-full sm:w-auto px-6 py-5 shadow-2xl">
+              <ShoppingCart className="w-5 h-5 mr-2" />
+              ¡LO QUIERO! — {tier.priceLabel}
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonios */}
+      <ProductReviews productType="english" />
 
       {/* What You Get Today - Value Stack */}
       <section className="py-12 md:py-16">
@@ -467,10 +487,7 @@ const Product8000 = () => {
         </div>
       </section>
 
-      {/* Reviews carousel (moved above preview) */}
-      <ProductReviews productType="english" />
-
-      {/* Preview & Bonus Sections */}
+      {/* Presentación: vista previa + bonos */}
       <Product8000Preview />
 
       <ProductCrossSell currentProduct="8000" lang="es" />
@@ -483,7 +500,7 @@ const Product8000 = () => {
               ¿Listo para dominar el inglés sin estrés?
             </h2>
             <p className="text-lg text-primary-foreground/90 mb-8">
-              Únete a más de 10,000 estudiantes que ya están aprendiendo con iLingue Relax
+              Empieza hoy con el libro y los 4 bonos GRATIS
             </p>
 
             <div className="bg-card rounded-3xl shadow-hero p-8 mb-8">
@@ -508,45 +525,12 @@ const Product8000 = () => {
       {/* FAQ Section */}
       <FAQ
         items={[
-        {
-          question: "¿Quién es el autor del libro?",
-          answer:
-          "INGLÉS RELAX es una obra de iLingue Relax, una marca educativa enfocada en aprender inglés de forma simple, práctica y sin estrés.",
-          icon: User
-        },
-        {
-          question: "¿INGLÉS RELAX es un libro físico o digital?",
-          answer:
-          "Actualmente, INGLÉS RELAX es un producto digital disponible para compra inmediata. El libro puede descargarse y imprimirse en casa si el usuario lo desea. El libro físico (tapa blanda pegada) está previsto para junio de 2026. En algunas promociones futuras, el libro físico podrá incluir la versión digital (PDF) como bono.",
-          icon: Smartphone
-        },
-        {
-          question: "¿Cuántas páginas tiene INGLÉS RELAX?",
-          answer:
-          "El libro digital tiene entre 300 y 350 páginas de contenido práctico, organizado y fácil de estudiar.",
-          icon: FileText
-        },
-        {
-          question: "¿Es adecuado para estudiar solo/a?",
-          answer: "Sí. INGLÉS RELAX está diseñado para autoestudio, para aprender a tu ritmo y sin presión.",
-          icon: GraduationCap
-        },
-        {
-          question: "¿Necesito saber inglés antes de usar el libro?",
-          answer: "No. Puedes empezar desde cero, sin conocimientos previos de inglés.",
-          icon: Lightbulb
-        },
-        {
-          question: "¿El libro incluye pronunciación?",
-          answer: "Sí. Todas las palabras incluyen pronunciación adaptada al español, pensada para hispanohablantes.",
-          icon: BookOpen
-        },
-        {
-          question: "¿Cómo realizo el pago?",
-          answer:
-          "Puedes pagar de forma segura mediante tarjeta de crédito o débito internacional (Stripe), Yape, Plin o transferencias según tu país.",
-          icon: CreditCard
-        }]
+        { question: "¿Qué recibo al comprar?", answer: "El libro digital de 8,000 palabras con pronunciación en español y fonética UK/USA, más 4 bonos GRATIS: repaso gramatical, ejemplos, errores comunes y notas.", icon: BookOpen },
+        { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Lo recibes por correo apenas pagas y puedes leerlo en celular, tablet o computadora, o imprimirlo.", icon: Smartphone },
+        { question: "¿Cuántas páginas tiene?", answer: "Entre 300 y 350 páginas de contenido práctico y fácil de estudiar.", icon: FileText },
+        { question: "¿Sirve si empiezo desde cero?", answer: "Sí. No necesitas saber inglés antes. Está hecho para estudiar solo y a tu ritmo.", icon: GraduationCap },
+        { question: "¿Incluye pronunciación?", answer: "Sí. Todas las palabras traen pronunciación adaptada al español.", icon: Lightbulb },
+        { question: "¿Cómo pago y qué garantía tengo?", answer: "Eliges tu método en el checkout seguro, según tu país. Tienes garantía de 7 días.", icon: CreditCard }]
         }
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas sobre INGLÉS RELAX" />

@@ -250,9 +250,26 @@ Deno.serve(async (req) => {
         countries: countries.length,
         generated_at: new Date().toISOString(),
       };
-      const leads = top
-        .filter((r) => !!r.email)
-        .map((r) => ({ email: r.email, country: r.country, city: r.city, status: r.status, last: r.last, slugs: r.slugs, reminders: r.reminders, client_purchase_event: r.client_purchase_event }));
+      // Un correo = una fila. Antes salía una fila por IP, así que la misma
+      // persona aparecía varias veces. Se queda la visita más reciente y el
+      // estado más fuerte (compró > abandonó > navegó).
+      const rank: Record<string, number> = { purchased: 3, abandoned: 2, browsing: 1, anonymous: 0 };
+      // deno-lint-ignore no-explicit-any
+      const leadMap = new Map<string, any>();
+      for (const r of top) {
+        if (!r.email) continue;
+        const k = r.email.trim().toLowerCase();
+        const row = { email: r.email, country: r.country, city: r.city, status: r.status, last: r.last, slugs: r.slugs, reminders: r.reminders, client_purchase_event: r.client_purchase_event };
+        const prev = leadMap.get(k);
+        if (!prev) { leadMap.set(k, row); continue; }
+        const best = (rank[row.status] ?? 0) > (rank[prev.status] ?? 0) ? row.status : prev.status;
+        const newer = String(row.last) > String(prev.last) ? row : prev;
+        leadMap.set(k, { ...newer, status: best, slugs: [...new Set([...(prev.slugs || []), ...(row.slugs || [])])].slice(0, 5) });
+      }
+      const leads = [...leadMap.values()].sort((a, b) => String(b.last).localeCompare(String(a.last)));
+      summary.with_email = leads.length;
+      summary.purchased = leads.filter((l) => l.status === "purchased").length;
+      summary.abandoned = leads.filter((l) => l.status === "abandoned").length;
       return json({ top, sources, countries, summary, leads, total: (data || []).length });
 
     }

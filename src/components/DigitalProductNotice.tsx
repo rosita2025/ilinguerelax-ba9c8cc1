@@ -19,6 +19,10 @@ const TEXTS: Record<string, { title: string; body: string }> = {
     title: "Matériel numérique en PDF téléchargeable",
     body: "Ce n'est pas un cours : sans cours en direct, professeur ni tutorat. Accès immédiat par e-mail après l'achat.",
   },
+  it: {
+    title: "Materiale digitale in PDF scaricabile",
+    body: "Non è un corso: non include lezioni dal vivo, insegnante né tutoraggio. Accesso immediato via email dopo l'acquisto.",
+  },
 };
 
 interface Props {

@@ -299,8 +299,9 @@ export function BuyerInfoForm() {
               onChange={(e) => { const v = e.target.value.trim(); setLocalEmail(v); commitBuyer({ email: v }); }}
               onBlur={() => {
                 const check = checkEmail(localEmail);
-                const finalEmail = check.corrected ? check.email : localEmail;
-                if (check.corrected) setLocalEmail(finalEmail);
+                // Muestra siempre el correo limpio (ej. "ana@gmail" -> "ana@gmail.com").
+                const finalEmail = check.ok ? check.email : localEmail;
+                if (finalEmail !== localEmail) setLocalEmail(finalEmail);
                 updateGlobalBuyer({ email: finalEmail });
               }}
               placeholder={t.emailPlaceholder}

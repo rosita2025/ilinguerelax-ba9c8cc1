@@ -118,7 +118,7 @@ export const Footer = () => {
     },
   };
 
-  const c = content[language];
+  const c = (content as any)[language] ?? content.es;
   const year = new Date().getFullYear();
 
   const columns = [

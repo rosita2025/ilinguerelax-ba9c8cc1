@@ -159,6 +159,36 @@ const hasPixelConsent = (): boolean => {
 
 
 
+// Cookies de Meta (_fbp/_fbc). La función CAPI vive en otro dominio (supabase.co),
+// así que el navegador NO le envía estas cookies: hay que pasarlas en el body.
+const readCookie = (name: string): string | undefined => {
+  try {
+    const m = document.cookie.match(new RegExp("(?:^|; )" + name + "=([^;]+)"));
+    return m ? decodeURIComponent(m[1]) : undefined;
+  } catch { return undefined; }
+};
+const getFbp = (): string | undefined => readCookie("_fbp");
+const getFbc = (): string | undefined => {
+  const c = readCookie("_fbc");
+  if (c) return c;
+  try {
+    const fbclid = new URLSearchParams(window.location.search).get("fbclid");
+    return fbclid ? `fb.1.${Date.now()}.${fbclid}` : undefined;
+  } catch { return undefined; }
+};
+
+// ID anónimo y estable del visitante (no es dato personal). Sirve como external_id
+// para que Meta reconozca al mismo visitante aunque aún no haya dejado su correo.
+const getExternalId = (): string | undefined => {
+  try {
+    let id = localStorage.getItem("ilr_visitor_id");
+    if (!id) {
+      id = (crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`);
+      localStorage.setItem("ilr_visitor_id", id);
+    }
+    return id;
+  } catch { return undefined; }
+};
 // Fire-and-forget Conversions API call (deduped via event_id with browser Pixel)
 const sendCapiEvent = (eventName: string, eventId: string, params: Record<string, unknown>, email?: string) => {
   if (!CAPI_EVENTS.has(eventName) && eventName !== "ViewContent" && eventName !== "AddToCart" && eventName !== "InitiateCheckout") return;
@@ -174,6 +204,10 @@ const sendCapiEvent = (eventName: string, eventId: string, params: Record<string
         event_source_url: window.location.href,
         custom_data: { content_name, content_ids, content_type, value, currency, num_items },
         email: email || undefined,
+        fbp: getFbp(),
+        fbc: getFbc(),
+        external_id: getExternalId(),
+        country: getCountry() || undefined,
       },
     });
   } catch (e) {
@@ -446,35 +480,6 @@ export const useHotmartPixelContact = () => {
       });
     }
   }, []);
-};
-
-// Une al visitante (navegador + sesión) con el correo que escribió en el
-// checkout, para que /admin/orders pueda reconstruir su recorrido completo
-// (primera visita, sesiones, vistas del producto, país, origen). Solo guarda el
-// correo en nuestro embudo propio; en la UE exige que haya aceptado cookies y
-// nunca se envía desde tráfico interno (admin / pruebas).
-export const linkVisitorEmail = (email: string) => {
-  if (typeof window === "undefined") return;
-  const clean = String(email || "").trim().toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean) || clean.length > 254) return;
-  if (isInternalTraffic() || !hasPixelConsent()) return;
-  try {
-    const key = `ilr_linked_${getSessionId()}`;
-    if (sessionStorage.getItem(key) === clean) return;
-    sessionStorage.setItem(key, clean);
-  } catch { /* noop */ }
-  void supabase.functions.invoke("log-funnel-event", {
-    body: {
-      event_name: "Lead",
-      email: clean,
-      session_id: getSessionId(),
-      client_id: getClientId(),
-      page_path: window.location.pathname,
-      country: getCountry(),
-      referrer: getAttributionReferrer(),
-      provider: "checkout_email",
-    },
-  });
 };
 
 // Track Lead (newsletter / coupon email subscriptions). Fires browser Pixel + CAPI with hashed email.

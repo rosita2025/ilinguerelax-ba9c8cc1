@@ -357,7 +357,7 @@ export default function MiDescarga() {
                     ) : (
                       <Download className="mr-2 h-4 w-4" />
                     )}
-                    {item.available === false ? "Archivo en preparación" : "Descargar"}
+                    {item.available === false ? "Archivo en preparación" : `Descargar: ${item.name}`}
                   </Button>
 
                   {item.bonuses.map((b) => (
@@ -430,6 +430,33 @@ export default function MiDescarga() {
               </CardContent>
             </Card>
 
+
+            <Card>
+              <CardContent className="space-y-3 py-6">
+                <p className="text-sm font-medium text-foreground">¿Ya compraste y tienes problemas para descargar?</p>
+                <p className="text-xs text-muted-foreground">
+                  Cada vez que tocas “Descargar” se cuenta 1 descarga (tienes {maxDownloads || 20} en total). Si te falla desde
+                  WhatsApp, Instagram o Facebook, abre este enlace en Chrome o Safari. Si sigue fallando, escríbenos con tus datos ya listos:
+                </p>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    const productos = items
+                      .map((i) => `• ${i.name} (${i.isUpsell ? "complemento / upsell" : "producto principal"})`)
+                      .join("\n");
+                    const msg =
+                      `Hola, ya compré y tengo problema para descargar.\n` +
+                      `Pedido: ${state.orderNumber}\n` +
+                      `Correo: ${state.emailMasked}\n` +
+                      `Productos:\n${productos}`;
+                    window.open(`https://wa.me/12512724704?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+                  }}
+                >
+                  Escribir por WhatsApp con mi pedido
+                </Button>
+              </CardContent>
+            </Card>
 
             <Card>
               <CardContent className="space-y-3 py-6">

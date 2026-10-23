@@ -5,3 +5,15 @@
 - [x] Align checkout email validation with the payment server and clear rejected emails visibly before retry.
 - [x] Keep checkout components, cart reminders, and digital delivery emails in the main product's audience language regardless of buyer country.
 - [x] Keep the Patrones product page and its checkout in Spanish for Spanish-to-English learners abroad, without changing regional prices.
+- [x] Reuse the existing postpurchase upsell table without repeating its already-applied creation.
+- [x] Apply the attached email language and source-product exclusion updates and deploy only the two requested functions.
+- [x] Run authenticated dry_run=1 without sending and report wouldSend: HTTP 200, seven candidates, zero sends.
+- [ ] Enable the three-hour email schedule only after the user permits real automatic sends.
+- [x] Query the last 30 days of delivery records grouped by provider.
+- [x] Add Italian site and product-audience checkout text without changing payments, prices or coupons.
+- [x] Verify Italian language isolation and existing Spanish checkout; 23 tests passed, compilation successful, no Italian-audience catalog products exist yet. No test purchases or emails.
+- [x] Add Italian email templates and audience selection while retaining delivery and payment behavior.
+- [x] Verify email language rules locally (19 tests passed and all six changed server files passed syntax compilation) and deploy the ten requested functions without test sends.
+- [x] Apply Maglia Relax course-only adjustments and add three videos and presentation image; seven tests passed, mobile/desktop presentation and Spanish product isolation checked, CDN video access confirmed. Playback could not be verified in the local browser; no purchases or emails.
+- [x] Apply attached course-only sticky testimonial diff; ten tests passed and the real empty-review page hides testimonials. No purchases or emails.
+- [x] Connect Maglia Relax purchase-bar stars and count to its SKU's existing admin values, without adding written reviews or changing other products.

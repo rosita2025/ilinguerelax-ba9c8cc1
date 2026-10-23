@@ -4,7 +4,7 @@
 // traducimos ese estado a un mensaje entendible + pasos concretos, para no
 // dejarlo en una pantalla de error sin salida.
 
-export type Lang = "es" | "en" | "pt" | "fr";
+export type Lang = "es" | "en" | "pt" | "fr" | "it";
 
 export type DlocalCode =
   | "dlocal_rejected"
@@ -67,6 +67,16 @@ const DICT: Record<DlocalCode, Record<Lang, { title: string; message: string; in
         "Besoin d'aide ? Écris-nous sur WhatsApp avec ton numéro de commande.",
       ],
     },
+    it: {
+      title: "La banca non ha approvato il pagamento",
+      message:
+        "Il tuo ordine è ancora riservato e non è stato addebitato nulla. Il processore (dLocal) ha rifiutato la transazione, di solito per limiti della banca, dati dell'intestatario o fondi insufficienti.",
+      instructions: [
+        "Torna al checkout e scegli un altro metodo di pagamento (bonifico, contanti o portafoglio digitale).",
+        "Se hai usato una carta, provane un'altra o abilita gli acquisti online con la tua banca.",
+        "Hai bisogno di aiuto? Scrivici su WhatsApp con il numero d'ordine e ti inviamo un link diretto.",
+      ],
+    },
   },
   dlocal_cancelled: {
     es: {
@@ -89,6 +99,11 @@ const DICT: Record<DlocalCode, Record<Lang, { title: string; message: string; in
       message: "Rien n'a été débité et ton panier est conservé. Tu peux finaliser quand tu veux.",
       instructions: ["Retourne au paiement et termine ta commande."],
     },
+    it: {
+      title: "Hai annullato il pagamento",
+      message: "Non è stato addebitato nulla e il carrello è ancora salvato. Puoi riprendere l'acquisto quando vuoi.",
+      instructions: ["Torna al checkout e completa l'acquisto con lo stesso metodo o con un altro."],
+    },
   },
   dlocal_expired: {
     es: {
@@ -110,6 +125,11 @@ const DICT: Record<DlocalCode, Record<Lang, { title: string; message: string; in
       title: "Le coupon de paiement a expiré",
       message: "Le délai est dépassé et aucun paiement n'a été enregistré.",
       instructions: ["Retourne au paiement pour générer un nouveau coupon."],
+    },
+    it: {
+      title: "Il coupon di pagamento è scaduto",
+      message: "Il termine del coupon/QR è scaduto e non è stato registrato alcun pagamento. Puoi generarne uno nuovo in pochi secondi.",
+      instructions: ["Torna al checkout per generare un nuovo coupon o scegli un altro metodo."],
     },
   },
   dlocal_pending: {
@@ -147,6 +167,16 @@ const DICT: Record<DlocalCode, Record<Lang, { title: string; message: string; in
       message: "Le paiement est en cours. Dès la confirmation de la banque, l'accès t'est envoyé par e-mail.",
       instructions: ["Ne paie pas une seconde fois.", "Suis l'état dans « Ma commande »."],
     },
+    it: {
+      title: "Stiamo confermando il tuo pagamento",
+      message:
+        "Il pagamento è in elaborazione. Appena la banca lo conferma ti invieremo automaticamente l'accesso via email (di solito da pochi minuti a qualche ora).",
+      instructions: [
+        "Non ripetere il pagamento: potresti pagare due volte.",
+        "Controlla lo stato in qualsiasi momento in “Il mio ordine”.",
+        "Se hai pagato in contanti, la conferma arriva dopo l'accredito nel punto di pagamento.",
+      ],
+    },
   },
   dlocal_unknown: {
     es: {
@@ -170,6 +200,11 @@ const DICT: Record<DlocalCode, Record<Lang, { title: string; message: string; in
       message: "L'opération est enregistrée mais le processeur n'a pas répondu. Ne paie pas à nouveau.",
       instructions: ["Consulte « Ma commande ».", "Si rien ne change sous 30 minutes, écris-nous."],
     },
+    it: {
+      title: "Non siamo riusciti a confermare lo stato del pagamento",
+      message: "L'operazione è stata registrata ma non abbiamo ancora una risposta dal processore. Non pagare di nuovo: controlla lo stato del tuo ordine.",
+      instructions: ["Consulta “Il mio ordine” con il tuo numero e la tua email.", "Se dopo 30 minuti è ancora uguale, scrivici su WhatsApp."],
+    },
   },
   dlocal_create_failed: {
     es: {
@@ -192,6 +227,11 @@ const DICT: Record<DlocalCode, Record<Lang, { title: string; message: string; in
       message: "Le processeur a refusé de démarrer la transaction. Ton panier est intact.",
       instructions: ["Essaie un autre moyen de paiement.", "Si tout échoue, écris-nous sur WhatsApp."],
     },
+    it: {
+      title: "Non siamo riusciti ad aprire il pagamento",
+      message: "Il processore non ha accettato di avviare la transazione. Il carrello è intatto: scegli un altro metodo e prosegui con un clic.",
+      instructions: ["Prova un altro metodo di pagamento disponibile nel tuo paese.", "Se nessuno funziona, scrivici su WhatsApp e ti aiutiamo."],
+    },
   },
   dlocal_downtime: {
     es: {
@@ -213,6 +253,11 @@ const DICT: Record<DlocalCode, Record<Lang, { title: string; message: string; in
       title: "Service dLocal indisponible",
       message: "Nous rencontrons des difficultés techniques temporaires avec le processeur de paiement (dLocal).",
       instructions: ["Réessaie dans quelques minutes.", "Choisis un autre mode de paiement si nécessaire.", "Contacte-nous sur WhatsApp pour un lien alternatif."],
+    },
+    it: {
+      title: "Il servizio dLocal non è disponibile (Errore 502)",
+      message: "Il processore di pagamento (dLocal) è sovraccarico o in manutenzione. Non è un problema della tua carta né del nostro sito.",
+      instructions: ["Attendi 2-3 minuti e riprova.", "Scegli un altro metodo (Stripe/PayPal) se disponibile.", "Se il problema persiste, scrivici su WhatsApp."],
     },
   },
 };
@@ -237,7 +282,7 @@ export function dlocalCodeFromStatus(status?: string | null, rawStatus?: string 
 }
 
 export function mapDlocalStatus(code: DlocalCode, lang: string): MappedDlocalStatus {
-  const l = (["es", "en", "pt", "fr"].includes(lang) ? lang : "es") as Lang;
+  const l = (["es", "en", "pt", "fr", "it"].includes(lang) ? lang : "es") as Lang;
   const entry = DICT[code][l];
   return {
     code,

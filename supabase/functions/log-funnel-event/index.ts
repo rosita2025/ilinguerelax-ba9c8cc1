@@ -153,11 +153,6 @@ serve(async (req) => {
       currency: typeof body.currency === "string" ? body.currency : null,
       session_id: sid,
       client_id: typeof body.client_id === "string" ? body.client_id.slice(0, 100) : null,
-      // Correo del comprador (solo lo envía el checkout al escribirlo): permite
-      // unir sus visitas con su pedido en /admin/orders.
-      email: typeof body.email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email.trim()) && body.email.length <= 254
-        ? body.email.trim().toLowerCase()
-        : null,
       page_path: body.page_path ?? null,
       country,
       referrer: typeof body.referrer === "string" ? body.referrer.slice(0, 500) : null,

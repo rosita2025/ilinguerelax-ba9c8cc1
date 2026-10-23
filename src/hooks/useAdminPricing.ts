@@ -46,6 +46,8 @@ export interface AdminPricing {
   galleryImages: string[] | null;
   /** Gallery metadata from admin. */
   galleryMetadata: Record<string, any> | null;
+  /** Learner language from admin (e.g. "es", "it"). */
+  learnerLanguage: string | null;
 }
 
 const INITIAL: AdminPricing = {
@@ -71,6 +73,7 @@ const INITIAL: AdminPricing = {
   localCompareAtPrices: null,
   galleryImages: null,
   galleryMetadata: null,
+  learnerLanguage: null,
 };
 
 /**
@@ -112,11 +115,12 @@ export function useAdminPricing(sku: string): AdminPricing {
         local_compare_at_prices: Record<string, number> | null;
         gallery_images: string[] | null;
         gallery_metadata: Record<string, any> | null;
+        learner_language: string | null;
       } | null = null;
       try {
         const result = await supabase
           .from("digital_products")
-          .select("price_usd, price_usd_latam, price_usd_tienda, local_prices, compare_at_price_usd, compare_at_price_usd_latam, compare_at_price_usd_tienda, compare_at_price_pen, name, description, hotmart_url, store_enabled, cover_image_url, active, rating, review_count, local_usd_prices, local_compare_at_prices, gallery_images, gallery_metadata")
+          .select("price_usd, price_usd_latam, price_usd_tienda, local_prices, compare_at_price_usd, compare_at_price_usd_latam, compare_at_price_usd_tienda, compare_at_price_pen, name, description, hotmart_url, store_enabled, cover_image_url, active, rating, review_count, local_usd_prices, local_compare_at_prices, gallery_images, gallery_metadata, learner_language")
 
           .eq("sku", sku)
           .maybeSingle();
@@ -163,6 +167,7 @@ export function useAdminPricing(sku: string): AdminPricing {
         localCompareAtPrices: (data as any).local_compare_at_prices ?? null,
         galleryImages: (data as any).gallery_images ?? null,
         galleryMetadata: (data as any).gallery_metadata ?? null,
+        learnerLanguage: (data as any).learner_language ?? null,
         loaded: true,
         missing: false,
       });

@@ -668,6 +668,32 @@ serve(async (req) => {
     }
     // Solo webhooks verificados (Stripe, PayPal, Mercado Pago, dLocal Go) + Hotmart y manual.
     // Los píxeles del navegador NO cuentan como compra.
+    // dLocal: el ingreso en USD es el precio en USD del pedido (order_created),
+    // no una conversión con tipo de cambio del importe local (CLP, MXN...).
+    const dlocalUsdByOrder = new Map<string, number>();
+    {
+      const wanted = new Set<string>();
+      for (const ev of gatewayEvents) {
+        let m: any = {};
+        try { m = ev.referrer && ev.referrer.startsWith("{") ? JSON.parse(ev.referrer) : {}; } catch { m = {}; }
+        const p = String(m.provider || ev.provider || "").toLowerCase();
+        if (!p.startsWith("dlocal")) continue;
+        const on = String(m.order_id || m.order_number || ev.session_id || "");
+        if (on.startsWith("ILR-")) wanted.add(on);
+      }
+      if (wanted.size > 0) {
+        const { data: created } = await supabase
+          .from("order_events")
+          .select("order_number, amount, currency")
+          .eq("event", "order_created")
+          .in("order_number", [...wanted]);
+        for (const r of (created ?? []) as any[]) {
+          if (String(r.currency || "").toUpperCase() === "USD" && Number(r.amount) > 0 && !dlocalUsdByOrder.has(r.order_number)) {
+            dlocalUsdByOrder.set(r.order_number, Number(r.amount));
+          }
+        }
+      }
+    }
     for (const ev of gatewayEvents) {
 
       let meta: any = {};
@@ -684,7 +710,10 @@ serve(async (req) => {
       seenGatewayKeys.add(dedupeKey);
       const currency = String(ev.currency || "USD").toUpperCase();
       const rawAmount = Number(ev.value || 0);
-      const usdAmount = currency === "USD" ? rawAmount : toUsd(rawAmount, currency);
+      const dlOn = String(meta.order_id || meta.order_number || ev.session_id || "");
+      const usdAmount = provider.startsWith("dlocal") && dlocalUsdByOrder.has(dlOn)
+        ? dlocalUsdByOrder.get(dlOn)!
+        : (currency === "USD" ? rawAmount : toUsd(rawAmount, currency));
       const status = String(meta.status || "approved").toLowerCase();
       const isPending = !APPROVED_STORE.has(status) && status !== "approved" && status !== "complete" && status !== "completed";
       const pid = ev.product_id || (meta.skus ? String(meta.skus).split(",")[0].trim() : "store");

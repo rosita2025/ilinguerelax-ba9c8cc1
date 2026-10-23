@@ -617,7 +617,7 @@ const AdminProductEdit = () => {
   };
 
   if (loading) return (
-    <><AdminNav /><div className="max-w-4xl mx-auto p-6 space-y-4 animate-pulse"><div className="h-8 w-64 rounded bg-muted" /><div className="h-40 rounded-xl bg-muted" /><div className="h-64 rounded-xl bg-muted" /><div className="h-40 rounded-xl bg-muted" /></div></>
+    <><AdminNav /><div className="min-h-dvh flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div></>
   );
 
   return (

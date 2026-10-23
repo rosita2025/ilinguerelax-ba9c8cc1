@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { formatCurrencyAmount } from "@/i18n";
+import { checkEmail } from "@/lib/emailGuard";
 
 import type { RegionTier } from "@/hooks/useRegionTier";
 
@@ -157,7 +158,16 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
       selectedMethod: null,
       clientSecret: null,
 
-      setBuyer: (patch) => set({ buyer: { ...get().buyer, ...patch } }),
+      setBuyer: (patch) => {
+        const next = { ...patch };
+        // Guarda siempre el correo limpio (el mismo que valida el formulario);
+        // antes se enviaba el texto sin limpiar y el servidor lo rechazaba.
+        if (typeof next.email === "string") {
+          const check = checkEmail(next.email);
+          next.email = check.ok ? check.email : next.email.trim();
+        }
+        set({ buyer: { ...get().buyer, ...next } });
+      },
       setSelectedMethod: (method) => set({ selectedMethod: method }),
       setClientSecret: (secret) => set({ clientSecret: secret }),
       hasPhysicalItems: () => get().items.some((i) => i.isPhysical),

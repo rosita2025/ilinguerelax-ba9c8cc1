@@ -4,7 +4,7 @@
 // tarjeta (declinada, 3DS, CVC) los muestra el propio iframe de Stripe
 // ya localizados por Stripe.
 
-export type Lang = "es" | "en" | "pt" | "fr";
+export type Lang = "es" | "en" | "pt" | "fr" | "it";
 
 export interface MappedStripeError {
   title: string;
@@ -43,120 +43,140 @@ const DICT: Record<
     en: { title: "Connection error", message: "Unstable connection detected. Please check your network or try again." },
     pt: { title: "Sem conexão", message: "Conexão instável detectada. Por favor, verifique sua rede ou tente novamente." },
     fr: { title: "Pas de connexion", message: "Connexion instable détectée. Veuillez vérifier votre réseau ou réessayer." },
+    it: { title: "Nessuna connessione", message: "Connessione instabile rilevata. Controlla la rete o riprova." },
   },
   timeout: {
     es: { title: "Tiempo agotado", message: "Stripe está tardando demasiado en responder. Intenta de nuevo." },
     en: { title: "Request timeout", message: "Stripe is taking too long. Please try again." },
     pt: { title: "Tempo esgotado", message: "A Stripe está demorando demais. Tente novamente." },
     fr: { title: "Délai dépassé", message: "Stripe met trop de temps à répondre. Réessaie." },
+    it: { title: "Tempo scaduto", message: "Stripe sta impiegando troppo tempo a rispondere. Riprova." },
   },
   auth: {
     es: { title: "Sesión de pago inválida", message: "No pudimos abrir el formulario seguro. Vuelve a intentarlo." },
     en: { title: "Invalid payment session", message: "We couldn't open the secure form. Please retry." },
     pt: { title: "Sessão de pagamento inválida", message: "Não conseguimos abrir o formulário seguro. Tente novamente." },
     fr: { title: "Session de paiement invalide", message: "Impossible d’ouvrir le formulaire sécurisé. Réessaie." },
+    it: { title: "Sessione di pagamento non valida", message: "Non siamo riusciti ad aprire il modulo sicuro. Riprova." },
   },
   rate_limit: {
     es: { title: "Demasiados intentos", message: "Espera unos segundos y vuelve a intentar." },
     en: { title: "Too many attempts", message: "Please wait a few seconds and try again." },
     pt: { title: "Muitas tentativas", message: "Aguarde alguns segundos e tente novamente." },
     fr: { title: "Trop de tentatives", message: "Attends quelques secondes et réessaie." },
+    it: { title: "Troppi tentativi", message: "Attendi qualche secondo e riprova." },
   },
   invalid_request: {
     es: { title: "Datos incorrectos", message: "Revisa tus datos e intenta de nuevo. Si persiste, escríbenos por WhatsApp." },
     en: { title: "Invalid data", message: "Please review your details and try again. Contact us on WhatsApp if it persists." },
     pt: { title: "Dados incorretos", message: "Revise seus dados e tente novamente. Fale conosco no WhatsApp se persistir." },
     fr: { title: "Données invalides", message: "Vérifie tes informations et réessaie. Contacte-nous sur WhatsApp si le problème persiste." },
+    it: { title: "Dati non corretti", message: "Controlla i tuoi dati e riprova. Se il problema persiste, scrivici su WhatsApp." },
   },
   currency_restricted: {
     es: { title: "Moneda no compatible", message: "Tu banco no permite pagos en moneda local. Intentaremos procesar el pago en USD para mayor seguridad." },
     en: { title: "Currency not supported", message: "Your bank doesn't allow payments in local currency. We'll try processing in USD for better reliability." },
     pt: { title: "Moeda não suportada", message: "Seu banco não permite pagamentos em moeda local. Tentaremos processar em USD para mayor seguridad." },
     fr: { title: "Devise non supportée", message: "Votre banque n'autorise pas les paiements en devise locale. Nous allons essayer de traiter en USD." },
+    it: { title: "Valuta non supportata", message: "La tua banca non consente pagamenti nella valuta locale. Proveremo a elaborare il pagamento in USD per maggiore affidabilità." },
   },
   card_declined: {
     es: { title: "Tarjeta rechazada", message: "Tu banco rechazó el pago. Prueba con otra tarjeta o PayPal." },
     en: { title: "Card declined", message: "Your bank declined the payment. Try another card or PayPal." },
     pt: { title: "Cartão recusado", message: "Seu banco recusou o pagamento. Tente outro cartão ou PayPal." },
     fr: { title: "Carte refusée", message: "Ta banque a refusé le paiement. Essaie une autre carte ou PayPal." },
+    it: { title: "Carta rifiutata", message: "La tua banca ha rifiutato il pagamento. Prova con un'altra carta o con PayPal." },
   },
   insufficient_funds: {
     es: { title: "Fondos insuficientes", message: "La tarjeta no tiene saldo suficiente. Prueba con otra." },
     en: { title: "Insufficient funds", message: "Not enough balance on this card. Try another one." },
     pt: { title: "Saldo insuficiente", message: "O cartão não tem saldo suficiente. Tente outro." },
     fr: { title: "Fonds insuffisants", message: "Solde insuffisant sur cette carte. Essaie-en une autre." },
+    it: { title: "Fondi insufficienti", message: "La carta non ha credito sufficiente. Provane un'altra." },
   },
   incorrect_cvc: {
     es: { title: "CVC incorrecto", message: "El código de seguridad no es correcto. Revísalo e intenta de nuevo." },
     en: { title: "Incorrect CVC", message: "The security code is wrong. Please check and retry." },
     pt: { title: "CVC incorreto", message: "O código de segurança está errado. Verifique e tente novamente." },
     fr: { title: "CVC incorrect", message: "Le code de sécurité est incorrect. Vérifie et réessaie." },
+    it: { title: "CVC errato", message: "Il codice di sicurezza non è corretto. Controllalo e riprova." },
   },
   expired_card: {
     es: { title: "Tarjeta vencida", message: "La tarjeta expiró. Usa otra tarjeta o PayPal." },
     en: { title: "Expired card", message: "This card has expired. Use another card or PayPal." },
     pt: { title: "Cartão vencido", message: "O cartão expirou. Use outro cartão ou PayPal." },
     fr: { title: "Carte expirée", message: "Cette carte a expiré. Utilise une autre carte ou PayPal." },
+    it: { title: "Carta scaduta", message: "La carta è scaduta. Usa un'altra carta o PayPal." },
   },
   processing: {
     es: { title: "Error al procesar", message: "Ocurrió un error al procesar la tarjeta. Intenta de nuevo." },
     en: { title: "Processing error", message: "There was an error processing the card. Please try again." },
     pt: { title: "Erro no processamento", message: "Ocorreu um erro ao processar o cartão. Tente novamente." },
     fr: { title: "Erreur de traitement", message: "Erreur lors du traitement de la carte. Réessaie." },
+    it: { title: "Errore di elaborazione", message: "Si è verificato un errore durante l'elaborazione della carta. Riprova." },
   },
   "3ds_required": {
     es: { title: "Verificación 3D Secure requerida", message: "Tu banco requiere confirmar el pago. Completa el paso de verificación (SMS, app o clave) y vuelve a intentar." },
     en: { title: "3D Secure verification required", message: "Your bank needs to confirm the payment. Complete the verification step (SMS, app or code) and try again." },
     pt: { title: "Verificação 3D Secure necessária", message: "Seu banco precisa confirmar o pagamento. Complete a verificação (SMS, app ou código) e tente novamente." },
     fr: { title: "Vérification 3D Secure requise", message: "Ta banque doit confirmer le paiement. Complète la vérification (SMS, appli ou code) et réessaie." },
+    it: { title: "Verifica 3D Secure richiesta", message: "La tua banca deve confermare il pagamento. Completa la verifica (SMS, app o codice) e riprova." },
   },
   "3ds_failed": {
     es: { title: "Verificación 3D Secure fallida", message: "No se completó la verificación con tu banco. Intenta de nuevo o usa otra tarjeta." },
     en: { title: "3D Secure verification failed", message: "The bank verification wasn't completed. Try again or use another card." },
     pt: { title: "Falha na verificação 3D Secure", message: "A verificação do banco não foi concluída. Tente novamente ou use outro cartão." },
     fr: { title: "Échec de la vérification 3D Secure", message: "La vérification bancaire n’a pas abouti. Réessaie ou utilise une autre carte." },
+    it: { title: "Verifica 3D Secure non riuscita", message: "La verifica con la tua banca non è stata completata. Riprova o usa un'altra carta." },
   },
   "3ds_canceled": {
     es: { title: "Verificación cancelada", message: "Cancelaste la verificación 3D Secure. Vuelve a intentar y completa el paso con tu banco." },
     en: { title: "Verification canceled", message: "You canceled the 3D Secure step. Try again and complete the bank verification." },
     pt: { title: "Verificação cancelada", message: "Você cancelou a verificação 3D Secure. Tente novamente e conclua a etapa com o banco." },
     fr: { title: "Vérification annulée", message: "Tu as annulé l’étape 3D Secure. Réessaie et complète la vérification bancaire." },
+    it: { title: "Verifica annullata", message: "Hai annullato la verifica 3D Secure. Riprova e completa il passaggio con la tua banca." },
   },
   "3ds_unsupported": {
     es: { title: "Tarjeta no compatible con 3D Secure", message: "Tu tarjeta no admite la verificación requerida. Prueba con otra tarjeta o paga con PayPal." },
     en: { title: "Card doesn't support 3D Secure", message: "Your card doesn't support the required verification. Try another card or pay with PayPal." },
     pt: { title: "Cartão sem suporte a 3D Secure", message: "Seu cartão não suporta a verificação necessária. Use outro cartão ou pague com PayPal." },
     fr: { title: "Carte non compatible 3D Secure", message: "Ta carte ne prend pas en charge la vérification requise. Utilise une autre carte ou paie via PayPal." },
+    it: { title: "Carta non compatibile con 3D Secure", message: "La tua carta non supporta la verifica richiesta. Prova con un'altra carta o paga con PayPal." },
   },
   coupon: {
     es: { title: "Cupón no válido", message: "El cupón aplicado no es válido o expiró. Quítalo e intenta de nuevo." },
     en: { title: "Invalid coupon", message: "The coupon isn't valid or has expired. Remove it and try again." },
     pt: { title: "Cupom inválido", message: "O cupom não é válido ou expirou. Remova-o e tente novamente." },
     fr: { title: "Coupon invalide", message: "Le coupon n’est pas valide ou a expiré. Retire-le et réessaie." },
+    it: { title: "Coupon non valido", message: "Il coupon applicato non è valido o è scaduto. Rimuovilo e riprova." },
   },
   amount: {
     es: { title: "Monto inválido", message: "El monto del pedido no es válido. Recarga la página." },
     en: { title: "Invalid amount", message: "The order amount is invalid. Please reload the page." },
     pt: { title: "Valor inválido", message: "O valor do pedido é inválido. Recarregue a página." },
     fr: { title: "Montant invalide", message: "Le montant de la commande est invalide. Recharge la page." },
+    it: { title: "Importo non valido", message: "L'importo dell'ordine non è valido. Ricarica la pagina." },
   },
   config: {
     es: { title: "Pago no disponible", message: "Los pagos con tarjeta no están disponibles ahora. Escríbenos por WhatsApp." },
     en: { title: "Payments unavailable", message: "Card payments are not available right now. Contact us on WhatsApp." },
     pt: { title: "Pagamentos indisponíveis", message: "Pagamentos com cartão indisponíveis. Fale conosco no WhatsApp." },
     fr: { title: "Paiements indisponibles", message: "Les paiements par carte sont indisponibles. Contacte-nous sur WhatsApp." },
+    it: { title: "Pagamento non disponibile", message: "I pagamenti con carta non sono disponibili al momento. Scrivici su WhatsApp." },
   },
   iframe_blocked: {
     es: { title: "El formulario de pago fue bloqueado", message: "Si usas un bloqueador de anuncios (AdBlock, uBlock, Brave Shields), desactívalo para este sitio e intenta de nuevo — puede estar bloqueando el formulario de pago seguro." },
     en: { title: "Payment form was blocked", message: "If you use an ad blocker (AdBlock, uBlock, Brave Shields), disable it for this site and try again — it may be blocking the secure payment form." },
     pt: { title: "O formulário de pagamento foi bloqueado", message: "Se você usa um bloqueador de anúncios (AdBlock, uBlock, Brave Shields), desative-o para este site e tente novamente — ele pode estar bloqueando o formulário de pagamento seguro." },
     fr: { title: "Le formulaire de paiement a été bloqué", message: "Si vous utilisez un bloqueur de publicités (AdBlock, uBlock, Brave Shields), désactivez-le pour ce site et réessayez — il bloque peut-être le formulaire de paiement sécurisé." },
+    it: { title: "Il modulo di pagamento è stato bloccato", message: "Se usi un blocco annunci (AdBlock, uBlock, Brave Shields), disattivalo per questo sito e riprova: potrebbe bloccare il modulo di pagamento sicuro." },
   },
   unknown: {
     es: { title: "No pudimos abrir el pago", message: "Ocurrió un problema con Stripe. Intenta de nuevo o escríbenos por WhatsApp." },
     en: { title: "We couldn't open payment", message: "Something went wrong with Stripe. Try again or contact us on WhatsApp." },
     pt: { title: "Não foi possível abrir o pagamento", message: "Algo deu errado com a Stripe. Tente novamente ou fale conosco no WhatsApp." },
     fr: { title: "Impossible d’ouvrir le paiement", message: "Un problème est survenu avec Stripe. Réessaie ou contacte-nous sur WhatsApp." },
+    it: { title: "Non siamo riusciti ad aprire il pagamento", message: "Si è verificato un problema con Stripe. Riprova o scrivici su WhatsApp." },
   },
 };
 
@@ -184,12 +204,18 @@ const INSTRUCTIONS: Partial<Record<MappedStripeError["code"], Record<Lang, strin
       "Entre le code ou approuve le paiement dans l’appli.",
       "Reviens ici et clique sur « Réessayer ».",
     ],
+    it: [
+      "Controlla l'app della tua banca o gli SMS per un codice di verifica.",
+      "Inserisci il codice o approva il pagamento nell'app.",
+      "Torna qui e premi “Riprova”.",
+    ],
   },
   "3ds_failed": {
     es: ["Asegúrate de tener señal e internet estable.", "Si el problema persiste, prueba otra tarjeta o PayPal."],
     en: ["Make sure you have stable signal and internet.", "If it persists, try another card or PayPal."],
     pt: ["Verifique se tem sinal e internet estáveis.", "Se persistir, tente outro cartão ou PayPal."],
     fr: ["Assure-toi d’avoir du signal et un internet stable.", "Si le problème persiste, essaie une autre carte ou PayPal."],
+    it: ["Assicurati di avere segnale e una connessione internet stabile.", "Se il problema persiste, prova un'altra carta o PayPal."],
   },
 };
 

@@ -10,7 +10,7 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, language } = useI18n();
   const myOrderLabel =
-    { es: "Mi Pedido", en: "My Order", fr: "Ma Commande", pt: "Meu Pedido" }[language] ?? "Mi Pedido";
+    { es: "Mi Pedido", en: "My Order", fr: "Ma Commande", pt: "Meu Pedido", it: "Il mio ordine" }[language] ?? "Mi Pedido";
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);

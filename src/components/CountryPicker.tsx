@@ -9,7 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { countries } from "@/hooks/useRegionTier";
 
 interface Props {
-  lang?: "es" | "en" | "fr" | "pt";
+  lang?: "es" | "en" | "fr" | "pt" | "it";
   className?: string;
 }
 
@@ -66,6 +66,12 @@ export const CountryPicker = ({ lang = "es", className = "" }: Props) => {
       desc: "Os preços e métodos de pagamento serão ajustados automaticamente.",
       auto: "Detectar automaticamente",
       current: "País atual",
+    },
+    it: {
+      title: "Seleziona il tuo paese",
+      desc: "I prezzi e i metodi di pagamento si adatteranno automaticamente.",
+      auto: "Rileva automaticamente",
+      current: "Paese attuale",
     },
   };
 

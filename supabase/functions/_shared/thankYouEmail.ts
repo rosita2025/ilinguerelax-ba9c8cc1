@@ -32,6 +32,22 @@ interface Args {
   skus?: string[];
 }
 
+/** Devuelve 'it' si el producto principal del pedido es para italianos; si no, undefined (español, como siempre). */
+async function resolveEmailLang(skus?: string[]): Promise<string | undefined> {
+  try {
+    const list = (skus || []).filter(Boolean);
+    if (!list.length) return undefined;
+    const { data } = await getClient()
+      .from("digital_products")
+      .select("sku, learner_language")
+      .in("sku", list);
+    const main = list.map((k) => data?.find((p: { sku: string }) => p.sku === k)).find(Boolean) as { learner_language?: string } | undefined;
+    return main?.learner_language?.toLowerCase().startsWith("it") ? "it" : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function getClient() {
   const url = Deno.env.get("SUPABASE_URL")!;
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -108,7 +124,9 @@ export async function sendThankYouEmail(a: Args): Promise<void> {
   const key = a.idempotencyKey || `${a.provider}-${a.customerEmail}-${Date.now()}`;
   const orderNumber = a.orderNumber || buildOrderNumber(a.provider, key);
 
+  const lang = await resolveEmailLang(a.skus);
   const data = {
+    lang,
     orderNumber,
     customerName: a.customerName,
     customerEmail: a.customerEmail,

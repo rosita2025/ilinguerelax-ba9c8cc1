@@ -1158,6 +1158,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       }
     }
     void captureAbandonedCheckout(m, true);
+    autoOpenBusy.current = false;
     if (m !== selected) setShowStripe(false);
     setSelected(m);
     setSelectedMethod(m);
@@ -2144,6 +2145,32 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       if (!isPeru && isStripeSel && valid && stripePromise && !showStripe) setShowStripe(true);
     }
   }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
+
+  // Perú: al elegir tarjeta, el formulario de Stripe se abre solo, sin tener que pulsar
+  // ningún botón (fuera de Perú esto ya ocurre arriba). Se conserva el aviso
+  // "¿Te gustaría agregar…?" una sola vez por sesión, antes de abrir el formulario.
+  const autoOpenBusy = useRef(false);
+  useEffect(() => {
+    if (!isPeru) return;
+    const isStripeSel = !!selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected);
+    if (!isStripeSel || !valid || !stripePromise || showStripe || autoOpenBusy.current) return;
+    if (total <= 0 && items.length > 0) return;
+    autoOpenBusy.current = true;
+    const openNow = () => {
+      autoOpenBusy.current = false;
+      useCheckoutPruebaStore.getState().setClientSecret(null);
+      setShowStripe(true);
+    };
+    void (async () => {
+      try {
+        const popupShown = await offerUpsellThen(openNow);
+        if (!popupShown) openNow();
+      } catch {
+        openNow();
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPeru, selected, valid, stripePromise, showStripe, total, items.length]);
 
   // Validación automática: el método dLocal seleccionado y sus etiquetas deben
   // coincidir siempre con la cobertura activa de /admin/dlocal para el país

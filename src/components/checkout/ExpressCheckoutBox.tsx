@@ -34,12 +34,12 @@ const COPY: Record<Lang, { title: string; divider: string; genericError: string 
 };
 
 const isEnabled = (): boolean => {
-  if (EXPRESS_CHECKOUT_ENABLED) return true;
   try {
-    return new URLSearchParams(window.location.search).get("express") === "1";
-  } catch {
-    return false;
-  }
+    const flag = new URLSearchParams(window.location.search).get("express");
+    if (flag === "0") return false;
+    if (flag === "1") return true;
+  } catch { /* sin URL: usar el valor por defecto */ }
+  return EXPRESS_CHECKOUT_ENABLED;
 };
 
 interface Quote {

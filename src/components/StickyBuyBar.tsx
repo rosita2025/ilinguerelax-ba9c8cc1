@@ -30,6 +30,8 @@ interface StickyBuyBarProps {
   isSecondaryLoading?: boolean;
   ctaClassName?: string;
   isPhysical?: boolean;
+  /** "course" = videolecciones grabadas (no PDF). Por defecto "pdf". */
+  productKind?: "pdf" | "course";
   /** Disables pulsing/scaling animations for accessibility (e.g. older audiences) */
   calmMode?: boolean;
   /** Currency code label shown next to price (e.g. "USD", "COP", "ARS"). Defaults to "USD". */
@@ -68,6 +70,7 @@ export const StickyBuyBar = ({
   isSecondaryLoading = false,
   ctaClassName,
   isPhysical = false,
+  productKind = "pdf",
   calmMode = false,
   currencyCode = "USD",
   dismissible = false,
@@ -499,7 +502,9 @@ export const StickyBuyBar = ({
                     <Check className="w-3 h-3 text-emerald-600" />
                     {isPhysical
                       ? (tr("Printed book", "Libro impreso", "Libro stampato"))
-                      : (tr("PDF · not a live course", "PDF · no son clases", "PDF · non è un corso dal vivo"))}
+                      : productKind === "course"
+                        ? (tr("Recorded video lessons", "Videolecciones grabadas", "Videolezioni registrate"))
+                        : (tr("PDF · not a live course", "PDF · no son clases", "PDF · non è un corso dal vivo"))}
                   </span>
 
                   <span className="flex items-center gap-1">

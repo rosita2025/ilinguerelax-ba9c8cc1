@@ -29,16 +29,17 @@ import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import { usePurchaseTracking } from "@/hooks/usePurchaseTracking";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 
-// Formulario de pago nuevo (tipo Payment Element). APAGADO por defecto: se prueba con ?pe=1.
-// Cuando esté probado, cambiar PAYMENT_ELEMENT_ENABLED a true.
-export const PAYMENT_ELEMENT_ENABLED = false;
+// Formulario de pago nuevo (tipo Payment Element). ACTIVO para TODOS los países.
+// Para volver al formulario anterior en una prueba: agregar ?pe=0 al enlace del checkout
+// (o poner PAYMENT_ELEMENT_ENABLED en false para apagarlo para todos).
+export const PAYMENT_ELEMENT_ENABLED = true;
 const isPaymentElementMode = (): boolean => {
-  if (PAYMENT_ELEMENT_ENABLED) return true;
   try {
-    return new URLSearchParams(window.location.search).get("pe") === "1";
-  } catch {
-    return false;
-  }
+    const flag = new URLSearchParams(window.location.search).get("pe");
+    if (flag === "0") return false;
+    if (flag === "1") return true;
+  } catch { /* sin URL: usar el valor por defecto */ }
+  return PAYMENT_ELEMENT_ENABLED;
 };
 const StripePaymentElementBox = React.lazy(() => import("@/components/checkout/StripePaymentElementBox"));
 import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";

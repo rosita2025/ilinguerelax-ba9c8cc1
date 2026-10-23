@@ -50,6 +50,7 @@ import koreanIndexAsset from "@/assets/previews/korean-2000-index.asset.json";
 
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
+const MagliaRelaxLanding = lazy(() => import("@/components/landing/MagliaRelaxLanding").then(m => ({ default: m.MagliaRelaxLanding })));
 const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then(m => ({ default: m.LooxStyleReviews })));
 
 
@@ -279,6 +280,8 @@ const ProductDynamic = () => {
   
   const isEs = product.learner_language === "es";
   const isIt = product.learner_language === "it";
+  // Curso de video de tejido (Maglia Relax): usa la landing italiana propia en lugar de las secciones de PDF.
+  const isCourse = isIt && product.sku.startsWith("maglia-relax");
   // Textos cortos en 3 idiomas: español (es), italiano (it) y, para el resto, inglés.
   const tx = (es: string, en: string, it: string) => (isIt ? it : isEs ? es : en);
 
@@ -427,8 +430,8 @@ const ProductDynamic = () => {
         type="product"
         price={String(effectiveUsd)}
         sku={product.sku}
-        rating={String(reviewsRating)}
-        reviewCount={String(reviewsCount)}
+        rating={isCourse && reviewsCount === 0 ? undefined : String(reviewsRating)}
+        reviewCount={isCourse && reviewsCount === 0 ? undefined : String(reviewsCount)}
         availability="InStock"
         isPhysical={false}
       />
@@ -438,6 +441,7 @@ const ProductDynamic = () => {
       <main className="pt-0 pb-2">
         <div className="container px-4 sm:px-6">
           {/* Trust Pilot Badge */}
+          {!isCourse && (
           <div className="flex justify-center mb-1">
             <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-emerald-200 shadow-sm">
               <div className="flex items-center gap-0.5">
@@ -449,6 +453,7 @@ const ProductDynamic = () => {
               <span className="text-[9px] font-bold text-emerald-600">★ Trustpilot</span>
             </div>
           </div>
+          )}
 
           <div className="grid lg:grid-cols-2 gap-4 items-start">
             {/* Left Column: Image Gallery */}
@@ -468,7 +473,7 @@ const ProductDynamic = () => {
                   description={`${product.name} — ${product.description || "PDF con pronunciación · iLingue Relax"}`}
                 />
                 <div className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-black shadow-lg">
-                  <Download className="w-4 h-4" /> DIGITAL PDF — INSTANT ACCESS
+                  <Download className="w-4 h-4" /> {isCourse ? "VIDEOLEZIONI — ACCESSO IMMEDIATO" : "DIGITAL PDF — INSTANT ACCESS"}
                 </div>
               </div>
 
@@ -492,6 +497,7 @@ const ProductDynamic = () => {
 
             {/* Right Column: Copy & Pricing */}
             <div className="space-y-2">
+              {(!isCourse || reviewsCount > 0) && (
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (

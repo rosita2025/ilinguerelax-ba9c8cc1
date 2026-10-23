@@ -526,11 +526,11 @@ const ProductDynamic = () => {
                   ) : (
                     <span className="h-9 md:h-10 w-24 rounded-lg bg-foreground/10 animate-pulse" aria-hidden="true" />
                   )}
-                  {priceReady && discountPercentage > 0 && (
+                  {priceReady && discountPercentage > 0 && !isCourse && (
                     <span className="text-xl text-muted-foreground line-through opacity-70 mb-1">{originalFormatted}</span>
                   )}
                 </div>
-                {priceReady && discountPercentage > 0 && (
+                {priceReady && discountPercentage > 0 && !isCourse && (
                   <div className="inline-block px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-black mb-3">
                     {tx(`AHORRA ${discountPercentage}%`, `SAVE ${discountPercentage}%`, `RISPARMIA ${discountPercentage}%`)}
                   </div>
@@ -547,7 +547,7 @@ const ProductDynamic = () => {
                     : tx("Lo quiero", "I want it", "Lo voglio")}
                 </Button>
 
-                <StockAlert count={7} className="mt-2 w-full justify-center" />
+                {!isCourse && <StockAlert count={7} className="mt-2 w-full justify-center" />}
 
 
                 <div className="flex items-center justify-between pt-3 border-t border-slate-200">
@@ -572,7 +572,7 @@ const ProductDynamic = () => {
                   <Smartphone className="w-5 h-5 text-emerald-600" />
                   <div>
                     <div className="text-[9px] font-black uppercase text-slate-400">{tx("Formato", "Format", "Formato")}</div>
-                    <div className="text-[11px] font-bold text-slate-700">PDF digital</div>
+                    <div className="text-[11px] font-bold text-slate-700">{isCourse ? "Videolezioni" : "PDF digital"}</div>
 
                   </div>
                 </div>
@@ -581,6 +581,7 @@ const ProductDynamic = () => {
           </div>
 
           {/* Features Section */}
+          {!isCourse && (
           <section className="mt-4 py-3 border-t border-slate-100">
             <div className="grid lg:grid-cols-2 gap-6">
               <div>

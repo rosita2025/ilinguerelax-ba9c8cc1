@@ -177,9 +177,9 @@ type CheckoutMethodDef = {
 
 const CHECKOUT_METHODS: CheckoutMethodDef[] = [
   { key: "stripe_card", label: "Stripe — tarjeta / wallets", note: "Tarjeta, Apple Pay, Google Pay y Link dentro de Stripe", icon: "CreditCard", regions: ["PE", "US", "GLOBAL"] },
-  { key: "stripe_link", label: "Link (Stripe)", note: "Autocompletado con 1 clic de Stripe", icon: "Wallet", baseStripe: true },
-  { key: "stripe_apple_pay", label: "Apple Pay", note: "iPhone / Safari", icon: "Smartphone", baseStripe: true },
-  { key: "stripe_google_pay", label: "Google Pay", note: "Android / Chrome", icon: "Smartphone", baseStripe: true },
+  { key: "stripe_link", label: "Link (Stripe)", note: "Autocompletado con 1 clic de Stripe · ya sale en Pago rápido arriba (no se duplica)", icon: "Wallet", baseStripe: true },
+  { key: "stripe_apple_pay", label: "Apple Pay", note: "iPhone / Safari · ya sale en Pago rápido arriba (no se duplica)", icon: "Smartphone", baseStripe: true },
+  { key: "stripe_google_pay", label: "Google Pay", note: "Android / Chrome · ya sale en Pago rápido arriba (no se duplica)", icon: "Smartphone", baseStripe: true },
   { key: "stripe_us_bank_account", label: "Stripe — ACH transferencia", note: "Transferencia bancaria de USA dentro de Stripe", icon: "Building2", regions: ["US"] },
   { key: "stripe_cashapp", label: "Stripe — Cash App Pay", note: "Cash App para compradores de Estados Unidos dentro de Stripe", icon: "Smartphone", regions: ["US"] },
   { key: "stripe_klarna", label: "Stripe — Klarna (Pay in 4)", note: "Paga en 4 cuotas sin interés (USA/UE)", icon: "Wallet", regions: ["US", "GLOBAL"] },
@@ -208,6 +208,19 @@ const CHECKOUT_METHODS: CheckoutMethodDef[] = [
   { key: "stripe_grabpay", label: "GrabPay", note: "Sudeste asiático", icon: "Smartphone", countryCodes: ["SG"] },
   { key: "stripe_paynow", label: "PayNow", note: "Singapur", icon: "Smartphone", countryCodes: ["SG"] },
   { key: "stripe_konbini", label: "Konbini", note: "Tiendas de conveniencia Japón", icon: "Banknote", countryCodes: ["JP"] },
+  { key: "stripe_amazon_pay", label: "Amazon Pay", note: "Billetera Amazon dentro de Stripe", icon: "Wallet", countryCodes: ["*"] },
+  { key: "stripe_satispay", label: "Satispay", note: "Monedero digital Italia", icon: "Smartphone", countryCodes: ["IT"] },
+  { key: "stripe_scalapay", label: "Scalapay", note: "Compra ahora, paga después · Italia, Francia y España", icon: "Wallet", countryCodes: ["IT", "FR", "ES"] },
+  { key: "stripe_zip", label: "Zip", note: "Compra ahora, paga después · Australia y USA", icon: "Wallet", countryCodes: ["AU", "US"] },
+  { key: "stripe_bizum", label: "Bizum", note: "Pago en tiempo real España", icon: "Smartphone", countryCodes: ["ES"] },
+  { key: "stripe_pay_by_bank", label: "Pay by Bank", note: "Pago bancario en tiempo real Finlandia y Reino Unido", icon: "Building2", countryCodes: ["FI", "GB"] },
+  { key: "stripe_customer_balance", label: "Transferencia bancaria (Stripe)", note: "Europa, Reino Unido, Japón, México y USA", icon: "Building2", countryCodes: ["US", "MX", "JP", "GB", "DE", "FR", "ES", "IT", "NL", "BE", "IE"] },
+  { key: "stripe_crypto", label: "Stablecoins y cripto (Stripe)", note: "Pago con stablecoins dentro de Stripe", icon: "Wallet", countryCodes: ["*"] },
+  { key: "stripe_kr_card", label: "Tarjetas coreanas", note: "Corea del Sur", icon: "CreditCard", countryCodes: ["KR"] },
+  { key: "stripe_kakao_pay", label: "Kakao Pay", note: "Corea del Sur", icon: "Smartphone", countryCodes: ["KR"] },
+  { key: "stripe_naver_pay", label: "Naver Pay", note: "Corea del Sur", icon: "Smartphone", countryCodes: ["KR"] },
+  { key: "stripe_payco", label: "PAYCO", note: "Corea del Sur", icon: "Smartphone", countryCodes: ["KR"] },
+  { key: "stripe_samsung_pay", label: "Samsung Pay", note: "Corea del Sur", icon: "Smartphone", countryCodes: ["KR"] },
   { key: "paypal", label: "PayPal", note: "Botón separado de PayPal", icon: "Wallet", regions: ["PE", "US", "GLOBAL"] },
   { key: "mercadopago_transfer", label: "Mercado Pago — transferencia", note: "Banco / transferencia por Mercado Pago", icon: "Building2", regions: ["PE"] },
   { key: "mercadopago_cash", label: "Mercado Pago — efectivo", note: "PagoEfectivo / agentes disponibles", icon: "Banknote", regions: ["PE"] },
@@ -857,7 +870,7 @@ export default function AdminCheckoutMethods() {
                   })()}
 
                   <div className="mb-3 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-[11px] text-muted-foreground">
-                    En USA puedes activar Stripe tarjeta, Stripe ACH y Stripe Cash App como filas visibles. Las tres abren el formulario seguro de Stripe.
+                    En USA puedes activar Stripe tarjeta, Stripe ACH y Stripe Cash App como filas visibles. Las tres abren el formulario seguro de Stripe. Apple Pay, Google Pay y Link salen una sola vez, en "Pago rápido" arriba del checkout.
                   </div>
 
 

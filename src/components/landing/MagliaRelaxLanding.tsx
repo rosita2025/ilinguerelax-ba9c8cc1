@@ -1,7 +1,7 @@
 import { Check, Play, Shield, Smartphone, Mail, Heart, HelpCircle, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FAQ } from "@/components/FAQ";
-import { INCLUDES_PDF, ADDS_NEW_LESSONS, REAL_REVIEWS, REELS, type ReelVideo } from "./magliaRelaxData";
+import { INCLUDES_PDF, ADDS_NEW_LESSONS, REAL_REVIEWS, REELS, PRESENTATION_IMAGE, type ReelVideo } from "./magliaRelaxData";
 
 /**
  * Landing en italiano para el curso de video "Maglia Relax".
@@ -25,7 +25,7 @@ const youtubeEmbed = (src: string): string | null => {
 const ReelCard = ({ reel, index }: { reel: ReelVideo; index: number }) => {
   const embed = youtubeEmbed(reel.src);
   return (
-    <div className="relative w-[70%] sm:w-auto shrink-0 snap-center aspect-[9/16] rounded-2xl overflow-hidden bg-slate-900 border border-slate-100 shadow-sm">
+    <div className="relative w-[70%] sm:w-auto shrink-0 snap-center aspect-[9/16] rounded-2xl overflow-hidden bg-foreground border border-border shadow-sm">
       {embed ? (
         <iframe
           src={embed}
@@ -39,10 +39,11 @@ const ReelCard = ({ reel, index }: { reel: ReelVideo; index: number }) => {
         <video
           src={reel.src}
           poster={reel.poster}
+          aria-label={`Video ${index + 1} di Maglia Relax`}
           controls
           playsInline
           preload="metadata"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-contain"
         />
       )}
     </div>
@@ -167,6 +168,14 @@ export const MagliaRelaxLanding = ({
           </h2>
           <p className="text-base md:text-lg font-semibold text-slate-800 mb-2">{PRESENTATION_SUBTITLE}</p>
           <p className="text-sm text-muted-foreground mb-4">{PRESENTATION_TEXT}</p>
+          <img
+            src={PRESENTATION_IMAGE}
+            alt="Videolezioni di maglia su tablet, con ferri e gomitoli"
+            width={768}
+            height={768}
+            loading="lazy"
+            className="mx-auto mb-4 w-full max-w-lg rounded-2xl"
+          />
           <ul className="grid sm:grid-cols-2 gap-2 text-left mb-5">
             {PRESENTATION_POINTS.map((p) => (
               <li

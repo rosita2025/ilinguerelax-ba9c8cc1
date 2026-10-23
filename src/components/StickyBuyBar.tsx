@@ -482,7 +482,7 @@ export const StickyBuyBar = ({
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 ml-2 animate-spin" />
-                    Processing...
+                    {productKind === "course" ? tr("Loading...", "Cargando...", "Caricamento...") : "Processing..."}
                   </>
                 ) : (
                   <>
@@ -493,7 +493,7 @@ export const StickyBuyBar = ({
               </Button>
               {/* Mobile trust microcopy */}
               {!disabled && !secondaryCtaText && (
-                <div className="flex items-center justify-center gap-3 text-[10px] text-muted-foreground">
+                <div className={`flex items-center justify-center text-[10px] text-muted-foreground ${productKind === "course" ? "flex-wrap gap-x-3 gap-y-1" : "gap-3"}`}>
                   <span className="flex items-center gap-1">
                     <Shield className="w-3 h-3 text-emerald-600" />
                     {tr("Secure", "Pago Seguro", "Pagamento sicuro")}
@@ -641,7 +641,7 @@ export const StickyBuyBar = ({
               {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 ml-2 animate-spin" />
-                  Processing...
+                  {productKind === "course" ? tr("Loading...", "Cargando...", "Caricamento...") : "Processing..."}
                 </>
               ) : (
                 <>

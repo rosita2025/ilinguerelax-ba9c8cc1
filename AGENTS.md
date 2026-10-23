@@ -3,3 +3,4 @@
 - Scope new product-audience localization through the same nested i18n provider; keep payment-method translations presentation-only so country, currency and purchase handlers remain unchanged.
 - Keep pre-payment upsell presentation in UpsellPopup and orchestration in PaymentMethodsGroup, reusing the checkout catalog loader and existing purchase check to avoid duplicating catalog or server logic.
 - Keep postpurchase email orchestration in process-postpurchase-upsell using existing internal authentication, purchase-history helper and transactional template registry; do not duplicate payment or webhook logic.
+- Keep Maglia Relax media, lesson flags and real-review statistics in its dedicated landing data module; course-only presentation must not alter other catalog products or commerce handlers.

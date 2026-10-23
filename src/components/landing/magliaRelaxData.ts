@@ -1,3 +1,13 @@
+import reel1 from "@/assets/maglia-relax/reel-1.mp4.asset.json";
+import reel2 from "@/assets/maglia-relax/reel-2.mp4.asset.json";
+import reel3 from "@/assets/maglia-relax/reel-3.mp4.asset.json";
+import poster1 from "@/assets/maglia-relax/reel-1.jpg.asset.json";
+import poster2 from "@/assets/maglia-relax/reel-2.jpg.asset.json";
+import poster3 from "@/assets/maglia-relax/reel-3.jpg.asset.json";
+import presentation from "@/assets/maglia-relax/presentation.png.asset.json";
+
+export const PRESENTATION_IMAGE = presentation.url;
+
 /**
  * Datos editables de la landing del curso "Maglia Relax".
  * Aquí Rosa (o Lovable) cambia cosas sin tocar el diseño.
@@ -47,4 +57,8 @@ export interface ReelVideo {
   src: string;
   poster?: string;
 }
-export const REELS: ReelVideo[] = [];
+export const REELS: ReelVideo[] = [
+  { src: reel1.url, poster: poster1.url },
+  { src: reel2.url, poster: poster2.url },
+  { src: reel3.url, poster: poster3.url },
+];

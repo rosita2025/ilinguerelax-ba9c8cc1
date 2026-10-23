@@ -212,6 +212,23 @@ const DLOCAL_COUNTRIES = DLOCAL_COUNTRY_CODES;
 type MethodBadge = { label: string; bg: string; color: string };
 
 
+// Etiqueta corta de ayuda por método (solo presentación).
+const methodHint = (id: string, language: string): { text: string; cls: string } | null => {
+  const L = (es: string, en: string, fr: string, it: string, pt: string) =>
+    language === "en" ? en : language === "fr" ? fr : language === "it" ? it : language === "pt" ? pt : es;
+  if (["yape", "dlocal_wallet", "clabe", "stripe_cashapp"].includes(id))
+    return { text: L("Rápido", "Fast", "Rapide", "Veloce", "Rápido"), cls: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200" };
+  if (id === "binance")
+    return { text: L("Cripto", "Crypto", "Crypto", "Cripto", "Cripto"), cls: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200" };
+  if (id === "cash" || id === "dlocal_cash")
+    return { text: L("Sin tarjeta", "No card", "Sans carte", "Senza carta", "Sem cartão"), cls: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200" };
+  if (id === "stripe_klarna")
+    return { text: L("En cuotas", "Pay later", "En plusieurs fois", "A rate", "Parcelado"), cls: "bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-200" };
+  if (["transfer", "dlocal_transfer", "stripe_ach"].includes(id))
+    return { text: L("Desde tu banco", "From your bank", "Depuis votre banque", "Dalla tua banca", "Do seu banco"), cls: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200" };
+  return null;
+};
+
 // Color del icono de cada tipo de método (solo presentación): ayuda a distinguirlos de un vistazo.
 const methodTone = (id: string): string => {
   if (id === "card" || id.startsWith("stripe")) return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300";
@@ -2449,6 +2466,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                       {language === "en" ? "Recommended" : language === "fr" ? "Recommandé" : language === "it" ? "Consigliato" : "Recomendado"}
                     </span>
                   )}
+                  {!isPrimaryCard && !isSelected && (() => {
+                    const h = methodHint(m.id, language);
+                    return h ? <span className={cn("text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0", h.cls)}>{h.text}</span> : null;
+                  })()}
                   {m.badge && isSelected && (
                     <span className={cn(
                       "text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0",

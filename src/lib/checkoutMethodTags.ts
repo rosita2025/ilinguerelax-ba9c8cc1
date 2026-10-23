@@ -6,6 +6,7 @@ export type MethodTag = { text: string; cls: string };
 
 const T = {
   recommended: { text: "Recomendado", cls: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200" },
+  card: { text: "Tarjeta", cls: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200" },
   fast: { text: "Pago rápido", cls: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200" },
   bank: { text: "Desde tu banco", cls: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200" },
   debit: { text: "Débito directo", cls: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200" },
@@ -31,6 +32,12 @@ const BY_KEY: Record<string, MethodTag> = {
   mercadopago_cash: T.noCard, dlocal_cash: T.noCard,
   binance_pay: T.crypto,
   hotmart_1click: T.oneClick,
+  stripe_amazon_pay: T.fast, stripe_satispay: T.fast, stripe_bizum: T.fast,
+  stripe_kakao_pay: T.fast, stripe_naver_pay: T.fast, stripe_payco: T.fast, stripe_samsung_pay: T.fast,
+  stripe_kr_card: T.card,
+  stripe_scalapay: T.installments, stripe_zip: T.installments,
+  stripe_pay_by_bank: T.bank, stripe_customer_balance: T.bank,
+  stripe_crypto: T.crypto,
 };
 
 export const getMethodTag = (methodKey: string): MethodTag | null => BY_KEY[(methodKey || "").toLowerCase()] ?? null;
@@ -39,7 +46,7 @@ export const getMethodTag = (methodKey: string): MethodTag | null => BY_KEY[(met
 export const getMethodTone = (methodKey: string): string => {
   const k = (methodKey || "").toLowerCase();
   const tag = BY_KEY[k];
-  if (tag === T.recommended) return "text-emerald-600";
+  if (tag === T.recommended || tag === T.card) return "text-emerald-600";
   if (tag === T.bank || tag === T.debit) return "text-blue-600";
   if (tag === T.noCard) return "text-amber-600";
   if (tag === T.fast) return "text-purple-600";

@@ -609,8 +609,10 @@ const ProductDynamic = () => {
               </div>
             </div>
           </section>
+          )}
 
           {/* Look Inside Gallery */}
+          {!isCourse && (
           <section className="mt-4 py-3 bg-slate-900 rounded-[1.5rem] text-white overflow-hidden">
             <div className="px-4 md:px-8">
               <div className="text-center mb-4">
@@ -651,6 +653,18 @@ const ProductDynamic = () => {
               </div>
             </div>
           </section>
+          )}
+
+          {isCourse && (
+            <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+              <MagliaRelaxLanding
+                galleryImages={product.gallery_images || []}
+                ctaLabel={priceReady ? `Lo voglio — ${displayFormatted}` : "Lo voglio"}
+                ctaDisabled={!priceReady}
+                onBuy={handleBuy}
+              />
+            </Suspense>
+          )}
           
           {(product.sku === "coreano-100-mapas-mentales" || 
             product.sku === "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca") && (
@@ -659,7 +673,7 @@ const ProductDynamic = () => {
             </div>
           )}
 
-          {product.sku !== "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca" && (
+          {!isCourse && product.sku !== "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca" && (
             <Suspense fallback={<Skeleton className="h-96 w-full" />}>
               <LooxStyleReviews />
             </Suspense>
@@ -695,6 +709,7 @@ const ProductDynamic = () => {
           )}
 
 
+          {!isCourse && (
           <Suspense fallback={<Skeleton className="h-48 w-full" />}>
             <FAQ 
               title={tx("Preguntas frecuentes", "FAQ", "Domande frequenti")} 
@@ -767,7 +782,8 @@ const ProductDynamic = () => {
       <StickyBuyBar
         sku={product.sku}
         price={displayFormatted}
-        originalPrice={originalFormatted}
+        originalPrice={isCourse ? undefined : originalFormatted}
+        showReviews={!isCourse || reviewsCount > 0}
         currencyCode={displayCurrencyCode}
         flag={flag}
         rating={reviewsRating}

@@ -15,4 +15,4 @@
 - [x] Add Italian email templates and audience selection while retaining delivery and payment behavior.
 - [x] Verify email language rules locally (19 tests passed and all six changed server files passed syntax compilation) and deploy the ten requested functions without test sends.
 - [x] Apply Maglia Relax course-only adjustments and add three videos and presentation image; seven tests passed, mobile/desktop presentation and Spanish product isolation checked, CDN video access confirmed. Playback could not be verified in the local browser; no purchases or emails.
-- [ ] Apply attached course-only sticky testimonial diff and test empty reviews, star filtering and phrase shortening without purchases or emails.
+- [x] Apply attached course-only sticky testimonial diff; ten tests passed and the real empty-review page hides testimonials. No purchases or emails.

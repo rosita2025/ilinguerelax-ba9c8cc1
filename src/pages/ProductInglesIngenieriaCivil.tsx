@@ -351,6 +351,19 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         </div>
       </section>
 
+      {isCourse && (
+        <div className="container px-4 md:px-6">
+          <Suspense fallback={<div className="h-96 w-full rounded-2xl bg-muted animate-pulse" />}>
+            <MagliaRelaxLanding
+              galleryImages={pricingAdmin.galleryImages ?? []}
+              ctaLabel={pricingReady ? `Lo voglio — ${priceLabel}` : "Lo voglio"}
+              ctaDisabled={!pricingReady}
+              onBuy={handleBuy}
+            />
+          </Suspense>
+        </div>
+      )}
+
       {/* Vista previa real (imágenes de la galería del admin de productos) */}
       {!isCourse && galleryPreviews.length > 0 && (
         <section className="py-10 md:py-14">
@@ -439,8 +452,10 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Testimonios y reseñas */}
+      {!isCourse && (
       <section className="py-10 md:py-14">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">

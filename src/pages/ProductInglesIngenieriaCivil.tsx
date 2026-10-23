@@ -1,5 +1,5 @@
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, lazy, Suspense } from "react";
 import { useNavigate, useParams, Navigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
@@ -24,6 +24,8 @@ import { type Currency } from "@/i18n";
 import { useI18n } from "@/i18n/I18nContext";
 import { UrgencyTimerBar } from "@/components/UrgencyTimerBar";
 import { PinterestSave } from "@/components/PinterestSave";
+
+const MagliaRelaxLanding = lazy(() => import("@/components/landing/MagliaRelaxLanding").then(m => ({ default: m.MagliaRelaxLanding })));
 
 const CIVIL_SKU = "1-000-palabras-ingles-mas-utilizadas-en-ingenieria-civil-n6mm";
 

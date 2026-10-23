@@ -534,7 +534,9 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
           </div>
         </div>
       </section>
+      )}
 
+      {!isCourse && (
       <FAQ
         items={[
           { question: t.productFaq.specialTitle, answer: t.productFaq.specialAnswer, icon: Sparkles },
@@ -545,6 +547,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas"
       />
+      )}
 
       <Footer />
 
@@ -552,14 +555,14 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
         sku={ADMIN_SKU}
         goesToInternalCheckout={true}
         price={priceLabel}
-        originalPrice={originalLabel}
+        originalPrice={isCourse ? undefined : originalLabel}
         currencyCode={displayCurrency}
         usdValue={PRICE_USD}
         flag={tier.loaded ? (currency === "USD" ? "🇺🇸" : currency === "EUR" ? "🇪🇺" : currency === "GBP" ? "🇬🇧" : currency === "AUD" ? "🇦🇺" : currency === "CAD" ? "🇨🇦" : "🌎") : undefined}
         productName={productName}
         rating={pricingAdmin.rating != null ? pricingAdmin.rating : 4.9}
         reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}
-        showReviews={true}
+        showReviews={!isCourse || courseReviewCount > 0}
         onBuyClick={handleBuy}
         ctaText={pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
         isLoading={!pricingReady}

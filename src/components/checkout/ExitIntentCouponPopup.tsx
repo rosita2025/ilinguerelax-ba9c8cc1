@@ -3,10 +3,8 @@ import { X, MessageCircle } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 
 const SESSION_KEY = "exit-coupon-shown-v1";
-// 45s de espera cuando el correo sigue vacío, sin usar el gesto de scroll
-// (causaba falsas alarmas con desplazamiento normal, no solo intención real
-// de irse).
-const MOBILE_TIMEOUT_MS = 45000;
+// Sin temporizador: el popup solo sale cuando la persona da señal de irse
+// (mouse sale por arriba, botón "atrás" del celular, o vuelve a la pestaña).
 
 interface Props {
   language: string;
@@ -66,7 +64,8 @@ const COPY: Record<string, { title: string; sub: string; cta: string; close: str
  * - Escritorio: el mouse sale por arriba de la ventana.
  * - Todos los dispositivos: vuelve a la pestaña después de estar en otra
  *   (cambiar de app/pestaña y regresar es una señal común de duda).
- * - Todos los dispositivos (respaldo): pasan 45s sin llenar el correo.
+ * - Celular: primer botón/gesto "atrás" (se queda en el checkout y muestra el popup).
+ * - SIN temporizador (decisión de Rosa): solo sale cuando hay señal de irse.
  *
  * NOTA: no es posible interceptar el cierre real de la pestaña/navegador
  * para mostrar un popup propio — los navegadores lo bloquean por seguridad
@@ -77,6 +76,8 @@ export function ExitIntentCouponPopup({ language }: Props) {
   const items = useCheckoutPruebaStore((s) => s.items);
   const [open, setOpen] = useState(false);
   const shownRef = useRef(false);
+  // Trampa del botón "atrás": se arma una sola vez (aunque el efecto se re-ejecute).
+  const trapArmedRef = useRef(false);
 
   useEffect(() => {
     if (shownRef.current) return;
@@ -105,20 +106,43 @@ export function ExitIntentCouponPopup({ language }: Props) {
       }
     };
 
-    // 3) Respaldo (todos los dispositivos): tiempo sin llenar el correo.
-    // Antes también existía un disparador por "scroll rápido hacia arriba",
-    // pero se activaba con scroll normal (leyendo la página), no solo con
-    // intención real de irse — se quitó por dar demasiadas falsas alarmas.
-    const mobileTimer = window.setTimeout(() => {
+    // 3) Botón/gesto "atrás" (celular): la primera vez que la persona intenta volver
+    // atrás, NO la dejamos salir: mostramos el popup y el checkout sigue abierto.
+    // Si toca "No gracias" (o vuelve a presionar atrás), se va normal: sale con un solo gesto.
+    // Se activa después del primer toque, porque Chrome ignora entradas de historial
+    // creadas sin que la persona haya tocado la página.
+    const armBackTrap = () => {
+      if (trapArmedRef.current) return;
+      trapArmedRef.current = true;
+      try {
+        window.history.pushState({ exitTrap: true }, "", window.location.href);
+      } catch { /* sin historial disponible */ }
+    };
+    const onPopState = () => {
+      if (!trapArmedRef.current) return;
+      const emailNow = (useCheckoutPruebaStore.getState().buyer.email || "").trim();
+      if (shownRef.current || emailNow.length > 3) {
+        // Ya se mostró (o ya dejó su correo): dejarla salir con este mismo gesto.
+        trapArmedRef.current = false;
+        window.history.back();
+        return;
+      }
+      // Primera vez: quedarse en el checkout y mostrar el popup.
+      try {
+        window.history.pushState({ exitTrap: true }, "", window.location.href);
+      } catch { /* ignore */ }
       trigger();
-    }, MOBILE_TIMEOUT_MS);
+    };
 
     document.addEventListener("mouseleave", onMouseLeave);
     document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("pointerdown", armBackTrap, { once: true, passive: true });
+    window.addEventListener("popstate", onPopState);
     return () => {
       document.removeEventListener("mouseleave", onMouseLeave);
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.clearTimeout(mobileTimer);
+      window.removeEventListener("pointerdown", armBackTrap);
+      window.removeEventListener("popstate", onPopState);
     };
   }, [buyerEmail]);
 

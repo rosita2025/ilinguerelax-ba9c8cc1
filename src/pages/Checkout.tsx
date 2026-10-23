@@ -53,7 +53,7 @@ function MobileOrderSummarySticky({ slug }: { slug?: string }) {
     <div
       className={cn(
         "lg:hidden z-20 bg-background/95 backdrop-blur border-b",
-        expanded ? "relative" : "sticky top-[44px] sm:top-[52px]",
+        expanded ? "relative" : "sticky top-[calc(var(--offer-bar-h,0px)+44px)] sm:top-[calc(var(--offer-bar-h,0px)+52px)]",
       )}
     >
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2">
@@ -647,7 +647,7 @@ export default function Checkout() {
               <CheckoutOfferCountdown productSlug={catalogItem?.id ?? slug ?? "checkout"} language={language} />
             )}
 
-            <header className="border-b bg-background/95 backdrop-blur sticky top-0 z-30">
+            <header className="border-b bg-background/95 backdrop-blur sticky top-[var(--offer-bar-h,0px)] z-30">
               <div className="max-w-6xl mx-auto px-3 sm:px-4 py-1.5 sm:py-2 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-3 min-w-0">
                   {catalogItem?.productPath && (

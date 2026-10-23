@@ -212,6 +212,16 @@ const DLOCAL_COUNTRIES = DLOCAL_COUNTRY_CODES;
 type MethodBadge = { label: string; bg: string; color: string };
 
 
+// Color del icono de cada tipo de método (solo presentación): ayuda a distinguirlos de un vistazo.
+const methodTone = (id: string): string => {
+  if (id === "card" || id.startsWith("stripe")) return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300";
+  if (id === "transfer" || id === "dlocal_transfer" || id === "clabe") return "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300";
+  if (id === "cash" || id === "dlocal_cash") return "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300";
+  if (id === "yape" || id === "dlocal_wallet" || id === "dlocal_card") return "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300";
+  if (id === "binance") return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300";
+  return "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400";
+};
+
 const getStripeVisibleMethodsBase = (language: string): Record<string, Omit<PaymentMethodRow, "id" | "methodKey" | "badge">> => ({
   stripe_apple_pay: {
     icon: Smartphone,
@@ -2377,6 +2387,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         const prev = idx > 0 ? methods[idx - 1] : null;
         const showSectionHeader = !prev || methodSection(prev.id) !== section;
         if ((m as any).isSeparator) {
+          if (idx === methods.length - 1) return null;
           return (
             <div key={rowKey} className="flex items-center gap-2 pt-1 mt-1 border-t border-neutral-200/70 dark:border-neutral-800 pt-2.5">
               <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">
@@ -2387,16 +2398,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         }
         return (
           <React.Fragment key={rowKey}>
-          {showSectionHeader && (
-            <div className={cn(
-              "flex items-center gap-2 pt-1",
-              idx > 0 && "mt-1 border-t border-neutral-200/70 dark:border-neutral-800 pt-2.5",
-            )}>
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
-                {sectionLabel(section, language)}
-              </span>
-            </div>
-          )}
           <div
             data-method-row={m.id}
             className={cn(
@@ -2428,7 +2429,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   "rounded-lg flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9",
                   isSelected
                     ? "bg-primary text-primary-foreground"
-                    : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
+                    : methodTone(m.id),
                 )}>
                   {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Icon className="w-5 h-5" />}
                 </div>
@@ -2443,7 +2444,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   ) : (
                     <span className="min-w-0 truncate">{m.title}</span>
                   )}
-                  {m.badge && (
+                  {isPrimaryCard && !isSelected && (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
+                      {language === "en" ? "Recommended" : language === "fr" ? "Recommandé" : language === "it" ? "Consigliato" : "Recomendado"}
+                    </span>
+                  )}
+                  {m.badge && isSelected && (
                     <span className={cn(
                       "text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0",
                       isSelected

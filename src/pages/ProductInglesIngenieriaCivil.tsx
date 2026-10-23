@@ -289,6 +289,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
                 {productDescription}
               </p>
 
+              {(!isCourse || courseReviewCount > 0) && (
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-4">
                 <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
@@ -305,6 +306,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
                   ({pricingAdmin.reviewCount ?? 6} {t.product.verifiedReviews})
                 </span>
               </div>
+              )}
 
               <PrecioEconomicoBanner />
 
@@ -350,7 +352,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
       </section>
 
       {/* Vista previa real (imágenes de la galería del admin de productos) */}
-      {galleryPreviews.length > 0 && (
+      {!isCourse && galleryPreviews.length > 0 && (
         <section className="py-10 md:py-14">
           <div className="container px-4 md:px-6">
             <div className="max-w-5xl mx-auto">
@@ -415,6 +417,7 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
       )}
 
       {/* What's included */}
+      {!isCourse && (
       <section className="py-8 md:py-10 bg-muted/30">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">

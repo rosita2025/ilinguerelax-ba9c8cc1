@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { Elements, ExpressCheckoutElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { Loader2, Lock } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
@@ -17,12 +17,12 @@ import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
  * El monto lo calcula el servidor (create-express-intent), nunca el navegador.
  */
 
-const COPY: Record<Lang, { pay: string; paying: string; secure: string; error: string; loading: string }> = {
-  es: { pay: "Pagar", paying: "Procesando…", secure: "Pago seguro procesado por Stripe", error: "No se pudo completar el pago. Intenta de nuevo.", loading: "Cargando formulario de pago…" },
-  en: { pay: "Pay", paying: "Processing…", secure: "Secure payment processed by Stripe", error: "The payment could not be completed. Please try again.", loading: "Loading payment form…" },
-  pt: { pay: "Pagar", paying: "Processando…", secure: "Pagamento seguro processado pela Stripe", error: "Não foi possível concluir o pagamento. Tente novamente.", loading: "Carregando formulário de pagamento…" },
-  fr: { pay: "Payer", paying: "Traitement…", secure: "Paiement sécurisé traité par Stripe", error: "Le paiement n'a pas pu être finalisé. Réessaie.", loading: "Chargement du formulaire de paiement…" },
-  it: { pay: "Paga", paying: "Elaborazione…", secure: "Pagamento sicuro elaborato da Stripe", error: "Non è stato possibile completare il pagamento. Riprova.", loading: "Caricamento del modulo di pagamento…" },
+const COPY: Record<Lang, { pay: string; paying: string; secure: string; error: string; loading: string; or: string }> = {
+  es: { pay: "Pagar", paying: "Procesando…", secure: "Pago seguro procesado por Stripe", error: "No se pudo completar el pago. Intenta de nuevo.", loading: "Cargando formulario de pago…", or: "o paga con tarjeta" },
+  en: { pay: "Pay", paying: "Processing…", secure: "Secure payment processed by Stripe", error: "The payment could not be completed. Please try again.", loading: "Loading payment form…", or: "or pay with card" },
+  pt: { pay: "Pagar", paying: "Processando…", secure: "Pagamento seguro processado pela Stripe", error: "Não foi possível concluir o pagamento. Tente novamente.", loading: "Carregando formulário de pagamento…", or: "ou pague com cartão" },
+  fr: { pay: "Payer", paying: "Traitement…", secure: "Paiement sécurisé traité par Stripe", error: "Le paiement n'a pas pu être finalisé. Réessaie.", loading: "Chargement du formulaire de paiement…", or: "ou payez par carte" },
+  it: { pay: "Paga", paying: "Elaborazione…", secure: "Pagamento sicuro elaborato da Stripe", error: "Non è stato possibile completare il pagamento. Riprova.", loading: "Caricamento del modulo di pagamento…", or: "o paga con carta" },
 };
 
 const ZERO_DECIMAL = new Set(["bif", "clp", "djf", "gnf", "jpy", "kmf", "krw", "mga", "pyg", "rwf", "ugx", "vnd", "vuv", "xaf", "xof", "xpf"]);
@@ -71,8 +71,12 @@ const Inner = ({
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // null = aún no se sabe; true = este dispositivo ofrece al menos una billetera rápida.
+  const [expressAvailable, setExpressAvailable] = useState<boolean | null>(null);
+  // Los pedidos con productos físicos no admiten pago rápido (lo rechaza el servidor).
+  const hasPhysical = useCheckoutPruebaStore((st) => st.items.some((i) => i.isPhysical));
 
-  const handlePay = async () => {
+  const runPayment = async (source: "payment-element" | "express-checkout") => {
     if (!stripe || !elements || busy) return;
     if (!canPay) {
       onNeedBuyerInfo();
@@ -98,7 +102,7 @@ const Inner = ({
           body: {
             environment: getStripeEnvironment(),
             action: "create",
-            source: "payment-element",
+            source,
             items: s.items.map((i) => ({ id: i.id, quantity: i.quantity })),
             currency: quote.currency,
             country,
@@ -136,6 +140,10 @@ const Inner = ({
     }
   };
 
+  const handlePay = () => runPayment("payment-element");
+  // Botones rápidos (Apple Pay / Google Pay / Link): mismo cobro, el monto lo calcula el servidor.
+  const handleExpressConfirm = () => runPayment("express-checkout");
+
   const s0 = useCheckoutPruebaStore.getState();
   return (
     <div className="space-y-3">
@@ -145,9 +153,33 @@ const Inner = ({
         </div>
       )}
       <div className={ready ? "" : "h-0 overflow-hidden opacity-0"}>
+        {!hasPhysical && (
+          <div className={expressAvailable ? "mb-3" : ""}>
+            <ExpressCheckoutElement
+              options={{
+                buttonHeight: 48,
+                layout: { maxColumns: 2, maxRows: 1 },
+                paymentMethods: { applePay: "auto", googlePay: "auto", link: "auto", amazonPay: "never", paypal: "never", klarna: "never" },
+              }}
+              onReady={({ availablePaymentMethods }) =>
+                setExpressAvailable(!!availablePaymentMethods && Object.values(availablePaymentMethods).some(Boolean))
+              }
+              onConfirm={handleExpressConfirm}
+            />
+            {expressAvailable && (
+              <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="h-px flex-1 bg-border" />
+                {t.or}
+                <span className="h-px flex-1 bg-border" />
+              </div>
+            )}
+          </div>
+        )}
         <PaymentElement
           options={{
             layout: { type: "tabs", defaultCollapsed: false },
+            // Las billeteras ya salen arriba como botones rápidos: no se repiten aquí.
+            wallets: { applePay: "never", googlePay: "never" },
             // Nombre y correo ya los tenemos arriba: no se vuelven a pedir.
             fields: { billingDetails: { name: "never", email: "never", phone: "never" } },
             defaultValues: { billingDetails: { email: s0.buyer.email.trim(), name: s0.buyer.fullName.trim() } },

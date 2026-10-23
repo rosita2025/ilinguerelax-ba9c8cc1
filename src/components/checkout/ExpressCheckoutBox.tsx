@@ -34,6 +34,11 @@ const COPY: Record<Lang, { title: string; divider: string; genericError: string 
   it: { title: "Pagamento rapido", divider: "oppure compila i tuoi dati qui sotto", genericError: "Non è stato possibile completare il pagamento. Riprova." },
 };
 
+// Con ?express=1 en el enlace se muestra el motivo si el Pago rápido no aparece (solo para diagnóstico).
+const isDebug = (): boolean => {
+  try { return new URLSearchParams(window.location.search).get("express") === "1"; } catch { return false; }
+};
+
 const isEnabled = (): boolean => {
   try {
     const flag = new URLSearchParams(window.location.search).get("express");
@@ -60,6 +65,8 @@ const ExpressInner = ({ language, country, currency, onAvailable, available }: I
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState<string | null>(null);
+  const [debugNote, setDebugNote] = useState<string | null>(null);
+  const debug = useMemo(isDebug, []);
   const t = COPY[language] ?? COPY.es;
 
   const handleConfirm = async (event: StripeExpressCheckoutElementConfirmEvent) => {
@@ -124,16 +131,22 @@ const ExpressInner = ({ language, country, currency, onAvailable, available }: I
   };
 
   return (
-    <div className={available ? "space-y-2" : "hidden"}>
+    <div className={available || (debug && debugNote) ? "space-y-2" : "hidden"}>
       <p className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t.title}</p>
       <ExpressCheckoutElement
         options={{ buttonHeight: 48, emailRequired: true, phoneNumberRequired: false }}
         onReady={(e) => {
           const methods = e.availablePaymentMethods as Record<string, boolean> | undefined;
-          onAvailable(!!methods && Object.values(methods).some(Boolean));
+          const any = !!methods && Object.values(methods).some(Boolean);
+          onAvailable(any);
+          if (debug) setDebugNote(any ? null : "Pago rápido no disponible en este dispositivo: no hay Apple Pay, Google Pay ni Link listos (o Stripe no tiene el dominio verificado).");
+        }}
+        onLoadError={(e) => {
+          if (debug) setDebugNote(`Pago rápido no pudo cargar: ${e?.error?.message ?? "error de Stripe"}`);
         }}
         onConfirm={handleConfirm}
       />
+      {debug && debugNote && <p className="text-center text-xs text-amber-700">{debugNote}</p>}
       {error && <p role="alert" className="text-center text-xs text-destructive">{error}</p>}
       <p className="pt-1 text-center text-[11px] text-muted-foreground">— {t.divider} —</p>
     </div>
@@ -178,7 +191,7 @@ export default function ExpressCheckoutBox({ language }: { language: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signature, enabled, stripePromise, hasPhysical]);
 
-  if (!enabled || !stripePromise || !quote || hasPhysical || !methods.loaded || !methods.stripe) return null;
+  if (!enabled || !stripePromise || !quote || hasPhysical || !methods.loaded || !methods.enabledMethodKeys.includes("stripe_card")) return null;
 
   return (
     <div className="rounded-xl border bg-card p-3 sm:p-4 shadow-sm">

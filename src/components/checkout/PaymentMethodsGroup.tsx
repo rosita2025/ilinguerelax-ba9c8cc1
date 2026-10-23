@@ -80,6 +80,7 @@ interface PaymentMethodRow {
 
 // Antes usaban una ruta temporal de Lovable (asset borrado del CDN) que no
 // sobrevivía al publicar; ahora usan archivos propios del proyecto.
+import { VisaBadge, MastercardBadge, AmexBadge, ApplePayBadge } from "@/components/checkout/CardBrandBadges";
 import visaLogoAsset from "@/assets/payment-logos/visa.png.asset.json";
 import mastercardLogoAsset from "@/assets/payment-logos/mastercard.png.asset.json";
 const visaLogo = visaLogoAsset.url;
@@ -138,9 +139,10 @@ function LinkBadge() {
  * es la mejor opción (esas marcas no tienen un logo monocromo estándar).
  */
 function renderMethodBadge(badge: MethodBadge) {
-  if (badge.label === "Visa") return <LogoBadge key={badge.label} src={visaLogo} alt="Visa" />;
-  if (badge.label === "Mastercard") return <LogoBadge key={badge.label} src={mastercardLogo} alt="Mastercard" />;
-  if (badge.label === "Apple Pay") return <LogoBadge key={badge.label} src={applePayLogo} alt="Apple Pay" bg="#000000" />;
+  if (badge.label === "Visa") return <VisaBadge key={badge.label} />;
+  if (badge.label === "Mastercard") return <MastercardBadge key={badge.label} />;
+  if (badge.label === "American Express") return <AmexBadge key={badge.label} />;
+  if (badge.label === "Apple Pay") return <ApplePayBadge key={badge.label} />;
   if (badge.label === "Hotmart") return <LogoBadge key={badge.label} src={hotmartLogo.url} alt="Hotmart" />;
   if (badge.label === "Google Pay") return <GooglePayBadge key={badge.label} />;
   if (badge.label === "Link") return <LinkBadge key={badge.label} />;
@@ -1902,6 +1904,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const primaryCardBadges: MethodBadge[] = [
     { label: "Visa", bg: "#ffffff", color: "#1F2937" },
     { label: "Mastercard", bg: "#ffffff", color: "#1F2937" },
+    { label: "American Express", bg: "#2E77BC", color: "#ffffff" },
     { label: "Apple Pay", bg: "#000000", color: "#ffffff" },
     { label: "Google Pay", bg: "#ffffff", color: "#1F2937" },
     ...(enabledStripeKeys.has("stripe_link") ? [{ label: "Link", bg: "#00D66F", color: "#0A2540" }] : []),
@@ -1947,14 +1950,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     {
       id: "clabe",
       icon: Building2,
-      title: language === "en" ? "SPEI · Bank transfer (Mexico)"
-        : language === "pt" ? "SPEI · Transferência bancária (México)"
-        : language === "fr" ? "SPEI · Virement bancaire (Mexique)"
-        : "SPEI · Transferencia bancaria (México)",
-      sub: language === "en" ? "Transfer in MXN to a Mexican CLABE · 1-24h verification by Supervisor Rosa"
-        : language === "pt" ? "Transferência em MXN para uma CLABE mexicana · Verificação 1-24h pela Supervisora Rosa"
-        : language === "fr" ? "Virement en MXN vers une CLABE mexicaine · Vérification 1-24h par la Superviseure Rosa"
-        : "Transferencia en MXN a CLABE mexicana · Verificación 1-24h por Supervisora Rosa",
+      title: language === "en" ? "SPEI · Bank transfer"
+        : language === "pt" ? "SPEI · Transferência"
+        : language === "fr" ? "SPEI · Virement"
+        : "SPEI · Transferencia",
+      sub: language === "en" ? "Pay from your bank app · verified in 1-24h"
+        : language === "pt" ? "Pague pelo app do seu banco · verificado em 1-24h"
+        : language === "fr" ? "Payez depuis votre banque · vérifié en 1-24h"
+        : "Paga desde tu app del banco · verificado en 1-24 h",
       badge: finalPriceLabel,
 
     },
@@ -2087,7 +2090,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         }
         if (m.id === "stripe_ach") return isUsa && methodsConfig.stripeAch;
         if (m.id === "stripe_cashapp") return isUsa && methodsConfig.stripeCashApp;
-        if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna;
+        if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna && country !== "MX"; // Klarna no opera en México
         
         // Rails locales de Perú (transferencia BCP/Interbank, efectivo, Yape/Plin)
         // SOLO deben verse desde Perú. Un comprador en México no puede pagar a
@@ -2095,7 +2098,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         if (m.id === "transfer") return methodsConfig.transfer && isPeru;
         if (m.id === "cash") return methodsConfig.cash && isPeru;
         if (m.id === "yape") return methodsConfig.yape && isPeru;
-        if (m.id === "binance") return methodsConfig.binance;
+        if (m.id === "binance") return methodsConfig.binance && country !== "MX";
         if (m.id === "clabe") return country === "MX";
 
         // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.

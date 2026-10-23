@@ -88,6 +88,11 @@ export default function Checkout() {
   // inmediatamente sin pantalla en blanco. El chequeo de rate-limit por IP se
   // hace en segundo plano (fail-open).
   // (sin estado de gate: renderizamos siempre y redirigimos en background si no cumple)
+  // Precarga Stripe.js en cuanto abre el checkout para que "Pago rápido" y la tarjeta aparezcan antes.
+  useEffect(() => {
+    import("@/lib/stripe").then((m) => { try { void m.getStripe(); } catch { /* sin Stripe configurado */ } }).catch(() => {});
+  }, []);
+
   useEffect(() => {
     if (!slug) return;
     let cancelled = false;

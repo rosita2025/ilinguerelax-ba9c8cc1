@@ -4,6 +4,7 @@ import { Loader2, Lock } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
+import { fetchStripeQuote } from "@/lib/stripeQuote";
 import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
 
 /**
@@ -208,26 +209,13 @@ export default function StripePaymentElementBox(props: Props) {
     if (!stripePromise || items.length === 0 || country.length !== 2) return;
     let cancelled = false;
     (async () => {
-      const { data, error } = await invokeWithRetry<{ amount?: number; currency?: string }>(
-        "create-express-intent",
-        {
-          body: {
-            environment: getStripeEnvironment(),
-            action: "quote",
-            items: items.map((i) => ({ id: i.id, quantity: i.quantity })),
-            currency: String(currency || "USD").toLowerCase(),
-            country,
-            couponCode: coupon ?? undefined,
-          },
-        },
-        { attempts: 2, baseDelayMs: 500 },
-      );
+      const q = await fetchStripeQuote({ items, currency: String(currency || "USD"), country, couponCode: coupon });
       if (cancelled) return;
-      if (error || !data?.amount || !data.currency) {
+      if (!q) {
         setFailed(true);
         return;
       }
-      setQuote({ amount: data.amount, currency: data.currency });
+      setQuote(q);
     })();
     return () => {
       cancelled = true;

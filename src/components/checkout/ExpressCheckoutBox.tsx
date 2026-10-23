@@ -7,6 +7,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import { useCheckoutMethodsConfig } from "@/hooks/useCheckoutMethodsConfig";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
+import { fetchStripeQuote } from "@/lib/stripeQuote";
 import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
 
 /**
@@ -165,33 +166,19 @@ export default function ExpressCheckoutBox({ language }: { language: string }) {
   useEffect(() => {
     setQuote(null);
     if (!enabled || !stripePromise || hasPhysical || items.length === 0 || country.length !== 2) return;
-    if (!methods.loaded || !methods.stripe) return;
     let cancelled = false;
     (async () => {
-      const { data, error } = await invokeWithRetry<{ amount?: number; currency?: string }>(
-        "create-express-intent",
-        {
-          body: {
-            environment: getStripeEnvironment(),
-            action: "quote",
-            items: items.map((i) => ({ id: i.id, quantity: i.quantity })),
-            currency: String(currency || "USD").toLowerCase(),
-            country,
-            couponCode: coupon ?? undefined,
-          },
-        },
-        { attempts: 2, baseDelayMs: 500 },
-      );
-      if (cancelled || error || !data?.amount || !data.currency) return;
-      setQuote({ amount: data.amount, currency: data.currency });
+      const q = await fetchStripeQuote({ items, currency: String(currency || "USD"), country, couponCode: coupon });
+      if (cancelled || !q) return;
+      setQuote(q);
     })();
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signature, enabled, stripePromise, hasPhysical, methods.loaded, methods.stripe]);
+  }, [signature, enabled, stripePromise, hasPhysical]);
 
-  if (!enabled || !stripePromise || !quote || hasPhysical) return null;
+  if (!enabled || !stripePromise || !quote || hasPhysical || !methods.loaded || !methods.stripe) return null;
 
   return (
     <div className="rounded-xl border bg-card p-3 sm:p-4 shadow-sm">

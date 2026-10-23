@@ -17,7 +17,6 @@ import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { motion } from "framer-motion";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { CompradoresReales } from "@/components/CompradoresReales";
-import { PrecioEconomicoBanner } from "@/components/PrecioEconomicoBanner";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { type Currency } from "@/i18n";
@@ -307,8 +306,6 @@ const ProductInglesIngenieriaCivil = ({ sku }: { sku?: string } = {}) => {
                 </span>
               </div>
               )}
-
-              <PrecioEconomicoBanner />
 
               <div className="mb-6 flex items-center justify-between bg-muted/30 p-3 rounded-xl border border-border/50">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Pagos Seguros:</span>

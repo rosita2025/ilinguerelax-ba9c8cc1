@@ -21,7 +21,7 @@ const BY_KEY: Record<string, MethodTag> = {
   stripe_link: T.fast, stripe_apple_pay: T.fast, stripe_google_pay: T.fast,
   stripe_cashapp: T.fast, stripe_pix: T.fast, stripe_mb_way: T.fast, stripe_blik: T.fast,
   stripe_twint: T.fast, stripe_mobilepay: T.fast, stripe_grabpay: T.fast, stripe_paynow: T.fast,
-  stripe_alipay: T.fast, stripe_wechat_pay: T.fast, stripe_paypal: T.fast, paypal: T.fast,
+  stripe_alipay: T.fast, stripe_wechat_pay: T.fast, paypal: T.fast,
   yape_plin: T.fast, dlocal_wallet: T.fast, dlocal_mercadopago: T.fast,
   stripe_us_bank_account: T.bank, stripe_ideal: T.bank, stripe_bancontact: T.bank, stripe_sofort: T.bank,
   stripe_giropay: T.bank, stripe_eps: T.bank, stripe_p24: T.bank, stripe_acss_debit: T.bank,

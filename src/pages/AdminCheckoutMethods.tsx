@@ -185,7 +185,6 @@ const CHECKOUT_METHODS: CheckoutMethodDef[] = [
   { key: "stripe_klarna", label: "Stripe — Klarna (Pay in 4)", note: "Paga en 4 cuotas sin interés (USA/UE)", icon: "Wallet", regions: ["US", "GLOBAL"] },
   { key: "stripe_affirm", label: "Affirm", note: "Compra ahora, paga después", icon: "CreditCard", countryCodes: ["US", "*"] },
   { key: "stripe_afterpay_clearpay", label: "Afterpay / Clearpay", note: "Paga en 4", icon: "CreditCard", countryCodes: ["US", "CA", "GB", "AU", "NZ"] },
-  { key: "stripe_paypal", label: "PayPal (vía Stripe)", note: "PayPal procesado por Stripe", icon: "Wallet", countryCodes: ["*", "US", "CA", "MX", "BR", "AR", "CL", "CO", "PE", "UY", "DE", "AT", "NL", "BE", "FR", "ES", "IT", "PT", "IE", "GB", "CH", "NO", "SE", "DK", "AU", "NZ", "JP", "KR", "SG", "HK", "IN", "AE", "ZA"] },
   { key: "stripe_oxxo", label: "OXXO", note: "Voucher efectivo México", icon: "Banknote", countryCodes: ["MX"] },
   { key: "stripe_boleto", label: "Boleto", note: "Voucher bancario Brasil", icon: "Banknote", countryCodes: ["BR"] },
   { key: "stripe_pix", label: "Pix", note: "Transferencia instantánea Brasil", icon: "Smartphone", countryCodes: ["BR"] },

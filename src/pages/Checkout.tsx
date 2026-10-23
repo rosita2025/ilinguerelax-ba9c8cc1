@@ -14,6 +14,7 @@ import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
 const loadPaymentMethodsGroup = () =>
   import("@/components/checkout/PaymentMethodsGroup").then((m) => ({ default: m.PaymentMethodsGroup }));
 const PaymentMethodsGroup = lazy(loadPaymentMethodsGroup);
+const ExpressCheckoutBox = lazy(() => import("@/components/checkout/ExpressCheckoutBox"));
 // Empieza a descargar los métodos de pago apenas se carga este módulo, en paralelo
 // con la consulta del producto, en vez de esperar a que se pinte esa sección.
 if (typeof window !== "undefined") void loadPaymentMethodsGroup().catch(() => {});
@@ -698,6 +699,12 @@ export default function Checkout() {
                   <PaymentLogos />
                 </div>
                 
+                <SectionErrorBoundary name="express-checkout">
+                  <Suspense fallback={null}>
+                    <ExpressCheckoutBox language={language} />
+                  </Suspense>
+                </SectionErrorBoundary>
+
                 <SectionErrorBoundary name="buyer-info">
                   <div id="buyer-info-section">
                     <BuyerInfoForm />

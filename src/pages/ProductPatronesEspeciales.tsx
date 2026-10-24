@@ -49,6 +49,7 @@ import resenaMx2 from "@/assets/resena-mx2.webp.asset.json";
 import resenaMx3 from "@/assets/resena-mx3.webp.asset.json";
 import resenaMx4 from "@/assets/resena-mx4.webp.asset.json";
 import { PinterestSave } from "@/components/PinterestSave";
+import { LazyImg, LazyMount } from "@/components/LazyImg";
 import { lightCoverUrl, disableImageTransform, readCachedCover, writeCachedCover } from "@/lib/coverImage";
 
 const previews = [
@@ -428,6 +429,7 @@ const PatronesContent = () => {
                 Mira cómo <span className="text-gradient">funciona por dentro</span>
               </h2>
             </div>
+            <LazyMount minHeight={520}>
             <div className="mb-6">
                 <div className="relative rounded-2xl overflow-hidden border border-border/50 bg-black">
                   <video
@@ -444,6 +446,7 @@ const PatronesContent = () => {
                 </div>
             </div>
             <TikTokVideos />
+            </LazyMount>
             <div className="text-center mt-6">
               <Button variant="hero" size="xl" onClick={handleBuy} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
                 <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
@@ -499,7 +502,7 @@ const PatronesContent = () => {
                   <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-background/90 text-foreground text-[11px] font-bold border border-border">
                     {r.flag} {r.country}
                   </div>
-                  <img src={r.src} alt={r.alt} loading="lazy" className="w-full h-auto block" />
+                  <LazyImg src={r.src} alt={r.alt} minHeight={260} className="w-full h-auto block" />
                 </figure>
               ))}
             </div>
@@ -571,14 +574,13 @@ const PatronesContent = () => {
                     Página {i + 1}
                   </div>
                    <div className="relative aspect-square bg-card overflow-hidden">
-                    <img
+                    <LazyImg
                       src={p.src}
                       alt={p.alt}
-                      loading="lazy"
-                       decoding="async"
-                       width={1254}
-                       height={1254}
-                       className="absolute inset-0 w-full h-full object-contain"
+                      wrapperClassName="absolute inset-0 block"
+                      width={1254}
+                      height={1254}
+                      className="w-full h-full object-contain"
                     />
                   </div>
                   <figcaption className="p-3 text-sm font-semibold text-foreground text-center">
@@ -621,14 +623,13 @@ const PatronesContent = () => {
                   <figure key={p.src} className="relative rounded-2xl overflow-hidden border border-accent/30 shadow-card bg-card">
 
                      <div className="relative aspect-square bg-card overflow-hidden">
-                      <img
+                      <LazyImg
                         src={p.src}
                         alt={p.alt}
-                        loading="lazy"
-                         decoding="async"
-                         width={1920}
-                         height={1920}
-                         className="absolute inset-0 w-full h-full object-contain"
+                        wrapperClassName="absolute inset-0 block"
+                        width={1920}
+                        height={1920}
+                        className="w-full h-full object-contain"
                       />
                     </div>
                     <figcaption className="p-3 text-sm font-semibold text-foreground text-center">

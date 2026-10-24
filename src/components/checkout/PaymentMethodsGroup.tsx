@@ -520,9 +520,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // o cuando se usa un gateway global, donde se fuerza USD.
   const priceBadge = penBadge ?? localTotalLabel;
   // Usamos el usdReference calculado por sumItemsLocal que ya contempla el USD Regional.
-  const usdSuffix = (isActuallyShowingLocal && !local.isUsd) 
-    ? ` · $${Math.round(currentUsdRef)}`
-    : "";
+  // Solo moneda local en el precio (sin "· $10" en dólares): evita confundir dólares con moneda local.
+  const usdSuffix = "";
   const finalPriceLabel = isActuallyShowingLocal ? `${priceBadge}${usdSuffix}` : "...";
   
   // Loading state detection for pricing across all components

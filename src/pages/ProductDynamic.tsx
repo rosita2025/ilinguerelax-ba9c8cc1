@@ -18,7 +18,7 @@ import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PinterestSave } from "@/components/PinterestSave";
 import { VerifiedReviews } from "@/components/VerifiedReviews";
 import { CartBadge } from "@/components/CartBadge";
-import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
+const ResenasWhatsAppCoreano = lazy(() => import("@/components/ResenasWhatsAppCoreano").then((m) => ({ default: m.ResenasWhatsAppCoreano })));
 import { StockAlert } from "@/components/StockAlert";
 import { SocialProofPill } from "@/components/SocialProofPill";
 import { ProductTypeBadge } from "@/components/ProductTypeBadge";
@@ -131,14 +131,19 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
   // Usamos requestIdleCallback (con fallback a setTimeout) para no competir
   // con la carga inicial de la propia página del producto.
   useEffect(() => {
-    const prefetch = () => { import("@/pages/Checkout"); prefetchCheckoutProduct(slug); };
-    const w = window as typeof window & { requestIdleCallback?: (cb: () => void) => number };
-    if (typeof w.requestIdleCallback === "function") {
-      const id = w.requestIdleCallback(prefetch);
-      return () => { /* no cleanup needed, prefetch is harmless if it fires */ };
-    }
-    const timeoutId = window.setTimeout(prefetch, 2000);
-    return () => window.clearTimeout(timeoutId);
+    // Se precarga el checkout cuando la página ya terminó de cargar y el navegador está libre
+    // (antes competía con la descarga de la propia página del producto).
+    let timeoutId = 0;
+    const run = () => {
+      const prefetch = () => { import("@/pages/Checkout"); prefetchCheckoutProduct(slug); };
+      const w = window as typeof window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+      if (typeof w.requestIdleCallback === "function") w.requestIdleCallback(prefetch, { timeout: 4000 });
+      else timeoutId = window.setTimeout(prefetch, 1500);
+    };
+    const start = () => { timeoutId = window.setTimeout(run, 2500); };
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
+    return () => { window.clearTimeout(timeoutId); window.removeEventListener("load", start); };
   }, []);
 
   useEffect(() => {
@@ -723,7 +728,7 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
           {(product.sku === "coreano-100-mapas-mentales" || 
             product.sku === "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca") && (
             <div className="mb-2">
-              <ResenasWhatsAppCoreano />
+              <Suspense fallback={null}><ResenasWhatsAppCoreano /></Suspense>
             </div>
           )}
 

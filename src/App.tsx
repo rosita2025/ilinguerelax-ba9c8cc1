@@ -18,7 +18,22 @@ import { isInternalTraffic } from "@/hooks/useMetaPixel";
 
 const Index = lazy(() => import("./pages/Index"));
 import { CookieConsent } from "@/components/CookieConsent";
-import { EmailSubscribePopup } from "@/components/EmailSubscribePopup";
+const EmailSubscribePopup = lazy(() => import("@/components/EmailSubscribePopup").then((m) => ({ default: m.EmailSubscribePopup })));
+
+// Monta contenido secundario cuando el navegador está libre (no compite con la carga de la página).
+const IdleMount = ({ children, timeout = 2500 }: { children: React.ReactNode; timeout?: number }) => {
+  const [ready, setReady] = React.useState(false);
+  useEffect(() => {
+    const w = window as typeof window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
+    if (typeof w.requestIdleCallback === "function") {
+      const id = w.requestIdleCallback(() => setReady(true), { timeout });
+      return () => w.cancelIdleCallback?.(id);
+    }
+    const t = window.setTimeout(() => setReady(true), 1500);
+    return () => window.clearTimeout(t);
+  }, [timeout]);
+  return ready ? <>{children}</> : null;
+};
 
 import { BrevoChatToggle } from "@/components/BrevoChatToggle";
 import AdminSubdomainGate from "@/components/admin/AdminSubdomainGate";
@@ -246,7 +261,7 @@ const App = () => (
                 <AutoTranslate />
                 <PublicOnly><BrevoChatToggle /></PublicOnly>
                 <PublicOnly><CookieConsent /></PublicOnly>
-                <PublicOnly><EmailSubscribePopup /></PublicOnly>
+                <PublicOnly><IdleMount><Suspense fallback={null}><EmailSubscribePopup /></Suspense></IdleMount></PublicOnly>
                 
                 <Suspense fallback={<PageFallback />}>
                   <Routes>

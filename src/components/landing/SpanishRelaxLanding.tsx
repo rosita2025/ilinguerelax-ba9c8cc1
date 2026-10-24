@@ -1,4 +1,6 @@
-import { Check, Brain, Layers, Repeat, Target, ShieldCheck, Download, Mail, CalendarDays, BookOpen, ClipboardCheck } from "lucide-react";
+import { useRef, useState } from "react";
+import { Check, Brain, Layers, Repeat, Target, ShieldCheck, Download, Mail, CalendarDays, BookOpen, ClipboardCheck, Play } from "lucide-react";
+import { RELAX_PREVIEWS, RELAX_BONUS_PLANNER, RELAX_BONUS_EXAM, RELAX_VIDEOS } from "./spanishRelaxMedia";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
@@ -15,9 +17,6 @@ type Props = {
   price: string | null;
   onBuy: () => void;
   buyDisabled?: boolean;
-  vocabPreviews: RelaxPreview[];
-  plannerPreview: RelaxPreview;
-  examPreview: RelaxPreview;
 };
 
 const sectionTitle = "text-2xl md:text-3xl font-black tracking-tight text-slate-900";
@@ -72,7 +71,54 @@ const plan = [
   { days: "Days 24–30", title: "Review and assess", text: "Revisit challenging words and use the exam to review your knowledge." },
 ];
 
-export function SpanishRelaxLanding({ price, onBuy, buyDisabled, vocabPreviews, plannerPreview, examPreview }: Props) {
+function VideoCarousel() {
+  const refs = useRef<Array<HTMLVideoElement | null>>([]);
+  const [playing, setPlaying] = useState<number | null>(null);
+  const toggle = (i: number) => {
+    const v = refs.current[i];
+    if (!v) return;
+    if (v.paused) {
+      refs.current.forEach((o, j) => { if (j !== i) o?.pause(); });
+      void v.play();
+    } else {
+      v.pause();
+    }
+  };
+  return (
+    <div className="mx-auto mt-5 flex max-w-4xl snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {RELAX_VIDEOS.map((src, i) => (
+        <div key={src} className="relative aspect-[9/16] w-[72%] shrink-0 snap-center overflow-hidden rounded-2xl bg-slate-900 sm:w-[260px]">
+          <video
+            ref={(el) => { refs.current[i] = el; }}
+            src={src}
+            preload="none"
+            playsInline
+            controls={playing === i}
+            controlsList="nodownload noplaybackrate noremoteplayback"
+            disablePictureInPicture
+            onPlay={() => setPlaying(i)}
+            onPause={() => setPlaying((p) => (p === i ? null : p))}
+            onEnded={() => setPlaying((p) => (p === i ? null : p))}
+            className="h-full w-full object-contain"
+            aria-label={`Spanish Relax video ${i + 1}`}
+          />
+          {playing !== i && (
+            <button type="button" onClick={() => toggle(i)} aria-label={`Play video ${i + 1}`} className="absolute inset-0 flex items-center justify-center bg-slate-900/30">
+              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl">
+                <Play className="ml-1 h-7 w-7" />
+              </span>
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function SpanishRelaxLanding({ price, onBuy, buyDisabled }: Props) {
+  const vocabPreviews = RELAX_PREVIEWS;
+  const plannerPreview = RELAX_BONUS_PLANNER;
+  const examPreview = RELAX_BONUS_EXAM;
   return (
     <div className="mt-6 space-y-10 md:space-y-14">
       {/* Dolor */}
@@ -132,6 +178,15 @@ export function SpanishRelaxLanding({ price, onBuy, buyDisabled, vocabPreviews, 
         </div>
       </section>
 
+      {/* Videos */}
+      <section>
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className={sectionTitle}>See Spanish Relax in Action</h2>
+          <p className="mt-2 text-sm text-slate-600 md:text-base">Swipe to watch the 3 videos. You decide when to play.</p>
+        </div>
+        <VideoCarousel />
+      </section>
+
       {/* Bonos: dos bloques independientes */}
       <section>
         <div className="mx-auto max-w-3xl text-center">
@@ -139,7 +194,7 @@ export function SpanishRelaxLanding({ price, onBuy, buyDisabled, vocabPreviews, 
         </div>
         <div className="mx-auto mt-5 grid max-w-4xl gap-4 md:grid-cols-2">
           <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <PreviewTile item={plannerPreview} className="aspect-[4/3] w-full rounded-none border-0" />
+            <PreviewTile item={plannerPreview} className="aspect-square w-full rounded-none border-0" />
             <div className="p-4">
               <div className="mb-1 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-black uppercase text-emerald-700">
                 <CalendarDays className="h-3 w-3" /> Bonus 1
@@ -149,7 +204,7 @@ export function SpanishRelaxLanding({ price, onBuy, buyDisabled, vocabPreviews, 
             </div>
           </div>
           <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <PreviewTile item={examPreview} className="aspect-[4/3] w-full rounded-none border-0" />
+            <PreviewTile item={examPreview} className="aspect-square w-full rounded-none border-0" />
             <div className="p-4">
               <div className="mb-1 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-black uppercase text-emerald-700">
                 <ClipboardCheck className="h-3 w-3" /> Bonus 2

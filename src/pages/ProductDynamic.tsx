@@ -681,13 +681,6 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
                 price={priceReady ? displayFormatted : null}
                 onBuy={handleBuy}
                 buyDisabled={!priceReady}
-                vocabPreviews={[
-                  { title: "Vocabulary page", image: previewSpanishVocab },
-                  { title: "Vocabulary table 1", image: vocabTable1Asset.url },
-                  { title: "Vocabulary table 2", image: vocabTable2Asset.url },
-                ]}
-                plannerPreview={{ title: "Daily Study Planner", image: plannerPreviewAsset.url }}
-                examPreview={{ title: "Complete Spanish Language Exam", image: examPreviewAsset.url }}
               />
             </Suspense>
           )}

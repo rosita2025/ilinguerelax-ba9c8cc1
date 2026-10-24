@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, Brain, Layers, Repeat, Target, ShieldCheck, Download, Mail, CalendarDays, BookOpen, ClipboardCheck, Play } from "lucide-react";
 import { RELAX_PREVIEWS, RELAX_BONUS_PLANNER, RELAX_BONUS_EXAM, RELAX_VIDEOS } from "./spanishRelaxMedia";
 import { Button } from "@/components/ui/button";
@@ -71,45 +71,75 @@ const plan = [
   { days: "Days 24–30", title: "Review and assess", text: "Revisit challenging words and use the exam to review your knowledge." },
 ];
 
-function VideoCarousel() {
-  const refs = useRef<Array<HTMLVideoElement | null>>([]);
-  const [playing, setPlaying] = useState<number | null>(null);
-  const toggle = (i: number) => {
-    const v = refs.current[i];
+// Cada video se muestra como vista previa muda de 4 segundos en bucle: se ve al instante,
+// solo se reproduce el que está en pantalla y se toca para pausar o reanudar.
+const PREVIEW_SECONDS = 4;
+
+function RelaxVideo({ src, index }: { src: string; index: number }) {
+  const ref = useRef<HTMLVideoElement | null>(null);
+  const [paused, setPaused] = useState(false);
+  const pausedByUser = useRef(false);
+
+  useEffect(() => {
+    const v = ref.current;
     if (!v) return;
-    if (v.paused) {
-      refs.current.forEach((o, j) => { if (j !== i) o?.pause(); });
-      void v.play();
-    } else {
-      v.pause();
-    }
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    const saveData = !!conn?.saveData;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+          if (!pausedByUser.current && !saveData) void v.play().catch(() => {});
+        } else {
+          v.pause();
+        }
+      },
+      { threshold: [0, 0.6, 1] },
+    );
+    io.observe(v);
+    const onTime = () => { if (v.currentTime >= PREVIEW_SECONDS) v.currentTime = 0; };
+    v.addEventListener("timeupdate", onTime);
+    return () => { io.disconnect(); v.removeEventListener("timeupdate", onTime); };
+  }, []);
+
+  const toggle = () => {
+    const v = ref.current;
+    if (!v) return;
+    if (v.paused) { pausedByUser.current = false; void v.play().catch(() => {}); }
+    else { pausedByUser.current = true; v.pause(); }
   };
+
+  return (
+    <div className="relative aspect-[9/16] w-[72%] shrink-0 snap-center overflow-hidden rounded-2xl bg-slate-900 sm:w-[260px]">
+      <video
+        ref={ref}
+        src={`${src}#t=0.1`}
+        muted
+        loop
+        playsInline
+        preload={index === 0 ? "auto" : "metadata"}
+        disablePictureInPicture
+        onPlay={() => setPaused(false)}
+        onPause={() => setPaused(true)}
+        onClick={toggle}
+        className="h-full w-full object-contain"
+        aria-label={`Spanish Relax video ${index + 1}`}
+      />
+      {paused && (
+        <button type="button" onClick={toggle} aria-label={`Play video ${index + 1}`} className="absolute inset-0 flex items-center justify-center bg-slate-900/20">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/90 text-primary-foreground shadow-xl">
+            <Play className="ml-1 h-6 w-6" />
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+function VideoCarousel() {
   return (
     <div className="mx-auto mt-5 flex max-w-4xl snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {RELAX_VIDEOS.map((src, i) => (
-        <div key={src} className="relative aspect-[9/16] w-[72%] shrink-0 snap-center overflow-hidden rounded-2xl bg-slate-900 sm:w-[260px]">
-          <video
-            ref={(el) => { refs.current[i] = el; }}
-            src={src}
-            preload="none"
-            playsInline
-            controls={playing === i}
-            controlsList="nodownload noplaybackrate noremoteplayback"
-            disablePictureInPicture
-            onPlay={() => setPlaying(i)}
-            onPause={() => setPlaying((p) => (p === i ? null : p))}
-            onEnded={() => setPlaying((p) => (p === i ? null : p))}
-            className="h-full w-full object-contain"
-            aria-label={`Spanish Relax video ${i + 1}`}
-          />
-          {playing !== i && (
-            <button type="button" onClick={() => toggle(i)} aria-label={`Play video ${i + 1}`} className="absolute inset-0 flex items-center justify-center bg-slate-900/30">
-              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl">
-                <Play className="ml-1 h-7 w-7" />
-              </span>
-            </button>
-          )}
-        </div>
+        <RelaxVideo key={src} src={src} index={i} />
       ))}
     </div>
   );
@@ -182,7 +212,7 @@ export function SpanishRelaxLanding({ price, onBuy, buyDisabled }: Props) {
       <section>
         <div className="mx-auto max-w-3xl text-center">
           <h2 className={sectionTitle}>See Spanish Relax in Action</h2>
-          <p className="mt-2 text-sm text-slate-600 md:text-base">Swipe to watch the 3 videos. You decide when to play.</p>
+          <p className="mt-2 text-sm text-slate-600 md:text-base">Swipe to see the 3 short previews. Tap a video to pause it.</p>
         </div>
         <VideoCarousel />
       </section>

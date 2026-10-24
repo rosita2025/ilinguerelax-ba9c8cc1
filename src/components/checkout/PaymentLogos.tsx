@@ -154,6 +154,8 @@ export function PaymentLogos({ className = "" }: { className?: string }) {
         <>
           {country === "ES" && <TextBadge label="Bizum" bg="#fe3344" />}
           {country === "NL" && <TextBadge label="iDEAL" bg="#cc0066" />}
+          {country === "IT" && <TextBadge label="Satispay" bg="#f93b33" />}
+          {country === "PT" && <TextBadge label="MB WAY" bg="#d0121a" />}
         </>
       )}
     </div>

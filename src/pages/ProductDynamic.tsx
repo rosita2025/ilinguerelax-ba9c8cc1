@@ -101,10 +101,20 @@ const LANG: Record<string, string> = {
 const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
   const { slug: routeSlug } = useParams<{ slug: string }>();
   const slug = forcedSlug ?? routeSlug;
-  const [product, setProduct] = useState<DBProduct | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Última respuesta del producto en este navegador: quien ya visitó la página la ve al instante y los
+  // datos se actualizan en segundo plano. No se guarda el enlace de Hotmart.
+  const cachedProduct = useMemo(() => {
+    try {
+      const raw = slug ? localStorage.getItem(`pdyn_v1:${slug}`) : null;
+      if (!raw) return null;
+      const { at, data } = JSON.parse(raw) as { at: number; data: DBProduct };
+      return data && Date.now() - at < 24 * 60 * 60 * 1000 ? data : null;
+    } catch { return null; }
+  }, [slug]);
+  const [product, setProduct] = useState<DBProduct | null>(cachedProduct);
+  const [loading, setLoading] = useState(!cachedProduct);
   const [notFound, setNotFound] = useState(false);
-  const [activeImage, setActiveImage] = useState<string>("");
+  const [activeImage, setActiveImage] = useState<string>(cachedProduct?.cover_image_url || "");
   
   const { t, language } = useI18n();
   const navigate = useNavigate();
@@ -149,6 +159,7 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
       if (error || !data) setNotFound(true);
       else { 
         const p = data as unknown as DBProduct;
+        try { localStorage.setItem(`pdyn_v1:${slug}`, JSON.stringify({ at: Date.now(), data: { ...p, hotmart_url: null } })); } catch { /* sin almacenamiento */ }
         setProduct(p); 
         setActiveImage(p.cover_image_url || "/placeholder.svg");
         setNotFound(false); 

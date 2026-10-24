@@ -23,15 +23,14 @@
 
     <!-- Base de datos y medios de la tienda: la conexión se abre mientras carga el JS -->
     <link rel="preconnect" href="https://opyitzdvvurdyyyzkwwv.supabase.co" crossorigin />
-    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin />
-    <link rel="preconnect" href="https://assets.pinterest.com" />
+    <link rel="dns-prefetch" href="https://cdn.shopify.com" />
+    <link rel="dns-prefetch" href="https://assets.pinterest.com" />
     <link rel="dns-prefetch" href="https://assets.pinterest.com" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://connect.facebook.net" />
-    <link rel="preconnect" href="https://www.facebook.com" />
-    <link rel="preconnect" href="https://storage.googleapis.com" />
+    <link rel="dns-prefetch" href="https://storage.googleapis.com" />
 
     <!-- DNS Prefetch for external resources -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
@@ -357,7 +356,14 @@
                 im.decoding = 'async';
                 im.setAttribute('fetchpriority', 'high');
                 im.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:20px;display:block';
-                im.src = d.cover_image_url;
+                // Versión liviana de la portada (800 px) si el almacenamiento la ofrece; si no, la original.
+                var orig = d.cover_image_url, light = orig, off = false;
+                try { off = localStorage.getItem('ilr_img_transform_off') === '1'; } catch (e) {}
+                if (!off && orig.indexOf('/storage/v1/object/public/') > -1) {
+                  light = orig.split('?')[0].replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + '?width=800&quality=75&resize=contain';
+                  im.onerror = function () { im.onerror = null; try { localStorage.setItem('ilr_img_transform_off', '1'); } catch (e) {} im.src = orig; };
+                }
+                im.src = light;
                 box.appendChild(im);
               } else {
                 var l = document.createElement('link');

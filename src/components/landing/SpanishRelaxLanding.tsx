@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Check, Brain, Layers, Repeat, Target, ShieldCheck, Download, Mail, CalendarDays, BookOpen, ClipboardCheck, Play } from "lucide-react";
 import { RELAX_PREVIEWS, RELAX_BONUS_PLANNER, RELAX_BONUS_EXAM, RELAX_VIDEOS } from "./spanishRelaxMedia";
 import { Button } from "@/components/ui/button";
+import { LazyImg } from "@/components/LazyImg";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 /**
@@ -44,7 +45,7 @@ function PreviewTile({ item, className = "" }: { item: RelaxPreview; className?:
     <Dialog>
       <DialogTrigger asChild>
         <button className={`group relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm ${className}`}>
-          <img src={thumb(item.image)} alt={item.title} loading="lazy" decoding="async" className="h-full w-full object-contain" />
+          <LazyImg src={thumb(item.image)} alt={item.title} wrapperClassName="block h-full w-full" className="h-full w-full object-contain" />
           <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/80 to-transparent p-2 text-left text-[11px] font-bold text-white">
             {item.title}
           </span>

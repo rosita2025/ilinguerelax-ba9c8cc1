@@ -189,11 +189,11 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
             <div className="flex gap-2.5 items-start">
               <Zap className="w-4 h-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
               <p className="text-xs text-muted-foreground leading-snug">
-                <strong className="text-foreground font-semibold">{t.digital}.</strong> {language === "es" ? "Necesitamos nombre, correo y teléfono para darte acceso." : language === "pt" ? "Nome, email e telefone necessários para o acesso." : language === "fr" ? "Nom, e-mail et téléphone requis pour l'accès." : "Name, email and phone required for access."}
+                <strong className="text-foreground font-semibold">{t.digital}.</strong> {language === "es" ? "Necesitamos nombre, correo y teléfono para darte acceso." : language === "pt" ? "Nome, email e telefone necessários para o acesso." : language === "fr" ? "Nom, e-mail et téléphone requis pour l'accès." : language === "it" ? "Nome, email e telefono necessari per l'accesso." : "Name, email and phone required for access."}
               </p>
             </div>
             <p className="text-[10px] pl-6 text-muted-foreground/80 italic">
-              {language === "es" ? "Acceso por correo después del pago." : language === "pt" ? "Acesso por email após o pagamento." : language === "fr" ? "Accès par e-mail après le paiement." : "Access by email after payment."}
+              {language === "es" ? "Acceso por correo después del pago." : language === "pt" ? "Acesso por email após o pagamento." : language === "fr" ? "Accès par e-mail après le paiement." : language === "it" ? "Accesso via email dopo il pagamento." : "Access by email after payment."}
             </p>
           </div>
         )}

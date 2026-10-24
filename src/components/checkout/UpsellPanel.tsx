@@ -78,7 +78,7 @@ function SavingsBadge({ usd }: { usd: number }) {
   const label = !local.isUsd && !local.loading ? local.formatted : `$${usd.toFixed(2)}`;
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 text-[11px] font-bold whitespace-nowrap">
-      <Tag className="w-3 h-3" /> {language === "en" ? "Save" : "Ahorras"} {label}
+      <Tag className="w-3 h-3" /> {pick(language, "Ahorras", "Save", "Économisez", "Risparmi", "Você economiza")} {label}
     </span>
   );
 }
@@ -89,10 +89,13 @@ function SavingsInline({ usd }: { usd: number }) {
   const label = !local.isUsd && !local.loading ? local.formatted : `$${usd.toFixed(2)}`;
   return (
     <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 leading-none">
-      {language === "en" ? "Save" : "Ahorras"} {label}
+      {pick(language, "Ahorras", "Save", "Économisez", "Risparmi", "Você economiza")} {label}
     </p>
   );
 }
+
+const pick = (language: string, es: string, en: string, fr: string, it: string, pt: string) =>
+  language === "en" ? en : language === "fr" ? fr : language === "it" ? it : language === "pt" ? pt : es;
 
 export function UpsellPanel({ upsells, mainProductId }: Props) {
   const items = useCheckoutPruebaStore((s) => s.items);
@@ -153,7 +156,7 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
             <Sparkles className="w-3.5 h-3.5" />
           </span>
           <h3 className="font-bold text-sm leading-tight truncate">
-            {language === "en" ? "Add to your order and save" : "Agrega a tu pedido y ahorra"}
+            {pick(language, "Agrega a tu pedido y ahorra", "Add to your order and save", "Ajoutez à votre commande et économisez", "Aggiungi al tuo ordine e risparmia", "Adicione ao seu pedido e economize")}
           </h3>
         </div>
         {totalSavings > 0 && <SavingsBadge usd={totalSavings} />}
@@ -254,8 +257,8 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
                   }`}
                 >
                   {added 
-                    ? (language === "en" ? "✓ Added · tap to remove" : "✓ Añadido · toca para quitar")
-                    : (language === "en" ? "Tap to add" : "Toca para agregar")}
+                    ? pick(language, "✓ Añadido · toca para quitar", "✓ Added · tap to remove", "✓ Ajouté · touchez pour retirer", "✓ Aggiunto · tocca per rimuovere", "✓ Adicionado · toque para remover")
+                    : pick(language, "Toca para agregar", "Tap to add", "Touchez pour ajouter", "Tocca per aggiungere", "Toque para adicionar")}
                 </p>
               </div>
 

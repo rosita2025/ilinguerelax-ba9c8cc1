@@ -251,7 +251,7 @@ const getStripeVisibleMethodsBase = (language: string): Record<string, Omit<Paym
   stripe_apple_pay: {
     icon: Smartphone,
     title: "Apple Pay",
-    sub: language === "en" ? "Pay with Touch ID / Face ID from your iPhone, iPad or Mac (Safari)." : "Paga con Touch ID / Face ID desde tu iPhone, iPad o Mac (Safari).",
+    sub: (language === "es" ? "Paga con Touch ID / Face ID desde tu iPhone, iPad o Mac (Safari)." : "Pay with Touch ID / Face ID from your iPhone, iPad or Mac (Safari)."),
     badges: [{ label: " Pay", bg: "#000000", color: "#ffffff" }],
   },
   stripe_google_pay: {
@@ -269,139 +269,139 @@ const getStripeVisibleMethodsBase = (language: string): Record<string, Omit<Paym
   stripe_boleto: {
     icon: Banknote,
     title: "Boleto",
-    sub: language === "en" ? "Bank voucher for Brazil inside Stripe." : "Voucher bancario para Brasil dentro de Stripe.",
+    sub: (language === "es" ? "Voucher bancario para Brasil dentro de Stripe." : "Bank voucher for Brazil inside Stripe."),
     badges: [{ label: "Boleto", bg: "#1F2937", color: "#ffffff" }],
   },
   stripe_pix: {
     icon: Smartphone,
     title: "Pix",
-    sub: language === "en" ? "Instant bank transfer for Brazil inside Stripe." : "Transferencia instantánea para Brasil dentro de Stripe.",
+    sub: (language === "es" ? "Transferencia instantánea para Brasil dentro de Stripe." : "Instant bank transfer for Brazil inside Stripe."),
     badges: [{ label: "Pix", bg: "#32BCAD", color: "#06211F" }],
   },
   stripe_ideal: {
     icon: Building2,
     title: "iDEAL",
-    sub: language === "en" ? "Online banking from Netherlands inside Stripe." : "Banca online de Países Bajos dentro de Stripe.",
+    sub: (language === "es" ? "Banca online de Países Bajos dentro de Stripe." : "Online banking from Netherlands inside Stripe."),
     badges: [{ label: "iDEAL", bg: "#CC0066", color: "#ffffff" }],
   },
   stripe_bancontact: {
     icon: Building2,
     title: "Bancontact",
-    sub: language === "en" ? "Local payment from Belgium inside Stripe." : "Pago local de Bélgica dentro de Stripe.",
+    sub: (language === "es" ? "Pago local de Bélgica dentro de Stripe." : "Local payment from Belgium inside Stripe."),
     badges: [{ label: "Bancontact", bg: "#005498", color: "#ffffff" }],
   },
   stripe_sepa_debit: {
     icon: Banknote,
     title: "SEPA débito directo",
-    sub: language === "en" ? "Bank debit for Eurozone inside Stripe." : "Débito bancario para zona euro dentro de Stripe.",
+    sub: (language === "es" ? "Débito bancario para zona euro dentro de Stripe." : "Bank debit for Eurozone inside Stripe."),
     badges: [{ label: "SEPA", bg: "#003399", color: "#ffffff" }],
   },
   stripe_giropay: {
     icon: Building2,
     title: "Giropay",
-    sub: language === "en" ? "Online banking from Germany inside Stripe." : "Banca online de Alemania dentro de Stripe.",
+    sub: (language === "es" ? "Banca online de Alemania dentro de Stripe." : "Online banking from Germany inside Stripe."),
     badges: [{ label: "Giropay", bg: "#0B5AA6", color: "#ffffff" }],
   },
   stripe_sofort: {
     icon: Building2,
     title: "Sofort",
-    sub: language === "en" ? "Instant transfer inside Stripe." : "Transferencia instantánea dentro de Stripe.",
+    sub: (language === "es" ? "Transferencia instantánea dentro de Stripe." : "Instant transfer inside Stripe."),
     badges: [{ label: "Sofort", bg: "#EE3423", color: "#ffffff" }],
   },
   stripe_eps: {
     icon: Building2,
     title: "EPS",
-    sub: language === "en" ? "Online banking from Austria inside Stripe." : "Banca online de Austria dentro de Stripe.",
+    sub: (language === "es" ? "Banca online de Austria dentro de Stripe." : "Online banking from Austria inside Stripe."),
     badges: [{ label: "EPS", bg: "#C8102E", color: "#ffffff" }],
   },
   stripe_p24: {
     icon: Building2,
     title: "Przelewy24 (P24)",
-    sub: language === "en" ? "Online banking from Poland inside Stripe." : "Banca online de Polonia dentro de Stripe.",
+    sub: (language === "es" ? "Banca online de Polonia dentro de Stripe." : "Online banking from Poland inside Stripe."),
     badges: [{ label: "P24", bg: "#D71920", color: "#ffffff" }],
   },
   stripe_blik: {
     icon: Smartphone,
     title: "BLIK",
-    sub: language === "en" ? "Mobile payment from Poland inside Stripe." : "Pago móvil de Polonia dentro de Stripe.",
+    sub: (language === "es" ? "Pago móvil de Polonia dentro de Stripe." : "Mobile payment from Poland inside Stripe."),
     badges: [{ label: "BLIK", bg: "#111827", color: "#ffffff" }],
   },
   stripe_multibanco: {
     icon: Banknote,
     title: "Multibanco",
-    sub: language === "en" ? "Local payment from Portugal inside Stripe." : "Pago local de Portugal dentro de Stripe.",
+    sub: (language === "es" ? "Pago local de Portugal dentro de Stripe." : "Local payment from Portugal inside Stripe."),
     badges: [{ label: "Multibanco", bg: "#1F4E79", color: "#ffffff" }],
   },
   stripe_mb_way: {
     icon: Smartphone,
     title: "MB WAY",
-    sub: language === "en" ? "Mobile payment from Portugal inside Stripe." : "Pago móvil de Portugal dentro de Stripe.",
+    sub: (language === "es" ? "Pago móvil de Portugal dentro de Stripe." : "Mobile payment from Portugal inside Stripe."),
     badges: [{ label: "MB WAY", bg: "#00A3E0", color: "#001B2D" }],
   },
   stripe_twint: {
     icon: Smartphone,
     title: "TWINT",
-    sub: language === "en" ? "Mobile payment from Switzerland inside Stripe." : "Pago móvil de Suiza dentro de Stripe.",
+    sub: (language === "es" ? "Pago móvil de Suiza dentro de Stripe." : "Mobile payment from Switzerland inside Stripe."),
     badges: [{ label: "TWINT", bg: "#FF5A00", color: "#ffffff" }],
   },
   stripe_mobilepay: {
     icon: Smartphone,
     title: "MobilePay",
-    sub: language === "en" ? "Mobile payment from Denmark/Finland inside Stripe." : "Pago móvil de Dinamarca/Finlandia dentro de Stripe.",
+    sub: (language === "es" ? "Pago móvil de Dinamarca/Finlandia dentro de Stripe." : "Mobile payment from Denmark/Finland inside Stripe."),
     badges: [{ label: "MobilePay", bg: "#5A78FF", color: "#ffffff" }],
   },
   stripe_bacs_debit: {
     icon: Banknote,
     title: "Bacs débito directo",
-    sub: language === "en" ? "Bank debit from United Kingdom inside Stripe." : "Débito bancario de Reino Unido dentro de Stripe.",
+    sub: (language === "es" ? "Débito bancario de Reino Unido dentro de Stripe." : "Bank debit from United Kingdom inside Stripe."),
     badges: [{ label: "Bacs", bg: "#1F2937", color: "#ffffff" }],
   },
   stripe_acss_debit: {
     icon: Banknote,
-    title: language === "en" ? "Canada Bank Debit" : "Débito bancario Canadá",
-    sub: language === "en" ? "Pre-authorized debit from Canada inside Stripe." : "Débito preautorizado de Canadá dentro de Stripe.",
+    title: (language === "es" ? "Débito bancario Canadá" : "Canada Bank Debit"),
+    sub: (language === "es" ? "Débito preautorizado de Canadá dentro de Stripe." : "Pre-authorized debit from Canada inside Stripe."),
     badges: [{ label: "ACSS", bg: "#D80621", color: "#ffffff" }],
   },
   stripe_afterpay_clearpay: {
     icon: CreditCard,
     title: "Afterpay / Clearpay",
-    sub: language === "en" ? "Buy now and pay in installments inside Stripe." : "Compra ahora y paga en cuotas dentro de Stripe.",
+    sub: (language === "es" ? "Compra ahora y paga en cuotas dentro de Stripe." : "Buy now and pay in installments inside Stripe."),
     badges: [{ label: "Afterpay", bg: "#B2FCE4", color: "#0A0A0A" }],
   },
   stripe_affirm: {
     icon: CreditCard,
     title: "Affirm",
-    sub: language === "en" ? "Buy now and pay later inside Stripe." : "Compra ahora y paga después dentro de Stripe.",
+    sub: (language === "es" ? "Compra ahora y paga después dentro de Stripe." : "Buy now and pay later inside Stripe."),
     badges: [{ label: "Affirm", bg: "#4A4AF4", color: "#ffffff" }],
   },
   stripe_alipay: {
     icon: Smartphone,
     title: "Alipay",
-    sub: language === "en" ? "Local payment from Asia inside Stripe." : "Pago local de Asia dentro de Stripe.",
+    sub: (language === "es" ? "Pago local de Asia dentro de Stripe." : "Local payment from Asia inside Stripe."),
     badges: [{ label: "Alipay", bg: "#1677FF", color: "#ffffff" }],
   },
   stripe_wechat_pay: {
     icon: Smartphone,
     title: "WeChat Pay",
-    sub: language === "en" ? "Local payment from China inside Stripe." : "Pago local de China dentro de Stripe.",
+    sub: (language === "es" ? "Pago local de China dentro de Stripe." : "Local payment from China inside Stripe."),
     badges: [{ label: "WeChat", bg: "#07C160", color: "#001B0A" }],
   },
   stripe_grabpay: {
     icon: Smartphone,
     title: "GrabPay",
-    sub: language === "en" ? "Local payment from Southeast Asia inside Stripe." : "Pago local del sudeste asiático dentro de Stripe.",
+    sub: (language === "es" ? "Pago local del sudeste asiático dentro de Stripe." : "Local payment from Southeast Asia inside Stripe."),
     badges: [{ label: "GrabPay", bg: "#00B14F", color: "#ffffff" }],
   },
   stripe_paynow: {
     icon: Smartphone,
     title: "PayNow",
-    sub: language === "en" ? "Local payment from Singapore inside Stripe." : "Pago local de Singapur dentro de Stripe.",
+    sub: (language === "es" ? "Pago local de Singapur dentro de Stripe." : "Local payment from Singapore inside Stripe."),
     badges: [{ label: "PayNow", bg: "#7B1FA2", color: "#ffffff" }],
   },
   stripe_konbini: {
     icon: Banknote,
     title: "Konbini",
-    sub: language === "en" ? "Payment at convenience stores in Japan inside Stripe." : "Pago en tiendas de conveniencia de Japón dentro de Stripe.",
+    sub: (language === "es" ? "Pago en tiendas de conveniencia de Japón dentro de Stripe." : "Payment at convenience stores in Japan inside Stripe."),
     badges: [{ label: "Konbini", bg: "#D32F2F", color: "#ffffff" }],
   },
 });
@@ -1933,8 +1933,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     },
 
     ...dynamicStripeRows,
-    { id: "stripe_ach", icon: Building2, title: language === "en" ? "ACH Bank Transfer" : "Transferencia bancaria ACH", sub: language === "en" ? "Pay from a US bank account inside Stripe." : "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe.", badge: finalPriceLabel },
-    { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: language === "en" ? "Pay with Cash App within Stripe's secure form." : "Paga con Cash App dentro del formulario seguro de Stripe.", badge: finalPriceLabel },
+    { id: "stripe_ach", icon: Building2, title: (language === "es" ? "Transferencia bancaria ACH" : "ACH Bank Transfer"), sub: (language === "es" ? "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe." : "Pay from a US bank account inside Stripe."), badge: finalPriceLabel },
+    { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: (language === "es" ? "Paga con Cash App dentro del formulario seguro de Stripe." : "Pay with Cash App within Stripe's secure form."), badge: finalPriceLabel },
     { id: "stripe_klarna", icon: Wallet, title: pick(language, "Klarna — Paga en 4", "Klarna — Pay in 4", "Klarna — Payez en 4", "Klarna — Paga in 4", "Klarna — Pague em 4"), sub: pick(language, "Divide tu compra en 4 cuotas sin interés dentro de Stripe.", "Split your purchase into 4 interest-free installments inside Stripe.", "Divisez votre achat en 4 fois sans frais avec Stripe.", "Dividi l'acquisto in 4 rate senza interessi con Stripe.", "Divida sua compra em 4 parcelas sem juros no Stripe."), badge: finalPriceLabel },
     
     { id: "transfer", icon: Building2, title: t.bankTransfer, sub: t.bankTransferSub(localBadge), badge: finalPriceLabel },
@@ -1971,12 +1971,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       title: language === "en" ? "Transfer"
         : language === "pt" ? "Transferência"
         : language === "fr" ? "Virement"
+        : language === "it" ? "Bonifico"
         : "Transferencia",
       sub: (dlocalRails(country, "transfer").length
         ? `${dlocalRails(country, "transfer").join(" · ")} — `
         : "") + (language === "en" ? "Pay from your bank or wallet in local currency. Instant confirmation."
         : language === "pt" ? "Pague pelo seu banco ou carteira em moeda local. Confirmação imediata."
         : language === "fr" ? "Payez depuis votre banque en monnaie locale. Confirmation immédiate."
+        : language === "it" ? "Paga dalla tua banca in valuta locale. Conferma immediata."
         : "Paga desde tu banco o billetera en moneda local. Confirmación inmediata."),
       badge: finalPriceLabel,
 
@@ -1990,12 +1992,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       title: language === "en" ? "Cash payment"
         : language === "pt" ? "Pagamento em dinheiro"
         : language === "fr" ? "Paiement en espèces"
+        : language === "it" ? "Pagamento in contanti"
         : "Pago en efectivo",
       sub: (dlocalRails(country, "cash").length
         ? `${dlocalRails(country, "cash").join(" · ")} — `
         : "") + (language === "en" ? "Get a voucher and pay cash at a nearby store or agent."
         : language === "pt" ? "Gere um voucher e pague em dinheiro em uma loja ou agente."
         : language === "fr" ? "Recevez un bon et payez en espèces dans un point de vente."
+        : language === "it" ? "Genera un voucher e paga in contanti in un punto vendita vicino."
         : "Genera un cupón y paga en efectivo en una tienda o agente cercano."),
       badge: finalPriceLabel,
 
@@ -2011,12 +2015,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         : language === "en" ? "Digital wallet"
         : language === "pt" ? "Carteira digital"
         : language === "fr" ? "Portefeuille numérique"
+        : language === "it" ? "Portafoglio digitale"
         : "Billetera digital"),
       sub: (dlocalRails(country, "wallet").length
         ? `${dlocalRails(country, "wallet").join(" · ")} — `
         : "") + (language === "en" ? "Pay from your wallet app in local currency. Instant confirmation."
         : language === "pt" ? "Pague pela sua carteira digital em moeda local. Confirmação imediata."
         : language === "fr" ? "Payez depuis votre portefeuille en monnaie locale. Confirmation immédiate."
+        : language === "it" ? "Paga dal tuo portafoglio digitale in valuta locale. Conferma immediata."
         : "Paga desde tu billetera digital en moneda local. Confirmación inmediata."),
       badge: finalPriceLabel,
 
@@ -2028,10 +2034,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       title: language === "en" ? "Debit / credit card"
         : language === "pt" ? "Cartão de débito / crédito"
         : language === "fr" ? "Carte bancaire"
+        : language === "it" ? "Carta di debito / credito"
         : "Tarjeta de débito / crédito",
       sub: language === "en" ? "Pay in local currency with your card. Secure fields by dLocal."
         : language === "pt" ? "Pague em moeda local com seu cartão. Campos seguros da dLocal."
         : language === "fr" ? "Payez en monnaie locale par carte. Champs sécurisés dLocal."
+        : language === "it" ? "Paga in valuta locale con la carta. Campi sicuri di dLocal."
         : "Paga en tu moneda local con tu tarjeta. Campos seguros de dLocal.",
       badge: finalPriceLabel,
 
@@ -2045,6 +2053,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       title: language === "en" ? "OR PAY VIA ANOTHER PLATFORM"
         : language === "pt" ? "OU PAGUE POR OUTRA PLATAFORMA"
         : language === "fr" ? "OU PAYEZ VIA UNE AUTRE PLATEFORME"
+        : language === "it" ? "OPPURE PAGA CON UN'ALTRA PIATTAFORMA"
         : "O PAGA POR OTRA PLATAFORMA",
       isSeparator: true,
       icon: CreditCard,
@@ -2058,10 +2067,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         ? (language === "en" ? "Hotmart (1-click)"
           : language === "pt" ? "Hotmart (1 clique)"
           : language === "fr" ? "Hotmart (1 clic)"
+          : language === "it" ? "Hotmart (1 clic)"
           : "Hotmart (1 clic)")
         : (language === "en" ? "Hotmart · PayPal & more (1-click)"
           : language === "pt" ? "Hotmart · PayPal e mais (1 clique)"
           : language === "fr" ? "Hotmart · PayPal et plus (1 clic)"
+          : language === "it" ? "Hotmart · PayPal e altro (1 clic)"
           : "Hotmart · PayPal y más (1 clic)"),
       sub: language === "en"
         ? `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 click`
@@ -2321,6 +2332,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             {language === "en" ? "We couldn't open this payment method"
               : language === "pt" ? "Não conseguimos abrir este método de pagamento"
               : language === "fr" ? "Impossible d'ouvrir ce moyen de paiement"
+              : language === "it" ? "Impossibile aprire questo metodo di pagamento"
               : "No pudimos abrir este método de pago"}
           </p>
           <p className="mt-1 text-xs">{methodError.message}</p>
@@ -2839,7 +2851,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-[#b38a08] dark:text-[#F0B90B]/80 italic text-left">
                     <MessageCircle className="w-4 h-4 mt-0.5 shrink-0 text-[#25D366]" />
                     <p>
-                      <strong>{language === "en" ? "Important:" : "Importante:"}</strong> {language === "en" ? "Send your screenshot to " : "Envía tu captura de pantalla a "}<span className="font-bold">hola@ilinguerelax.com</span> {language === "en" ? "or via WhatsApp to validate your payment immediately." : "o por WhatsApp para validar tu pago de inmediato."}
+                      <strong>{(language === "es" ? "Importante:" : "Important:")}</strong> {(language === "es" ? "Envía tu captura de pantalla a " : "Send your screenshot to ")}<span className="font-bold">hola@ilinguerelax.com</span> {(language === "es" ? "o por WhatsApp para validar tu pago de inmediato." : "or via WhatsApp to validate your payment immediately.")}
                     </p>
                   </div>
                 </div>
@@ -2868,13 +2880,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1 block">
-                    {language === "en" ? "ID document (e.g. RFC, CURP, DNI, CI)" : "Documento de identidad (ej. RFC, CURP, DNI, CI)"}
+                    {(language === "es" ? "Documento de identidad (ej. RFC, CURP, DNI, CI)" : "ID document (e.g. RFC, CURP, DNI, CI)")}
                   </label>
                   <input
                     type="text"
                     value={dlocalDocument}
                     onChange={(e) => setDlocalDocument(e.target.value.trim())}
-                    placeholder={language === "en" ? "Enter your document number" : "Ingresa tu número de documento"}
+                    placeholder={(language === "es" ? "Ingresa tu número de documento" : "Enter your document number")}
                     className="w-full px-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                   />
                 </div>
@@ -2923,7 +2935,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     </div>
 
                     <div className="pt-2 border-t border-amber-100 dark:border-amber-900/10">
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{language === "en" ? "Receiving Bank" : "Banco Receptor"}</p>
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{(language === "es" ? "Banco Receptor" : "Receiving Bank")}</p>
                       <p className="font-bold text-sm text-neutral-900 dark:text-neutral-100">{CLABE_BANK}</p>
                     </div>
                   </div>
@@ -2942,7 +2954,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-amber-900/80 dark:text-amber-300/80 italic">
                     <MessageCircle className="w-4 h-4 mt-0.5 shrink-0" />
                     <p>
-                      <strong>{language === "en" ? "Important:" : "Importante:"}</strong> {language === "en" ? "Send your transfer proof to " : "Envía tu comprobante de transferencia a "}<span className="font-bold">hola@ilinguerelax.com</span> {language === "en" ? "or via WhatsApp to validate your order immediately." : "o por WhatsApp para validar tu pedido inmediatamente."}
+                      <strong>{(language === "es" ? "Importante:" : "Important:")}</strong> {(language === "es" ? "Envía tu comprobante de transferencia a " : "Send your transfer proof to ")}<span className="font-bold">hola@ilinguerelax.com</span> {(language === "es" ? "o por WhatsApp para validar tu pedido inmediatamente." : "or via WhatsApp to validate your order immediately.")}
                     </p>
                   </div>
                 </div>
@@ -2990,7 +3002,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           {mpLoading ? (
             <><Loader2 className="w-5 h-5 animate-spin" /> {t.redirecting}</>
           ) : (
-            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? (language === "en" ? "Checkout with Hotmart" : "Pagar con Hotmart") : t.buyNow}</>
+            <><Lock className="w-4 h-4" /> {selected === "hotmart" ? ((language === "es" ? "Pagar con Hotmart" : "Checkout with Hotmart")) : t.buyNow}</>
           )}
         </button>
       )}

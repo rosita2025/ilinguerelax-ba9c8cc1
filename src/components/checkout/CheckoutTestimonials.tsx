@@ -162,6 +162,7 @@ const HEADINGS: Record<string, string> = {
   en: "Verified buyers in",
   fr: "Acheteurs vérifiés en",
   pt: "Compradores verificados em",
+  it: "Acquirenti verificati in",
 };
 
 const VERIFIED: Record<string, string> = {
@@ -169,6 +170,7 @@ const VERIFIED: Record<string, string> = {
   en: "Verified purchase",
   fr: "Achat vérifié",
   pt: "Compra verificada",
+  it: "Acquisto verificato",
 };
 
 const cardClass = "h-[148px] sm:h-[152px] w-full max-w-full overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900/40 px-4 py-4 sm:px-5 sm:py-5";
@@ -213,7 +215,7 @@ const TestimonialsContent = memo(function TestimonialsContent() {
   }, [region.country, language]);
 
   const countryLabel = items[0]?.country ?? "";
-  const quotes = QUOTES[language] ?? QUOTES.es;
+  const quotes = QUOTES[language] ?? (language === "it" ? QUOTES.en : QUOTES.es);
   const heading = HEADINGS[language] ?? HEADINGS.es;
   const verified = VERIFIED[language] ?? VERIFIED.es;
 

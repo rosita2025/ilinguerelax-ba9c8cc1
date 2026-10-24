@@ -2107,7 +2107,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         if (m.id === "stripe_ach") return isUsa && methodsConfig.stripeAch;
         if (m.id === "stripe_cashapp") return isUsa && methodsConfig.stripeCashApp;
         if (m.id === "stripe_bizum") return methodsConfig.stripeBizum && country === "ES"; // Bizum: solo España
-        if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna && !LATAM_COUNTRIES.has(country); // Klarna no opera en Latinoamérica
+        if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna && !LATAM_COUNTRIES.has(country) && country !== "ES"; // Klarna no opera en Latinoamérica
         
         // Rails locales de Perú (transferencia BCP/Interbank, efectivo, Yape/Plin)
         // SOLO deben verse desde Perú. Un comprador en México no puede pagar a
@@ -2115,7 +2115,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         if (m.id === "transfer") return methodsConfig.transfer && isPeru;
         if (m.id === "cash") return methodsConfig.cash && isPeru;
         if (m.id === "yape") return methodsConfig.yape && isPeru;
-        if (m.id === "binance") return methodsConfig.binance && (country === "PE" || !LATAM_COUNTRIES.has(country)); // sin Binance en Latinoamérica (Perú lo conserva)
+        if (m.id === "binance") return methodsConfig.binance && (country === "PE" || !LATAM_COUNTRIES.has(country)) && country !== "ES"; // sin Binance en Latinoamérica (Perú lo conserva)
         if (m.id === "clabe") return country === "MX";
 
         // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.

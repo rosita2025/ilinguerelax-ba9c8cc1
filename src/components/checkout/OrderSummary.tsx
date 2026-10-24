@@ -80,6 +80,10 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
 
   const penMode = penTotals !== null && !isGlobalGateway;
   const showLocalRef = currency !== "USD";
+  // Solo se muestra la moneda local: la referencia en dólares y el desglose de tipo de cambio confundían
+  // al comprador (¿dólares o euros?). Poner en false para volver a mostrarlos.
+  const HIDE_USD_REFERENCE = true;
+  const showUsdRef = showLocalRef && !HIDE_USD_REFERENCE;
 
   const localTotalLabel = formatLocalDirect(totalLocal, country);
   const currentUsdRef = totalUsd;
@@ -135,7 +139,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                 penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel
               )}
             </span>
-            {showLocalRef && !breakdown.isUsd && (
+            {showUsdRef && !breakdown.isUsd && (
               <span className="text-[10px] font-normal text-muted-foreground leading-none mt-1">
                 {region.loading ? (
                   <Skeleton className="h-3 w-16" />
@@ -351,7 +355,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                   penMode && penTotals ? formatPen(penTotals.total) : localTotalLabel
                 )}
               </div>
-              {showLocalRef && !breakdown.isUsd && (
+              {showUsdRef && !breakdown.isUsd && (
                 <div className="text-[11px] text-muted-foreground font-normal mt-0.5">
                   {region.loading ? (
                     <Skeleton className="h-3 w-20 ml-auto mt-1" />
@@ -361,7 +365,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
                 </div>
               )}
               
-              {showLocalRef && !breakdown.isUsd && (
+              {showUsdRef && !breakdown.isUsd && (
                 <div className="mt-4 pt-4 border-t border-dashed space-y-2">
                   <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-1">
                     <span>{t.currencyBreakdown}</span>

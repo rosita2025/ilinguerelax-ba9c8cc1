@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Cookie } from "lucide-react";
 
@@ -45,6 +46,7 @@ const COPY: Record<string, { body: string; more: string; accept: string; reject:
 };
 
 export const CookieConsent = () => {
+  const { pathname } = useLocation();
   const [visible, setVisible] = useState(false);
   const [lang, setLang] = useState<string>("es");
 
@@ -77,7 +79,9 @@ export const CookieConsent = () => {
     window.dispatchEvent(new CustomEvent("ilr-cookie-consent", { detail: v }));
   };
 
-  if (!visible) return null;
+  // En el checkout no se muestra el banner (tapaba el formulario de pago): la decisión se toma en la
+  // página del producto y el checkout la respeta (se guarda en el navegador).
+  if (!visible || pathname.startsWith("/checkout")) return null;
   const t = COPY[lang] || COPY.en;
 
   return (

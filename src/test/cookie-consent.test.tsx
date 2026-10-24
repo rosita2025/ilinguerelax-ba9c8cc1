@@ -1,12 +1,23 @@
 import { cleanup, fireEvent, render, screen, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import { CookieConsent, getCookieConsent } from "@/components/CookieConsent";
 
 beforeEach(() => { localStorage.clear(); vi.useFakeTimers(); });
 afterEach(() => { cleanup(); vi.useRealTimers(); });
-const show = () => { render(<CookieConsent />); act(() => { vi.advanceTimersByTime(2500); }); };
+const show = (path = "/products/x") => { render(<MemoryRouter initialEntries={[path]}><CookieConsent /></MemoryRouter>); act(() => { vi.advanceTimersByTime(2500); }); };
 
 describe("cookie consent version 2", () => {
+  it("does not show the banner on checkout pages", () => {
+    localStorage.setItem("ilr_country", "ES");
+    show("/checkouts/patrones-ingles");
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+  it("shows the banner on product pages for European visitors", () => {
+    localStorage.setItem("ilr_country", "ES");
+    show("/products/patrones");
+    expect(screen.queryByRole("dialog")).not.toBeNull();
+  });
   it.each(["ES", "FR", "NO", "GB", "CH"])("renews old European acceptance in %s", country => {
     localStorage.setItem("ilr_country", country);
     localStorage.setItem("ilr_cookie_consent", "accepted");

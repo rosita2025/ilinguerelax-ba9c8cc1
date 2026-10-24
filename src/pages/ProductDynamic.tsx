@@ -1,4 +1,5 @@
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
+import { lightCoverUrl, disableImageTransform } from "@/lib/coverImage";
 import { useEffect, useState, useRef, useMemo, lazy, Suspense } from "react";
 import { useParams, Link, Navigate, useNavigate } from "react-router-dom";
 import { 
@@ -17,7 +18,7 @@ import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PinterestSave } from "@/components/PinterestSave";
 import { VerifiedReviews } from "@/components/VerifiedReviews";
 import { CartBadge } from "@/components/CartBadge";
-import { ResenasWhatsAppCoreano } from "@/components/ResenasWhatsAppCoreano";
+const ResenasWhatsAppCoreano = lazy(() => import("@/components/ResenasWhatsAppCoreano").then((m) => ({ default: m.ResenasWhatsAppCoreano })));
 import { StockAlert } from "@/components/StockAlert";
 import { SocialProofPill } from "@/components/SocialProofPill";
 import { ProductTypeBadge } from "@/components/ProductTypeBadge";
@@ -115,6 +116,8 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
   const [loading, setLoading] = useState(!cachedProduct);
   const [notFound, setNotFound] = useState(false);
   const [activeImage, setActiveImage] = useState<string>(cachedProduct?.cover_image_url || "");
+  // Portada liviana (800 px) cuando el almacenamiento la ofrece; si falla, se usa la original.
+  const [heroFailed, setHeroFailed] = useState(false);
   
   const { t, language } = useI18n();
   const navigate = useNavigate();
@@ -128,14 +131,19 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
   // Usamos requestIdleCallback (con fallback a setTimeout) para no competir
   // con la carga inicial de la propia página del producto.
   useEffect(() => {
-    const prefetch = () => { import("@/pages/Checkout"); prefetchCheckoutProduct(slug); };
-    const w = window as typeof window & { requestIdleCallback?: (cb: () => void) => number };
-    if (typeof w.requestIdleCallback === "function") {
-      const id = w.requestIdleCallback(prefetch);
-      return () => { /* no cleanup needed, prefetch is harmless if it fires */ };
-    }
-    const timeoutId = window.setTimeout(prefetch, 2000);
-    return () => window.clearTimeout(timeoutId);
+    // Se precarga el checkout cuando la página ya terminó de cargar y el navegador está libre
+    // (antes competía con la descarga de la propia página del producto).
+    let timeoutId = 0;
+    const run = () => {
+      const prefetch = () => { import("@/pages/Checkout"); prefetchCheckoutProduct(slug); };
+      const w = window as typeof window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+      if (typeof w.requestIdleCallback === "function") w.requestIdleCallback(prefetch, { timeout: 4000 });
+      else timeoutId = window.setTimeout(prefetch, 1500);
+    };
+    const start = () => { timeoutId = window.setTimeout(run, 2500); };
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
+    return () => { window.clearTimeout(timeoutId); window.removeEventListener("load", start); };
   }, []);
 
   useEffect(() => {
@@ -483,8 +491,11 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
             <div className="space-y-4">
               <div className="relative group bg-card border border-border rounded-3xl overflow-hidden shadow-hero">
                 <img
-                  src={activeImage}
+                  src={heroFailed ? activeImage : (lightCoverUrl(activeImage) ?? activeImage)}
+                  onError={() => { if (!heroFailed) { disableImageTransform(); setHeroFailed(true); } }}
                   alt={product.name}
+                  width={800}
+                  height={800}
                   className="w-full aspect-square object-cover transition-all duration-300"
                   loading="eager"
                   fetchPriority="high"
@@ -511,7 +522,7 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
                         activeImage === img ? "border-primary scale-95" : "border-transparent opacity-70"
                       }`}
                     >
-                      <img src={img} className="w-full h-full object-cover" alt="" loading="lazy" />
+                      <img src={heroFailed ? img : (lightCoverUrl(img, 160) ?? img)} className="w-full h-full object-cover" alt="" width={64} height={64} loading="lazy" decoding="async" />
                     </button>
                   ))}
                 </div>
@@ -717,7 +728,7 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
           {(product.sku === "coreano-100-mapas-mentales" || 
             product.sku === "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca") && (
             <div className="mb-2">
-              <ResenasWhatsAppCoreano />
+              <Suspense fallback={null}><ResenasWhatsAppCoreano /></Suspense>
             </div>
           )}
 

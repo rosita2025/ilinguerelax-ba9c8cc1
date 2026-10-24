@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Check, Brain, Layers, Repeat, Target, ShieldCheck, Download, Mail, CalendarDays, BookOpen, ClipboardCheck, Play } from "lucide-react";
 import { RELAX_PREVIEWS, RELAX_BONUS_PLANNER, RELAX_BONUS_EXAM, RELAX_VIDEOS } from "./spanishRelaxMedia";
 import { Button } from "@/components/ui/button";
-import { LazyImg } from "@/components/LazyImg";
+import { LazyImg, LazyMount } from "@/components/LazyImg";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 /**
@@ -218,7 +218,9 @@ export function SpanishRelaxLanding({ price, onBuy, buyDisabled }: Props) {
           <h2 className={sectionTitle}>See Spanish Relax in Action</h2>
           <p className="mt-2 text-sm text-slate-600 md:text-base">Swipe to see the 3 short previews. Tap a video to pause it.</p>
         </div>
-        <VideoCarousel />
+        <LazyMount minHeight={460}>
+          <VideoCarousel />
+        </LazyMount>
       </section>
 
       {/* Bonos: dos bloques independientes */}

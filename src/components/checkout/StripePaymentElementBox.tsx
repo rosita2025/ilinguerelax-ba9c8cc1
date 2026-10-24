@@ -43,6 +43,8 @@ interface Quote {
 }
 
 interface Props {
+  /** "bizum": solo España (EUR). Por defecto, tarjeta como siempre. */
+  method?: "card" | "bizum";
   language: string;
   country: string;
   /** Moneda que se muestra en el checkout (el servidor decide la final). */
@@ -64,6 +66,7 @@ const Inner = ({
   canPay,
   onNeedBuyerInfo,
   onBeforePay,
+  method = "card",
 }: Omit<Props, "currency" | "onUnavailable"> & { quote: Quote }) => {
   const lang = (["es", "en", "pt", "fr", "it"].includes(language) ? language : "es") as Lang;
   const t = COPY[lang];
@@ -100,6 +103,7 @@ const Inner = ({
             environment: getStripeEnvironment(),
             action: "create",
             source,
+            ...(method === "bizum" ? { method: "bizum" } : {}),
             items: s.items.map((i) => ({ id: i.id, quantity: i.quantity })),
             currency: quote.currency,
             country,
@@ -154,7 +158,7 @@ const Inner = ({
             // Apple Pay / Google Pay / Link ya están en "Pago rápido" (arriba de la página): no se repiten aquí.
             wallets: { applePay: "never", googlePay: "never" },
             // Nombre y correo ya los tenemos arriba: no se vuelven a pedir.
-            fields: { billingDetails: { name: "never", email: "never", phone: "never" } },
+            fields: { billingDetails: { name: "never", email: "never", phone: method === "bizum" ? "auto" : "never" } },
             defaultValues: { billingDetails: { email: s0.buyer.email.trim(), name: s0.buyer.fullName.trim() } },
           }}
           onReady={() => setReady(true)}
@@ -242,20 +246,21 @@ export default function StripePaymentElementBox(props: Props) {
 
   return (
     <Elements
-      key={`${quote.amount}-${quote.currency}`}
+      key={`${quote.amount}-${quote.currency}-${props.method ?? "card"}`}
       stripe={stripePromise}
       options={{
         mode: "payment",
         amount: quote.amount,
         currency: quote.currency,
-        setupFutureUsage: "off_session",
+        ...(props.method === "bizum" ? {} : { setupFutureUsage: "off_session" as const }),
         // Este formulario maneja solo tarjeta de crédito/débito; las billeteras rápidas van arriba.
-        paymentMethodTypes: ["card"],
+        paymentMethodTypes: props.method === "bizum" ? ["bizum"] : ["card"],
         locale,
         appearance: { theme: "stripe" },
       }}
     >
       <Inner
+        method={props.method}
         language={props.language}
         country={props.country}
         canPay={props.canPay}

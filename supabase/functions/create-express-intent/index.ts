@@ -45,6 +45,8 @@ const BodySchema = z.object({
   environment: z.enum(["sandbox", "live"]).default("sandbox"),
   action: z.enum(["quote", "create"]),
   source: z.enum(["express-checkout", "payment-element"]).default("express-checkout"),
+  // "bizum": solo España y en euros (pago por redirección, sin guardar tarjeta). Por defecto, el flujo de siempre.
+  method: z.enum(["card", "bizum"]).default("card"),
   items: z.array(z.object({
     id: z.string().min(1).max(180),
     quantity: z.number().int().min(1).max(50),
@@ -164,6 +166,22 @@ Deno.serve(async (req) => {
       customerId = existing.data[0]?.id ?? (await stripe.customers.create({ email, name: fullName })).id;
     } catch (custErr) {
       console.error("[create-express-intent] customer create/find failed (non-fatal):", custErr);
+    }
+
+    if (body.method === "bizum") {
+      if (country !== "ES" || currency !== "eur") {
+        return json({ error: "Bizum is only available in Spain (EUR)", reason: "bizum_not_available" }, 400);
+      }
+      const bizumIntent = await stripe.paymentIntents.create({
+        amount,
+        currency,
+        ...(customerId ? { customer: customerId } : {}),
+        receipt_email: email,
+        description: productSummary || "iLingue Relax Digital",
+        payment_method_types: ["bizum"],
+        metadata,
+      });
+      return json({ clientSecret: bizumIntent.client_secret, paymentIntentId: bizumIntent.id, amount, currency });
     }
 
     const intent = await stripe.paymentIntents.create({

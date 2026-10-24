@@ -46,8 +46,9 @@ const BodySchema = z.object({
   action: z.enum(["quote", "create"]),
   source: z.enum(["express-checkout", "payment-element"]).default("express-checkout"),
   // Métodos locales de Stripe (pago por redirección, sin guardar tarjeta), cada uno solo en su país y en euros:
-  // bizum (ES), satispay (IT), ideal (NL), mb_way (PT). Por defecto, el flujo de siempre.
-  method: z.enum(["card", "bizum", "satispay", "ideal", "mb_way"]).default("card"),
+  // bizum (ES), satispay (IT), ideal (NL), mb_way (PT), klarna (países de la UE en EUR y EE. UU. en USD) y
+  // crypto (stablecoins; solo se cobra en USD). Por defecto, el flujo de siempre.
+  method: z.enum(["card", "bizum", "satispay", "ideal", "mb_way", "klarna", "crypto"]).default("card"),
   items: z.array(z.object({
     id: z.string().min(1).max(180),
     quantity: z.number().int().min(1).max(50),
@@ -170,8 +171,13 @@ Deno.serve(async (req) => {
     }
 
     if (body.method !== "card") {
-      const LOCAL_METHOD_COUNTRY: Record<string, string> = { bizum: "ES", satispay: "IT", ideal: "NL", mb_way: "PT" };
-      if (country !== LOCAL_METHOD_COUNTRY[body.method] || currency !== "eur") {
+      const EUR_ONLY: Record<string, string> = { bizum: "ES", satispay: "IT", ideal: "NL", mb_way: "PT" };
+      const KLARNA_EUR = ["AT", "BE", "DE", "ES", "FI", "FR", "IE", "IT", "NL", "PT"];
+      let allowed = false;
+      if (body.method === "crypto") allowed = currency === "usd";
+      else if (body.method === "klarna") allowed = (currency === "eur" && KLARNA_EUR.includes(country)) || (currency === "usd" && country === "US");
+      else allowed = country === EUR_ONLY[body.method] && currency === "eur";
+      if (!allowed) {
         return json({ error: `${body.method} is not available for this country/currency`, reason: "local_method_not_available" }, 400);
       }
       const localIntent = await stripe.paymentIntents.create({

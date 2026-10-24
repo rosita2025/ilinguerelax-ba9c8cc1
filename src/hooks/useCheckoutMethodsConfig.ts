@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
  * Seguridad: si no hay región configurada o falla la consulta, no se habilita
  * ningún método. Así nunca aparecen opciones que el admin no guardó.
  */
-export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "stripeKlarna" | "stripeBizum" | "stripeSatispay" | "stripeIdeal" | "stripeMbway" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocalTransfer" | "dlocalCash" | "dlocalWallet" | "dlocalCard";
+export type FamilyKey = "stripe" | "stripeAch" | "stripeCashApp" | "stripeKlarna" | "stripeBizum" | "stripeSatispay" | "stripeIdeal" | "stripeMbway" | "stripeCrypto" | "paypal" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocalTransfer" | "dlocalCash" | "dlocalWallet" | "dlocalCard";
 
 export interface CheckoutMethodsConfig {
   loaded: boolean;
@@ -25,6 +25,7 @@ export interface CheckoutMethodsConfig {
   stripeSatispay: boolean;
   stripeIdeal: boolean;
   stripeMbway: boolean;
+  stripeCrypto: boolean;
   paypal: boolean;
   transfer: boolean;
   cash: boolean;
@@ -40,10 +41,10 @@ export interface CheckoutMethodsConfig {
   familyOrder: FamilyKey[];
 }
 
-const DEFAULT_ORDER: FamilyKey[] = ["stripe", "hotmart", "paypal", "transfer", "cash", "yape", "binance", "clabe", "dlocalTransfer", "dlocalCash", "dlocalWallet", "dlocalCard", "stripeAch", "stripeCashApp", "stripeKlarna", "stripeBizum", "stripeSatispay", "stripeIdeal", "stripeMbway"];
+const DEFAULT_ORDER: FamilyKey[] = ["stripe", "hotmart", "paypal", "transfer", "cash", "yape", "binance", "clabe", "dlocalTransfer", "dlocalCash", "dlocalWallet", "dlocalCard", "stripeAch", "stripeCashApp", "stripeKlarna", "stripeBizum", "stripeSatispay", "stripeIdeal", "stripeMbway", "stripeCrypto"];
 
 const DEFAULT_ALL_OFF: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
-  stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, stripeBizum: false, stripeSatispay: false, stripeIdeal: false, stripeMbway: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false, hotmart: false, dlocalTransfer: false, dlocalCash: false, dlocalWallet: false, dlocalCard: false,
+  stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, stripeBizum: false, stripeSatispay: false, stripeIdeal: false, stripeMbway: false, stripeCrypto: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false, hotmart: false, dlocalTransfer: false, dlocalCash: false, dlocalWallet: false, dlocalCard: false,
 };
 
 
@@ -103,6 +104,7 @@ function keyToFamily(key: string): FamilyKey | null {
   if (k === "stripe_satispay") return "stripeSatispay";
   if (k === "stripe_ideal") return "stripeIdeal";
   if (k === "stripe_mb_way") return "stripeMbway";
+  if (k === "stripe_crypto") return "stripeCrypto";
   if (k.startsWith("stripe_")) return "stripe";
   if (k === "paypal") return "paypal";
   if (k === "yape_plin") return "yape";
@@ -183,7 +185,7 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
         return;
       }
       const enabledFamilies = { ...DEFAULT_ALL_OFF, stripe: true };
-      const familyMinOrder: Record<FamilyKey, number> = { stripe: -1, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, stripeBizum: Infinity, stripeSatispay: Infinity, stripeIdeal: Infinity, stripeMbway: Infinity, paypal: 0, transfer: Infinity, cash: Infinity, yape: Infinity, binance: Infinity, clabe: Infinity, hotmart: Infinity, dlocalTransfer: Infinity, dlocalCash: Infinity, dlocalWallet: Infinity, dlocalCard: Infinity };
+      const familyMinOrder: Record<FamilyKey, number> = { stripe: -1, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, stripeBizum: Infinity, stripeSatispay: Infinity, stripeIdeal: Infinity, stripeMbway: Infinity, stripeCrypto: Infinity, paypal: 0, transfer: Infinity, cash: Infinity, yape: Infinity, binance: Infinity, clabe: Infinity, hotmart: Infinity, dlocalTransfer: Infinity, dlocalCash: Infinity, dlocalWallet: Infinity, dlocalCard: Infinity };
 
       const enabledMethodKeys: string[] = ["stripe_card", "paypal"];
       enabledFamilies.paypal = true;

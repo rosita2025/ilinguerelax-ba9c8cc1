@@ -44,7 +44,7 @@ interface Quote {
 
 interface Props {
   /** Método local de Stripe (solo su país, en EUR). Por defecto, tarjeta como siempre. */
-  method?: "card" | "bizum" | "satispay" | "ideal" | "mb_way";
+  method?: "card" | "bizum" | "satispay" | "ideal" | "mb_way" | "klarna" | "crypto";
   language: string;
   country: string;
   /** Moneda que se muestra en el checkout (el servidor decide la final). */
@@ -205,7 +205,9 @@ export default function StripePaymentElementBox(props: Props) {
     }
   }, []);
 
-  const signature = JSON.stringify({ items: items.map((i) => [i.id, i.quantity]), coupon, currency, country });
+  // Stablecoins (USDC) solo se cobran en dólares; el resto, en la moneda local.
+  const quoteCurrency = props.method === "crypto" ? "USD" : String(currency || "USD");
+  const signature = JSON.stringify({ items: items.map((i) => [i.id, i.quantity]), coupon, currency: quoteCurrency, country });
 
   useEffect(() => {
     setQuote(null);
@@ -213,7 +215,7 @@ export default function StripePaymentElementBox(props: Props) {
     if (!stripePromise || items.length === 0 || country.length !== 2) return;
     let cancelled = false;
     (async () => {
-      const q = await fetchStripeQuote({ items, currency: String(currency || "USD"), country, couponCode: coupon });
+      const q = await fetchStripeQuote({ items, currency: quoteCurrency, country, couponCode: coupon });
       if (cancelled) return;
       if (!q) {
         setFailed(true);

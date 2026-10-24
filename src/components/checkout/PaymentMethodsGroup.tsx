@@ -131,6 +131,9 @@ function LinkBadge() {
 const pick = (language: string, es: string, en: string, fr: string, it: string, pt: string) =>
   language === "en" ? en : language === "fr" ? fr : language === "it" ? it : language === "pt" ? pt : es;
 
+// Europa: no se ofrece Hotmart (en Europa se paga con Stripe: tarjeta, billeteras y métodos locales).
+const EUROPE_COUNTRIES = new Set(["AL","AD","AT","BA","BE","BG","BY","CH","CY","CZ","DE","DK","EE","ES","FI","FR","GB","GR","HR","HU","IE","IS","IT","LI","LT","LU","LV","MC","MD","ME","MK","MT","NL","NO","PL","PT","RO","RS","SE","SI","SK","SM","UA","VA","XK"]);
+
 const LATAM_COUNTRIES = new Set(["AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "NI", "PA", "PE", "PY", "PR", "UY", "VE"]);
 
 /**
@@ -225,7 +228,7 @@ const methodHint = (id: string, language: string): { text: string; cls: string }
   const L = (es: string, en: string, fr: string, it: string, pt: string) =>
     language === "en" ? en : language === "fr" ? fr : language === "it" ? it : language === "pt" ? pt : es;
   if (["yape", "dlocal_wallet", "clabe", "stripe_cashapp", "stripe_bizum"].includes(id))
-    return { text: L("Rápido", "Fast", "Rapide", "Veloce", "Rápido"), cls: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200" };
+    return { text: L("Pago rápido", "Fast pay", "Paiement rapide", "Pagamento rapido", "Pagamento rápido"), cls: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200" };
   if (id === "binance")
     return { text: L("Cripto", "Crypto", "Crypto", "Cripto", "Cripto"), cls: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200" };
   if (id === "cash" || id === "dlocal_cash")
@@ -1919,7 +1922,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const dynamicStripeRows: PaymentMethodRow[] = methodsConfig.enabledMethodKeys
     // Apple Pay / Google Pay / Link salen como botones rápidos DENTRO del formulario de tarjeta de
     // Stripe; una fila aparte hacía dos botones para lo mismo.
-    .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link" && key !== "stripe_apple_pay" && key !== "stripe_google_pay")
+    .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link" && key !== "stripe_apple_pay" && key !== "stripe_google_pay" && key !== "stripe_sepa_debit" /* SEPA tarda días en cobrar */)
     .map((key) => ({ id: "card", methodKey: key, badge: finalPriceLabel, ...STRIPE_VISIBLE_METHODS[key] }));
   const allMethods: PaymentMethodRow[] = [
     { 
@@ -2127,7 +2130,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
 
-        if (m.id === "hotmart") return methodsConfig.hotmart && !!hotmartResolvedUrl;
+        if (m.id === "hotmart") return methodsConfig.hotmart && !!hotmartResolvedUrl && !EUROPE_COUNTRIES.has(country);
 
 
         return true;

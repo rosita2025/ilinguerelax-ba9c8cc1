@@ -269,6 +269,8 @@ const App = () => (
                       de más abajo, que renderiza ProductDynamic — el mismo componente que
                       usa "cmb7", con el mismo diseño y todas las mejoras de conversión ya
                       aplicadas. El SKU en el admin ya coincide exacto con este slug. */}
+                  {/* Landing propia de Spanish Relax (digital, inglés): misma lógica de precio y compra, página dedicada. */}
+                  <Route path="/products/5-000-spanish-words-with-english-pronunciation-digital" element={<ProductDynamic forcedSlug="5-000-spanish-words-with-english-pronunciation-digital" />} />
                   <Route path="/products/3-000-spanish-verbs-mastery-physical-book-preorder" element={<ProductSpanish3000VerbsBook />} />
                   <Route path="/products/spanish-grammar-patterns-a1-c1-mastery-preorder" element={<ProductSpanishGrammarPatterns />} />
                   <Route path="/products/1-000-verbs-in-spanish-past-present-future-with-english-pronunciation" element={<ProductSpanish1000Verbs />} />

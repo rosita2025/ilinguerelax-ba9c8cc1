@@ -51,6 +51,8 @@ import koreanIndexAsset from "@/assets/previews/korean-2000-index.asset.json";
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
 const MagliaRelaxLanding = lazy(() => import("@/components/landing/MagliaRelaxLanding").then(m => ({ default: m.MagliaRelaxLanding })));
+const SpanishRelaxLanding = lazy(() => import("@/components/landing/SpanishRelaxLanding").then(m => ({ default: m.SpanishRelaxLanding })));
+const SpanishRelaxClosing = lazy(() => import("@/components/landing/SpanishRelaxLanding").then(m => ({ default: m.SpanishRelaxClosing })));
 const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then(m => ({ default: m.LooxStyleReviews })));
 
 
@@ -96,8 +98,9 @@ const LANG: Record<string, string> = {
   de: "German", it: "Italian", ja: "Japanese", nl: "Dutch",
 };
 
-const ProductDynamic = () => {
-  const { slug } = useParams<{ slug: string }>();
+const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
+  const { slug: routeSlug } = useParams<{ slug: string }>();
+  const slug = forcedSlug ?? routeSlug;
   const [product, setProduct] = useState<DBProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -278,6 +281,8 @@ const ProductDynamic = () => {
   const cover = product.cover_image_url || "/placeholder.svg";
   const canonical = `https://ilinguerelax.com/products/${product.sku}`;
   
+  // Landing propia de Spanish Relax (digital, en inglés): mismo precio, botón, métodos de pago y barra fija.
+  const isRelax = product.sku === "5-000-spanish-words-with-english-pronunciation-digital";
   const isEs = product.learner_language === "es";
   const isIt = product.learner_language === "it";
   // Curso de video de tejido (Maglia Relax): usa la landing italiana propia en lugar de las secciones de PDF.
@@ -441,7 +446,7 @@ const ProductDynamic = () => {
       <main className="pt-0 pb-2">
         <div className="container px-4 sm:px-6">
           {/* Trust Pilot Badge */}
-          {!isCourse && (
+          {!isCourse && !isRelax && (
           <div className="flex justify-center mb-1">
             <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-emerald-200 shadow-sm">
               <div className="flex items-center gap-0.5">
@@ -512,13 +517,28 @@ const ProductDynamic = () => {
                 {product.name}
               </h1>
 
+              {isRelax && (
+                <p className="text-base font-black text-emerald-700 md:text-lg">Build Your Spanish Vocabulary in 30 Days</p>
+              )}
               <p className="text-sm text-muted-foreground leading-snug">
-                {product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" 
+                {isRelax
+                  ? "A more organized way to study Spanish, one day at a time. Explore 5,000 Spanish words with English meanings and simplified pronunciation guidance designed for English speakers."
+                  : product.sku === "5000-words-spanish-relax-with-english-pronunciation-spanish-relax-cmb7" 
                   ? "Reach C1 fluency faster with our professional 5,000 words guide, 6-month study planner, and proficiency exams."
                   : product.description?.split('\n')[0] || tx("Domina el idioma con nuestra guía profesional en PDF.", "Master your target language with our professional PDF guide.", "Padroneggia la lingua con la nostra guida professionale in PDF.")}
 
 
               </p>
+
+              {isRelax && (
+                <ul className="flex flex-wrap gap-1.5">
+                  {["5,000 Spanish words", "English-friendly pronunciation", "Two digital bonuses"].map((c) => (
+                    <li key={c} className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-800">
+                      <Check className="h-3 w-3" /> {c}
+                    </li>
+                  ))}
+                </ul>
+              )}
 
               <div className="p-3 rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
                 <div className="flex items-end gap-2 mb-1">
@@ -548,7 +568,7 @@ const ProductDynamic = () => {
                     : tx("Lo quiero", "I want it", "Lo voglio")}
                 </Button>
 
-                {!isCourse && <StockAlert count={7} className="mt-2 w-full justify-center" />}
+                {!isCourse && !isRelax && <StockAlert count={7} className="mt-2 w-full justify-center" />}
 
 
                 <div className="flex items-center justify-between pt-3 border-t border-slate-200">
@@ -582,7 +602,7 @@ const ProductDynamic = () => {
           </div>
 
           {/* Features Section */}
-          {!isCourse && (
+          {!isCourse && !isRelax && (
           <section className="mt-4 py-3 border-t border-slate-100">
             <div className="grid lg:grid-cols-2 gap-6">
               <div>
@@ -612,7 +632,7 @@ const ProductDynamic = () => {
           )}
 
           {/* Look Inside Gallery */}
-          {!isCourse && (
+          {!isCourse && !isRelax && (
           <section className="mt-4 py-3 bg-slate-900 rounded-[1.5rem] text-white overflow-hidden">
             <div className="px-4 md:px-8">
               <div className="text-center mb-4">
@@ -655,6 +675,23 @@ const ProductDynamic = () => {
           </section>
           )}
 
+          {isRelax && (
+            <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+              <SpanishRelaxLanding
+                price={priceReady ? displayFormatted : null}
+                onBuy={handleBuy}
+                buyDisabled={!priceReady}
+                vocabPreviews={[
+                  { title: "Vocabulary page", image: previewSpanishVocab },
+                  { title: "Vocabulary table 1", image: vocabTable1Asset.url },
+                  { title: "Vocabulary table 2", image: vocabTable2Asset.url },
+                ]}
+                plannerPreview={{ title: "Daily Study Planner", image: plannerPreviewAsset.url }}
+                examPreview={{ title: "Complete Spanish Language Exam", image: examPreviewAsset.url }}
+              />
+            </Suspense>
+          )}
+
           {isCourse && (
             <Suspense fallback={<Skeleton className="h-96 w-full" />}>
               <MagliaRelaxLanding
@@ -673,7 +710,7 @@ const ProductDynamic = () => {
             </div>
           )}
 
-          {!isCourse && product.sku !== "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca" && (
+          {!isCourse && !isRelax && product.sku !== "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca" && (
             <Suspense fallback={<Skeleton className="h-96 w-full" />}>
               <LooxStyleReviews />
             </Suspense>
@@ -714,7 +751,16 @@ const ProductDynamic = () => {
             <FAQ 
               title={tx("Preguntas frecuentes", "FAQ", "Domande frequenti")} 
               subtitle={tx("Respuestas rápidas", "Quick Answers", "Risposte rapide")} 
-              items={[...SP5K_SKUS, "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca"].includes(product.sku) ? (isIt ? [
+              items={isRelax ? [
+                { question: "What exactly is Spanish Relax?", answer: "Spanish Relax is a digital Spanish vocabulary resource with 5,000 words, English meanings, and simplified pronunciation guidance for English speakers.", icon: BookOpen },
+                { question: "How will I receive my purchase?", answer: "Your download link is sent to your email after payment, usually within a few minutes. If you don't see it, check Spam or Promotions.", icon: Download },
+                { question: "Does it include pronunciation?", answer: "Yes. The vocabulary includes simplified pronunciation guidance for English speakers. Open the previews above to see the format.", icon: FileText },
+                { question: "Is it for beginners?", answer: "It is intended for English-speaking learners from beginners to people with some prior knowledge. It supports your learning but does not replace a full beginner course.", icon: Check },
+                { question: "Will I be fluent in 30 days?", answer: "No fluency result is guaranteed. The 30-day plan is a suggested study routine; progress depends on your starting point and on practice with listening, speaking, reading, and grammar.", icon: Shield },
+                { question: "What are the two bonuses?", answer: "The Daily Study Planner: Spanish for English Speakers and the Complete Spanish Language Exam.", icon: FileText },
+                { question: "Is this a physical book?", answer: "No. This is a digital PDF bundle and no physical book is shipped. A printed edition is available separately.", icon: Package },
+                { question: "Can I get a refund?", answer: "Yes. Full refund within 7 days if you haven't downloaded the files yet, or 50% back if you already have.", icon: Shield }
+              ] : [...SP5K_SKUS, "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca"].includes(product.sku) ? (isIt ? [
                 { question: "Quanto tempo ci vuole per la consegna?", answer: "Arriva alla tua email in meno di 5 minuti dopo l'acquisto.", icon: Download },
                 { question: "Qual è il formato?", answer: "PDF digitale di alta qualità (marchio ufficiale iLingue Relax).", icon: FileText },
                 { question: "Quali metodi di pagamento ci sono?", answer: "Pagamenti sicuri con Stripe, carte di credito/debito e PayPal.", icon: CreditCard },
@@ -745,6 +791,12 @@ const ProductDynamic = () => {
             />
 
           </Suspense>
+          )}
+
+          {isRelax && (
+            <Suspense fallback={null}>
+              <SpanishRelaxClosing price={priceReady ? displayFormatted : null} onBuy={handleBuy} buyDisabled={!priceReady} />
+            </Suspense>
           )}
 
           {product.sku === "5-000-spanish-words-with-english-pronunciation-digital" && (

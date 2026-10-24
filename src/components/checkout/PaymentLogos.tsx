@@ -55,7 +55,7 @@ export function PaymentLogos({ className = "" }: { className?: string }) {
         </span>
       </span>
 
-      {(country === "US" || !["PE", "MX", "CO", "AR", "CL", "BR", "PA", "GT", "HN", "SV", "NI", "PY", "UY", "DO", "BO", "CR", "EC"].includes(country)) && (
+      {country !== "ES" && (country === "US" || !["PE", "MX", "CO", "AR", "CL", "BR", "PA", "GT", "HN", "SV", "NI", "PY", "UY", "DO", "BO", "CR", "EC"].includes(country)) && (
         <PayPalBadge />
       )}
       
@@ -152,7 +152,7 @@ export function PaymentLogos({ className = "" }: { className?: string }) {
       )}
       {["ES", "FR", "DE", "IT", "PT", "GB", "NL", "BE"].includes(country) && (
         <>
-          <TextBadge label="SEPA" bg="#0B5AA6" />
+          {country !== "ES" && <TextBadge label="SEPA" bg="#0B5AA6" />}
           {country === "ES" && <TextBadge label="Bizum" bg="#fe3344" />}
           {country === "NL" && <TextBadge label="iDEAL" bg="#cc0066" />}
         </>

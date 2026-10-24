@@ -55,9 +55,9 @@ import { loadCheckoutProduct } from "@/lib/checkoutProductCache";
 import type { UpsellItem } from "@/config/checkoutCatalog";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "stripe_bizum" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
 
-const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"];
+const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
 
 interface HotmartCountryPrice { amount: number; currency: string }
@@ -170,7 +170,7 @@ type MethodSection = "cards" | "transfer" | "cash" | "wallet" | "other";
 const SECTION_ORDER: MethodSection[] = ["cards", "transfer", "cash", "wallet", "other"];
 
 function methodSection(id: string): MethodSection {
-  if (["card", "dlocal_card", "stripe_klarna"].includes(id)) return "cards";
+  if (["card", "dlocal_card", "stripe_bizum", "stripe_klarna"].includes(id)) return "cards";
   if (["transfer", "stripe_ach", "dlocal_transfer", "clabe"].includes(id)) return "transfer";
   if (["cash", "dlocal_cash"].includes(id)) return "cash";
   if (["yape", "binance", "dlocal_wallet", "stripe_cashapp"].includes(id)) return "wallet";
@@ -224,7 +224,7 @@ type MethodBadge = { label: string; bg: string; color: string };
 const methodHint = (id: string, language: string): { text: string; cls: string } | null => {
   const L = (es: string, en: string, fr: string, it: string, pt: string) =>
     language === "en" ? en : language === "fr" ? fr : language === "it" ? it : language === "pt" ? pt : es;
-  if (["yape", "dlocal_wallet", "clabe", "stripe_cashapp"].includes(id))
+  if (["yape", "dlocal_wallet", "clabe", "stripe_cashapp", "stripe_bizum"].includes(id))
     return { text: L("Rápido", "Fast", "Rapide", "Veloce", "Rápido"), cls: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200" };
   if (id === "binance")
     return { text: L("Cripto", "Crypto", "Crypto", "Cripto", "Cripto"), cls: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200" };
@@ -697,7 +697,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
         const payload = getPaymentPayload(
           pricing,
-          selected === "stripe_ach" ? "stripe" : selected === "stripe_cashapp" ? "stripe" : selected === "stripe_klarna" ? "stripe" : "stripe",
+          selected === "stripe_ach" ? "stripe" : selected === "stripe_cashapp" ? "stripe" : selected === "stripe_klarna" ? "stripe" : selected === "stripe_bizum" ? "stripe" : "stripe",
           country
         );
 
@@ -710,7 +710,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             })),
             currency: payload.currency,
             amount: payload.amount,
-            stripePaymentMethod: selected === "stripe_ach" ? "us_bank_account" : selected === "stripe_cashapp" ? "cashapp" : selected === "stripe_klarna" ? "klarna" : "card",
+            stripePaymentMethod: selected === "stripe_ach" ? "us_bank_account" : selected === "stripe_cashapp" ? "cashapp" : selected === "stripe_klarna" ? "klarna" : selected === "stripe_bizum" ? "bizum" : "card",
             couponPercent: s.couponPercent,
             couponCode: s.coupon ?? undefined,
             contact: {
@@ -1194,7 +1194,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     // Yape / Binance / CLABE / dLocal tarjeta: el pago se confirma en su propio
     // panel (sin botón "Comprar ahora"), así que el aviso sale al elegirlos.
     if (["yape", "binance", "clabe", "dlocal_card"].includes(m)) void offerUpsellThen(null);
-    if (!["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m)) setShowStripe(false);
+    if (!["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum"].includes(m)) setShowStripe(false);
     // Hotmart: no redirige al seleccionar; espera al botón "Comprar ahora".
     // Al colapsar el iframe de Stripe la página se encoge y el scroll salta
     // hacia arriba. Reancla la vista sobre el método recién elegido (PayPal,
@@ -1242,11 +1242,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       // Aviso "¿Te gustaría agregar…?" ANTES de abrir Stripe o crear el pago en
       // dLocal / Mercado Pago. Si algo falla al mostrarlo, el pago sigue normal.
       if (
-        ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "dlocal_transfer", "dlocal_cash", "dlocal_wallet", "transfer", "cash"].includes(selected) &&
+        ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "dlocal_transfer", "dlocal_cash", "dlocal_wallet", "transfer", "cash"].includes(selected) &&
         (await offerUpsellThen(() => { void handleBuyNow(); }))
       ) return;
 
-      if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) {
+      if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum"].includes(selected)) {
         setShowStripe(true); 
         // Force fresh fetch on "Continuar" to handle stale sessions
         useCheckoutPruebaStore.getState().setClientSecret(null);
@@ -1353,7 +1353,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
   useEffect(() => {
     if (peActive) return; // el formulario nuevo no usa el iframe de Embedded Checkout
-    if (!(showStripe && selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected))) return;
+    if (!(showStripe && selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum"].includes(selected))) return;
     setStripeFrameMounted(false);
     setStripeElapsed(0);
     const container = stripeContainerRef.current;
@@ -1936,6 +1936,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     { id: "stripe_ach", icon: Building2, title: (language === "es" ? "Transferencia bancaria ACH" : "ACH Bank Transfer"), sub: (language === "es" ? "Paga desde una cuenta bancaria de Estados Unidos dentro de Stripe." : "Pay from a US bank account inside Stripe."), badge: finalPriceLabel },
     { id: "stripe_cashapp", icon: Smartphone, title: "Cash App Pay", sub: (language === "es" ? "Paga con Cash App dentro del formulario seguro de Stripe." : "Pay with Cash App within Stripe's secure form."), badge: finalPriceLabel },
     { id: "stripe_klarna", icon: Wallet, title: pick(language, "Klarna — Paga en 4", "Klarna — Pay in 4", "Klarna — Payez en 4", "Klarna — Paga in 4", "Klarna — Pague em 4"), sub: pick(language, "Divide tu compra en 4 cuotas sin interés dentro de Stripe.", "Split your purchase into 4 interest-free installments inside Stripe.", "Divisez votre achat en 4 fois sans frais avec Stripe.", "Dividi l'acquisto in 4 rate senza interessi con Stripe.", "Divida sua compra em 4 parcelas sem juros no Stripe."), badge: finalPriceLabel },
+    { id: "stripe_bizum", icon: Smartphone, title: "Bizum", sub: pick(language, "Paga con Bizum desde la app de tu banco.", "Pay with Bizum from your bank app.", "Payez avec Bizum depuis l'app de votre banque.", "Paga con Bizum dall'app della tua banca.", "Pague com Bizum pelo app do seu banco."), badge: finalPriceLabel },
     
     { id: "transfer", icon: Building2, title: t.bankTransfer, sub: t.bankTransferSub(localBadge), badge: finalPriceLabel },
     { id: "cash", icon: Banknote, title: t.cashPayment, sub: t.cashPaymentSub(localBadge), badge: finalPriceLabel },
@@ -2105,7 +2106,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         }
         if (m.id === "stripe_ach") return isUsa && methodsConfig.stripeAch;
         if (m.id === "stripe_cashapp") return isUsa && methodsConfig.stripeCashApp;
-        if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna && !LATAM_COUNTRIES.has(country); // Klarna no opera en Latinoamérica
+        if (m.id === "stripe_bizum") return methodsConfig.stripeBizum && country === "ES"; // Bizum: solo España
+        if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna && !LATAM_COUNTRIES.has(country) && country !== "ES"; // Klarna no opera en Latinoamérica
         
         // Rails locales de Perú (transferencia BCP/Interbank, efectivo, Yape/Plin)
         // SOLO deben verse desde Perú. Un comprador en México no puede pagar a
@@ -2113,7 +2115,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         if (m.id === "transfer") return methodsConfig.transfer && isPeru;
         if (m.id === "cash") return methodsConfig.cash && isPeru;
         if (m.id === "yape") return methodsConfig.yape && isPeru;
-        if (m.id === "binance") return methodsConfig.binance && (country === "PE" || !LATAM_COUNTRIES.has(country)); // sin Binance en Latinoamérica (Perú lo conserva)
+        if (m.id === "binance") return methodsConfig.binance && (country === "PE" || !LATAM_COUNTRIES.has(country)) && country !== "ES"; // sin Binance en Latinoamérica (Perú lo conserva)
         if (m.id === "clabe") return country === "MX";
 
         // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.
@@ -2133,7 +2135,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     : [];
   // Aplica el orden configurado en /admin/checkout-methods (según sort_order
   // más bajo de cada familia en la región activa).
-  const familyOf = (id: Method) => id === "card" ? "stripe" : id === "stripe_ach" ? "stripeAch" : id === "stripe_cashapp" ? "stripeCashApp" : id === "stripe_klarna" ? "stripeKlarna" : id === "dlocal_transfer" ? "dlocalTransfer" : id === "dlocal_cash" ? "dlocalCash" : id === "dlocal_wallet" ? "dlocalWallet" : id === "dlocal_card" ? "dlocalCard" : id;
+  const familyOf = (id: Method) => id === "card" ? "stripe" : id === "stripe_ach" ? "stripeAch" : id === "stripe_cashapp" ? "stripeCashApp" : id === "stripe_klarna" ? "stripeKlarna" : id === "stripe_bizum" ? "stripeBizum" : id === "dlocal_transfer" ? "dlocalTransfer" : id === "dlocal_cash" ? "dlocalCash" : id === "dlocal_wallet" ? "dlocalWallet" : id === "dlocal_card" ? "dlocalCard" : id;
   const orderIndex = (id: Method) => {
     const fam = familyOf(id);
     const i = methodsConfig.familyOrder.indexOf(fam as FamilyKey);
@@ -2159,7 +2161,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const methods = [...visibleMethods].sort(
     (a, b) => SECTION_ORDER.indexOf(methodSection(a.id)) - SECTION_ORDER.indexOf(methodSection(b.id)),
   );
-  const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m.id));
+  const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum"].includes(m.id));
 
 
 
@@ -2176,7 +2178,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         setSelected("card");
         setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`);
       }
-      const isStripeSel = selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected);
+      const isStripeSel = selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum"].includes(selected);
       // En Perú el formulario lo abre el efecto de abajo (con el aviso de upsell).
       if (!isPeru && isStripeSel && valid && stripePromise && !showStripe) setShowStripe(true);
     }
@@ -2188,7 +2190,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const autoOpenBusy = useRef(false);
   useEffect(() => {
     if (!isPeru) return;
-    const isStripeSel = !!selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected);
+    const isStripeSel = !!selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum"].includes(selected);
     if (!isStripeSel || !valid || !stripePromise || showStripe || autoOpenBusy.current) return;
     if (total <= 0 && items.length > 0) return;
     autoOpenBusy.current = true;
@@ -2238,7 +2240,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // Cuando se abre el iframe de Stripe, hacer scroll hasta él para que el
   // comprador VEA el formulario de tarjeta y no crea que "no pasó nada".
   useEffect(() => {
-    if (showStripe && selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected)) {
+    if (showStripe && selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum"].includes(selected)) {
       const id = window.setTimeout(() => {
         stripeAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 250);
@@ -2410,7 +2412,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
       {!isFree && !isInvalidZero && methods.map((m, idx) => {
         const primaryCardTitle = isPeru ? t.cardTitlePeru : t.cardTitleGlobal;
-        const isStripeRow = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(m.id);
+        const isStripeRow = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum"].includes(m.id);
         const isPrimaryCard = m.id === "card" && m.title === primaryCardTitle;
         // For USA extra rows (Cash App, US Bank) — highlight only the clicked one.
         const rowKey = `${m.id}-${m.title}`;
@@ -2513,6 +2515,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   <div className="mt-1 flex items-center gap-1 flex-wrap">
                     <BankBadge label="Cash App" bg="#00D632" color="#001B0A" />
                   </div>
+                ) : m.id === "stripe_bizum" ? (
+                  <div className="mt-1 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="Bizum" bg="#05C3DD" color="#001B22" />
+                  </div>
                 ) : m.id === "stripe_klarna" ? (
                   <div className="mt-1 flex items-center gap-1 flex-wrap">
                     <BankBadge label="Klarna" bg="#FFA8CD" color="#0A0A0A" />
@@ -2581,6 +2587,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-3 sm:p-4 scroll-mt-24">
                 <React.Suspense fallback={null}>
                   <StripePaymentElementBox
+                    method={selected === "stripe_bizum" ? "bizum" : "card"}
                     language={language}
                     country={(country || "").toUpperCase().slice(0, 2)}
                     currency={String(currency)}
@@ -2987,7 +2994,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
       {/* Con tarjeta no hay botón aparte (el de pagar es el de Stripe) y sin método elegido tampoco.
           Para transferencia, efectivo, dLocal Go y Hotmart se mantiene, sin monto en USD. */}
-      {!!selected && selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "dlocal_card" && !["card", "stripe_ach", "stripe_cashapp", "stripe_klarna"].includes(selected) && (
+      {!!selected && selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "dlocal_card" && !["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum"].includes(selected) && (
         <button
           type="button"
           onClick={handleBuyNow}

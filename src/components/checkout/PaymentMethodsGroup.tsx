@@ -2369,22 +2369,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
       {!isFree && !isInvalidZero && (
-        <div className="flex items-center gap-2 mb-4 px-1 text-xs font-semibold">
-          <span className={valid ? "text-emerald-600 dark:text-emerald-400" : "text-teal-600 dark:text-teal-400"}>
-            {valid
-              ? pick(language, "✓ Paso 1: Tus datos", "✓ Step 1: Your details", "✓ Étape 1 : Vos informations", "✓ Passo 1: I tuoi dati", "✓ Passo 1: Seus dados")
-              : pick(language, "● Paso 1 de 2: Tus datos", "● Step 1 of 2: Your details", "● Étape 1 sur 2 : Vos informations", "● Passo 1 di 2: I tuoi dati", "● Passo 1 de 2: Seus dados")}
-          </span>
-          <span className="text-neutral-300 dark:text-neutral-600">—</span>
-          <span className={valid ? "text-teal-600 dark:text-teal-400" : "text-neutral-400 dark:text-neutral-600"}>
-            {valid
-              ? pick(language, "● Paso 2 de 2: Pago", "● Step 2 of 2: Payment", "● Étape 2 sur 2 : Paiement", "● Passo 2 di 2: Pagamento", "● Passo 2 de 2: Pagamento")
-              : pick(language, "Paso 2: Pago", "Step 2: Payment", "Étape 2 : Paiement", "Passo 2: Pagamento", "Passo 2: Pagamento")}
-          </span>
-        </div>
-      )}
-
-      {!isFree && !isInvalidZero && (
         <div className="flex items-center gap-2 mb-4 px-1">
           <Smartphone className="w-5 h-5 text-teal-600 dark:text-teal-400" />
           <h3 className="font-bold text-neutral-800 dark:text-neutral-100 uppercase tracking-tight">

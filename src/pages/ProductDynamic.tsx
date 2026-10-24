@@ -1,4 +1,5 @@
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
+import { lightCoverUrl, disableImageTransform } from "@/lib/coverImage";
 import { useEffect, useState, useRef, useMemo, lazy, Suspense } from "react";
 import { useParams, Link, Navigate, useNavigate } from "react-router-dom";
 import { 
@@ -115,6 +116,8 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
   const [loading, setLoading] = useState(!cachedProduct);
   const [notFound, setNotFound] = useState(false);
   const [activeImage, setActiveImage] = useState<string>(cachedProduct?.cover_image_url || "");
+  // Portada liviana (800 px) cuando el almacenamiento la ofrece; si falla, se usa la original.
+  const [heroFailed, setHeroFailed] = useState(false);
   
   const { t, language } = useI18n();
   const navigate = useNavigate();
@@ -483,8 +486,11 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
             <div className="space-y-4">
               <div className="relative group bg-card border border-border rounded-3xl overflow-hidden shadow-hero">
                 <img
-                  src={activeImage}
+                  src={heroFailed ? activeImage : (lightCoverUrl(activeImage) ?? activeImage)}
+                  onError={() => { if (!heroFailed) { disableImageTransform(); setHeroFailed(true); } }}
                   alt={product.name}
+                  width={800}
+                  height={800}
                   className="w-full aspect-square object-cover transition-all duration-300"
                   loading="eager"
                   fetchPriority="high"
@@ -511,7 +517,7 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
                         activeImage === img ? "border-primary scale-95" : "border-transparent opacity-70"
                       }`}
                     >
-                      <img src={img} className="w-full h-full object-cover" alt="" loading="lazy" />
+                      <img src={heroFailed ? img : (lightCoverUrl(img, 160) ?? img)} className="w-full h-full object-cover" alt="" width={64} height={64} loading="lazy" decoding="async" />
                     </button>
                   ))}
                 </div>

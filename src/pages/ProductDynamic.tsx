@@ -144,7 +144,14 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
     const load = async () => {
       let data: unknown = null;
       let error: unknown = null;
-      try {
+      // Datos pedidos desde index.html mientras cargaba el JS (solo la primera vez).
+      const early = (window as unknown as { __pdyn?: { sku: string; p: Promise<unknown>; used: boolean } }).__pdyn;
+      if (early && early.sku === slug && !early.used) {
+        early.used = true;
+        try { data = await early.p; } catch { data = null; }
+        if (cancelled) return;
+      }
+      if (!data) try {
         const result = await supabase
           .from("digital_products")
           .select("id, sku, name, description, learner_language, target_language, price_usd, price_usd_latam, price_usd_tienda, price_pen, compare_at_price_usd, compare_at_price_usd_latam, compare_at_price_usd_tienda, compare_at_price_pen, local_compare_at_prices, cover_image_url, gallery_images, gallery_metadata, is_upsell, active, bonus_titles, hotmart_url, store_enabled, excluded_countries, store_excluded_countries, hotmart_excluded_countries, rating, review_count, local_prices, local_usd_prices, local_compare_at_prices")

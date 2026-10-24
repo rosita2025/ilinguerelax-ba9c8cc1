@@ -36,12 +36,15 @@ function Cta({ label, onBuy, disabled }: { label: string; onBuy: () => void; dis
   );
 }
 
+// Las miniaturas piden a la CDN de la tienda una versión reducida (ancho 640); al abrir se ve la original.
+const thumb = (url: string) => (url.includes("cdn.shopify.com") ? `${url}${url.includes("?") ? "&" : "?"}width=640` : url);
+
 function PreviewTile({ item, className = "" }: { item: RelaxPreview; className?: string }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
         <button className={`group relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm ${className}`}>
-          <img src={item.image} alt={item.title} loading="lazy" decoding="async" className="h-full w-full object-contain" />
+          <img src={thumb(item.image)} alt={item.title} loading="lazy" decoding="async" className="h-full w-full object-contain" />
           <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/80 to-transparent p-2 text-left text-[11px] font-bold text-white">
             {item.title}
           </span>
@@ -116,7 +119,7 @@ function RelaxVideo({ src, index }: { src: string; index: number }) {
         muted
         loop
         playsInline
-        preload={index === 0 ? "auto" : "metadata"}
+        preload="metadata"
         disablePictureInPicture
         onPlay={() => setPaused(false)}
         onPause={() => setPaused(true)}

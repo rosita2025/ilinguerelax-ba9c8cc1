@@ -349,6 +349,15 @@ const ensurePixelReady = () => {
   pixelInitialized = true;
 };
 
+/**
+ * Carga el Pixel lo antes posible (apenas arranca la app), sin esperar a que cargue la página del
+ * producto ni sus datos. Meta cuenta la "visita a la página de destino" cuando el Pixel carga: si tarda,
+ * quien hace clic y se va rápido no se cuenta. Respeta las mismas reglas de consentimiento de siempre.
+ */
+export const initMetaPixelEarly = () => {
+  try { ensurePixelReady(); } catch { /* noop */ }
+};
+
 // ============================================
 // HOTMART PIXEL
 // ============================================

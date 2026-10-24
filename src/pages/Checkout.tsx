@@ -733,17 +733,6 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
                   </p>
                 </div>
 
-                {/* Logos de métodos de pago — antes solo se veían en la
-                    barra lateral de computadora (hidden lg:block), invisible
-                    para casi todo el tráfico real, que es móvil. Verlos
-                    temprano genera confianza antes de llenar el formulario. */}
-                <div className="flex flex-col items-center gap-1.5 py-1">
-                  <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-                    {language === "en" ? "Accepted payment methods" : language === "it" ? "Metodi di pagamento accettati" : language === "fr" ? "Moyens de paiement acceptés" : language === "pt" ? "Métodos de pagamento aceitos" : "Métodos de pago aceptados"}
-                  </p>
-                  <PaymentLogos />
-                </div>
-                
                 <SectionErrorBoundary name="express-checkout">
                   <Suspense fallback={null}>
                     <ExpressCheckoutBox language={language} />

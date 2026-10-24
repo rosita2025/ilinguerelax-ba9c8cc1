@@ -8,6 +8,8 @@ import { toast } from "sonner";
 
 import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { CheckoutOfferCountdown } from "@/components/checkout/CheckoutOfferCountdown";
+
+const SHOW_OFFER_COUNTDOWN = false;
 import { SectionErrorBoundary } from "@/components/SectionErrorBoundary";
 
 import { BuyerInfoForm } from "@/components/checkout/BuyerInfoForm";
@@ -658,8 +660,9 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
               <link rel="preload" as="script" href="https://js.stripe.com/v3" crossOrigin="anonymous" />
             </Helmet>
 
-            {/* Cuenta regresiva arriba de todo, encima del menú */}
-            {!items.some((i) => i.isPhysical) && (
+            {/* Cuenta regresiva del cupón NEW10: apagada (el cupón se entrega por el popup de correo).
+                Para volver a mostrarla, poner SHOW_OFFER_COUNTDOWN en true. */}
+            {SHOW_OFFER_COUNTDOWN && !items.some((i) => i.isPhysical) && (
               <CheckoutOfferCountdown productSlug={catalogItem?.id ?? slug ?? "checkout"} language={language} />
             )}
 

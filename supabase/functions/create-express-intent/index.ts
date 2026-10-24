@@ -45,8 +45,9 @@ const BodySchema = z.object({
   environment: z.enum(["sandbox", "live"]).default("sandbox"),
   action: z.enum(["quote", "create"]),
   source: z.enum(["express-checkout", "payment-element"]).default("express-checkout"),
-  // "bizum": solo España y en euros (pago por redirección, sin guardar tarjeta). Por defecto, el flujo de siempre.
-  method: z.enum(["card", "bizum"]).default("card"),
+  // Métodos locales de Stripe (pago por redirección, sin guardar tarjeta), cada uno solo en su país y en euros:
+  // bizum (ES), satispay (IT), ideal (NL), mb_way (PT). Por defecto, el flujo de siempre.
+  method: z.enum(["card", "bizum", "satispay", "ideal", "mb_way"]).default("card"),
   items: z.array(z.object({
     id: z.string().min(1).max(180),
     quantity: z.number().int().min(1).max(50),
@@ -168,20 +169,21 @@ Deno.serve(async (req) => {
       console.error("[create-express-intent] customer create/find failed (non-fatal):", custErr);
     }
 
-    if (body.method === "bizum") {
-      if (country !== "ES" || currency !== "eur") {
-        return json({ error: "Bizum is only available in Spain (EUR)", reason: "bizum_not_available" }, 400);
+    if (body.method !== "card") {
+      const LOCAL_METHOD_COUNTRY: Record<string, string> = { bizum: "ES", satispay: "IT", ideal: "NL", mb_way: "PT" };
+      if (country !== LOCAL_METHOD_COUNTRY[body.method] || currency !== "eur") {
+        return json({ error: `${body.method} is not available for this country/currency`, reason: "local_method_not_available" }, 400);
       }
-      const bizumIntent = await stripe.paymentIntents.create({
+      const localIntent = await stripe.paymentIntents.create({
         amount,
         currency,
         ...(customerId ? { customer: customerId } : {}),
         receipt_email: email,
         description: productSummary || "iLingue Relax Digital",
-        payment_method_types: ["bizum"],
+        payment_method_types: [body.method],
         metadata,
       });
-      return json({ clientSecret: bizumIntent.client_secret, paymentIntentId: bizumIntent.id, amount, currency });
+      return json({ clientSecret: localIntent.client_secret, paymentIntentId: localIntent.id, amount, currency });
     }
 
     const intent = await stripe.paymentIntents.create({

@@ -43,8 +43,8 @@ interface Quote {
 }
 
 interface Props {
-  /** "bizum": solo España (EUR). Por defecto, tarjeta como siempre. */
-  method?: "card" | "bizum";
+  /** Método local de Stripe (solo su país, en EUR). Por defecto, tarjeta como siempre. */
+  method?: "card" | "bizum" | "satispay" | "ideal" | "mb_way";
   language: string;
   country: string;
   /** Moneda que se muestra en el checkout (el servidor decide la final). */
@@ -103,7 +103,7 @@ const Inner = ({
             environment: getStripeEnvironment(),
             action: "create",
             source,
-            ...(method === "bizum" ? { method: "bizum" } : {}),
+            ...(method !== "card" ? { method } : {}),
             items: s.items.map((i) => ({ id: i.id, quantity: i.quantity })),
             currency: quote.currency,
             country,
@@ -158,7 +158,7 @@ const Inner = ({
             // Apple Pay / Google Pay / Link ya están en "Pago rápido" (arriba de la página): no se repiten aquí.
             wallets: { applePay: "never", googlePay: "never" },
             // Nombre y correo ya los tenemos arriba: no se vuelven a pedir.
-            fields: { billingDetails: { name: "never", email: "never", phone: method === "bizum" ? "auto" : "never" } },
+            fields: { billingDetails: { name: "never", email: "never", phone: method !== "card" ? "auto" : "never" } },
             defaultValues: { billingDetails: { email: s0.buyer.email.trim(), name: s0.buyer.fullName.trim() } },
           }}
           onReady={() => setReady(true)}
@@ -252,9 +252,9 @@ export default function StripePaymentElementBox(props: Props) {
         mode: "payment",
         amount: quote.amount,
         currency: quote.currency,
-        ...(props.method === "bizum" ? {} : { setupFutureUsage: "off_session" as const }),
+        ...(props.method && props.method !== "card" ? {} : { setupFutureUsage: "off_session" as const }),
         // Este formulario maneja solo tarjeta de crédito/débito; las billeteras rápidas van arriba.
-        paymentMethodTypes: props.method === "bizum" ? ["bizum"] : ["card"],
+        paymentMethodTypes: props.method && props.method !== "card" ? [props.method] : ["card"],
         locale,
         appearance: { theme: "stripe" },
       }}

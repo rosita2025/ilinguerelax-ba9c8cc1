@@ -736,7 +736,7 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
                     temprano genera confianza antes de llenar el formulario. */}
                 <div className="flex flex-col items-center gap-1.5 py-1">
                   <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-                    {language === "en" ? "Accepted payment methods" : language === "it" ? "Metodi di pagamento accettati" : "Métodos de pago aceptados"}
+                    {language === "en" ? "Accepted payment methods" : language === "it" ? "Metodi di pagamento accettati" : language === "fr" ? "Moyens de paiement acceptés" : language === "pt" ? "Métodos de pagamento aceitos" : "Métodos de pago aceptados"}
                   </p>
                   <PaymentLogos />
                 </div>
@@ -819,11 +819,11 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
                 <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
                   <div className="flex items-center gap-2 mb-4">
                     <Lock className="w-5 h-5 text-primary" />
-                    <h3 className="font-bold text-lg">Checkout Seguro</h3>
+                    <h3 className="font-bold text-lg">{language === "en" ? "Secure Checkout" : language === "fr" ? "Paiement sécurisé" : language === "it" ? "Pagamento sicuro" : language === "pt" ? "Checkout seguro" : "Checkout Seguro"}</h3>
                   </div>
                   <div className="pt-6 border-t border-border/50">
                     <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wider">
-                      Métodos de pago aceptados:
+                      {language === "en" ? "Accepted payment methods:" : language === "fr" ? "Moyens de paiement acceptés :" : language === "it" ? "Metodi di pagamento accettati:" : language === "pt" ? "Métodos de pagamento aceitos:" : "Métodos de pago aceptados:"}
                     </p>
                     <PaymentLogos />
                   </div>

@@ -233,7 +233,7 @@
       <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp</g:image_link>
       <g:condition>new</g:condition>
       <g:availability>in stock</g:availability>
-      <g:price>18.00 USD</g:price>
+      <g:price>30.00 USD</g:price>
       <g:brand>iLingue Relax</g:brand>
       <g:mpn>5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
@@ -263,26 +263,6 @@
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
       <g:product_type>Libros Digitales &gt; Idiomas &gt; Coreano</g:product_type>
       <g:custom_label_0>Coreano</g:custom_label_0>
-      <g:custom_label_1>Digital</g:custom_label_1>
-    </item>
-    <item>
-      <g:id>5-000-spanish-words-with-english-pronunciation-digital</g:id>
-      <g:title>5,000 spanish with english pronunciation  - Digital Only</g:title>
-      <g:description>The Complete Spanish Learning System — From A1 to C1 Master Spanish with a structured, progressive system designed to help you build vocabulary, strengthen grammar, master essential verbs, and practice real Spanish step by step.</g:description>
-      <g:link>https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-digital</g:link>
-      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-spanish-words-with-english-pronunciation-digital/1788987402310-zg20z.webp</g:image_link>
-      <g:condition>new</g:condition>
-      <g:availability>in stock</g:availability>
-      <g:price>24.90 USD</g:price>
-      <g:brand>iLingue Relax</g:brand>
-      <g:mpn>5-000-spanish-words-with-english-pronunciation-digital</g:mpn>
-      <g:identifier_exists>no</g:identifier_exists>
-      <g:adult>no</g:adult>
-      <g:content_language>es</g:content_language>
-      <g:target_country>US</g:target_country>
-      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
-      <g:product_type>Libros Digitales &gt; Idiomas &gt; Español</g:product_type>
-      <g:custom_label_0>Español</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>
@@ -413,7 +393,7 @@
       <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/patrones-especiales-alfabeto-combinaciones-secretas-ingles/1789945794300-1sxv9.webp</g:image_link>
       <g:condition>new</g:condition>
       <g:availability>in stock</g:availability>
-      <g:price>25.00 USD</g:price>
+      <g:price>20.00 USD</g:price>
       <g:brand>iLingue Relax</g:brand>
       <g:mpn>patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
@@ -476,6 +456,26 @@
       <g:price>28.00 USD</g:price>
       <g:brand>iLingue Relax</g:brand>
       <g:mpn>maglia-relax-schemi-ai-ferri-passo-passo-jiae</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:adult>no</g:adult>
+      <g:content_language>es</g:content_language>
+      <g:target_country>US</g:target_country>
+      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
+      <g:product_type>Libros Digitales &gt; Idiomas &gt; Español</g:product_type>
+      <g:custom_label_0>Español</g:custom_label_0>
+      <g:custom_label_1>Digital</g:custom_label_1>
+    </item>
+    <item>
+      <g:id>5-000-spanish-words-with-english-pronunciation-digital</g:id>
+      <g:title>Build Your Spanish Vocabulary — One eBook and 3 Bonuses FREE</g:title>
+      <g:description>The Complete Spanish Learning System — From A1 to C1 Master Spanish with a structured, progressive system designed to help you build vocabulary, strengthen grammar, master essential verbs, and practice real Spanish step by step.</g:description>
+      <g:link>https://ilinguerelax.com/products/5-000-spanish-words-with-english-pronunciation-digital</g:link>
+      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-spanish-words-with-english-pronunciation-digital/1792803050558-xml9e.webp</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in stock</g:availability>
+      <g:price>17.00 USD</g:price>
+      <g:brand>iLingue Relax</g:brand>
+      <g:mpn>5-000-spanish-words-with-english-pronunciation-digital</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:adult>no</g:adult>
       <g:content_language>es</g:content_language>

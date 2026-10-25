@@ -38,7 +38,11 @@ type Config = {
   enabled: boolean;
 };
 
-async function loadConfig(admin: ReturnType<typeof createClient>): Promise<Config> {
+// Los clientes aquí son "untyped"; evitamos chocar con los genéricos de
+// supabase-js anotando el helper como any.
+type AdminClient = any;
+
+async function loadConfig(admin: AdminClient): Promise<Config> {
   const { data } = await admin
     .from("digital_delivery_config").select("*").eq("id", 1).maybeSingle();
   return {
@@ -70,7 +74,7 @@ async function invokeSend(payload: Record<string, unknown>) {
 }
 
 async function upsertAlert(
-  admin: ReturnType<typeof createClient>,
+  admin: AdminClient,
   source: string, source_ref: string, customer_email: string | null,
   reason: string, details: Record<string, unknown>,
 ) {
@@ -85,7 +89,7 @@ async function upsertAlert(
 // then exact name equality; only fall back to a long shared prefix (>=12 chars)
 // so short/generic names like "coreano" or "palabras" can't match the wrong row.
 async function resolveSkusFromItems(
-  admin: ReturnType<typeof createClient>,
+  admin: AdminClient,
   items: unknown,
 ): Promise<string[]> {
   if (!Array.isArray(items)) return [];

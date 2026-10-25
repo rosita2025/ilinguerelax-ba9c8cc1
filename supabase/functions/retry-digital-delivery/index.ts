@@ -38,7 +38,11 @@ type Config = {
   enabled: boolean;
 };
 
-async function loadConfig(admin: ReturnType<typeof createClient>): Promise<Config> {
+// Los clientes aquí son "untyped"; evitamos chocar con los genéricos de
+// supabase-js anotando el helper como any.
+type AdminClient = any;
+
+async function loadConfig(admin: AdminClient): Promise<Config> {
   const { data } = await admin
     .from("digital_delivery_config").select("*").eq("id", 1).maybeSingle();
   return {

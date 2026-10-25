@@ -3,6 +3,8 @@
  * (Stripe, dLocal, etc.), que no viven en manual_payments ni shopify_sales.
  * Solo se crea la fila si alguno de los SKU comprados es físico.
  */
+import { sendShippingEmail } from "./shippingEmails.ts";
+
 export async function upsertPhysicalShipment(params: {
   adminClient: any;
   orderNumber: string;

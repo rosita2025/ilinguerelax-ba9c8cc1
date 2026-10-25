@@ -74,7 +74,7 @@ async function invokeSend(payload: Record<string, unknown>) {
 }
 
 async function upsertAlert(
-  admin: ReturnType<typeof createClient>,
+  admin: AdminClient,
   source: string, source_ref: string, customer_email: string | null,
   reason: string, details: Record<string, unknown>,
 ) {
@@ -89,7 +89,7 @@ async function upsertAlert(
 // then exact name equality; only fall back to a long shared prefix (>=12 chars)
 // so short/generic names like "coreano" or "palabras" can't match the wrong row.
 async function resolveSkusFromItems(
-  admin: ReturnType<typeof createClient>,
+  admin: AdminClient,
   items: unknown,
 ): Promise<string[]> {
   if (!Array.isArray(items)) return [];

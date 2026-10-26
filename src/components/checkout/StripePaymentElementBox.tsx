@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { Loader2, Lock } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
+import { isBuyerValid } from "@/components/checkout/BuyerInfoForm";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { fetchStripeQuote } from "@/lib/stripeQuote";
@@ -147,8 +148,44 @@ const Inner = ({
   const handlePay = () => runPayment("payment-element");
 
   const s0 = useCheckoutPruebaStore.getState();
+  const buyer = useCheckoutPruebaStore((st) => st.buyer);
+  const setBuyer = useCheckoutPruebaStore((st) => st.setBuyer);
+  // Una vez mostrados, los campos se quedan aunque ya sean válidos (no se pierde el foco al escribir).
+  const [needsContact] = useState(() => !isBuyerValid(useCheckoutPruebaStore.getState().buyer));
+  const inputCls = "h-11 w-full rounded-md border border-neutral-300 bg-white px-3 text-base text-neutral-900 outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100";
+  const contactLabels = {
+    es: ["Nombre completo", "Correo electrónico"],
+    en: ["Full name", "Email"],
+    pt: ["Nome completo", "E-mail"],
+    fr: ["Nom complet", "E-mail"],
+    it: ["Nome completo", "E-mail"],
+  }[lang];
+
   return (
     <div className="space-y-3">
+      {needsContact && (
+        <div className="grid gap-2">
+          <input
+            type="text"
+            autoComplete="name"
+            placeholder={contactLabels[0]}
+            aria-label={contactLabels[0]}
+            value={buyer.fullName}
+            onChange={(e) => setBuyer({ fullName: e.target.value })}
+            className={inputCls}
+          />
+          <input
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            placeholder={contactLabels[1]}
+            aria-label={contactLabels[1]}
+            value={buyer.email}
+            onChange={(e) => setBuyer({ email: e.target.value })}
+            className={inputCls}
+          />
+        </div>
+      )}
       {!ready && (
         <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" /> {t.loading}

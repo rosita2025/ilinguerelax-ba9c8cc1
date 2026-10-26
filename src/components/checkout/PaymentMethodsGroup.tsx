@@ -2587,7 +2587,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
 
-            {isStripeRow && (valid || !isPeru) && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && peActive && (
+            {isStripeRow && peActive && !!stripePromise && (
+              ((valid || !isPeru) && selected === m.id && selectedCardRow === rowKey && showStripe) ||
+              // Perú: el formulario de tarjeta se ve desde el inicio (mientras no elija otro método),
+              // sin esperar a que llene nombre y correo; el aviso de upsell sigue saliendo al elegir tarjeta.
+              (isPeru && m.id === "card" && isPrimaryCard && (selected === null || selected === "card"))
+            ) && (
               <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-3 sm:p-4 scroll-mt-24">
                 <React.Suspense fallback={null}>
                   <StripePaymentElementBox

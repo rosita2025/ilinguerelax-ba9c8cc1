@@ -172,7 +172,7 @@ Deno.serve(async (req) => {
 
     return json({ status: "paid", orderNumber, email });
   } catch (err) {
-    console.error("paypal-capture-order error:", err);
+    console.error("paypal-order-capture error:", err);
     return json({ status: "error" }, 500);
   }
 });

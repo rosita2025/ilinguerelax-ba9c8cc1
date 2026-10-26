@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { Elements, LinkAuthenticationElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { Loader2, Lock } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { isBuyerValid } from "@/components/checkout/BuyerInfoForm";
@@ -183,15 +183,13 @@ const Inner = ({
             onChange={(e) => setBuyer({ fullName: e.target.value })}
             className={inputCls}
           />
-          <input
-            type="email"
-            autoComplete="email"
-            inputMode="email"
-            placeholder={contactLabels[1]}
-            aria-label={contactLabels[1]}
-            value={buyer.email}
-            onChange={(e) => setBuyer({ email: e.target.value })}
-            className={inputCls}
+          {/* Link de Stripe: con el correo, ofrece autocompletar la tarjeta guardada del cliente. */}
+          <LinkAuthenticationElement
+            options={{ defaultValues: { email: buyer.email } }}
+            onChange={(e) => {
+              const v = e.value?.email;
+              if (typeof v === "string" && v !== buyer.email) setBuyer({ email: v });
+            }}
           />
         </div>
       )}

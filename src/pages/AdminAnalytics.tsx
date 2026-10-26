@@ -719,6 +719,46 @@ const AdminAnalytics = () => {
                 <Kpi icon={<DollarSign className="w-4 h-4" />} label="Compras" value={data.totals.purchases.toLocaleString()} sub={money(data.totals.revenue)} highlight />
               </div>
 
+              {/* Embudo de conversión (estilo Shopify): cada paso con su % respecto al anterior y lo que se pierde */}
+              <Card className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-semibold">Embudo de conversión</h2>
+                  <span className="text-xs text-muted-foreground">Conversión global {data.conversion.globalPct}%</span>
+                </div>
+                <div className="space-y-2">
+                  {(() => {
+                    const steps = [
+                      { label: "Sesiones", value: data.totals.sessions },
+                      { label: "Agregaron al carrito", value: data.totals.addToCart },
+                      { label: "Llegaron al checkout", value: data.totals.checkout },
+                      { label: "Compraron", value: data.totals.purchases },
+                    ];
+                    const top = Math.max(1, steps[0].value);
+                    return steps.map((st, i) => {
+                      const prev = i === 0 ? null : steps[i - 1].value;
+                      const stepPct = prev ? Math.round((st.value / prev) * 1000) / 10 : null;
+                      return (
+                        <div key={st.label}>
+                          <div className="flex items-baseline justify-between text-sm">
+                            <span className="font-medium">{st.label}</span>
+                            <span className="tabular-nums">
+                              {st.value.toLocaleString()}
+                              {stepPct !== null && <span className="ml-2 text-xs text-muted-foreground">{stepPct}% del paso anterior</span>}
+                            </span>
+                          </div>
+                          <div className="mt-1 h-2.5 w-full rounded-full bg-muted">
+                            <div className="h-2.5 rounded-full bg-primary" style={{ width: `${Math.max(2, Math.min(100, (st.value / top) * 100))}%` }} />
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+                <p className="mt-3 text-[11px] text-muted-foreground">
+                  Checkout → Compra: <strong>{data.conversion.checkoutToPurchasePct}%</strong> ({data.totals.purchases} de {data.totals.checkout}). Los precios no se modifican; solo se leen los datos.
+                </p>
+              </Card>
+
               {/* Desglose de compras por método de pago */}
               <Card className="p-4">
                 <div className="flex items-center justify-between mb-3 gap-2">

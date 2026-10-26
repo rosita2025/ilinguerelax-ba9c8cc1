@@ -936,7 +936,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       }, { attempts: 2, baseDelayMs: 500 });
       if (error || !data?.approveUrl) {
         const detail = await extractEdgeErrorMessage(error);
-        throw new Error(detail || t.errorPayment);
+        const e = error as { status?: number; message?: string } | null;
+        // Sin texto del servidor casi siempre es que la función aún no está desplegada o no responde: se deja la pista a la vista.
+        throw new Error(detail || `${t.errorPayment} (Ref: paypal-create-order ${[e?.status, e?.message].filter(Boolean).join(" · ") || "sin respuesta"})`);
       }
       window.location.assign(data.approveUrl);
     } catch (err) {
@@ -946,7 +948,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       try {
         trackPaymentError({ provider: "paypal", skus: s.items.map((i) => i.id), reason: rawReason, value: 0, currency: "USD" });
       } catch { /* noop */ }
-      const friendly = looksTechnical(rawReason) ? t.errorPayment : rawReason;
+      const friendly = rawReason; // incluye "(Ref: …)" para poder ver la causa real
       setMethodError({ method: "paypal", message: friendly });
       toast({ title: t.errorPayment, description: friendly, variant: "destructive" });
     }

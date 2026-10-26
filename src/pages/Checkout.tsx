@@ -158,6 +158,11 @@ export default function Checkout() {
           mode: "cors" 
         });
       } catch {}
+      // La función que cotiza/crea el pago también se calienta, y el formulario de tarjeta se descarga antes.
+      try {
+        void fetch(`https://opyitzdvvurdyyyzkwwv.supabase.co/functions/v1/create-express-intent`, { method: "OPTIONS", mode: "cors" });
+      } catch {}
+      void import("@/components/checkout/StripePaymentElementBox").catch(() => {});
     };
     
     // Idle callback to avoid blocking the main thread

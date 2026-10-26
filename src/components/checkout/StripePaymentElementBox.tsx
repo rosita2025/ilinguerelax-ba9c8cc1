@@ -281,7 +281,17 @@ export default function StripePaymentElementBox(props: Props) {
   const { currency, country } = props;
   const items = useCheckoutPruebaStore((s) => s.items);
   const coupon = useCheckoutPruebaStore((s) => s.coupon);
-  const [quote, setQuote] = useState<Quote | null>(null);
+  const quoteStoreKey = `pe_quote_v1:${country}:${props.method === "crypto" ? "USD" : String(currency || "USD")}:${coupon ?? ""}:${items.map((i) => `${i.id}x${i.quantity}`).join(",")}`;
+  // Último monto conocido para esta misma compra: el formulario aparece al instante y el monto se confirma enseguida.
+  const [quote, setQuote] = useState<Quote | null>(() => {
+    try {
+      const raw = sessionStorage.getItem(quoteStoreKey);
+      const q = raw ? (JSON.parse(raw) as Quote) : null;
+      return q && q.amount > 0 && q.currency ? q : null;
+    } catch {
+      return null;
+    }
+  });
   const [failed, setFailed] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const stripePromise = useMemo(() => {
@@ -311,6 +321,7 @@ export default function StripePaymentElementBox(props: Props) {
         return;
       }
       setQuote(q);
+      try { sessionStorage.setItem(quoteStoreKey, JSON.stringify(q)); } catch { /* sin almacenamiento */ }
     })();
     return () => {
       cancelled = true;

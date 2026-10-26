@@ -79,6 +79,8 @@ const Inner = ({
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Detalle técnico (código de Stripe / de la función) para poder diagnosticar el error real.
+  const [detail, setDetail] = useState<string | null>(null);
 
   // Si el formulario no carga (error de Stripe o sin respuesta), se vuelve al formulario anterior.
   useEffect(() => {
@@ -129,6 +131,9 @@ const Inner = ({
 
       if (fnError || !data?.clientSecret || !data.paymentIntentId) {
         console.error("[payment-element] create intent failed", fnError, data);
+        const fe = fnError as { edgeDetail?: string; status?: number; message?: string } | null;
+        const dd = data as { reason?: string; error?: string } | null;
+        setDetail([fe?.status, dd?.reason, dd?.error, fe?.edgeDetail || fe?.message].filter(Boolean).join(" · ").slice(0, 200) || "create-intent");
         setError(mapStripeError(fnError, lang).message || t.error);
         return;
       }
@@ -145,7 +150,13 @@ const Inner = ({
       });
 
       // Si todo sale bien, Stripe redirige solo a return_url (no llegamos aquí).
-      if (confirmError) setError(mapStripeError(confirmError, lang).message || confirmError.message || t.error);
+      if (confirmError) {
+        console.error("[payment-element] confirm failed", confirmError);
+        setDetail([confirmError.type, confirmError.code, confirmError.decline_code, confirmError.message].filter(Boolean).join(" · ").slice(0, 200));
+        const mapped = mapStripeError(confirmError, lang);
+        // Si no reconocemos el error, se muestra el mensaje real de Stripe en vez de uno genérico.
+        setError(mapped.code === "unknown" ? confirmError.message || mapped.message || t.error : mapped.message || confirmError.message || t.error);
+      }
     } catch (err) {
       console.error("[payment-element] unexpected error", err);
       setError(mapStripeError(err, lang).message || t.error);
@@ -218,7 +229,8 @@ const Inner = ({
           <p role="alert" className="text-sm text-destructive">
             {error}
           </p>
-          <SupportWhatsApp variant="error" language={lang} country={country} method={method === "card" ? "card" : method} amountLabel={formatMinor(quote.amount, quote.currency, language)} error={error} />
+          {detail && <p className="mt-1 break-words text-[11px] text-muted-foreground">Ref: {detail}</p>}
+          <SupportWhatsApp variant="error" language={lang} country={country} method={method === "card" ? "card" : method} amountLabel={formatMinor(quote.amount, quote.currency, language)} error={detail ? `${error} (${detail})` : error} />
         </div>
       )}
 

@@ -767,7 +767,7 @@ const AdminAnalytics = () => {
                 </div>
                 <p className="mt-3 text-[11px] text-muted-foreground">
                   Checkout → Compra: <strong>{data.conversion.checkoutToPurchasePct}%</strong> ({data.totals.purchases} de {data.totals.checkout}).{" "}
-                  Colores de referencia: <span className="font-semibold text-emerald-700">verde</span> saludable, <span className="font-semibold text-amber-600">amarillo</span> por mejorar, <span className="font-semibold text-red-600">rojo</span> mal. Umbrales: carrito 8% / 4%, checkout 60% / 35%, compra 40% / 20%, global 2,5% / 1%. Son valores generales, ajústalos a tu negocio.
+                  Colores de referencia: <span className="font-semibold text-emerald-700">verde</span> saludable, <span className="font-semibold text-amber-600">amarillo</span> por mejorar, <span className="font-semibold text-red-600">rojo</span> mal. Umbrales: página del producto (visita → checkout) 10% / 5%, carrito 8% / 4%, checkout 60% / 35%, compra 40% / 20%, global 2,5% / 1%. Son valores generales, ajústalos a tu negocio.
                 </p>
               </Card>
 
@@ -852,7 +852,19 @@ const AdminAnalytics = () => {
 
 
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                {(() => {
+                  const visitToCheckoutPct = data.totals.sessions > 0 ? Math.round((data.totals.checkout / data.totals.sessions) * 10000) / 100 : 0;
+                  return (
+                    <Kpi
+                      icon={<Percent className="w-4 h-4" />}
+                      label="Página del producto (visita → checkout)"
+                      value={`${visitToCheckoutPct}%`}
+                      sub={`Checkouts ÷ visitas × 100 = ${data.totals.checkout} ÷ ${data.totals.sessions}`}
+                      tone={rateTone(visitToCheckoutPct, 10, 5)}
+                    />
+                  );
+                })()}
                 <Kpi icon={<Percent className="w-4 h-4" />} label="Conversión global" value={`${data.conversion.globalPct}%`} sub={`Compras ÷ visitas × 100 = ${data.totals.purchases} ÷ ${data.totals.sessions}`} tone={rateTone(data.conversion.globalPct, 2.5, 1)} />
                 <Kpi icon={<Percent className="w-4 h-4" />} label="Checkout → Compra" value={`${data.conversion.checkoutToPurchasePct}%`} sub={`Compras ÷ checkouts × 100 = ${data.totals.purchases} ÷ ${data.totals.checkout}`} tone={rateTone(data.conversion.checkoutToPurchasePct, 40, 20)} />
                 <Kpi icon={<PackageX className="w-4 h-4" />} label="Checkouts iniciados sin compra" value={`${Math.max(0, data.totals.checkout - data.totals.purchases)}`} sub={`${data.conversion.abandonedCheckoutPct}% de abandono · incluye visitas sin correo`} />

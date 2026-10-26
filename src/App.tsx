@@ -224,10 +224,15 @@ const RouteTracker = () => {
   return null;
 };
 
+// Mismo esqueleto que el de index.html (#app-shell): al cargar una página no se pasa a una pantalla en blanco con
+// un círculo, sino que la maqueta ya visible se mantiene hasta que aparece el contenido real.
 const PageFallback = () => {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+    <div id="app-shell" aria-hidden="true">
+      <div className="bar"><span className="logo">iLingue <b>Relax</b></span></div>
+      <div className="box" />
+      <div className="line" />
+      <div className="line s" />
     </div>
   );
 };

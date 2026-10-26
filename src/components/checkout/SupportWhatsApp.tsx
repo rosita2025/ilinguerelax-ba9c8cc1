@@ -11,6 +11,13 @@ const COPY: Record<string, { cta: string; pick: string; reasons: Record<SupportR
 };
 
 const ORDER: SupportReason[] = ["problem", "error", "other", "question"];
+// Cada motivo con su propio color y emoji (el verde de WhatsApp queda solo en el encabezado).
+const STYLE: Record<SupportReason, { emoji: string; cls: string }> = {
+  problem: { emoji: "💳", cls: "border-orange-300 bg-orange-50 text-orange-900 hover:bg-orange-100 dark:border-orange-900/60 dark:bg-orange-950/30 dark:text-orange-100" },
+  error: { emoji: "⚠️", cls: "border-rose-300 bg-rose-50 text-rose-900 hover:bg-rose-100 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-100" },
+  other: { emoji: "🔄", cls: "border-sky-300 bg-sky-50 text-sky-900 hover:bg-sky-100 dark:border-sky-900/60 dark:bg-sky-950/30 dark:text-sky-100" },
+  question: { emoji: "❓", cls: "border-violet-300 bg-violet-50 text-violet-900 hover:bg-violet-100 dark:border-violet-900/60 dark:bg-violet-950/30 dark:text-violet-100" },
+};
 
 /**
  * Ayuda por WhatsApp: el cliente elige qué le pasó y se abre el chat con el mensaje ya escrito
@@ -41,14 +48,14 @@ export function SupportWhatsApp({
   }
 
   return (
-    <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 dark:border-emerald-900/50 dark:bg-emerald-950/20">
+    <div className="rounded-xl border border-emerald-300 bg-white shadow-sm dark:border-emerald-900/50 dark:bg-neutral-900">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex min-h-11 w-full items-center justify-center gap-2 px-3 py-2 text-center text-xs font-semibold text-emerald-800 dark:text-emerald-200 sm:text-sm"
+        className="flex min-h-11 w-full items-center justify-center gap-2 px-3 py-2 text-center text-xs font-bold text-emerald-700 dark:text-emerald-200 sm:text-sm"
       >
-        <MessageCircle className="h-4 w-4 shrink-0 text-[#128C7E]" /> {c.cta}
+        <span className="text-base leading-none" aria-hidden="true">🆘</span> {c.cta}
         <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
@@ -60,8 +67,9 @@ export function SupportWhatsApp({
               href={link(r)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#25D366] px-3 py-2 text-sm font-semibold text-white hover:bg-[#20bd5a]"
+              className={`inline-flex min-h-11 items-center justify-start gap-2.5 rounded-lg border px-3 py-2 text-sm font-semibold ${STYLE[r].cls}`}
             >
+              <span className="text-lg leading-none" aria-hidden="true">{STYLE[r].emoji}</span>
               {c.reasons[r]}
             </a>
           ))}

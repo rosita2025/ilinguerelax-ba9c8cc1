@@ -8,6 +8,7 @@ import { useCheckoutMethodsConfig } from "@/hooks/useCheckoutMethodsConfig";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { fetchStripeQuote } from "@/lib/stripeQuote";
+import { getOrderRef } from "@/lib/support";
 import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
 
 /**
@@ -92,6 +93,7 @@ const ExpressInner = ({ language, country, currency, onAvailable, available }: I
           body: {
             environment: getStripeEnvironment(),
             action: "create",
+            orderRef: getOrderRef(),
             items: s.items.map((i) => ({ id: i.id, quantity: i.quantity })),
             currency,
             country,

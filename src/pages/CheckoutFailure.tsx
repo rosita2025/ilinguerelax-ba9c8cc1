@@ -87,7 +87,7 @@ export default function CheckoutFailure() {
             </Link>
           </Button>
           <Button asChild variant="ghost" size="lg" className="gap-2">
-            <a href="https://wa.me/112512724704" target="_blank" rel="noopener noreferrer">
+            <a href="https://wa.me/12512724704" target="_blank" rel="noopener noreferrer">
               <MessageCircle className="w-4 h-4" /> {t.contactSupport}
             </a>
           </Button>

@@ -56,6 +56,8 @@ const BodySchema = z.object({
   currency: z.string().length(3).default("usd"),
   country: z.string().length(2),
   couponCode: z.string().max(20).optional(),
+  // Referencia corta del pedido (ej. PED-7K3QX2): queda en la descripción y los metadatos del pago en Stripe.
+  orderRef: z.string().regex(/^PED-[A-Z0-9-]{3,12}$/).optional(),
   contact: z.object({
     email: z.string().email().max(255),
     name: z.string().max(100).optional(),
@@ -158,6 +160,7 @@ Deno.serve(async (req) => {
       items_count: String(pricing.items.length),
       items_summary: productSummary,
       skus: deliverySkus,
+      order_ref: body.orderRef ?? "",
       shipping_usd: "0",
     };
 
@@ -185,7 +188,7 @@ Deno.serve(async (req) => {
         currency,
         ...(customerId ? { customer: customerId } : {}),
         receipt_email: email,
-        description: productSummary || "iLingue Relax Digital",
+        description: `${body.orderRef ? `[${body.orderRef}] ` : ""}${productSummary || "iLingue Relax Digital"}`.slice(0, 300),
         payment_method_types: [body.method],
         metadata,
       });
@@ -197,7 +200,7 @@ Deno.serve(async (req) => {
       currency,
       ...(customerId ? { customer: customerId } : {}),
       receipt_email: email,
-      description: productSummary || "iLingue Relax Digital",
+      description: `${body.orderRef ? `[${body.orderRef}] ` : ""}${productSummary || "iLingue Relax Digital"}`.slice(0, 300),
       setup_future_usage: "off_session",
       automatic_payment_methods: {
         enabled: true,

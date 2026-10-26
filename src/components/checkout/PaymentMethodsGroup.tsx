@@ -80,6 +80,7 @@ interface PaymentMethodRow {
 
 // Antes usaban una ruta temporal de Lovable (asset borrado del CDN) que no
 // sobrevivía al publicar; ahora usan archivos propios del proyecto.
+import { SupportWhatsApp } from "@/components/checkout/SupportWhatsApp";
 import { VisaBadge, MastercardBadge, AmexBadge, ApplePayBadge } from "@/components/checkout/CardBrandBadges";
 import visaLogoAsset from "@/assets/payment-logos/visa.png.asset.json";
 import mastercardLogoAsset from "@/assets/payment-logos/mastercard.png.asset.json";
@@ -2348,6 +2349,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               : "No pudimos abrir este método de pago"}
           </p>
           <p className="mt-1 text-xs">{methodError.message}</p>
+          <SupportWhatsApp variant="error" language={language} country={(country || "").toUpperCase()} method={methodError.method} amountLabel={local.formatted || undefined} error={methodError.message} />
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
@@ -2992,6 +2994,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         <p className="text-xs text-center text-muted-foreground pt-2">
           {t.enableMethods}
         </p>
+      )}
+
+      {/* Ayuda por WhatsApp con el pedido ya escrito (referencia, producto, correo, país, monto y método). */}
+      {!isFree && !isInvalidZero && (
+        <div className="pt-3">
+          <SupportWhatsApp language={language} country={(country || "").toUpperCase()} method={selected || undefined} amountLabel={local.formatted || undefined} />
+        </div>
       )}
 
       {/* Con tarjeta no hay botón aparte (el de pagar es el de Stripe) y sin método elegido tampoco.

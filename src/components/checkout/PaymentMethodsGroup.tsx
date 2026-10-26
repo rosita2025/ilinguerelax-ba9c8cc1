@@ -2604,6 +2604,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     onNeedBuyerInfo={requestBuyerInfo}
                     onBeforePay={() => { void captureAbandonedCheckout(selected || "stripe", true); }}
                     onUnavailable={() => setPeUnavailable(true)}
+                    onHostedFallback={payWithHostedFallback}
+                    hostedLoading={hostedLoading}
                   />
                 </React.Suspense>
               </div>

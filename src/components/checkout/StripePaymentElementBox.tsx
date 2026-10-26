@@ -60,6 +60,9 @@ interface Props {
   onBeforePay?: () => void;
   /** Si no se puede cargar el formulario nuevo, el checkout vuelve al formulario anterior. */
   onUnavailable?: () => void;
+  /** Abre la página completa de Stripe (checkout.stripe.com) como alternativa si el formulario da error. */
+  onHostedFallback?: () => void;
+  hostedLoading?: boolean;
 }
 
 const Inner = ({
@@ -71,6 +74,8 @@ const Inner = ({
   onBeforePay,
   method = "card",
   onUnavailable,
+  onHostedFallback,
+  hostedLoading,
 }: Omit<Props, "currency"> & { quote: Quote }) => {
   const lang = (["es", "en", "pt", "fr", "it"].includes(language) ? language : "es") as Lang;
   const t = COPY[lang];
@@ -229,6 +234,17 @@ const Inner = ({
           <p role="alert" className="text-sm text-destructive">
             {error}
           </p>
+          {onHostedFallback && (
+            <button
+              type="button"
+              onClick={onHostedFallback}
+              disabled={hostedLoading}
+              className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-md border border-neutral-300 bg-white text-sm font-semibold text-neutral-800 hover:bg-neutral-50 disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+            >
+              {hostedLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {{ es: "Pagar en la página segura de Stripe", en: "Pay on Stripe's secure page", pt: "Pagar na página segura da Stripe", fr: "Payer sur la page sécurisée Stripe", it: "Paga sulla pagina sicura di Stripe" }[lang]}
+            </button>
+          )}
           {detail && <p className="mt-1 break-words text-[11px] text-muted-foreground">Ref: {detail}</p>}
           <SupportWhatsApp variant="error" language={lang} country={country} method={method === "card" ? "card" : method} amountLabel={formatMinor(quote.amount, quote.currency, language)} error={detail ? `${error} (${detail})` : error} />
         </div>
@@ -332,6 +348,8 @@ export default function StripePaymentElementBox(props: Props) {
         onNeedBuyerInfo={props.onNeedBuyerInfo}
         onBeforePay={props.onBeforePay}
         onUnavailable={props.onUnavailable}
+        onHostedFallback={props.onHostedFallback}
+        hostedLoading={props.hostedLoading}
         quote={quote}
       />
     </Elements>

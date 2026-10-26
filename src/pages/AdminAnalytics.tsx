@@ -739,7 +739,7 @@ const AdminAnalytics = () => {
                       { label: "Sesiones", value: data.totals.sessions, good: 0, ok: 0 },
                       { label: "Agregaron al carrito", value: data.totals.addToCart, good: 8, ok: 4 },
                       { label: "Llegaron al checkout", value: data.totals.checkout, good: 60, ok: 35 },
-                      { label: "Compraron", value: data.totals.purchases, good: 25, ok: 15 },
+                      { label: "Compraron", value: data.totals.purchases, good: 40, ok: 20 },
                     ];
                     const top = Math.max(1, steps[0].value);
                     return steps.map((st, i) => {
@@ -767,7 +767,7 @@ const AdminAnalytics = () => {
                 </div>
                 <p className="mt-3 text-[11px] text-muted-foreground">
                   Checkout → Compra: <strong>{data.conversion.checkoutToPurchasePct}%</strong> ({data.totals.purchases} de {data.totals.checkout}).{" "}
-                  Colores de referencia: <span className="font-semibold text-emerald-700">verde</span> saludable, <span className="font-semibold text-amber-600">amarillo</span> por mejorar, <span className="font-semibold text-red-600">rojo</span> mal. Umbrales: carrito 8% / 4%, checkout 60% / 35%, compra 25% / 15%, global 2,5% / 1%. Son valores generales, ajústalos a tu negocio.
+                  Colores de referencia: <span className="font-semibold text-emerald-700">verde</span> saludable, <span className="font-semibold text-amber-600">amarillo</span> por mejorar, <span className="font-semibold text-red-600">rojo</span> mal. Umbrales: carrito 8% / 4%, checkout 60% / 35%, compra 40% / 20%, global 2,5% / 1%. Son valores generales, ajústalos a tu negocio.
                 </p>
               </Card>
 

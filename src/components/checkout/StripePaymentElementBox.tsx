@@ -206,17 +206,6 @@ const Inner = ({
   return (
     <div className="space-y-3">
       <div className="grid gap-2">
-        <label className="grid gap-1 text-sm font-medium text-neutral-700 dark:text-neutral-200">
-          {{ es: "Nombre en la tarjeta", en: "Name on card", pt: "Nome no cartão", fr: "Nom sur la carte", it: "Nome sulla carta" }[lang]}
-          <input
-            type="text"
-            autoComplete="cc-name"
-            placeholder={contactLabels[0]}
-            value={buyer.fullName}
-            onChange={(e) => setBuyer({ fullName: e.target.value })}
-            className={inputCls}
-          />
-        </label>
         {/* Como el ejemplo de Stripe: correo arriba; si el cliente ya usó Link, se ofrece su tarjeta guardada. */}
         <LinkAuthenticationElement
           options={{ defaultValues: { email: buyer.email } }}
@@ -280,6 +269,17 @@ const Inner = ({
           onLoadError={() => onUnavailable?.()}
         />
       </div>
+      <label className={`grid gap-1 text-sm font-medium text-neutral-700 dark:text-neutral-200 ${tab === "link" && (!method || method === "card") ? "hidden" : ""}`}>
+        {{ es: "Nombre en la tarjeta", en: "Name on card", pt: "Nome no cartão", fr: "Nom sur la carte", it: "Nome sulla carta" }[lang]}
+        <input
+          type="text"
+          autoComplete="cc-name"
+          placeholder={contactLabels[0]}
+          value={buyer.fullName}
+          onChange={(e) => setBuyer({ fullName: e.target.value })}
+          className={inputCls}
+        />
+      </label>
 
       {error && (
         <div>

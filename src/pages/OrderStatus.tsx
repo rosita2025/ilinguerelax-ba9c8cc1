@@ -566,7 +566,7 @@ export default function OrderStatus() {
               </a>{" "}
               o por{" "}
               <a
-                href="https://wa.me/112512724704"
+                href="https://wa.me/12512724704"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary underline"

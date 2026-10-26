@@ -161,7 +161,7 @@ const HotmartSuccess = () => {
 
   const handleWhatsApp = () => {
     window.open(
-      "https://wa.me/112512724704?text=¡Hola!%20Acabo%20de%20comprar%20Inglés%20Relax",
+      "https://wa.me/12512724704?text=¡Hola!%20Acabo%20de%20comprar%20Inglés%20Relax",
       "_blank"
     );
   };

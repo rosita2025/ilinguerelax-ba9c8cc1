@@ -420,7 +420,7 @@ export default function CheckoutSuccess() {
                 <div className="text-muted-foreground">
                   {t.messageUsOn}{" "}
                   <a
-                    href="https://wa.me/112512724704"
+                    href="https://wa.me/12512724704"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary underline"
@@ -648,7 +648,7 @@ export default function CheckoutSuccess() {
             <Link to="/"><ShoppingBag className="w-4 h-4" /> {t.continueShopping}</Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <a href="https://wa.me/112512724704" target="_blank" rel="noopener noreferrer">{t.contactSupport}</a>
+            <a href="https://wa.me/12512724704" target="_blank" rel="noopener noreferrer">{t.contactSupport}</a>
           </Button>
         </div>
       </main>

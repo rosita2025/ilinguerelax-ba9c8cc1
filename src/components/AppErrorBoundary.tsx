@@ -60,7 +60,7 @@ export class AppErrorBoundary extends Component<Props, State> {
               <RefreshCw className="h-5 w-5" /> Intentar de nuevo
             </Button>
             <Button asChild variant="outline" className="w-full gap-2">
-              <a href="https://wa.me/112512724704" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/12512724704" target="_blank" rel="noopener noreferrer">
                 <MessageCircle className="h-4 w-4" /> Ayuda por WhatsApp
               </a>
             </Button>

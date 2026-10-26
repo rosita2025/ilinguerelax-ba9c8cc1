@@ -14,7 +14,7 @@ import {
 
 const HotmartCreditPending = () => {
   const handleWhatsApp = () => {
-    window.open("https://wa.me/112512724704?text=¡Hola!%20Mi%20pago%20está%20en%20análisis%20de%20crédito", "_blank");
+    window.open("https://wa.me/12512724704?text=¡Hola!%20Mi%20pago%20está%20en%20análisis%20de%20crédito", "_blank");
   };
 
   const handleEmail = () => {

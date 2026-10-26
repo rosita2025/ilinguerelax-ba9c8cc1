@@ -5,6 +5,8 @@ import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { fetchStripeQuote } from "@/lib/stripeQuote";
+import { SupportWhatsApp } from "@/components/checkout/SupportWhatsApp";
+import { getOrderRef } from "@/lib/support";
 import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
 
 /**
@@ -104,6 +106,7 @@ const Inner = ({
             action: "create",
             source,
             ...(method !== "card" ? { method } : {}),
+            orderRef: getOrderRef(),
             items: s.items.map((i) => ({ id: i.id, quantity: i.quantity })),
             currency: quote.currency,
             country,
@@ -166,9 +169,12 @@ const Inner = ({
       </div>
 
       {error && (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
+        <div>
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+          <SupportWhatsApp variant="error" language={lang} country={country} method={method === "card" ? "card" : method} amountLabel={formatMinor(quote.amount, quote.currency, language)} error={error} />
+        </div>
       )}
 
       <button

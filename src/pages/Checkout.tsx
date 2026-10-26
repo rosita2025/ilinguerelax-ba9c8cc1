@@ -43,6 +43,7 @@ import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";
 import { trackHotmartEvent, trackBeginCheckout } from "@/hooks/useMetaPixel";
 import { cn } from "@/lib/utils";
+import { buildSupportUrl } from "@/lib/support";
 import { authorizeCheckout, evaluateCheckoutGate } from "@/lib/checkoutGate";
 import { getCountryInfo } from "@/lib/countryInfo";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -792,7 +793,7 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
                           <span className="text-xs font-bold leading-tight text-foreground">{L.guaranteeTitle}</span>
                           <span className="text-[11px] leading-tight text-muted-foreground">{L.guaranteeSub}</span>
                         </div>
-                        <a href="https://wa.me/112512724704" target="_blank" rel="noopener noreferrer" className={cn(cell, "hover:border-emerald-400")}>
+                        <a href={buildSupportUrl({ language, country: (region.country || "").toUpperCase(), kind: "help" })} target="_blank" rel="noopener noreferrer" className={cn(cell, "hover:border-emerald-400")}>
                           <MessageCircle className="w-4 h-4 text-emerald-600" />
                           <span className="text-xs font-bold leading-tight text-foreground">{L.supportTitle}</span>
                           <span className="text-[11px] leading-tight text-muted-foreground">{L.supportSub}</span>

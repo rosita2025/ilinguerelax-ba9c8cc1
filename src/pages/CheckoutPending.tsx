@@ -48,7 +48,7 @@ export default function CheckoutPending() {
               <div className="font-medium">{t.fasterReceipt}</div>
               <div className="text-muted-foreground text-xs">
                 {t.fasterReceiptDesc}{" "}
-                <a href="https://wa.me/112512724704" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                <a href="https://wa.me/12512724704" target="_blank" rel="noopener noreferrer" className="text-primary underline">
                   WhatsApp +1 251 272 4704
                 </a>
               </div>
@@ -71,7 +71,7 @@ export default function CheckoutPending() {
           </Button>
           <Button asChild variant="outline" size="lg"><Link to="/">{t.backHome}</Link></Button>
           <Button asChild variant="outline" size="lg">
-            <a href="https://wa.me/112512724704" target="_blank" rel="noopener noreferrer">{t.whatsappSupport}</a>
+            <a href="https://wa.me/12512724704" target="_blank" rel="noopener noreferrer">{t.whatsappSupport}</a>
           </Button>
         </div>
 

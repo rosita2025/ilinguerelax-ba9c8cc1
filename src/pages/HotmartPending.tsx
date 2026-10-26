@@ -14,7 +14,7 @@ import {
 
 const HotmartPending = () => {
   const handleWhatsApp = () => {
-    window.open("https://wa.me/112512724704?text=¡Hola!%20Tengo%20un%20pago%20pendiente%20para%20Inglés%20Relax", "_blank");
+    window.open("https://wa.me/12512724704?text=¡Hola!%20Tengo%20un%20pago%20pendiente%20para%20Inglés%20Relax", "_blank");
   };
 
   const handleEmail = () => {

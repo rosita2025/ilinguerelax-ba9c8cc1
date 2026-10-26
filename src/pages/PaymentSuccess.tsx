@@ -66,7 +66,7 @@ const PaymentSuccess = () => {
 
 
   const handleWhatsApp = () => {
-    window.open("https://wa.me/112512724704?text=Hello!%20I%20just%20purchased%20Spanish%20Relax%205,000%20Words", "_blank");
+    window.open("https://wa.me/12512724704?text=Hello!%20I%20just%20purchased%20Spanish%20Relax%205,000%20Words", "_blank");
   };
 
   const handleEmail = () => {

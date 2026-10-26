@@ -938,7 +938,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         const detail = await extractEdgeErrorMessage(error);
         const e = error as { status?: number; message?: string } | null;
         // Sin texto del servidor casi siempre es que la función aún no está desplegada o no responde: se deja la pista a la vista.
-        throw new Error(detail || `${t.errorPayment} (Ref: paypal-create-order ${[e?.status, e?.message].filter(Boolean).join(" · ") || "sin respuesta"})`);
+        throw new Error(detail || `${t.errorPayment} (Ref: paypal-create-order ${[e?.status, e?.message].filter(Boolean).join(" · ") || `respuesta sin enlace de PayPal${data ? ` (campos: ${Object.keys(data).join(",") || "ninguno"})` : ""}`})`);
       }
       window.location.assign(data.approveUrl);
     } catch (err) {

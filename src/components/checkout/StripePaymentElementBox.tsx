@@ -432,7 +432,10 @@ export default function StripePaymentElementBox(props: Props) {
         currency: quote.currency,
         ...(props.method && props.method !== "card" ? {} : { setupFutureUsage: "off_session" as const }),
         // Este formulario maneja solo tarjeta de crédito/débito; las billeteras rápidas van arriba.
-        paymentMethodTypes: props.method && props.method !== "card" ? [props.method] : ["card", "link"],
+        // Tarjeta: el pago se crea en el servidor con métodos automáticos, así que el formulario también debe ser automático
+        // (si se fijan paymentMethodTypes aquí, Stripe rechaza la confirmación: "cannot be confirmed through the API configured with automatic payment methods").
+        // Los métodos locales (Bizum, iDEAL…) sí se crean con su tipo fijo en el servidor.
+        ...(props.method && props.method !== "card" ? { paymentMethodTypes: [props.method] } : {}),
         locale,
         appearance: { theme: "stripe" },
       }}

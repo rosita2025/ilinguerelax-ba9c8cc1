@@ -195,8 +195,8 @@ const Inner = ({
 
   return (
     <div className="space-y-3">
-      {needsContact && (
-        <div className="grid gap-2">
+      <div className="grid gap-2">
+        {needsContact && (
           <input
             type="text"
             autoComplete="name"
@@ -206,16 +206,16 @@ const Inner = ({
             onChange={(e) => setBuyer({ fullName: e.target.value })}
             className={inputCls}
           />
-          {/* Link de Stripe: con el correo, ofrece autocompletar la tarjeta guardada del cliente. */}
-          <LinkAuthenticationElement
-            options={{ defaultValues: { email: buyer.email } }}
-            onChange={(e) => {
-              const v = e.value?.email;
-              if (typeof v === "string" && v !== buyer.email) setBuyer({ email: v });
-            }}
-          />
-        </div>
-      )}
+        )}
+        {/* Link de Stripe: con el correo, reconoce al cliente y le ofrece pagar con su tarjeta guardada, sin escribirla. */}
+        <LinkAuthenticationElement
+          options={{ defaultValues: { email: buyer.email } }}
+          onChange={(e) => {
+            const v = e.value?.email;
+            if (typeof v === "string" && v && v !== buyer.email) setBuyer({ email: v });
+          }}
+        />
+      </div>
       {!ready && (
         <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" /> {t.loading}

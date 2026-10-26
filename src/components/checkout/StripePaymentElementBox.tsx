@@ -206,17 +206,17 @@ const Inner = ({
   return (
     <div className="space-y-3">
       <div className="grid gap-2">
-        {needsContact && (
+        <label className="grid gap-1 text-sm font-medium text-neutral-700 dark:text-neutral-200">
+          {{ es: "Nombre en la tarjeta", en: "Name on card", pt: "Nome no cartão", fr: "Nom sur la carte", it: "Nome sulla carta" }[lang]}
           <input
             type="text"
-            autoComplete="name"
+            autoComplete="cc-name"
             placeholder={contactLabels[0]}
-            aria-label={contactLabels[0]}
             value={buyer.fullName}
             onChange={(e) => setBuyer({ fullName: e.target.value })}
             className={inputCls}
           />
-        )}
+        </label>
         {/* Como el ejemplo de Stripe: correo arriba; si el cliente ya usó Link, se ofrece su tarjeta guardada. */}
         <LinkAuthenticationElement
           options={{ defaultValues: { email: buyer.email } }}
@@ -234,7 +234,7 @@ const Inner = ({
       {currencyToggle}
       {(!method || method === "card") && (
         <div role="tablist" aria-label="Método de pago" className="grid grid-cols-2 gap-2">
-          {([["card", { es: "Tarjeta", en: "Card", pt: "Cartão", fr: "Carte", it: "Carta" }[lang]], ["link", "Link"]] as const).map(([id, label]) => (
+          {([["card", { es: "Crédito o débito", en: "Credit or debit", pt: "Crédito ou débito", fr: "Crédit ou débit", it: "Credito o debito" }[lang]], ["link", "Link"]] as const).map(([id, label]) => (
             <button
               key={id}
               type="button"
@@ -286,17 +286,6 @@ const Inner = ({
           <p role="alert" className="text-sm text-destructive">
             {error}
           </p>
-          {onHostedFallback && (
-            <button
-              type="button"
-              onClick={onHostedFallback}
-              disabled={hostedLoading}
-              className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-md border border-neutral-300 bg-white text-sm font-semibold text-neutral-800 hover:bg-neutral-50 disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
-            >
-              {hostedLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {{ es: "Pagar en la página segura de Stripe", en: "Pay on Stripe's secure page", pt: "Pagar na página segura da Stripe", fr: "Payer sur la page sécurisée Stripe", it: "Paga sulla pagina sicura di Stripe" }[lang]}
-            </button>
-          )}
           {detail && <p className="mt-1 break-words text-[11px] text-muted-foreground">Ref: {detail}</p>}
           <SupportWhatsApp variant="error" language={lang} country={country} method={method === "card" ? "card" : method} amountLabel={formatMinor(quote.amount, quote.currency, language)} error={detail ? `${error} (${detail})` : error} />
         </div>

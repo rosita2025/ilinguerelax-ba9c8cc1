@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Elements, LinkAuthenticationElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { Loader2, Lock } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
@@ -77,7 +77,8 @@ const Inner = ({
   onHostedFallback,
   hostedLoading,
   refreshing,
-}: Omit<Props, "currency"> & { quote: Quote; refreshing?: boolean }) => {
+  currencyToggle,
+}: Omit<Props, "currency"> & { quote: Quote; refreshing?: boolean; currencyToggle?: React.ReactNode }) => {
   const lang = (["es", "en", "pt", "fr", "it"].includes(language) ? language : "es") as Lang;
   const t = COPY[lang];
   const stripe = useStripe();
@@ -221,6 +222,7 @@ const Inner = ({
           <Loader2 className="h-4 w-4 animate-spin" /> {t.loading}
         </div>
       )}
+      {currencyToggle}
       <div className={ready ? "" : "h-0 overflow-hidden opacity-0"}>
         <PaymentElement
           options={{
@@ -281,7 +283,11 @@ export default function StripePaymentElementBox(props: Props) {
   const { currency, country } = props;
   const items = useCheckoutPruebaStore((s) => s.items);
   const coupon = useCheckoutPruebaStore((s) => s.coupon);
-  const quoteStoreKey = `pe_quote_v1:${country}:${props.method === "crypto" ? "USD" : String(currency || "USD")}:${coupon ?? ""}:${items.map((i) => `${i.id}x${i.quantity}`).join(",")}`;
+  // Tarjeta: el cliente puede pagar en su moneda local o en dólares (útil si su banco no acepta la moneda local).
+  const [payUsd, setPayUsd] = useState(false);
+  const localCode = String(currency || "USD").toUpperCase();
+  const canChooseCurrency = (!props.method || props.method === "card") && localCode !== "USD";
+  const quoteStoreKey = `pe_quote_v1:${country}:${props.method === "crypto" || (canChooseCurrency && payUsd) ? "USD" : String(currency || "USD")}:${coupon ?? ""}:${items.map((i) => `${i.id}x${i.quantity}`).join(",")}`;
   // Último monto conocido para esta misma compra: el formulario aparece al instante y el monto se confirma enseguida.
   const [quote, setQuote] = useState<Quote | null>(() => {
     try {
@@ -303,7 +309,7 @@ export default function StripePaymentElementBox(props: Props) {
   }, []);
 
   // Stablecoins (USDC) solo se cobran en dólares; el resto, en la moneda local.
-  const quoteCurrency = props.method === "crypto" ? "USD" : String(currency || "USD");
+  const quoteCurrency = props.method === "crypto" || (canChooseCurrency && payUsd) ? "USD" : String(currency || "USD");
   const signature = JSON.stringify({ items: items.map((i) => [i.id, i.quantity]), coupon, currency: quoteCurrency, country });
 
   useEffect(() => {
@@ -346,6 +352,22 @@ export default function StripePaymentElementBox(props: Props) {
 
   const locale = (["es", "en", "pt", "fr", "it"].includes(props.language) ? props.language : "es") as "es" | "en" | "pt" | "fr" | "it";
 
+  const currencyToggle = canChooseCurrency ? (
+    <div role="group" aria-label="Moneda" className="grid grid-cols-2 gap-2">
+      {[{ usd: false, label: `💰 ${localCode}` }, { usd: true, label: "💵 USD" }].map((o) => (
+        <button
+          key={o.label}
+          type="button"
+          onClick={() => setPayUsd(o.usd)}
+          aria-pressed={payUsd === o.usd}
+          className={`h-10 rounded-md border text-sm font-semibold transition ${payUsd === o.usd ? "border-emerald-600 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200" : "border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"}`}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  ) : null;
+
   return (
     <Elements
       key={props.method ?? "card"}
@@ -372,6 +394,7 @@ export default function StripePaymentElementBox(props: Props) {
         onHostedFallback={props.onHostedFallback}
         hostedLoading={props.hostedLoading}
         refreshing={refreshing}
+        currencyToggle={currencyToggle}
         quote={quote}
       />
     </Elements>

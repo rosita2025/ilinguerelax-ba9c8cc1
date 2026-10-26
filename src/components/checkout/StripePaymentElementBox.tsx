@@ -70,7 +70,8 @@ const Inner = ({
   onNeedBuyerInfo,
   onBeforePay,
   method = "card",
-}: Omit<Props, "currency" | "onUnavailable"> & { quote: Quote }) => {
+  onUnavailable,
+}: Omit<Props, "currency"> & { quote: Quote }) => {
   const lang = (["es", "en", "pt", "fr", "it"].includes(language) ? language : "es") as Lang;
   const t = COPY[lang];
   const stripe = useStripe();
@@ -78,6 +79,14 @@ const Inner = ({
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Si el formulario no carga (error de Stripe o sin respuesta), se vuelve al formulario anterior.
+  useEffect(() => {
+    if (ready) return;
+    const id = window.setTimeout(() => onUnavailable?.(), 15000);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
 
   const runPayment = async (source: "payment-element" | "express-checkout") => {
     if (!stripe || !elements || busy) return;
@@ -202,6 +211,7 @@ const Inner = ({
             defaultValues: { billingDetails: { email: s0.buyer.email.trim(), name: s0.buyer.fullName.trim() } },
           }}
           onReady={() => setReady(true)}
+          onLoadError={() => onUnavailable?.()}
         />
       </div>
 
@@ -311,6 +321,7 @@ export default function StripePaymentElementBox(props: Props) {
         canPay={props.canPay}
         onNeedBuyerInfo={props.onNeedBuyerInfo}
         onBeforePay={props.onBeforePay}
+        onUnavailable={props.onUnavailable}
         quote={quote}
       />
     </Elements>

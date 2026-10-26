@@ -76,12 +76,19 @@ const Inner = ({
   onUnavailable,
   onHostedFallback,
   hostedLoading,
-}: Omit<Props, "currency"> & { quote: Quote }) => {
+  refreshing,
+}: Omit<Props, "currency"> & { quote: Quote; refreshing?: boolean }) => {
   const lang = (["es", "en", "pt", "fr", "it"].includes(language) ? language : "es") as Lang;
   const t = COPY[lang];
   const stripe = useStripe();
   const elements = useElements();
   const [ready, setReady] = useState(false);
+
+  // Al agregar/quitar un upsell el formulario NO se recarga: solo se actualiza el monto.
+  useEffect(() => {
+    if (!elements) return;
+    try { elements.update({ amount: quote.amount, currency: quote.currency }); } catch { /* el siguiente cambio lo corrige */ }
+  }, [elements, quote.amount, quote.currency]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Detalle técnico (código de Stripe / de la función) para poder diagnosticar el error real.
@@ -253,7 +260,7 @@ const Inner = ({
       <button
         type="button"
         onClick={handlePay}
-        disabled={!ready || busy || !stripe}
+        disabled={!ready || busy || !stripe || refreshing}
         className="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-emerald-600 text-base font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {busy ? (
@@ -276,6 +283,7 @@ export default function StripePaymentElementBox(props: Props) {
   const coupon = useCheckoutPruebaStore((s) => s.coupon);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [failed, setFailed] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const stripePromise = useMemo(() => {
     try {
       return getStripe();
@@ -289,13 +297,15 @@ export default function StripePaymentElementBox(props: Props) {
   const signature = JSON.stringify({ items: items.map((i) => [i.id, i.quantity]), coupon, currency: quoteCurrency, country });
 
   useEffect(() => {
-    setQuote(null);
     setFailed(false);
     if (!stripePromise || items.length === 0 || country.length !== 2) return;
     let cancelled = false;
+    // El formulario anterior se queda en pantalla mientras llega el monto nuevo.
+    setRefreshing(true);
     (async () => {
       const q = await fetchStripeQuote({ items, currency: quoteCurrency, country, couponCode: coupon });
       if (cancelled) return;
+      setRefreshing(false);
       if (!q) {
         setFailed(true);
         return;
@@ -327,7 +337,7 @@ export default function StripePaymentElementBox(props: Props) {
 
   return (
     <Elements
-      key={`${quote.amount}-${quote.currency}-${props.method ?? "card"}`}
+      key={props.method ?? "card"}
       stripe={stripePromise}
       options={{
         mode: "payment",
@@ -350,6 +360,7 @@ export default function StripePaymentElementBox(props: Props) {
         onUnavailable={props.onUnavailable}
         onHostedFallback={props.onHostedFallback}
         hostedLoading={props.hostedLoading}
+        refreshing={refreshing}
         quote={quote}
       />
     </Elements>

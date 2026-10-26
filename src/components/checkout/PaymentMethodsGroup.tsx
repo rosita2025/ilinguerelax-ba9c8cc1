@@ -1355,7 +1355,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   }, [stripeError, retryStripe]);
 
   useEffect(() => {
-    if (peActive && selected !== "card") return; // el formulario nuevo no usa el iframe de Embedded Checkout
+    if (peActive) return; // el formulario nuevo no usa el iframe de Embedded Checkout
     if (!(showStripe && selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(selected))) return;
     setStripeFrameMounted(false);
     setStripeElapsed(0);
@@ -2191,9 +2191,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       }
       const isStripeSel = selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(selected);
       // En Perú el formulario lo abre el efecto de abajo (con el aviso de upsell).
-      if (!isPeru && isStripeSel && valid && stripePromise && !showStripe) setShowStripe(true);
+      if (!isPeru && isStripeSel && stripePromise && !showStripe) setShowStripe(true);
     }
-  }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
+  }, [isPeru, stripeMethodAvailable, selected, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
 
   // Perú: al elegir tarjeta, el formulario de Stripe se abre solo, sin tener que pulsar
   // ningún botón (fuera de Perú esto ya ocurre arriba). Se conserva el aviso
@@ -2412,7 +2412,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         const isPrimaryCard = m.id === "card" && m.title === primaryCardTitle;
         // For USA extra rows (Cash App, US Bank) — highlight only the clicked one.
         const rowKey = `${m.id}-${m.title}`;
-        const isSelected = valid && selected === m.id && (!isStripeRow || selectedCardRow === rowKey);
+        const isSelected = (valid || (isStripeRow && !isPeru)) && selected === m.id && (!isStripeRow || selectedCardRow === rowKey);
         const isLoading = mpLoading === m.id;
         const Icon = m.icon;
         const section = methodSection(m.id);
@@ -2434,7 +2434,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             data-method-row={m.id}
             className={cn(
               "rounded-xl border-2 overflow-hidden transition-all scroll-mt-24",
-              !valid && "opacity-60",
+              !valid && !(isStripeRow && !isPeru) && "opacity-60",
               isSelected
                 ? "border-primary bg-primary/5 shadow-sm"
                 : "border-neutral-200 bg-background hover:border-primary/40 dark:border-neutral-700",
@@ -2587,7 +2587,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
 
-            {isStripeRow && valid && m.id !== "card" && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && peActive && (
+            {isStripeRow && peActive && !!stripePromise && (
+              ((valid || !isPeru) && selected === m.id && selectedCardRow === rowKey && showStripe) ||
+              // Perú: el formulario de tarjeta se ve desde el inicio (mientras no elija otro método),
+              // sin esperar a que llene nombre y correo; el aviso de upsell sigue saliendo al elegir tarjeta.
+              (isPeru && m.id === "card" && isPrimaryCard && (selected === null || selected === "card"))
+            ) && (
               <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-3 sm:p-4 scroll-mt-24">
                 <React.Suspense fallback={null}>
                   <StripePaymentElementBox
@@ -2606,7 +2611,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               </div>
             )}
 
-            {isStripeRow && valid && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && (!peActive || m.id === "card") && (
+            {isStripeRow && (valid || !isPeru) && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && !peActive && (
               <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 scroll-mt-24">
                 <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
                   {isFallingBackToUsd && (

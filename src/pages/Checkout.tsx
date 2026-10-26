@@ -785,22 +785,22 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
                 <div className="grid grid-cols-3 gap-2 pt-1">
                   {(() => {
                     const L = TRUST_COPY[language as keyof typeof TRUST_COPY] ?? TRUST_COPY.es;
-                    const cell = "flex flex-col items-center gap-0.5 rounded-xl border border-emerald-200/70 bg-emerald-50/60 px-1.5 py-2 text-center dark:border-emerald-900/50 dark:bg-emerald-950/20";
+                    const cell = "flex flex-col items-center gap-0.5 rounded-xl border px-1.5 py-2.5 text-center";
                     return (
                       <>
-                        <div className={cell}>
-                          <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                          <span className="text-xs font-bold leading-tight text-foreground">{L.secureTitle}</span>
+                        <div className={cn(cell, "border-sky-200 bg-sky-50 dark:border-sky-900/50 dark:bg-sky-950/20")}>
+                          <span className="text-xl leading-none" aria-hidden="true">🔒</span>
+                          <span className="text-xs font-bold leading-tight text-sky-900 dark:text-sky-100">{L.secureTitle}</span>
                           <span className="text-[11px] leading-tight text-muted-foreground">{L.secureSub}</span>
                         </div>
-                        <div className={cell}>
-                          <BadgeCheck className="w-4 h-4 text-emerald-600" />
-                          <span className="text-xs font-bold leading-tight text-foreground">{L.guaranteeTitle}</span>
+                        <div className={cn(cell, "border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20")}>
+                          <span className="text-xl leading-none" aria-hidden="true">✅</span>
+                          <span className="text-xs font-bold leading-tight text-amber-900 dark:text-amber-100">{L.guaranteeTitle}</span>
                           <span className="text-[11px] leading-tight text-muted-foreground">{L.guaranteeSub}</span>
                         </div>
-                        <a href={buildSupportUrl({ language, country: (region.country || "").toUpperCase(), reason: "question" })} target="_blank" rel="noopener noreferrer" className={cn(cell, "hover:border-emerald-400")}>
-                          <MessageCircle className="w-4 h-4 text-emerald-600" />
-                          <span className="text-xs font-bold leading-tight text-foreground">{L.supportTitle}</span>
+                        <a href={buildSupportUrl({ language, country: (region.country || "").toUpperCase(), reason: "question" })} target="_blank" rel="noopener noreferrer" className={cn(cell, "border-violet-200 bg-violet-50 hover:border-violet-400 dark:border-violet-900/50 dark:bg-violet-950/20")}>
+                          <span className="text-xl leading-none" aria-hidden="true">💬</span>
+                          <span className="text-xs font-bold leading-tight text-violet-900 dark:text-violet-100">{L.supportTitle}</span>
                           <span className="text-[11px] leading-tight text-muted-foreground">{L.supportSub}</span>
                         </a>
                       </>

@@ -220,7 +220,7 @@ const CHECKOUT_METHODS: CheckoutMethodDef[] = [
   { key: "stripe_naver_pay", label: "Naver Pay", note: "Corea del Sur", icon: "Smartphone", countryCodes: ["KR"] },
   { key: "stripe_payco", label: "PAYCO", note: "Corea del Sur", icon: "Smartphone", countryCodes: ["KR"] },
   { key: "stripe_samsung_pay", label: "Samsung Pay", note: "Corea del Sur", icon: "Smartphone", countryCodes: ["KR"] },
-  { key: "paypal", label: "PayPal", note: "Botón separado de PayPal", icon: "Wallet", regions: ["PE", "US", "GLOBAL"] },
+  { key: "paypal", label: "PayPal", note: "PayPal directo (el cliente aprueba en paypal.com y vuelve)", icon: "Wallet", regions: ["PE", "US", "GLOBAL"] },
   { key: "mercadopago_transfer", label: "Mercado Pago — transferencia", note: "Banco / transferencia por Mercado Pago", icon: "Building2", regions: ["PE"] },
   { key: "mercadopago_cash", label: "Mercado Pago — efectivo", note: "PagoEfectivo / agentes disponibles", icon: "Banknote", regions: ["PE"] },
   { key: "yape_plin", label: "Yape / Plin", note: "Pago móvil manual Perú", icon: "Smartphone", regions: ["PE"] },

@@ -55,7 +55,7 @@ import { loadCheckoutProduct } from "@/lib/checkoutProductCache";
 import type { UpsellItem } from "@/config/checkoutCatalog";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "stripe_bizum" | "stripe_satispay" | "stripe_ideal" | "stripe_mbway" | "stripe_crypto" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "stripe_bizum" | "stripe_satispay" | "stripe_ideal" | "stripe_mbway" | "stripe_crypto" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "paypal" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
 
 const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
@@ -177,7 +177,7 @@ function methodSection(id: string): MethodSection {
   if (["card", "dlocal_card", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto", "stripe_klarna"].includes(id)) return "cards";
   if (["transfer", "stripe_ach", "dlocal_transfer", "clabe"].includes(id)) return "transfer";
   if (["cash", "dlocal_cash"].includes(id)) return "cash";
-  if (["yape", "binance", "dlocal_wallet", "stripe_cashapp", "stripe_crypto"].includes(id)) return "wallet";
+  if (["yape", "binance", "paypal", "dlocal_wallet", "stripe_cashapp", "stripe_crypto"].includes(id)) return "wallet";
   return "other";
 }
 
@@ -247,6 +247,7 @@ const methodTone = (id: string): string => {
   if (id === "transfer" || id === "dlocal_transfer" || id === "clabe") return "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300";
   if (id === "cash" || id === "dlocal_cash") return "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300";
   if (id === "yape" || id === "dlocal_wallet" || id === "dlocal_card") return "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300";
+  if (id === "paypal") return "bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300";
   if (id === "binance") return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300";
   return "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400";
 };
@@ -909,6 +910,48 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
   // dLocal Go — pagos locales de LatAm (OXXO/SPEI, PSE/Nequi, Pix, tarjetas).
   // Cobra en la moneda local del país cuando dLocal la soporta; si no, USD.
+  // PayPal directo: el servidor crea la orden (precio calculado allí) y el cliente aprueba el pago en paypal.com.
+  const payPaypal = async () => {
+    if (!valid) { requestBuyerInfo(); return; }
+    if (redirectingRef.current) return;
+    const s = useCheckoutPruebaStore.getState();
+    const ctry = (region.country || localStorage.getItem("ilr_country") || "US").toUpperCase().slice(0, 2);
+    redirectingRef.current = true;
+    setMpLoading("paypal");
+    try {
+      void captureAbandonedCheckout("paypal", true);
+      try { sessionStorage.setItem("ilr_paypal_pending", JSON.stringify({ email: s.buyer.email.trim(), at: Date.now() })); } catch { /* sin almacenamiento */ }
+      const { data, error } = await invokeWithRetry<{ approveUrl?: string; orderId?: string }>("paypal-create-order", {
+        body: {
+          items: s.items.map((i) => ({ id: i.id, quantity: i.quantity })),
+          couponCode: s.coupon ?? undefined,
+          country: ctry,
+          currency: String(currency || "USD"),
+          payerEmail: s.buyer.email.trim(),
+          payerName: s.buyer.fullName.trim(),
+          payerPhone: (s.buyer.phone ?? "").trim() || undefined,
+          returnUrl: `${window.location.origin}/checkouts/return?provider=paypal`,
+          cancelUrl: window.location.href,
+        },
+      }, { attempts: 2, baseDelayMs: 500 });
+      if (error || !data?.approveUrl) {
+        const detail = await extractEdgeErrorMessage(error);
+        throw new Error(detail || t.errorPayment);
+      }
+      window.location.assign(data.approveUrl);
+    } catch (err) {
+      redirectingRef.current = false;
+      setMpLoading(null);
+      const rawReason = err instanceof Error ? err.message : String(err);
+      try {
+        trackPaymentError({ provider: "paypal", skus: s.items.map((i) => i.id), reason: rawReason, value: 0, currency: "USD" });
+      } catch { /* noop */ }
+      const friendly = looksTechnical(rawReason) ? t.errorPayment : rawReason;
+      setMethodError({ method: "paypal", message: friendly });
+      toast({ title: t.errorPayment, description: friendly, variant: "destructive" });
+    }
+  };
+
   const payDlocal = async (kind: "transfer" | "cash" | "wallet") => {
     const dlMethod: Method = kind === "cash" ? "dlocal_cash" : kind === "wallet" ? "dlocal_wallet" : "dlocal_transfer";
     if (!valid) { requestBuyerInfo(); return; }
@@ -1259,6 +1302,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         }, 100);
         return; 
       }
+      if (selected === "paypal") { await payPaypal(); return; }
       if (selected === "dlocal_transfer") { await payDlocal("transfer"); return; }
       if (selected === "dlocal_cash") { await payDlocal("cash"); return; }
       if (selected === "dlocal_wallet") { await payDlocal("wallet"); return; }
@@ -2059,6 +2103,18 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       ],
     },
     {
+      id: "paypal",
+      icon: Wallet,
+      title: "PayPal",
+      sub: language === "en" ? "Pay with your PayPal account or card · secure"
+        : language === "pt" ? "Pague com sua conta PayPal ou cartão · seguro"
+        : language === "fr" ? "Payez avec votre compte PayPal ou carte · sécurisé"
+        : language === "it" ? "Paga con il tuo conto PayPal o carta · sicuro"
+        : "Paga con tu cuenta PayPal o tarjeta · seguro",
+      badge: finalPriceLabel,
+      badges: [{ label: "PayPal", bg: "#003087", color: "#ffffff" }],
+    },
+    {
       id: "hotmart_separator",
       title: language === "en" ? "OR PAY VIA ANOTHER PLATFORM"
         : language === "pt" ? "OU PAGUE POR OUTRA PLATAFORMA"
@@ -2130,6 +2186,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         if (m.id === "yape") return methodsConfig.yape && isPeru;
         if (m.id === "binance") return methodsConfig.binance && (country === "PE" || !LATAM_COUNTRIES.has(country)) && country !== "ES"; // sin Binance en Latinoamérica (Perú lo conserva)
         if (m.id === "clabe") return country === "MX";
+        if (m.id === "paypal") return methodsConfig.paypal; // PayPal directo: se activa por región en /admin/checkout-methods
 
         // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.
         if (m.id === "dlocal_transfer") return methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer") && !getDlocalCountry(country)?.transferComingSoon;

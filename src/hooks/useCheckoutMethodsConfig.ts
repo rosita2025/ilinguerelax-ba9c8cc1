@@ -185,10 +185,10 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
         return;
       }
       const enabledFamilies = { ...DEFAULT_ALL_OFF, stripe: true };
-      const familyMinOrder: Record<FamilyKey, number> = { stripe: -1, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, stripeBizum: Infinity, stripeSatispay: Infinity, stripeIdeal: Infinity, stripeMbway: Infinity, stripeCrypto: Infinity, paypal: 0, transfer: Infinity, cash: Infinity, yape: Infinity, binance: Infinity, clabe: Infinity, hotmart: Infinity, dlocalTransfer: Infinity, dlocalCash: Infinity, dlocalWallet: Infinity, dlocalCard: Infinity };
+      const familyMinOrder: Record<FamilyKey, number> = { stripe: -1, stripeAch: Infinity, stripeCashApp: Infinity, stripeKlarna: Infinity, stripeBizum: Infinity, stripeSatispay: Infinity, stripeIdeal: Infinity, stripeMbway: Infinity, stripeCrypto: Infinity, paypal: Infinity, transfer: Infinity, cash: Infinity, yape: Infinity, binance: Infinity, clabe: Infinity, hotmart: Infinity, dlocalTransfer: Infinity, dlocalCash: Infinity, dlocalWallet: Infinity, dlocalCard: Infinity };
 
-      const enabledMethodKeys: string[] = ["stripe_card", "paypal"];
-      enabledFamilies.paypal = true;
+      // PayPal directo solo aparece si el admin lo activa para la región (antes estaba siempre "encendido" sin fila en el checkout).
+      const enabledMethodKeys: string[] = ["stripe_card"];
       let configuredMethods = 0;
       for (const m of methods) {
         if (m.region_code !== region.code) continue;

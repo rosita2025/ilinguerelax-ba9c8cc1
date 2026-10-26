@@ -234,7 +234,7 @@ const Inner = ({
       {currencyToggle}
       {(!method || method === "card") && (
         <div role="tablist" aria-label="Método de pago" className="grid grid-cols-2 gap-2">
-          {([["card", { es: "Crédito o débito", en: "Credit or debit", pt: "Crédito ou débito", fr: "Crédit ou débit", it: "Credito o debito" }[lang]], ["link", "Link"]] as const).map(([id, label]) => (
+          {([["card", { es: "Tarjeta", en: "Card", pt: "Cartão", fr: "Carte", it: "Carta" }[lang]], ["link", "Link"]] as const).map(([id, label]) => (
             <button
               key={id}
               type="button"

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { Elements, LinkAuthenticationElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { Loader2, Lock } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
+import { isBuyerValid } from "@/components/checkout/BuyerInfoForm";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { fetchStripeQuote } from "@/lib/stripeQuote";
@@ -69,7 +70,8 @@ const Inner = ({
   onNeedBuyerInfo,
   onBeforePay,
   method = "card",
-}: Omit<Props, "currency" | "onUnavailable"> & { quote: Quote }) => {
+  onUnavailable,
+}: Omit<Props, "currency"> & { quote: Quote }) => {
   const lang = (["es", "en", "pt", "fr", "it"].includes(language) ? language : "es") as Lang;
   const t = COPY[lang];
   const stripe = useStripe();
@@ -77,6 +79,14 @@ const Inner = ({
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Si el formulario no carga (error de Stripe o sin respuesta), se vuelve al formulario anterior.
+  useEffect(() => {
+    if (ready) return;
+    const id = window.setTimeout(() => onUnavailable?.(), 15000);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
 
   const runPayment = async (source: "payment-element" | "express-checkout") => {
     if (!stripe || !elements || busy) return;
@@ -147,8 +157,42 @@ const Inner = ({
   const handlePay = () => runPayment("payment-element");
 
   const s0 = useCheckoutPruebaStore.getState();
+  const buyer = useCheckoutPruebaStore((st) => st.buyer);
+  const setBuyer = useCheckoutPruebaStore((st) => st.setBuyer);
+  // Una vez mostrados, los campos se quedan aunque ya sean válidos (no se pierde el foco al escribir).
+  const [needsContact] = useState(() => !isBuyerValid(useCheckoutPruebaStore.getState().buyer));
+  const inputCls = "h-11 w-full rounded-md border border-neutral-300 bg-white px-3 text-base text-neutral-900 outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100";
+  const contactLabels = {
+    es: ["Nombre completo", "Correo electrónico"],
+    en: ["Full name", "Email"],
+    pt: ["Nome completo", "E-mail"],
+    fr: ["Nom complet", "E-mail"],
+    it: ["Nome completo", "E-mail"],
+  }[lang];
+
   return (
     <div className="space-y-3">
+      {needsContact && (
+        <div className="grid gap-2">
+          <input
+            type="text"
+            autoComplete="name"
+            placeholder={contactLabels[0]}
+            aria-label={contactLabels[0]}
+            value={buyer.fullName}
+            onChange={(e) => setBuyer({ fullName: e.target.value })}
+            className={inputCls}
+          />
+          {/* Link de Stripe: con el correo, ofrece autocompletar la tarjeta guardada del cliente. */}
+          <LinkAuthenticationElement
+            options={{ defaultValues: { email: buyer.email } }}
+            onChange={(e) => {
+              const v = e.value?.email;
+              if (typeof v === "string" && v !== buyer.email) setBuyer({ email: v });
+            }}
+          />
+        </div>
+      )}
       {!ready && (
         <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" /> {t.loading}
@@ -165,6 +209,7 @@ const Inner = ({
             defaultValues: { billingDetails: { email: s0.buyer.email.trim(), name: s0.buyer.fullName.trim() } },
           }}
           onReady={() => setReady(true)}
+          onLoadError={() => onUnavailable?.()}
         />
       </div>
 
@@ -274,6 +319,7 @@ export default function StripePaymentElementBox(props: Props) {
         canPay={props.canPay}
         onNeedBuyerInfo={props.onNeedBuyerInfo}
         onBeforePay={props.onBeforePay}
+        onUnavailable={props.onUnavailable}
         quote={quote}
       />
     </Elements>

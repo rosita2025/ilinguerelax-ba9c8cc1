@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Elements, LinkAuthenticationElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { Elements, ExpressCheckoutElement, LinkAuthenticationElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { Loader2, Lock } from "lucide-react";
+import type { StripeExpressCheckoutElementConfirmEvent } from "@stripe/stripe-js";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { isBuyerValid } from "@/components/checkout/BuyerInfoForm";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
@@ -94,6 +95,8 @@ const Inner = ({
   const [error, setError] = useState<string | null>(null);
   // Detalle técnico (código de Stripe / de la función) para poder diagnosticar el error real.
   const [detail, setDetail] = useState<string | null>(null);
+  const [tab, setTab] = useState<"card" | "link">("card");
+  const [linkOk, setLinkOk] = useState<boolean | null>(null);
 
   // Si el formulario no carga (error de Stripe o sin respuesta), se vuelve al formulario anterior.
   useEffect(() => {
@@ -103,9 +106,9 @@ const Inner = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
 
-  const runPayment = async (source: "payment-element" | "express-checkout") => {
+  const runPayment = async (source: "payment-element" | "express-checkout", linkEvent?: StripeExpressCheckoutElementConfirmEvent) => {
     if (!stripe || !elements || busy) return;
-    if (!canPay) {
+    if (source === "payment-element" && !canPay) {
       onNeedBuyerInfo();
       return;
     }
@@ -119,8 +122,12 @@ const Inner = ({
       }
 
       const s = useCheckoutPruebaStore.getState();
-      const email = s.buyer.email.trim();
-      const name = s.buyer.fullName.trim();
+      const email = (linkEvent?.billingDetails?.email || s.buyer.email).trim();
+      const name = (linkEvent?.billingDetails?.name || s.buyer.fullName).trim();
+      if (!email) {
+        setError(t.error);
+        return;
+      }
       onBeforePay?.();
 
       const { data, error: fnError } = await invokeWithRetry<{ clientSecret?: string; paymentIntentId?: string }>(
@@ -156,9 +163,9 @@ const Inner = ({
         clientSecret: data.clientSecret,
         confirmParams: {
           return_url: `${window.location.origin}/checkouts/return?session_id=${encodeURIComponent(data.paymentIntentId)}`,
-          payment_method_data: {
-            billing_details: { name: name || undefined, email, phone: (s.buyer.phone ?? "").trim() || undefined },
-          },
+          ...(source === "payment-element"
+            ? { payment_method_data: { billing_details: { name: name || undefined, email, phone: (s.buyer.phone ?? "").trim() || undefined } } }
+            : {}),
         },
       });
 
@@ -225,7 +232,41 @@ const Inner = ({
         </div>
       )}
       {currencyToggle}
-      <div className={ready ? "" : "h-0 overflow-hidden opacity-0"}>
+      {(!method || method === "card") && (
+        <div role="tablist" aria-label="Método de pago" className="grid grid-cols-2 gap-2">
+          {([["card", { es: "Tarjeta", en: "Card", pt: "Cartão", fr: "Carte", it: "Carta" }[lang]], ["link", "Link"]] as const).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={tab === id}
+              onClick={() => setTab(id)}
+              className={`h-11 rounded-md border text-sm font-semibold transition ${tab === id ? "border-emerald-600 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200" : "border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+      {tab === "link" && (!method || method === "card") && (
+        <div className="space-y-2">
+          <ExpressCheckoutElement
+            options={{
+              buttonHeight: 48,
+              emailRequired: true,
+              paymentMethods: { link: "auto", applePay: "never", googlePay: "never", amazonPay: "never", paypal: "never" },
+            }}
+            onReady={(e) => setLinkOk(!!e.availablePaymentMethods?.link)}
+            onConfirm={(e) => { void runPayment("express-checkout", e); }}
+          />
+          {linkOk === false && (
+            <p className="text-sm text-muted-foreground">
+              {{ es: "Link no está disponible para este pago. Elige Tarjeta.", en: "Link isn't available for this payment. Choose Card.", pt: "O Link não está disponível para este pagamento. Escolha Cartão.", fr: "Link n'est pas disponible pour ce paiement. Choisissez Carte.", it: "Link non è disponibile per questo pagamento. Scegli Carta." }[lang]}
+            </p>
+          )}
+        </div>
+      )}
+      <div className={tab === "link" && (!method || method === "card") ? "hidden" : ready ? "" : "h-0 overflow-hidden opacity-0"}>
         <PaymentElement
           options={{
             layout: { type: "tabs", defaultCollapsed: false },
@@ -264,6 +305,7 @@ const Inner = ({
       <button
         type="button"
         onClick={handlePay}
+        hidden={tab === "link" && (!method || method === "card")}
         disabled={!ready || busy || !stripe || refreshing}
         className="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-emerald-600 text-base font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
       >

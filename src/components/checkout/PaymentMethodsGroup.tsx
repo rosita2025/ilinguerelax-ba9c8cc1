@@ -1751,6 +1751,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
   const isUsa = country === "US";
   const methodsConfig = useCheckoutMethodsConfig(country);
+  // La lista de métodos solo se muestra cuando ya se conoce el país Y la configuración de ese país (evita que salga primero Tarjeta + Hotmart y luego cambie).
+  const methodsReady = methodsConfig.loaded && !region.loading;
   const binanceCfg = useBinancePayConfig(methodsConfig.regionCode);
 
   // Hotmart 1-clic: resuelve URL y precio local por país
@@ -2103,7 +2105,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // del mundo cae en la región GLOBAL. Si el admin desactiva un método, aquí
   // deja de aparecer. Antes de cargar la config no mostramos opciones para
   // evitar que aparezcan fugazmente todos los métodos legacy.
-  const filteredByAdmin = methodsConfig.loaded
+  const filteredByAdmin = methodsReady
     ? allMethods.filter((m) => {
         if (m.id === "card") {
           if (m.methodKey) return enabledStripeKeys.has(m.methodKey);
@@ -2166,7 +2168,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // Si el admin configuró explícitamente la región (methodsConfig.loaded con
   // regionCode), respetamos exactamente lo que habilitó, sin forzar el filtro
   // legacy card+paypal fuera de Perú. Perú siempre oculta paypal directo.
-  const visibleMethods = orderedByAdmin.length > 0 ? orderedByAdmin : allMethods.filter(m => m.id === 'card' || m.id === 'hotmart');
+  // Mientras carga la configuración no se muestra ningún método (antes aparecían un instante solo Tarjeta y Hotmart y
+  // luego cambiaba la lista entera): se muestra un esqueleto y la lista sale ya completa y en su orden.
+  const visibleMethods = orderedByAdmin.length > 0
+    ? orderedByAdmin
+    : methodsReady
+      ? allMethods.filter(m => m.id === 'card' || m.id === 'hotmart')
+      : [];
   // Orden de secciones para que el checkout se lea de arriba a abajo sin saltos:
   // tarjetas → transferencias → efectivo → billeteras → otros (Hotmart al final).
   const methods = [...visibleMethods].sort(
@@ -2406,6 +2414,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
 
+      {!isFree && !isInvalidZero && !methodsReady && (
+        <div className="space-y-2" aria-hidden="true">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="h-[58px] animate-pulse rounded-xl border-2 border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900" />
+          ))}
+        </div>
+      )}
       {!isFree && !isInvalidZero && methods.map((m, idx) => {
         const primaryCardTitle = isPeru ? t.cardTitlePeru : t.cardTitleGlobal;
         const isStripeRow = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(m.id);

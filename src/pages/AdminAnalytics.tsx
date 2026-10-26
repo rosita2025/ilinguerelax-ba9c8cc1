@@ -723,27 +723,38 @@ const AdminAnalytics = () => {
               <Card className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="font-semibold">Embudo de conversión</h2>
-                  <span className="text-xs text-muted-foreground">Conversión global {data.conversion.globalPct}%</span>
+                  {(() => {
+                    const t = rateTone(data.conversion.globalPct, 2.5, 1);
+                    return (
+                      <span className="flex items-center gap-2 text-xs text-muted-foreground">
+                        Conversión global
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${t.cls}`}>{data.conversion.globalPct}% · {t.label}</span>
+                      </span>
+                    );
+                  })()}
                 </div>
                 <div className="space-y-2">
                   {(() => {
                     const steps = [
-                      { label: "Sesiones", value: data.totals.sessions },
-                      { label: "Agregaron al carrito", value: data.totals.addToCart },
-                      { label: "Llegaron al checkout", value: data.totals.checkout },
-                      { label: "Compraron", value: data.totals.purchases },
+                      { label: "Sesiones", value: data.totals.sessions, good: 0, ok: 0 },
+                      { label: "Agregaron al carrito", value: data.totals.addToCart, good: 8, ok: 4 },
+                      { label: "Llegaron al checkout", value: data.totals.checkout, good: 60, ok: 35 },
+                      { label: "Compraron", value: data.totals.purchases, good: 25, ok: 15 },
                     ];
                     const top = Math.max(1, steps[0].value);
                     return steps.map((st, i) => {
                       const prev = i === 0 ? null : steps[i - 1].value;
                       const stepPct = prev ? Math.round((st.value / prev) * 1000) / 10 : null;
+                      const tone = stepPct !== null ? rateTone(stepPct, st.good, st.ok) : null;
                       return (
                         <div key={st.label}>
                           <div className="flex items-baseline justify-between text-sm">
                             <span className="font-medium">{st.label}</span>
                             <span className="tabular-nums">
                               {st.value.toLocaleString()}
-                              {stepPct !== null && <span className="ml-2 text-xs text-muted-foreground">{stepPct}% del paso anterior</span>}
+                              {stepPct !== null && tone && (
+                                <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-bold ${tone.cls}`}>{stepPct}% · {tone.label}</span>
+                              )}
                             </span>
                           </div>
                           <div className="mt-1 h-2.5 w-full rounded-full bg-muted">
@@ -755,7 +766,8 @@ const AdminAnalytics = () => {
                   })()}
                 </div>
                 <p className="mt-3 text-[11px] text-muted-foreground">
-                  Checkout → Compra: <strong>{data.conversion.checkoutToPurchasePct}%</strong> ({data.totals.purchases} de {data.totals.checkout}). Los precios no se modifican; solo se leen los datos.
+                  Checkout → Compra: <strong>{data.conversion.checkoutToPurchasePct}%</strong> ({data.totals.purchases} de {data.totals.checkout}).{" "}
+                  Colores de referencia: <span className="font-semibold text-emerald-700">verde</span> saludable, <span className="font-semibold text-amber-600">amarillo</span> por mejorar, <span className="font-semibold text-red-600">rojo</span> mal. Umbrales: carrito 8% / 4%, checkout 60% / 35%, compra 25% / 15%, global 2,5% / 1%. Son valores generales, ajústalos a tu negocio.
                 </p>
               </Card>
 
@@ -1344,6 +1356,14 @@ const AdminAnalytics = () => {
     </>
   );
 };
+
+// Semáforo de una tasa: verde (>= bueno), amarillo (>= aceptable), rojo (por debajo).
+const rateTone = (pct: number, good: number, ok: number) =>
+  pct >= good
+    ? { label: "saludable", cls: "bg-emerald-100 text-emerald-800" }
+    : pct >= ok
+      ? { label: "por mejorar", cls: "bg-amber-100 text-amber-800" }
+      : { label: "mal", cls: "bg-red-100 text-red-800" };
 
 function Kpi({
   icon,

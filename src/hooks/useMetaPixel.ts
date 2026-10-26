@@ -230,6 +230,12 @@ const getAttributionReferrer = (): string | null => {
       localStorage.setItem(FUNNEL_REF_KEY, ref);
       return ref;
     }
+    // Clic desde un anuncio de Meta sin UTM: Meta añade fbclid al enlace; también cuenta como Meta (y reemplaza una fuente vieja).
+    if (params.get("fbclid")) {
+      const ref = "utm:facebook:fbclid";
+      localStorage.setItem(FUNNEL_REF_KEY, ref);
+      return ref;
+    }
     const saved = localStorage.getItem(FUNNEL_REF_KEY);
     if (saved) return saved;
     const referrer = document.referrer || null;

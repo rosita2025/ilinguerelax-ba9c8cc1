@@ -32,6 +32,17 @@ type TrafficSource =
 function classifyTrafficSource(referrer: string | null): TrafficSource {
   const raw = (referrer || "").trim().toLowerCase();
   if (!raw) return "directo";
+  // El pixel propio guarda las visitas con UTM como "utm:<fuente>:<campaña>" (no como URL). Antes esa forma no
+  // coincidía con ninguna regla y todo el tráfico de anuncios caía en "Referral externo".
+  if (raw.startsWith("utm:")) {
+    const src = raw.split(":")[1] || "";
+    if (/^(facebook|fb|ig|instagram|meta|messenger|threads|an|audience_network|facebook_ads|fb_ads|igshopping)$/.test(src)) return "pixel_meta";
+    if (/^(google|adwords|googleads|google_ads|gads)$/.test(src)) return "google_ads";
+    if (/^(email|newsletter|brevo|mailchimp|resend|sendinblue|sendgrid|mailgun)$/.test(src)) return "email";
+    if (/^(whatsapp|wa|telegram|tg)$/.test(src)) return "mensajeria";
+    if (/^(tiktok|youtube|yt|twitter|x|linkedin|pinterest|reddit|snapchat)$/.test(src)) return "social";
+    return "referral";
+  }
   // Meta (Facebook, Instagram, Messenger, Threads)
   if (raw.includes("fbclid=") || /(?:^|[\/.@])(facebook|instagram|fb|m\.facebook|l\.facebook|lm\.facebook|fb\.watch|messenger|threads\.net)\b/.test(raw)) {
     return "pixel_meta";

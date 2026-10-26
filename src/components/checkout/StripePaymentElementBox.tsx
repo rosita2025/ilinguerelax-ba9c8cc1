@@ -172,6 +172,8 @@ const Inner = ({
       }
     } catch (err) {
       console.error("[payment-element] unexpected error", err);
+      const ex = err as { name?: string; type?: string; code?: string; message?: string };
+      setDetail(["excepción", ex?.name, ex?.type, ex?.code, ex?.message].filter(Boolean).join(" · ").slice(0, 200));
       setError(mapStripeError(err, lang).message || t.error);
     } finally {
       setBusy(false);

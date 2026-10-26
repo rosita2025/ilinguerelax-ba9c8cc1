@@ -27,21 +27,16 @@ export function SupportWhatsApp({
   const link = (reason: SupportReason) => buildSupportUrl({ language, ...ctx, reason });
 
   if (variant === "error") {
-    const show: SupportReason[] = ["error", "other"];
+    // Un solo enlace discreto (sin botones de color) para no competir con el botón de pago.
     return (
-      <div className="mt-2 flex flex-col gap-2">
-        {show.map((r) => (
-          <a
-            key={r}
-            href={link(r)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white hover:bg-[#20bd5a]"
-          >
-            <MessageCircle className="h-4 w-4" /> {c.reasons[r]}
-          </a>
-        ))}
-      </div>
+      <a
+        href={link("error")}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-1 inline-flex min-h-9 items-center gap-1.5 text-sm font-medium text-[#128C7E] underline underline-offset-2"
+      >
+        <MessageCircle className="h-4 w-4" /> {c.reasons.error}
+      </a>
     );
   }
 

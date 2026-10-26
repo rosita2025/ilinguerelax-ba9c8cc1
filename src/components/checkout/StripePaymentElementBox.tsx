@@ -60,6 +60,9 @@ interface Props {
   onBeforePay?: () => void;
   /** Si no se puede cargar el formulario nuevo, el checkout vuelve al formulario anterior. */
   onUnavailable?: () => void;
+  /** Abre la página completa de Stripe (checkout.stripe.com) como alternativa si el formulario da error. */
+  onHostedFallback?: () => void;
+  hostedLoading?: boolean;
 }
 
 const Inner = ({
@@ -71,6 +74,8 @@ const Inner = ({
   onBeforePay,
   method = "card",
   onUnavailable,
+  onHostedFallback,
+  hostedLoading,
 }: Omit<Props, "currency"> & { quote: Quote }) => {
   const lang = (["es", "en", "pt", "fr", "it"].includes(language) ? language : "es") as Lang;
   const t = COPY[lang];
@@ -79,6 +84,8 @@ const Inner = ({
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Detalle técnico (código de Stripe / de la función) para poder diagnosticar el error real.
+  const [detail, setDetail] = useState<string | null>(null);
 
   // Si el formulario no carga (error de Stripe o sin respuesta), se vuelve al formulario anterior.
   useEffect(() => {
@@ -129,6 +136,9 @@ const Inner = ({
 
       if (fnError || !data?.clientSecret || !data.paymentIntentId) {
         console.error("[payment-element] create intent failed", fnError, data);
+        const fe = fnError as { edgeDetail?: string; status?: number; message?: string } | null;
+        const dd = data as { reason?: string; error?: string } | null;
+        setDetail([fe?.status, dd?.reason, dd?.error, fe?.edgeDetail || fe?.message].filter(Boolean).join(" · ").slice(0, 200) || "create-intent");
         setError(mapStripeError(fnError, lang).message || t.error);
         return;
       }
@@ -145,7 +155,13 @@ const Inner = ({
       });
 
       // Si todo sale bien, Stripe redirige solo a return_url (no llegamos aquí).
-      if (confirmError) setError(mapStripeError(confirmError, lang).message || confirmError.message || t.error);
+      if (confirmError) {
+        console.error("[payment-element] confirm failed", confirmError);
+        setDetail([confirmError.type, confirmError.code, confirmError.decline_code, confirmError.message].filter(Boolean).join(" · ").slice(0, 200));
+        const mapped = mapStripeError(confirmError, lang);
+        // Si no reconocemos el error, se muestra el mensaje real de Stripe en vez de uno genérico.
+        setError(mapped.code === "unknown" ? confirmError.message || mapped.message || t.error : mapped.message || confirmError.message || t.error);
+      }
     } catch (err) {
       console.error("[payment-element] unexpected error", err);
       setError(mapStripeError(err, lang).message || t.error);
@@ -218,7 +234,19 @@ const Inner = ({
           <p role="alert" className="text-sm text-destructive">
             {error}
           </p>
-          <SupportWhatsApp variant="error" language={lang} country={country} method={method === "card" ? "card" : method} amountLabel={formatMinor(quote.amount, quote.currency, language)} error={error} />
+          {onHostedFallback && (
+            <button
+              type="button"
+              onClick={onHostedFallback}
+              disabled={hostedLoading}
+              className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-md border border-neutral-300 bg-white text-sm font-semibold text-neutral-800 hover:bg-neutral-50 disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+            >
+              {hostedLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {{ es: "Pagar en la página segura de Stripe", en: "Pay on Stripe's secure page", pt: "Pagar na página segura da Stripe", fr: "Payer sur la page sécurisée Stripe", it: "Paga sulla pagina sicura di Stripe" }[lang]}
+            </button>
+          )}
+          {detail && <p className="mt-1 break-words text-[11px] text-muted-foreground">Ref: {detail}</p>}
+          <SupportWhatsApp variant="error" language={lang} country={country} method={method === "card" ? "card" : method} amountLabel={formatMinor(quote.amount, quote.currency, language)} error={detail ? `${error} (${detail})` : error} />
         </div>
       )}
 
@@ -320,6 +348,8 @@ export default function StripePaymentElementBox(props: Props) {
         onNeedBuyerInfo={props.onNeedBuyerInfo}
         onBeforePay={props.onBeforePay}
         onUnavailable={props.onUnavailable}
+        onHostedFallback={props.onHostedFallback}
+        hostedLoading={props.hostedLoading}
         quote={quote}
       />
     </Elements>

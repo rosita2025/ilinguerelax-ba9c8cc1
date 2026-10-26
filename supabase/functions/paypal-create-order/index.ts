@@ -115,7 +115,8 @@ Deno.serve(async (req) => {
     const approveUrl = (data?.links as { rel: string; href: string }[] | undefined)?.find((l) => l.rel === "payer-action" || l.rel === "approve")?.href;
     if (!res.ok || !data?.id || !approveUrl) {
       console.error("PayPal create order error:", res.status, JSON.stringify(data).slice(0, 800));
-      return json({ error: "No pudimos iniciar el pago con PayPal. Intenta de nuevo o elige otro método." }, 400);
+      const issue = [data?.name, data?.details?.[0]?.issue].filter(Boolean).join(":") || `http_${res.status}`;
+      return json({ error: `No pudimos iniciar el pago con PayPal. Intenta de nuevo o elige otro método. (Ref: paypal ${issue})` }, 400);
     }
 
     await logOrderEvent({
@@ -144,6 +145,7 @@ Deno.serve(async (req) => {
     return json({ orderId: orderNumber, paypalOrderId: data.id, approveUrl });
   } catch (err) {
     console.error("paypal-create-order error:", err);
-    return json({ error: "No pudimos iniciar el pago con PayPal. Intenta de nuevo en unos segundos." }, 400);
+    const detail = (err instanceof Error ? err.message : String(err)).slice(0, 120);
+    return json({ error: `No pudimos iniciar el pago con PayPal. Intenta de nuevo en unos segundos. (Ref: ${detail})` }, 400);
   }
 });

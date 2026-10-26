@@ -24,6 +24,7 @@ export default function CheckoutReturn() {
   const { language } = useI18n();
   const t = getCheckoutStrings(language);
   const isDlocal = (sp.get("provider") || "").toLowerCase() === "dlocal";
+  const isPaypal = (sp.get("provider") || "").toLowerCase() === "paypal";
   const [slow, setSlow] = useState(false);
 
   useEffect(() => {
@@ -84,9 +85,50 @@ export default function CheckoutReturn() {
     return () => { cancelled = true; };
   }, [isDlocal, sp, navigate]);
 
+  // ---- PayPal directo ----------------------------------------------------
+  // PayPal vuelve con ?provider=paypal&token=<id de la orden>. Aquí se confirma (captura) el pago en el servidor y
+  // solo entonces se muestra éxito; si el cliente cancela en PayPal no hay token aprobado y se vuelve al checkout.
+  useEffect(() => {
+    if (!isPaypal) return;
+    let cancelled = false;
+    const go = (path: string) => { if (!cancelled) navigate(path, { replace: true }); };
+    (async () => {
+      const token = sp.get("token") || "";
+      const params = new URLSearchParams();
+      params.set("provider", "paypal");
+      if (!token) {
+        params.set("status", "unknown");
+        params.set("reason", "paypal_unknown");
+        go(`/checkouts/failure?${params.toString()}`);
+        return;
+      }
+      const { data } = await invokeWithRetry<{ status?: "paid" | "pending" | "failed" | "not_found"; orderNumber?: string }>(
+        "paypal-capture-order",
+        { body: { paypalOrderId: token } },
+        { attempts: 3, baseDelayMs: 700 },
+      );
+      if (data?.orderNumber) params.set("order", data.orderNumber);
+      if (data?.status === "paid") {
+        params.set("status", "approved");
+        go(`/checkouts/success?${params.toString()}`);
+        return;
+      }
+      if (data?.status === "pending") {
+        params.set("status", "pending");
+        params.set("reason", "paypal_pending");
+        go(`/checkouts/pending?${params.toString()}`);
+        return;
+      }
+      params.set("status", "rejected");
+      params.set("reason", "paypal_failed");
+      go(`/checkouts/failure?${params.toString()}`);
+    })();
+    return () => { cancelled = true; };
+  }, [isPaypal, sp, navigate]);
+
   // ---- Stripe ------------------------------------------------------------
   useEffect(() => {
-    if (isDlocal) return;
+    if (isDlocal || isPaypal) return;
     const params = new URLSearchParams();
     if (sessionId) params.set("session_id", sessionId);
     // Stripe appends `redirect_status` after 3DS/off-session redirects:
@@ -111,7 +153,7 @@ export default function CheckoutReturn() {
     }
     params.set("status", "approved");
     navigate(`/checkouts/success?${params.toString()}`, { replace: true });
-  }, [sessionId, navigate, sp, isDlocal]);
+  }, [sessionId, navigate, sp, isDlocal, isPaypal]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">

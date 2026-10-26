@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { Elements, LinkAuthenticationElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { Loader2, Lock } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { isBuyerValid } from "@/components/checkout/BuyerInfoForm";
@@ -208,18 +208,14 @@ const Inner = ({
             className={inputCls}
           />
         )}
-        {needsContact && (
-          <input
-            type="email"
-            autoComplete="email"
-            inputMode="email"
-            placeholder={contactLabels[1]}
-            aria-label={contactLabels[1]}
-            value={buyer.email}
-            onChange={(e) => setBuyer({ email: e.target.value })}
-            className={inputCls}
-          />
-        )}
+        {/* Como el ejemplo de Stripe: correo arriba; si el cliente ya usó Link, se ofrece su tarjeta guardada. */}
+        <LinkAuthenticationElement
+          options={{ defaultValues: { email: buyer.email } }}
+          onChange={(e) => {
+            const v = e.value?.email;
+            if (typeof v === "string" && v && v !== buyer.email) setBuyer({ email: v });
+          }}
+        />
       </div>
       {!ready && (
         <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">

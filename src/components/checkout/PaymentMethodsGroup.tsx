@@ -921,7 +921,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     try {
       void captureAbandonedCheckout("paypal", true);
       try { sessionStorage.setItem("ilr_paypal_pending", JSON.stringify({ email: s.buyer.email.trim(), at: Date.now() })); } catch { /* sin almacenamiento */ }
-      const { data, error } = await invokeWithRetry<{ approveUrl?: string; orderId?: string }>("paypal-create-order", {
+      const { data, error } = await invokeWithRetry<{ approveUrl?: string; orderId?: string }>("paypal-order-create", {
         body: {
           items: s.items.map((i) => ({ id: i.id, quantity: i.quantity })),
           couponCode: s.coupon ?? undefined,
@@ -938,7 +938,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         const detail = await extractEdgeErrorMessage(error);
         const e = error as { status?: number; message?: string } | null;
         // Sin texto del servidor casi siempre es que la función aún no está desplegada o no responde: se deja la pista a la vista.
-        throw new Error(detail || `${t.errorPayment} (Ref: paypal-create-order ${[e?.status, e?.message].filter(Boolean).join(" · ") || `respuesta sin enlace de PayPal${data ? ` (campos: ${Object.keys(data).join(",") || "ninguno"})` : ""}`})`);
+        throw new Error(detail || `${t.errorPayment} (Ref: paypal-order-create ${[e?.status, e?.message].filter(Boolean).join(" · ") || `respuesta sin enlace de PayPal${data ? ` (campos: ${Object.keys(data).join(",") || "ninguno"})` : ""}`})`);
       }
       window.location.assign(data.approveUrl);
     } catch (err) {

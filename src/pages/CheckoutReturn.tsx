@@ -103,7 +103,7 @@ export default function CheckoutReturn() {
         return;
       }
       const { data } = await invokeWithRetry<{ status?: "paid" | "pending" | "failed" | "not_found"; orderNumber?: string }>(
-        "paypal-capture-order",
+        "paypal-order-capture",
         { body: { paypalOrderId: token } },
         { attempts: 3, baseDelayMs: 700 },
       );

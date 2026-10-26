@@ -144,7 +144,7 @@ Deno.serve(async (req) => {
 
     return json({ orderId: orderNumber, paypalOrderId: data.id, approveUrl });
   } catch (err) {
-    console.error("paypal-create-order error:", err);
+    console.error("paypal-order-create error:", err);
     const detail = (err instanceof Error ? err.message : String(err)).slice(0, 120);
     return json({ error: `No pudimos iniciar el pago con PayPal. Intenta de nuevo en unos segundos. (Ref: ${detail})` }, 400);
   }

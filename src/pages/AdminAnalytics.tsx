@@ -853,8 +853,8 @@ const AdminAnalytics = () => {
 
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <Kpi icon={<Percent className="w-4 h-4" />} label="Conversión global" value={`${data.conversion.globalPct}%`} sub="compra / sesión" />
-                <Kpi icon={<Percent className="w-4 h-4" />} label="Checkout → Compra" value={`${data.conversion.checkoutToPurchasePct}%`} sub={`${data.totals.purchases} de ${data.totals.checkout}`} />
+                <Kpi icon={<Percent className="w-4 h-4" />} label="Conversión global" value={`${data.conversion.globalPct}%`} sub={`Compras ÷ visitas × 100 = ${data.totals.purchases} ÷ ${data.totals.sessions}`} tone={rateTone(data.conversion.globalPct, 2.5, 1)} />
+                <Kpi icon={<Percent className="w-4 h-4" />} label="Checkout → Compra" value={`${data.conversion.checkoutToPurchasePct}%`} sub={`Compras ÷ checkouts × 100 = ${data.totals.purchases} ÷ ${data.totals.checkout}`} tone={rateTone(data.conversion.checkoutToPurchasePct, 40, 20)} />
                 <Kpi icon={<PackageX className="w-4 h-4" />} label="Checkouts iniciados sin compra" value={`${Math.max(0, data.totals.checkout - data.totals.purchases)}`} sub={`${data.conversion.abandonedCheckoutPct}% de abandono · incluye visitas sin correo`} />
                 <Kpi icon={<PackageX className="w-4 h-4" />} label="Carritos con correo (identificados)" value={(data.abandoned.open || Math.max(0, data.abandoned.total - data.abandoned.recovered)).toLocaleString()} sub={`sin recuperar · ${data.abandoned.total} en total: ${data.abandoned.newCustomers} nuevos · ${data.abandoned.returningCustomers} recurrentes · ${data.abandoned.recovered} recuperados`} />
               </div>
@@ -1360,10 +1360,10 @@ const AdminAnalytics = () => {
 // Semáforo de una tasa: verde (>= bueno), amarillo (>= aceptable), rojo (por debajo).
 const rateTone = (pct: number, good: number, ok: number) =>
   pct >= good
-    ? { label: "saludable", cls: "bg-emerald-100 text-emerald-800" }
+    ? { label: "saludable", cls: "bg-emerald-100 text-emerald-800 border-emerald-300" }
     : pct >= ok
-      ? { label: "por mejorar", cls: "bg-amber-100 text-amber-800" }
-      : { label: "mal", cls: "bg-red-100 text-red-800" };
+      ? { label: "por mejorar", cls: "bg-amber-100 text-amber-800 border-amber-300" }
+      : { label: "mal", cls: "bg-red-100 text-red-800 border-red-300" };
 
 function Kpi({
   icon,
@@ -1371,21 +1371,27 @@ function Kpi({
   value,
   sub,
   highlight,
+  tone,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
   sub?: string;
   highlight?: boolean;
+  /** Semáforo opcional: pinta la tarjeta de verde, amarillo o rojo según la tasa. */
+  tone?: { label: string; cls: string };
 }) {
   return (
-    <Card className={cn("p-4", highlight && "bg-primary/5 border-primary/30")}>
+    <Card className={cn("p-4", highlight && "bg-primary/5 border-primary/30", tone && tone.cls)}>
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         {icon}
         {label}
       </div>
-      <div className="mt-1 text-2xl font-bold tabular-nums">{value}</div>
-      {sub && <div className="text-xs text-muted-foreground mt-0.5">{sub}</div>}
+      <div className="mt-1 text-2xl font-bold tabular-nums">
+        {value}
+        {tone && <span className="ml-2 align-middle text-xs font-bold uppercase">{tone.label}</span>}
+      </div>
+      {sub && <div className={cn("text-xs mt-0.5", tone ? "opacity-80" : "text-muted-foreground")}>{sub}</div>}
     </Card>
   );
 }

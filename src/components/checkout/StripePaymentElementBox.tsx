@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Elements, LinkAuthenticationElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { Loader2, Lock } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { isBuyerValid } from "@/components/checkout/BuyerInfoForm";
@@ -208,14 +208,18 @@ const Inner = ({
             className={inputCls}
           />
         )}
-        {/* Link de Stripe: con el correo, reconoce al cliente y le ofrece pagar con su tarjeta guardada, sin escribirla. */}
-        <LinkAuthenticationElement
-          options={{ defaultValues: { email: buyer.email } }}
-          onChange={(e) => {
-            const v = e.value?.email;
-            if (typeof v === "string" && v && v !== buyer.email) setBuyer({ email: v });
-          }}
-        />
+        {needsContact && (
+          <input
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            placeholder={contactLabels[1]}
+            aria-label={contactLabels[1]}
+            value={buyer.email}
+            onChange={(e) => setBuyer({ email: e.target.value })}
+            className={inputCls}
+          />
+        )}
       </div>
       {!ready && (
         <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
@@ -227,8 +231,8 @@ const Inner = ({
         <PaymentElement
           options={{
             layout: { type: "tabs", defaultCollapsed: false },
-            // Pestañas "Tarjeta | Google Pay | Apple Pay" dentro del formulario (según el dispositivo del cliente).
-            wallets: { applePay: "auto", googlePay: "auto" },
+            // Solo dos opciones: Tarjeta y Link. Apple Pay / Google Pay quedan en "Pago rápido" (arriba de la página).
+            wallets: { applePay: "never", googlePay: "never" },
             // Nombre y correo ya los tenemos arriba: no se vuelven a pedir.
             fields: { billingDetails: { name: "never", email: "never", phone: method !== "card" ? "auto" : "never" } },
             defaultValues: { billingDetails: { email: s0.buyer.email.trim(), name: s0.buyer.fullName.trim() } },
@@ -341,6 +345,21 @@ export default function StripePaymentElementBox(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unavailable]);
 
+  // Precio de la otra moneda, solo para mostrarlo en el botón (no cambia lo que se cobra).
+  const [altQuote, setAltQuote] = useState<Quote | null>(null);
+  const altCurrency = payUsd ? localCode : "USD";
+  useEffect(() => {
+    if (!canChooseCurrency || !stripePromise || items.length === 0 || country.length !== 2) return;
+    let cancelled = false;
+    void fetchStripeQuote({ items, currency: altCurrency, country, couponCode: coupon }).then((q) => {
+      if (!cancelled && q) setAltQuote(q);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signature, altCurrency, canChooseCurrency]);
+
   if (unavailable) return null;
   if (!quote) {
     return (
@@ -354,17 +373,22 @@ export default function StripePaymentElementBox(props: Props) {
 
   const currencyToggle = canChooseCurrency ? (
     <div role="group" aria-label="Moneda" className="grid grid-cols-2 gap-2">
-      {[{ usd: false, label: `💰 ${localCode}` }, { usd: true, label: "💵 USD" }].map((o) => (
+      {[{ usd: false, code: localCode }, { usd: true, code: "USD" }].map((o) => {
+        const q = o.usd === payUsd ? quote : altQuote;
+        const amount = q && q.currency.toUpperCase() === o.code ? formatMinor(q.amount, q.currency, props.language) : "";
+        return (
         <button
-          key={o.label}
+          key={o.code}
           type="button"
           onClick={() => setPayUsd(o.usd)}
           aria-pressed={payUsd === o.usd}
-          className={`h-10 rounded-md border text-sm font-semibold transition ${payUsd === o.usd ? "border-emerald-600 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200" : "border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"}`}
+          className={`flex h-12 flex-col items-center justify-center rounded-md border text-sm font-semibold leading-tight transition ${payUsd === o.usd ? "border-emerald-600 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200" : "border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"}`}
         >
-          {o.label}
+          <span>{amount || o.code}</span>
+          {amount && <span className="text-[11px] font-medium opacity-70">{o.code}</span>}
         </button>
-      ))}
+        );
+      })}
     </div>
   ) : null;
 
@@ -378,7 +402,7 @@ export default function StripePaymentElementBox(props: Props) {
         currency: quote.currency,
         ...(props.method && props.method !== "card" ? {} : { setupFutureUsage: "off_session" as const }),
         // Este formulario maneja solo tarjeta de crédito/débito; las billeteras rápidas van arriba.
-        paymentMethodTypes: props.method && props.method !== "card" ? [props.method] : ["card"],
+        paymentMethodTypes: props.method && props.method !== "card" ? [props.method] : ["card", "link"],
         locale,
         appearance: { theme: "stripe" },
       }}

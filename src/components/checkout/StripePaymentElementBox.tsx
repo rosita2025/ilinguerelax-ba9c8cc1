@@ -227,8 +227,8 @@ const Inner = ({
         <PaymentElement
           options={{
             layout: { type: "tabs", defaultCollapsed: false },
-            // Apple Pay / Google Pay / Link ya están en "Pago rápido" (arriba de la página): no se repiten aquí.
-            wallets: { applePay: "never", googlePay: "never" },
+            // Pestañas "Tarjeta | Google Pay | Apple Pay" dentro del formulario (según el dispositivo del cliente).
+            wallets: { applePay: "auto", googlePay: "auto" },
             // Nombre y correo ya los tenemos arriba: no se vuelven a pedir.
             fields: { billingDetails: { name: "never", email: "never", phone: method !== "card" ? "auto" : "never" } },
             defaultValues: { billingDetails: { email: s0.buyer.email.trim(), name: s0.buyer.fullName.trim() } },

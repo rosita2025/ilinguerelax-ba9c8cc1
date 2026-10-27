@@ -87,6 +87,7 @@ interface PaymentMethodRow {
 
 // Antes usaban una ruta temporal de Lovable (asset borrado del CDN) que no
 // sobrevivía al publicar; ahora usan archivos propios del proyecto.
+import { buildSupportUrl } from "@/lib/support";
 import { SupportWhatsApp } from "@/components/checkout/SupportWhatsApp";
 import { VisaBadge, MastercardBadge, AmexBadge, ApplePayBadge } from "@/components/checkout/CardBrandBadges";
 import visaLogoAsset from "@/assets/payment-logos/visa.png.asset.json";
@@ -2447,6 +2448,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 if (m === "hotmart") { setCfgReload((n) => n + 1); void redirectToHotmart(); }
                 else if (m === "transfer") { payMercado("transfer"); }
                 else if (m === "cash") { payMercado("cash"); }
+                else if (m === "paypal") { void payPaypal(); }
               }}
               className="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-2 text-xs font-semibold text-white hover:bg-red-800"
             >
@@ -2454,7 +2456,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               {language === "en" ? "Try again" : language === "pt" ? "Tentar novamente" : language === "fr" ? "Réessayer" : "Intentar de nuevo"}
             </button>
             <a
-              href={WHATSAPP_URL}
+              href={buildSupportUrl({ language, country: (country || "").toUpperCase(), method: methodError.method, amountLabel: local.formatted || undefined, error: methodError.message, reason: "error" })}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-md bg-[#25D366] px-3 py-2 text-xs font-semibold text-white hover:bg-[#20b858]"

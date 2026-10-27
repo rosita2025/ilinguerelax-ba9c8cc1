@@ -34,16 +34,22 @@ const paypalBase = () => (Deno.env.get("PAYPAL_ENV") === "sandbox" ? "https://ap
 
 async function accessToken(): Promise<string> {
   const id = Deno.env.get("PAYPAL_CLIENT_ID");
-  const secret = Deno.env.get("PAYPAL_CLIENT_SECRET");
-  if (!id || !secret) throw new Error("PAYPAL_CLIENT_ID / PAYPAL_CLIENT_SECRET no configurados");
-  const res = await fetch(`${paypalBase()}/v1/oauth2/token`, {
-    method: "POST",
-    headers: { Authorization: `Basic ${btoa(`${id}:${secret}`)}`, "Content-Type": "application/x-www-form-urlencoded" },
-    body: "grant_type=client_credentials",
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok || !data.access_token) throw new Error(`PayPal auth ${res.status}: ${data?.error_description || data?.error || "sin token"}`);
-  return data.access_token as string;
+  // PAYPAL_CLIENT_SECRET es el nombre nuevo; PAYPAL_SECRET es el de la versión anterior: se prueban los dos si hace falta.
+  const secrets = [Deno.env.get("PAYPAL_CLIENT_SECRET"), Deno.env.get("PAYPAL_SECRET")]
+    .filter((v, i, arr): v is string => !!v && arr.indexOf(v) === i);
+  if (!id || secrets.length === 0) throw new Error("PAYPAL_CLIENT_ID / PAYPAL_CLIENT_SECRET no configurados");
+  let last = "";
+  for (const secret of secrets) {
+    const res = await fetch(`${paypalBase()}/v1/oauth2/token`, {
+      method: "POST",
+      headers: { Authorization: `Basic ${btoa(`${id}:${secret}`)}`, "Content-Type": "application/x-www-form-urlencoded" },
+      body: "grant_type=client_credentials",
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.access_token) return data.access_token as string;
+    last = `PayPal auth ${res.status}: ${data?.error_description || data?.error || "sin token"} (${Deno.env.get("PAYPAL_ENV") === "sandbox" ? "modo sandbox" : "modo live"})`;
+  }
+  throw new Error(last);
 }
 
 Deno.serve(async (req) => {

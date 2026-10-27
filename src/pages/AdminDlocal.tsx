@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import AdminNav from "@/components/admin/AdminNav";
 import { adminInvoke } from "@/lib/adminInvoke";
-import OrderReconcilePanel from "@/components/admin/OrderReconcilePanel";
+import ManualPaymentsTabs from "@/components/admin/ManualPaymentsTabs";
 import DlocalTestSimulator from "@/components/admin/DlocalTestSimulator";
 
 import { invalidateCheckoutMethodsCache } from "@/hooks/useCheckoutMethodsConfig";
@@ -216,6 +216,7 @@ export default function AdminDlocal() {
       <AdminNav />
       <main className="min-h-dvh bg-background py-4 sm:py-10 px-3 sm:px-4">
         <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6">
+          <ManualPaymentsTabs />
           <header className="space-y-1.5">
             <div className="flex items-center gap-2 text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">
               <Globe className="h-3.5 w-3.5" /> dLocal Go
@@ -226,8 +227,6 @@ export default function AdminDlocal() {
               Los cambios se reflejan al instante en el checkout según la IP del comprador.
             </p>
           </header>
-
-          <OrderReconcilePanel />
 
           <Card className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3">
 

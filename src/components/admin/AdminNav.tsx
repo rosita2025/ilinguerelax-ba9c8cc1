@@ -46,6 +46,8 @@ import { Users } from "lucide-react";
 import AdminPWAMeta from "./AdminPWAMeta";
 import AdminTrustBadge from "./AdminTrustBadge";
 
+import { MANUAL_PAYMENT_PATHS } from "./ManualPaymentsTabs";
+
 type Group = { label: string; items: Array<{ to: string; label: string; icon: any }> };
 
 const groups: Group[] = [
@@ -65,9 +67,7 @@ const groups: Group[] = [
       { to: "/admin/orders-physical", label: "Pedidos físicos", icon: Package },
       { to: "/admin/purchases-status", label: "Pagos · Estado", icon: CreditCard },
       { to: "/admin/checkout-methods", label: "Métodos de pago Stripe", icon: CreditCard },
-      { to: "/admin/manual-payments", label: "Pagos manuales (Yape/Plin)", icon: Wallet },
-      { to: "/admin/binance-config", label: "Binance Pay", icon: Wallet },
-      { to: "/admin/dlocal", label: "dLocal Go · Manual", icon: Globe },
+      { to: "/admin/manual-payments", label: "Pago manual", icon: Wallet },
       
     ],
   },
@@ -106,13 +106,17 @@ const groups: Group[] = [
 
 const flat = groups.flatMap((g) => g.items);
 
+// "Pago manual" agrupa Pendientes, Binance Pay y dLocal Go: se ve activo en las tres pantallas.
+const isActivePath = (to: string, pathname: string) =>
+  to === "/admin/manual-payments" ? MANUAL_PAYMENT_PATHS.includes(pathname) : pathname === to;
+
 const SIDEBAR_STYLE_ID = "admin-sidebar-offset";
 
 export const AdminNav = () => {
   const { logout } = useAdminKey();
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const current = flat.find((t) => t.to === pathname) ?? flat[0];
+  const current = flat.find((t) => isActivePath(t.to, pathname)) ?? flat[0];
   const CurrentIcon = current.icon;
 
   // Desplaza el contenido del panel para dejar espacio a la barra lateral fija
@@ -153,7 +157,7 @@ export const AdminNav = () => {
                     end={to === "/admin"}
                     className={cn(
                       "flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors",
-                      pathname === to
+                      isActivePath(to, pathname)
                         ? "bg-primary/10 text-primary font-medium"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground",
                     )}
@@ -215,7 +219,7 @@ export const AdminNav = () => {
                           onClick={() => navigate(to)}
                           className={cn(
                             "gap-2 cursor-pointer",
-                            pathname === to && "bg-primary/10 text-primary font-medium",
+                            isActivePath(to, pathname) && "bg-primary/10 text-primary font-medium",
                           )}
                         >
                           <Icon className="w-4 h-4" />

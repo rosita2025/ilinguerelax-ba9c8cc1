@@ -1,17 +1,8 @@
+import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
-import { Languages } from "@/components/Languages";
-import { HowItWorks } from "@/components/HowItWorks";
-
-import { AboutMe } from "@/components/AboutMe";
-import { InstagramFeed } from "@/components/InstagramFeed";
-import { Contact } from "@/components/Contact";
-import { Footer } from "@/components/Footer";
-import { AllProductsReviews } from "@/components/AllProductsReviews";
-
-import { TrackingSearchBar } from "@/components/TrackingSearchBar";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { LazyMount } from "@/components/LazyImg";
 import { useSpanishRelaxPixelPageView } from "@/hooks/useMetaPixel";
 
 // Partner logos
@@ -28,6 +19,37 @@ const partnerLogos = [
   { src: logoHotmart, alt: "Hotmart platform partner", height: "h-6 md:h-10" },
   { src: logoKindle, alt: "Amazon Kindle store", height: "h-6 md:h-10" },
 ];
+
+
+// Secciones bajo el pliegue: se descargan y montan solo al acercarse a la pantalla,
+// para que lo de arriba (Navbar + Hero) pinte rápido.
+const TrackingSearchBar = lazy(() => import("@/components/TrackingSearchBar").then((m) => ({ default: m.TrackingSearchBar })));
+const Languages = lazy(() => import("@/components/Languages").then((m) => ({ default: m.Languages })));
+const HowItWorks = lazy(() => import("@/components/HowItWorks").then((m) => ({ default: m.HowItWorks })));
+const AllProductsReviews = lazy(() => import("@/components/AllProductsReviews").then((m) => ({ default: m.AllProductsReviews })));
+const InstagramFeed = lazy(() => import("@/components/InstagramFeed").then((m) => ({ default: m.InstagramFeed })));
+const AboutMe = lazy(() => import("@/components/AboutMe").then((m) => ({ default: m.AboutMe })));
+const Contact = lazy(() => import("@/components/Contact").then((m) => ({ default: m.Contact })));
+const Footer = lazy(() => import("@/components/Footer").then((m) => ({ default: m.Footer })));
+const WhatsAppButton = lazy(() => import("@/components/WhatsAppButton").then((m) => ({ default: m.WhatsAppButton })));
+
+const Deferred = ({ id, minHeight, rootMargin = "300px", children }: { id?: string; minHeight: number; rootMargin?: string; children: ReactNode }) => (
+  <div id={id}>
+    <LazyMount minHeight={minHeight} rootMargin={rootMargin}>
+      <Suspense fallback={<div style={{ minHeight }} />}>{children}</Suspense>
+    </LazyMount>
+  </div>
+);
+
+const IdleMount = ({ children }: { children: ReactNode }) => {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+    if (w.requestIdleCallback) w.requestIdleCallback(() => setReady(true), { timeout: 4000 });
+    else setTimeout(() => setReady(true), 2500);
+  }, []);
+  return ready ? <Suspense fallback={null}>{children}</Suspense> : null;
+};
 
 const Index = () => {
   // Spanish Relax Pixel - PageView only
@@ -71,23 +93,18 @@ const Index = () => {
         <div className="absolute inset-0 bg-primary/5 -skew-y-3 transform origin-top-left" />
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-white mb-8">Rastreo de Pedidos</h2>
-          <TrackingSearchBar />
+          <Deferred minHeight={80} rootMargin="300px"><TrackingSearchBar /></Deferred>
         </div>
       </section>
 
-      <Languages />
-      <HowItWorks />
-
-      <AllProductsReviews />
-
-      <InstagramFeed />
-
-
-
-      <AboutMe />
-      <Contact />
-      <Footer />
-      <WhatsAppButton />
+      <Deferred minHeight={500}><Languages /></Deferred>
+      <Deferred minHeight={500}><HowItWorks /></Deferred>
+      <Deferred minHeight={500}><AllProductsReviews /></Deferred>
+      <Deferred minHeight={400}><InstagramFeed /></Deferred>
+      <Deferred id="sobre-mi" minHeight={500}><AboutMe /></Deferred>
+      <Deferred id="contacto" minHeight={600}><Contact /></Deferred>
+      <Deferred minHeight={300}><Footer /></Deferred>
+      <IdleMount><WhatsAppButton /></IdleMount>
 </main>
   );
 };

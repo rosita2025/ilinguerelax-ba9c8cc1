@@ -48,9 +48,12 @@ const productRoutePreload = () => ({
       };
       const patrones = closure("pages/ProductPatronesEspeciales");
       const dynamic = closure("pages/ProductDynamic");
-      if (!patrones.length && !dynamic.length) return html;
+      const home = closure("pages/Index");
+      if (!patrones.length && !dynamic.length && !home.length) return html;
       const script =
-        `<script>(function(){try{var p=location.pathname;if(p.indexOf('/products/')!==0)return;` +
+        `<script>(function(){try{var p=location.pathname;var H=${JSON.stringify(home)};` +
+        `if(p==='/'){H.forEach(function(u){var l=document.createElement('link');l.rel='modulepreload';l.href=u;document.head.appendChild(l);});return;}` +
+        `if(p.indexOf('/products/')!==0)return;` +
         `var L=p.indexOf('patrones-especiales-alfabeto-combinaciones-secretas-ingles')>-1?${JSON.stringify(patrones)}:${JSON.stringify(dynamic)};` +
         `L.forEach(function(u){var l=document.createElement('link');l.rel='modulepreload';l.href=u;document.head.appendChild(l);});}catch(e){}})();</script>`;
       return html.replace("</head>", `${script}</head>`);

@@ -12,7 +12,7 @@
 //    provider `dlocalgo-test`, para que no contaminen reportes ni ingresos.
 //  · No llama a la API de dLocal: los estados son locales y simulados.
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { z } from "npm:zod@3.23.8";
+import { z } from "npm:zod@3.25.76";
 import { assertAdminCsrf, adminCorsHeaders, adminLog } from "../_shared/adminCsrf.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";

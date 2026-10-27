@@ -2,7 +2,7 @@
 // Seguridad: no hay login, así que exigimos número de pedido + correo exacto del comprador.
 const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { z } from "npm:zod@3.23.8";
+import { z } from "npm:zod@3.25.76";
 import { normalizeEmailBasic } from "../_shared/emailGuard.ts";
 
 const TOKEN_RE = /^[A-Za-z0-9_-]{20,120}$/;

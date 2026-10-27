@@ -6,6 +6,8 @@ import { adminInvoke } from "@/lib/adminInvoke";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AdminNav from "@/components/admin/AdminNav";
+import ManualPaymentsTabs from "@/components/admin/ManualPaymentsTabs";
+import OrderReconcilePanel from "@/components/admin/OrderReconcilePanel";
 import { extractPaymentReference, methodLabel } from "@/lib/paymentReference";
 
 import { useAdminKey } from "@/components/admin/AdminGate";
@@ -208,16 +210,22 @@ const AdminManualPayments = () => {
       <AdminNav />
       <main className="min-h-dvh bg-background p-4 md:p-8">
         <div className="max-w-5xl mx-auto">
+          <div className="mb-4"><ManualPaymentsTabs /></div>
           <header className="mb-6">
             <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
-              <Wallet className="w-7 h-7 text-primary" /> Pagos manuales (Yape / Plin / Binance)
+              <Wallet className="w-7 h-7 text-primary" /> Pago manual
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Órdenes creadas cuando el cliente pulsa "Ya pagué" en el checkout. Verifica el pago en Yape/Plin o Binance Pay y marca como <strong>Verificada</strong>.
+              Todo lo pendiente en un solo lugar: arriba, los pagos por pasarela (PayPal, dLocal Go, Mercado Pago) que puedes aceptar o rechazar; abajo, los pagos manuales (Yape/Plin, Binance, SPEI, transferencias). Al aceptar, el material se entrega automáticamente.
 
             </p>
           </header>
 
+          <div className="mb-8">
+            <OrderReconcilePanel />
+          </div>
+
+          <h2 className="text-lg font-semibold mb-3">Pagos manuales (Yape · Plin · Binance · SPEI · transferencias)</h2>
           <div className="flex gap-2 mb-6 flex-wrap">
             {(["pending", "verified", "rejected", "all"] as const).map((f) => (
               <Button key={f} variant={filter === f ? "default" : "outline"} size="sm" onClick={() => setFilter(f)}>

@@ -11,6 +11,7 @@ import { adminInvoke } from "@/lib/adminInvoke";
 import { invalidateBinanceConfigCache } from "@/hooks/useBinancePayConfig";
 import { toast } from "sonner";
 import { Loader2, Plus, Save, Trash2, Wallet } from "lucide-react";
+import ManualPaymentsTabs from "@/components/admin/ManualPaymentsTabs";
 
 type BinanceConfig = {
   id?: string;
@@ -89,6 +90,7 @@ export default function AdminBinanceConfig() {
     <div className="min-h-screen bg-background">
       <AdminNav />
       <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
+        <ManualPaymentsTabs />
         <header className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-[#F0B90B]/10 flex items-center justify-center">
             <Wallet className="w-5 h-5 text-[#F0B90B]" />

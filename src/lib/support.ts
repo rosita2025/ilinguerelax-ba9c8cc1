@@ -91,3 +91,46 @@ export function buildSupportUrl(ctx: SupportContext = {}): string {
   if (link) lines.push(`${t.link}: ${link}`);
   return `https://wa.me/${SUPPORT_WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
 }
+
+const PAID: Record<Lang, { intro: (method: string) => string; order: string; product: string; method: string; link: string; email: string }> = {
+  es: { intro: (m) => `Hola, ya pagué${m ? ` con ${m}` : ""}. ¿Me ayudas a confirmar mi pedido?`, order: "Pedido", product: "Producto", method: "Método", link: "Link de pago (checkout)", email: "Correo" },
+  en: { intro: (m) => `Hi, I already paid${m ? ` with ${m}` : ""}. Can you help me confirm my order?`, order: "Order", product: "Product", method: "Method", link: "Payment link (checkout)", email: "Email" },
+  fr: { intro: (m) => `Bonjour, j'ai déjà payé${m ? ` avec ${m}` : ""}. Pouvez-vous confirmer ma commande ?`, order: "Commande", product: "Produit", method: "Méthode", link: "Lien de paiement (checkout)", email: "E-mail" },
+  pt: { intro: (m) => `Olá, já paguei${m ? ` com ${m}` : ""}. Pode me ajudar a confirmar meu pedido?`, order: "Pedido", product: "Produto", method: "Método", link: "Link de pagamento (checkout)", email: "E-mail" },
+  it: { intro: (m) => `Ciao, ho già pagato${m ? ` con ${m}` : ""}. Puoi aiutarmi a confermare il mio ordine?`, order: "Ordine", product: "Prodotto", method: "Metodo", link: "Link di pagamento (checkout)", email: "Email" },
+};
+
+/**
+ * WhatsApp "ya pagué": para compradores que pagaron (PayPal u otro) y no ven su pedido o su correo.
+ * Lleva el número de pedido real, el nombre del producto y el link del checkout que usó el cliente.
+ */
+export function buildPaidSupportUrl(opts: { language?: string; orderNumber?: string | null; method?: string; email?: string } = {}): string {
+  const lang = (["es", "en", "fr", "pt", "it"].includes(opts.language ?? "") ? opts.language : "es") as Lang;
+  const t = PAID[lang];
+  let product = "";
+  let checkoutLink = "";
+  let email = (opts.email || "").trim();
+  try {
+    const st = useCheckoutPruebaStore.getState();
+    product = st.items.map((i) => i.name).join(" + ");
+    if (!email) email = (st.buyer.email || "").trim();
+  } catch { /* sin carrito */ }
+  try {
+    // El carrito se vacía al pagar: se recupera lo que quedó guardado al iniciar el checkout.
+    const raw = localStorage.getItem("ilr_last_checkout") || sessionStorage.getItem("ilr_last_checkout");
+    if (raw) {
+      const mem = JSON.parse(raw) as { content_name?: string | null; page_path?: string | null };
+      if (!product && mem.content_name) product = String(mem.content_name);
+      if (mem.page_path) checkoutLink = `${window.location.origin}${mem.page_path}`;
+    }
+  } catch { /* sin memoria */ }
+  if (!checkoutLink) {
+    try { checkoutLink = `${window.location.origin}/checkouts`; } catch { /* sin ventana */ }
+  }
+  const lines = [t.intro(opts.method ?? "")];
+  lines.push(`${t.order}: #${opts.orderNumber || getOrderRef()}`);
+  if (product) lines.push(`${t.product}: ${product.slice(0, 160)}`);
+  if (email) lines.push(`${t.email}: ${email}`);
+  if (checkoutLink) lines.push(`${t.link}: ${checkoutLink}`);
+  return `https://wa.me/${SUPPORT_WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
+}

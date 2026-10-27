@@ -2642,7 +2642,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     <div className="mt-1 text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400">{m.sub}</div>
                   </div>
 
-                ) : m.badges?.length ? (
+                ) : (m.id === "dlocal_cash" || m.id === "dlocal_wallet") && rowLogo ? null : m.badges?.length ? (
                   <div className="mt-1 flex items-center gap-1 flex-wrap">
                     {m.badges.map(renderMethodBadge)}
 

@@ -18,13 +18,53 @@ const asyncMainCss = () => ({
   },
 });
 
+// Las páginas de producto (la entrada de los anuncios) arrancan a descargar su propio código desde que llega el HTML,
+// en paralelo con el JS principal, en lugar de esperar a que éste termine de ejecutarse (ahorra ~1 s en móvil lento).
+// Solo se precarga en rutas /products/…; el resto del sitio no descarga nada de más.
+const productRoutePreload = () => ({
+  name: "product-route-preload",
+  enforce: "post" as const,
+  transformIndexHtml: {
+    order: "post" as const,
+    handler(html: string, ctx: { bundle?: Record<string, any> }) {
+      const bundle = ctx.bundle;
+      if (!bundle) return html;
+      const closure = (entryName: string) => {
+        const start = Object.values(bundle).find(
+          (c: any) => c.type === "chunk" && typeof c.facadeModuleId === "string" && c.facadeModuleId.includes(entryName),
+        ) as any;
+        if (!start) return [] as string[];
+        const seen = new Set<string>();
+        const walk = (file: string) => {
+          if (seen.has(file)) return;
+          const c = bundle[file];
+          if (!c || c.type !== "chunk") return;
+          seen.add(file);
+          for (const i of c.imports ?? []) walk(i);
+        };
+        walk(start.fileName);
+        // Lo que el HTML ya descarga (JS principal, vendors) no se repite: solo el código propio de la página.
+        return [...seen].map((f) => `/${f}`).filter((u) => !html.includes(u));
+      };
+      const patrones = closure("pages/ProductPatronesEspeciales");
+      const dynamic = closure("pages/ProductDynamic");
+      if (!patrones.length && !dynamic.length) return html;
+      const script =
+        `<script>(function(){try{var p=location.pathname;if(p.indexOf('/products/')!==0)return;` +
+        `var L=p.indexOf('patrones-especiales-alfabeto-combinaciones-secretas-ingles')>-1?${JSON.stringify(patrones)}:${JSON.stringify(dynamic)};` +
+        `L.forEach(function(u){var l=document.createElement('link');l.rel='modulepreload';l.href=u;document.head.appendChild(l);});}catch(e){}})();</script>`;
+      return html.replace("</head>", `${script}</head>`);
+    },
+  },
+});
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
   },
-  plugins: [react(), mode === "development" && componentTagger(), mode === "production" && asyncMainCss()].filter(Boolean),
+  plugins: [react(), mode === "development" && componentTagger(), mode === "production" && asyncMainCss(), mode === "production" && productRoutePreload()].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

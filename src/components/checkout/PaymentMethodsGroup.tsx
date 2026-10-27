@@ -30,6 +30,8 @@ import { usePurchaseTracking } from "@/hooks/usePurchaseTracking";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 import paypalLogo from "@/assets/paypal-logo.png";
 import yapeLogo from "@/assets/yape-logo.webp";
+import oxxoLogo from "@/assets/oxxo-logo.webp";
+import speiLogo from "@/assets/spei-logo.webp";
 
 // Formulario de pago nuevo (tipo Payment Element). ACTIVO para TODOS los países.
 // Para volver al formulario anterior en una prueba: agregar ?pe=0 al enlace del checkout
@@ -156,6 +158,8 @@ function renderMethodBadge(badge: MethodBadge) {
   if (badge.label === "American Express") return <AmexBadge key={badge.label} />;
   if (badge.label === "Apple Pay") return <ApplePayBadge key={badge.label} />;
   if (badge.label === "Hotmart") return <LogoBadge key={badge.label} src={hotmartLogo.url} alt="Hotmart" />;
+  if (badge.label === "OXXO") return <LogoBadge key={badge.label} src={oxxoLogo} alt="OXXO" />;
+  if (badge.label === "SPEI") return <LogoBadge key={badge.label} src={speiLogo} alt="SPEI" />;
   if (badge.label === "Google Pay") return <GooglePayBadge key={badge.label} />;
   if (badge.label === "Link") return <LinkBadge key={badge.label} />;
   return <BankBadge key={badge.label} {...badge} />;
@@ -2501,6 +2505,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         const isSelected = valid && selected === m.id && (!isStripeRow || selectedCardRow === rowKey);
         const isLoading = mpLoading === m.id;
         const Icon = m.icon;
+        // Logo oficial en lugar del ícono genérico (PayPal, Yape, y OXXO / SPEI en México).
+        const rowLogo: { src: string; alt: string } | null =
+          m.id === "paypal" ? { src: paypalLogo, alt: "PayPal" }
+          : m.id === "yape" ? { src: yapeLogo, alt: "Yape" }
+          : m.id === "clabe" || (m.id === "dlocal_transfer" && country === "MX") ? { src: speiLogo, alt: "SPEI" }
+          : m.id === "dlocal_cash" && country === "MX" ? { src: oxxoLogo, alt: "OXXO" }
+          : null;
         const section = methodSection(m.id);
         const prev = idx > 0 ? methods[idx - 1] : null;
         const showSectionHeader = !prev || methodSection(prev.id) !== section;
@@ -2542,12 +2553,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 !valid && "cursor-pointer",
               )}
             >
-              {(m.id === "paypal" || m.id === "yape") && (
+              {rowLogo && (
                 <div className="rounded-lg flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9 overflow-hidden">
-                  {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <img src={m.id === "paypal" ? paypalLogo : yapeLogo} alt={m.id === "paypal" ? "PayPal" : "Yape"} width={36} height={36} className="w-full h-full object-contain" />}
+                  {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <img src={rowLogo.src} alt={rowLogo.alt} width={36} height={36} className="w-full h-full object-contain" />}
                 </div>
               )}
-              {m.id !== "hotmart" && m.id !== "paypal" && m.id !== "yape" && (
+              {m.id !== "hotmart" && !rowLogo && (
                 <div className={cn(
                   "rounded-lg flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9",
                   isSelected
@@ -2657,7 +2668,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   </div>
                 ) : m.id === "clabe" ? (
                   <div className="mt-1 flex items-center gap-1 flex-wrap">
-                    <BankBadge label="SPEI" bg="#0A2540" color="#ffffff" />
+                    {renderMethodBadge({ label: "SPEI", bg: "#0A2540", color: "#ffffff" })}
                     <BankBadge label="CLABE" bg="#006341" color="#ffffff" />
                     <BankBadge label="MXN" bg="#ffffff" color="#0A2540" />
                   </div>

@@ -425,9 +425,6 @@ const PatronesContent = () => {
                 </span>
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                {pricingAdmin.name ?? "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"}
-              </h1>
 
               <p className="text-lg md:text-xl font-bold text-foreground mb-2">
                 Deja de pronunciar el inglés como se escribe.

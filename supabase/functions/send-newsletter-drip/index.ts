@@ -80,7 +80,8 @@ Deno.serve(async (req) => {
       .eq('enabled', true)
       .order('step', { ascending: true });
     if (cfgErr) throw cfgErr;
-    const configs = configRows ?? [];
+    // Newsletter: un solo correo por suscriptor (solo el primer paso activo).
+    const configs = (configRows ?? []).slice(0, 1);
     if (!configs.length) {
       return json({ ok: true, note: 'no active drip config', stats });
     }

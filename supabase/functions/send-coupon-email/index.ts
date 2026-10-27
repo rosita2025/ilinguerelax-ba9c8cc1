@@ -30,6 +30,11 @@ const handler = async (req: Request): Promise<Response> => {
   const __blocked = await assertInternalCall(req);
   if (__blocked) return __blocked;
 
+  // Correo de cupón apagado. Para reactivarlo: secreto COUPON_EMAILS=on.
+  if (Deno.env.get("COUPON_EMAILS") !== "on") {
+    return new Response(JSON.stringify({ ok: true, skipped: "coupon emails disabled" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  }
+
   try {
     const { email, couponCode, discount, lang = "es" }: CouponEmailRequest = await req.json();
 

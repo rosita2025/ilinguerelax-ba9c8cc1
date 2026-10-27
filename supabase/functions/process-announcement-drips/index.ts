@@ -9,6 +9,8 @@ const corsHeaders = {
 
 // Intervals in days for follow-up emails (10 total sends including initial)
 const DRIP_INTERVALS_DAYS = [0, 1, 2, 4, 9, 15, 22, 30, 45, 60];
+// Los anuncios de producto nuevo se envían solo a mano (send-announcement); la secuencia automática está apagada.
+// Para reactivarla: secreto ANNOUNCEMENT_DRIPS=on.
 
 const buildAnnouncementHtml = (
   productName: string,
@@ -103,6 +105,10 @@ Deno.serve(async (req) => {
 
   const __blocked = await assertInternalCall(req);
   if (__blocked) return __blocked;
+
+  if (Deno.env.get("ANNOUNCEMENT_DRIPS") !== "on") {
+    return new Response(JSON.stringify({ ok: true, note: "announcement drips disabled" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  }
 
   try {
     const supabaseAdmin = createClient(

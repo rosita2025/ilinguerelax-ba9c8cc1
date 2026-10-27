@@ -57,6 +57,11 @@ const buildCouponEmail = (customerName: string, couponCode: string): string => {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  // Correo de cupón por reseña apagado. Para reactivarlo: secreto COUPON_EMAILS=on.
+  if (Deno.env.get("COUPON_EMAILS") !== "on") {
+    return new Response(JSON.stringify({ ok: true, skipped: "coupon emails disabled" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  }
+
   try {
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,

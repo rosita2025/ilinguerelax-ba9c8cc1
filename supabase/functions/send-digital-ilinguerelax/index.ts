@@ -796,6 +796,9 @@ serve(async (req) => {
     // Solo UN aviso por cliente y día: si el mismo comprador genera dos pedidos
     // seguidos, el admin recibe un único correo.
     try {
+      // Apagado por defecto: el aviso de venta a hola@ilinguerelax.com ya no se envía (las ventas se ven en /admin).
+      // Para volver a recibirlo, crear el secreto ADMIN_SALE_EMAILS con el valor "on".
+      if (Deno.env.get("ADMIN_SALE_EMAILS") !== "on") throw new DedupedAdminNotice();
       const adminEmail = Deno.env.get("ADMIN_2FA_EMAIL") || BRAND.supportEmail;
       const adminRecipients = Array.from(new Set([adminEmail, BRAND.supportEmail].filter(Boolean)));
       const noticeKey = `admin-sale:${customerEmail.trim().toLowerCase()}:${new Date().toISOString().slice(0, 10)}`;

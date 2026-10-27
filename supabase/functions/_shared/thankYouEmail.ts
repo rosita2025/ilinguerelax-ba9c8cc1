@@ -144,7 +144,11 @@ export async function sendThankYouEmail(a: Args): Promise<void> {
 
   await Promise.all([
     invokeTemplate("thank-you", a.customerEmail, data, `thank-you-${key}`),
-    invokeTemplate("admin-sale", undefined, data, `admin-sale-${key}`),
+    // Aviso de venta a hola@ilinguerelax.com: apagado (las ventas se ven en /admin). Para volver a recibirlo,
+    // crear el secreto ADMIN_SALE_EMAILS con el valor "on".
+    Deno.env.get("ADMIN_SALE_EMAILS") === "on"
+      ? invokeTemplate("admin-sale", undefined, data, `admin-sale-${key}`)
+      : Promise.resolve(),
     upsertBrevoContact({
       email: a.customerEmail,
       name: a.customerName,

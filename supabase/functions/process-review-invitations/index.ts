@@ -9,8 +9,9 @@ const corsHeaders = {
 
 // Schedule: 1 day, 5 days, 10 days, 15 days, 30 days, 60 days
 // intervals[i] = delay AFTER emails_sent == i before sending email i+1
-const EMAIL_INTERVALS_DAYS = [1, 15, 20, 27, 45]; // Ajustado a 1, 15, 20, 27 según pedido + backup 45
-const MAX_EMAILS = 5; // Máximo 5 correos según pedido
+// Una sola invitación a reseña, 1 día después de la compra (antes eran 5 en 108 días).
+const EMAIL_INTERVALS_DAYS = [1];
+const MAX_EMAILS = 1;
 
 const getNextEmailDelay = (emailsSent: number): number | null => {
   if (emailsSent >= MAX_EMAILS) return null;

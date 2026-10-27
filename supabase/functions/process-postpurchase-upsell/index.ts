@@ -8,7 +8,7 @@
 //      compró sin upsells  → ofrece todos
 //      compró 2 de 3       → ofrece el que falta
 //      compró todos        → no envía nada
-//  · Días 1 y 3 después de la entrega. Un correo por cliente y día. Respeta supresiones.
+//  · Un solo correo, al día 3 después de la entrega. Respeta supresiones.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { assertInternalCall, internalCors } from "../_shared/internalAuth.ts";
 import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
@@ -19,7 +19,8 @@ const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...internalCors, "Content-Type": "application/json" } });
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const DAYS = [1, 3] as const;
+// Un solo correo de upsell por compra: al 3.er día después de la entrega.
+const DAYS = [3] as const;
 const MAX_AGE_MS = 6 * DAY_MS;
 const GAP_MS = 20 * 60 * 60 * 1000;
 const SITE = "https://www.ilinguerelax.com";

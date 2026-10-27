@@ -179,10 +179,10 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="w-full bg-[#111827] text-white py-10 px-4 box-border overflow-hidden pb-24 md:pb-10">
-      <div className="container px-4 md:px-6 py-10 w-full max-w-full overflow-hidden">
+    <footer className="w-full bg-[#111827] text-white py-6 md:py-10 px-4 box-border overflow-hidden pb-24 md:pb-10">
+      <div className="container px-2 md:px-6 py-4 md:py-10 w-full max-w-full overflow-hidden">
         {/* Brand row */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10 pb-8 border-b border-primary-foreground/10">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6 mb-6 md:mb-10 pb-6 md:pb-8 border-b border-primary-foreground/10">
           <Link to="/" className="flex flex-col">
             <span className="text-2xl font-bold tracking-tight">
               iLingue <span className="font-light">Relax</span>
@@ -214,13 +214,14 @@ export const Footer = () => {
         </div>
 
         {/* Columns */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full max-w-full px-4 box-border">
-          {columns.map((col) => (
-            <div key={col.title}>
-              <h3 className="text-sm font-bold tracking-wider mb-4 text-primary-foreground">
+        {/* Móvil: 2 filas (arriba 3 columnas cortas, abajo "Servicios" a ancho completo en 2 columnas). Escritorio: 4 columnas. */}
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-x-3 gap-y-6 md:gap-6 w-full max-w-full md:px-4 box-border">
+          {columns.map((col, idx) => (
+            <div key={col.title} className={idx === 1 ? "col-span-3 md:col-span-1 order-last md:order-none" : ""}>
+              <h3 className="text-xs md:text-sm font-bold tracking-wider mb-3 md:mb-4 text-primary-foreground">
                 {col.title}
               </h3>
-              <ul className="space-y-2.5 text-sm text-primary-foreground/70">
+              <ul className={`text-[13px] md:text-sm text-primary-foreground/70 ${idx === 1 ? "grid grid-cols-2 md:grid-cols-1 gap-x-4 gap-y-2.5 md:block md:space-y-2.5" : "space-y-2 md:space-y-2.5"}`}>
                 {col.links.map((link) =>
                   link.external ? (
                     <li key={link.label}>
@@ -250,7 +251,7 @@ export const Footer = () => {
         </div>
 
         {/* Bottom */}
-        <div className="mt-12 pt-6 border-t border-primary-foreground/10 text-center space-y-2">
+        <div className="mt-8 md:mt-12 pt-5 md:pt-6 border-t border-primary-foreground/10 text-center space-y-2">
           <div className="flex justify-center px-2">
             <CountryPicker lang={language === "en" ? "en" : "es"} className="!text-primary-foreground/70 hover:!text-primary-foreground hover:!bg-primary-foreground/5" />
           </div>

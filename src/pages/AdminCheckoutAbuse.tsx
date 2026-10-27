@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Shield, Trash2, RefreshCw } from "lucide-react";
+import { Shield, Trash2, RefreshCw, MessageCircle, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { useToast } from "@/hooks/use-toast";
@@ -14,9 +14,20 @@ interface Ban {
   created_at: string;
 }
 
+interface CartInfo {
+  name: string;
+  phone: string;
+  started: string | null;
+  last_activity: string | null;
+  recover_url: string | null;
+}
+
 interface StatRow {
   ip: string;
   count: number;
+  first?: string;
+  duration_sec?: number;
+  cart?: CartInfo | null;
   last: string;
   slugs: string[];
   sources: string[];
@@ -109,6 +120,66 @@ function SourceBadge({ source }: { source: string }) {
   );
 }
 
+/** 75 s → "1 min 15 s"; 0 → "menos de 1 s". */
+function fmtDuration(sec?: number | null) {
+  const s = Math.max(0, Math.round(sec ?? 0));
+  if (s < 1) return "menos de 1 s";
+  if (s < 60) return `${s} s`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m} min ${s % 60} s`;
+  return `${Math.floor(m / 60)} h ${m % 60} min`;
+}
+
+const DIAL: Record<string, string> = { PE: "51", MX: "52", CO: "57", AR: "54", CL: "56", EC: "593", BO: "591", PY: "595", UY: "598", VE: "58", ES: "34", US: "1", CA: "1", BR: "55", GT: "502", CR: "506", PA: "507", DO: "1", SV: "503", HN: "504", NI: "505", PR: "1", IT: "39", FR: "33", DE: "49", GB: "44", PT: "351" };
+
+/** Teléfono → solo dígitos con prefijo de país (si lo escribió sin él). null si no sirve. */
+function waNumber(phone?: string | null, country?: string | null) {
+  const raw = (phone || "").trim();
+  let d = raw.replace(/\D/g, "");
+  if (d.length < 7) return null;
+  if (!raw.startsWith("+") && !raw.startsWith("00")) {
+    const dial = DIAL[(country || "").toUpperCase()];
+    if (dial && !d.startsWith(dial) && d.length <= 10) d = dial + d.replace(/^0+/, "");
+  }
+  return d.replace(/^00/, "");
+}
+
+/** WhatsApp con el mensaje ya escrito para retomar un carrito abandonado. */
+function recoveryWaUrl(opts: { phone?: string | null; country?: string | null; name?: string | null; slugs?: string[]; recoverUrl?: string | null }) {
+  const num = waNumber(opts.phone, opts.country);
+  if (!num) return null;
+  const first = (opts.name || "").trim().split(/\s+/)[0];
+  const product = (opts.slugs ?? [])[0]?.replace(/-/g, " ");
+  const lines = [
+    `Hola${first ? ` ${first}` : ""}, soy de iLingue Relax 👋`,
+    `Vi que dejaste tu pedido${product ? ` de "${product}"` : ""} a medias. ¿Tuviste algún problema con el pago o te ayudo a terminar tu compra?`,
+  ];
+  if (opts.recoverUrl) lines.push(`Aquí puedes retomarlo: ${opts.recoverUrl}`);
+  return `https://wa.me/${num}?text=${encodeURIComponent(lines.join("\n"))}`;
+}
+
+function WhatsAppFollowUp({ url }: { url: string | null }) {
+  if (!url) return <span className="text-xs text-muted-foreground">Sin teléfono para WhatsApp</span>;
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[#25D366] text-white hover:bg-[#20b358]"
+    >
+      <MessageCircle className="h-3.5 w-3.5" /> Escribir por WhatsApp
+    </a>
+  );
+}
+
+/** Qué hizo en el checkout, en una frase. */
+function activityLabel(r: { status?: string; email?: string | null; cart?: CartInfo | null }) {
+  if (r.status === "purchased") return "Completó la compra";
+  if (r.status === "abandoned") return "Llenó sus datos y dejó el carrito abierto";
+  if (r.email) return "Dejó su correo pero no llegó a pagar";
+  return "Solo vio el checkout: no llenó el formulario ni el carrito";
+}
+
 interface Summary {
   visits: number;
   visitors: number;
@@ -117,6 +188,7 @@ interface Summary {
   purchased: number;
   abandoned: number;
   countries: number;
+  avg_duration_sec?: number;
   generated_at: string;
 }
 
@@ -125,6 +197,9 @@ interface Lead {
   country?: string | null;
   city?: string | null;
   status?: string;
+  first?: string;
+  duration_sec?: number;
+  cart?: CartInfo | null;
   last: string;
   slugs?: string[];
   reminders?: number;
@@ -220,7 +295,7 @@ export default function AdminCheckoutAbuse() {
         </div>
 
         {summary && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
             {[
               { label: "Visitantes", value: summary.visitors, hint: `${summary.visits} visitas` },
               { label: "Países", value: summary.countries, hint: "distintos" },
@@ -228,10 +303,11 @@ export default function AdminCheckoutAbuse() {
               { label: "Sin correo", value: summary.without_email, hint: "no llenó formulario" },
               { label: "Compraron", value: summary.purchased, hint: "confirmadas" },
               { label: "Abandonaron", value: summary.abandoned, hint: "carrito abierto" },
+              { label: "Tiempo medio", value: fmtDuration(summary.avg_duration_sec), hint: "en el checkout" },
             ].map((k) => (
               <div key={k.label} className="border rounded-lg p-3">
                 <div className="text-xs text-muted-foreground">{k.label}</div>
-                <div className="text-2xl font-bold">{k.value}</div>
+                <div className={`font-bold ${typeof k.value === "string" ? "text-lg leading-8" : "text-2xl"}`}>{k.value}</div>
                 <div className="text-[11px] text-muted-foreground">{k.hint}</div>
               </div>
             ))}
@@ -258,6 +334,14 @@ export default function AdminCheckoutAbuse() {
                   <a href={`mailto:${l.email}`} className="text-primary hover:underline break-all">{l.email}</a>
                   <StatusBadge status={l.status} />
                   {l.client_purchase_event && <ClientPurchaseWarning />}
+                  {(l.duration_sec ?? 0) > 0 && (
+                    <span className="inline-flex items-center gap-1 text-xs text-muted-foreground" title="Tiempo entre su primera y última visita al checkout">
+                      <Timer className="h-3.5 w-3.5" /> {fmtDuration(l.duration_sec)}
+                    </span>
+                  )}
+                  {l.status === "abandoned" && (
+                    <WhatsAppFollowUp url={recoveryWaUrl({ phone: l.cart?.phone, country: l.country, name: l.cart?.name, slugs: l.slugs, recoverUrl: l.cart?.recover_url })} />
+                  )}
                   <span className="text-xs text-muted-foreground ml-auto">{new Date(l.last).toLocaleString()}</span>
                 </div>
               ))}
@@ -382,8 +466,19 @@ export default function AdminCheckoutAbuse() {
                       <span>{new Date(r.last).toLocaleString()}</span>
                     </div>
                   </div>
+                  <div className="flex items-center gap-x-4 gap-y-1 flex-wrap text-xs text-muted-foreground">
+                    <span className="inline-flex items-center gap-1 text-foreground">
+                      <Timer className="h-3.5 w-3.5" /> Estuvo {r.count > 1 ? fmtDuration(r.duration_sec) : "una sola visita (sin tiempo medible)"}
+                    </span>
+                    {r.first && <span>Primera visita: {new Date(r.first).toLocaleTimeString()}</span>}
+                    <span>Abrió el checkout {r.count} {r.count === 1 ? "vez" : "veces"}</span>
+                    <span className="text-foreground">{activityLabel(r)}</span>
+                  </div>
                   <div className="flex items-center gap-2 flex-wrap text-xs">
                     <StatusBadge status={r.status} />
+                    {r.status === "abandoned" && (
+                      <WhatsAppFollowUp url={recoveryWaUrl({ phone: r.cart?.phone, country: r.country, name: r.cart?.name, slugs: r.slugs, recoverUrl: r.cart?.recover_url })} />
+                    )}
                     {r.client_purchase_event && <ClientPurchaseWarning />}
                     {r.email ? (
                       <a href={`mailto:${r.email}`} className="text-primary hover:underline break-all">

@@ -32,6 +32,7 @@ import paypalLogo from "@/assets/paypal-logo.png";
 import yapeLogo from "@/assets/yape-logo.webp";
 import oxxoLogo from "@/assets/oxxo-logo.webp";
 import speiLogo from "@/assets/spei-logo.webp";
+import mercadopagoLogo from "@/assets/mercadopago-logo.webp";
 
 // Formulario de pago nuevo (tipo Payment Element). ACTIVO para TODOS los países.
 // Para volver al formulario anterior en una prueba: agregar ?pe=0 al enlace del checkout
@@ -158,6 +159,7 @@ function renderMethodBadge(badge: MethodBadge) {
   if (badge.label === "American Express") return <AmexBadge key={badge.label} />;
   if (badge.label === "Apple Pay") return <ApplePayBadge key={badge.label} />;
   if (badge.label === "Hotmart") return <LogoBadge key={badge.label} src={hotmartLogo.url} alt="Hotmart" />;
+  if (badge.label === "Mercado Pago") return <LogoBadge key={badge.label} src={mercadopagoLogo} alt="Mercado Pago" />;
   if (badge.label === "OXXO") return <LogoBadge key={badge.label} src={oxxoLogo} alt="OXXO" />;
   if (badge.label === "SPEI") return <LogoBadge key={badge.label} src={speiLogo} alt="SPEI" />;
   if (badge.label === "Google Pay") return <GooglePayBadge key={badge.label} />;
@@ -2083,7 +2085,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     {
       id: "dlocal_wallet",
       icon: Wallet,
-      title: (getDlocalCountry(country)?.walletLabel
+      // Donde Mercado Pago está disponible (México, Argentina, Brasil, Perú…) la fila lo nombra y usa su logo.
+      title: dlocalRails(country, "wallet").includes("Mercado Pago") ? "Mercado Pago"
+        : (getDlocalCountry(country)?.walletLabel
         ? `${getDlocalCountry(country)!.walletLabel}`
         : language === "en" ? "Digital wallet"
         : language === "pt" ? "Carteira digital"
@@ -2511,6 +2515,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           : m.id === "yape" ? { src: yapeLogo, alt: "Yape" }
           : m.id === "clabe" || (m.id === "dlocal_transfer" && country === "MX") ? { src: speiLogo, alt: "SPEI" }
           : m.id === "dlocal_cash" && country === "MX" ? { src: oxxoLogo, alt: "OXXO" }
+          : m.id === "dlocal_wallet" && dlocalRails(country, "wallet").includes("Mercado Pago") ? { src: mercadopagoLogo, alt: "Mercado Pago" }
           : null;
         const section = methodSection(m.id);
         const prev = idx > 0 ? methods[idx - 1] : null;

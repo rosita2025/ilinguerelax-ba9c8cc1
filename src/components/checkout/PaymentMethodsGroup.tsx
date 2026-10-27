@@ -33,6 +33,8 @@ import yapeLogo from "@/assets/yape-logo.webp";
 import oxxoLogo from "@/assets/oxxo-logo.webp";
 import speiLogo from "@/assets/spei-logo.webp";
 import mercadopagoLogo from "@/assets/mercadopago-logo.webp";
+import cardBrandsStrip from "@/assets/card-brands-strip.webp";
+import stripeLogo from "@/assets/stripe-logo.webp";
 
 // Formulario de pago nuevo (tipo Payment Element). ACTIVO para TODOS los países.
 // Para volver al formulario anterior en una prueba: agregar ?pe=0 al enlace del checkout
@@ -2603,8 +2605,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   )}
                 </div>
                 {isPrimaryCard ? (
-                  <div className="mt-1 flex items-center gap-1 flex-wrap">
-                    {primaryCardBadges.map(renderMethodBadge)}
+                  // Tira de marcas (Visa, Mastercard, Amex, Apple Pay, Google Pay) + "by Stripe", todo junto.
+                  <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                    <img src={cardBrandsStrip} alt="Visa, Mastercard, American Express, Apple Pay, Google Pay" height={20} className="h-6 sm:h-7 w-auto" />
+                    <span className="text-[10px] font-medium text-neutral-500 dark:text-neutral-400">by</span>
+                    <img src={stripeLogo} alt="Stripe" height={14} className="h-3.5 sm:h-[15px] w-auto" />
                   </div>
                 ) : null}
 

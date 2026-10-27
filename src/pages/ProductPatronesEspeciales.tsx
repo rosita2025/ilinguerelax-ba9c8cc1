@@ -234,7 +234,6 @@ const PatronesContent = () => {
 
 
   
-  const hasLongPriceLabel = priceLabel.length > 9;
 
   // Imagen del producto: usa la portada configurada en el admin y,
   // si aún no carga o no existe, cae a la imagen local por defecto.

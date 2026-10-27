@@ -225,7 +225,6 @@ Deno.serve(async (req) => {
           event_type: payment.status === "approved" ? "Purchase" : `mp_${payment.status}`,
           email: payerEmail,
           name: payerName,
-          country: payment.payer?.address?.country_id || "PE",
           product_id: (payment.metadata?.skus ? String(payment.metadata.skus).split(",")[0].trim() : "")
             || getPaymentSkus(payment)[0]
             || payment.metadata?.source
@@ -258,7 +257,7 @@ Deno.serve(async (req) => {
         // Send pending-payment emails for transferencia/efectivo/ticket/atm
         // so the customer keeps a receipt if the tab/battery dies.
         const isPending = payment.status === "pending" || payment.status === "in_process";
-        const payerEmail = payment.payer?.email || payment.metadata?.customer_email;
+        const pendingEmail = payment.payer?.email || payment.metadata?.customer_email;
         if (isPending && payerEmail) {
           const orderNumber = payment.external_reference || `MP-${payment.id}`;
           const method = payment.payment_type_id === "ticket"

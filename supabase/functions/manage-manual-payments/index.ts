@@ -263,7 +263,7 @@ Deno.serve(async (req) => {
           // Nunca enviamos enlaces de Drive por correo: solo la URL privada
           // /mi-descarga?t=<token>, con límites de descarga y auditoría.
           const downloadUrl = await ensureDownloadUrl(
-            admin, order.order_number, order.buyer_email, resolvedSkus,
+            admin, order.order_number, order.buyer_email, resolvedSkus ?? [],
           );
           return await sendTemplate(admin, "material-delivery", order.buyer_email, deliveryIdemKey, {
             customerName: order.buyer_name,

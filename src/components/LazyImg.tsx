@@ -16,9 +16,11 @@ type Props = Omit<ImgHTMLAttributes<HTMLImageElement>, "loading"> & {
   minHeight?: number;
 };
 
-export function LazyImg({ src, alt, rootMargin = "300px", wrapperClassName = "block", minHeight, ...rest }: Props) {
+export function LazyImg({ src, alt, rootMargin = "300px", wrapperClassName = "block", minHeight, onLoad, onError, ...rest }: Props) {
   const ref = useRef<HTMLSpanElement>(null);
   const [show, setShow] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     const el = ref.current;
@@ -40,9 +42,31 @@ export function LazyImg({ src, alt, rootMargin = "300px", wrapperClassName = "bl
     return () => io.disconnect();
   }, [rootMargin]);
 
+  // Mientras baja (o si el CDN falla una vez) se ve un fondo suave en vez de un hueco en blanco;
+  // si falla, reintenta hasta 2 veces con una pequeña espera.
+  const handleError: ImgHTMLAttributes<HTMLImageElement>["onError"] = (e) => {
+    onError?.(e);
+    if (attempt < 2) setTimeout(() => setAttempt((n) => n + 1), 1200 * (attempt + 1));
+  };
+  const finalSrc = attempt > 0 ? `${src}${src.includes("?") ? "&" : "?"}r=${attempt}` : src;
+
   return (
-    <span ref={ref} className={wrapperClassName} style={!show && minHeight ? { minHeight } : undefined}>
-      {show && <img src={src} alt={alt} decoding="async" {...rest} />}
+    <span
+      ref={ref}
+      className={`${wrapperClassName} ${show && !loaded ? "bg-muted/60 animate-pulse" : ""}`}
+      style={!show && minHeight ? { minHeight } : undefined}
+    >
+      {show && (
+        <img
+          key={attempt}
+          src={finalSrc}
+          alt={alt}
+          decoding="async"
+          {...rest}
+          onLoad={(e) => { setLoaded(true); onLoad?.(e); }}
+          onError={handleError}
+        />
+      )}
     </span>
   );
 }

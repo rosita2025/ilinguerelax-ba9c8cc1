@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { formatAmountLocalized, detectCurrency } from "@/i18n";
+import { PaymentBadgesStrip } from "@/components/PaymentBadgesStrip";
 
 
 interface StickyBuyBarProps {
@@ -491,6 +492,7 @@ export const StickyBuyBar = ({
                   </>
                 )}
               </Button>
+              {!disabled && <PaymentBadgesStrip className="justify-center flex-nowrap overflow-hidden" />}
               {/* Mobile trust microcopy */}
               {!disabled && !secondaryCtaText && (
                 <div className={`flex items-center justify-center text-[10px] text-muted-foreground ${productKind === "course" ? "flex-wrap gap-x-3 gap-y-1" : "gap-3"}`}>
@@ -650,6 +652,7 @@ export const StickyBuyBar = ({
                 </>
               )}
               </Button>
+              {!disabled && <PaymentBadgesStrip className="justify-center" />}
             </div>
             {secondaryCtaText && onSecondaryClick && (
               <Button

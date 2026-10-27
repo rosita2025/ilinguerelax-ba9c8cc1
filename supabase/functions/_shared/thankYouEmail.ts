@@ -143,10 +143,9 @@ export async function sendThankYouEmail(a: Args): Promise<void> {
   };
 
   await Promise.all([
-    // "Pedido #… confirmado" se omite cuando hay entrega digital: el correo "Gracias por tu compra" de la entrega
-    // (send-digital-ilinguerelax) ya confirma el pedido y trae las descargas; mandar los dos duplicaba el aviso.
-    // Sin entrega digital (p. ej. libro físico) sí se envía. Para volver a enviarlo siempre: secreto ORDER_CONFIRMED_EMAIL=on.
-    (a.skus && a.skus.length > 0 && Deno.env.get("ORDER_CONFIRMED_EMAIL") !== "on")
+    // El comprador digital recibe 2 correos por compra: "Pedido #… confirmado" (esta plantilla) y "Gracias por tu compra"
+    // (la entrega, en send-digital-ilinguerelax). Para dejar solo el de entrega: secreto ORDER_CONFIRMED_EMAIL=off.
+    (a.skus && a.skus.length > 0 && Deno.env.get("ORDER_CONFIRMED_EMAIL") === "off")
       ? Promise.resolve()
       : invokeTemplate("thank-you", a.customerEmail, data, `thank-you-${key}`),
     // Aviso de venta a hola@ilinguerelax.com: apagado (las ventas se ven en /admin). Para volver a recibirlo,

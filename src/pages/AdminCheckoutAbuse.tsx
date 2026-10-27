@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Shield, Trash2, RefreshCw, MessageCircle, Timer } from "lucide-react";
+import { Shield, Trash2, RefreshCw, MessageCircle, Timer, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { useToast } from "@/hooks/use-toast";
@@ -180,6 +180,49 @@ function activityLabel(r: { status?: string; email?: string | null; cart?: CartI
   return "Solo vio el checkout: no llenó el formulario ni el carrito";
 }
 
+/** Modelo de teléfono / navegador a partir del user-agent (lo que el navegador deja ver). */
+function parseDevice(ua?: string | null): { device: string; browser: string } {
+  const u = ua || "";
+  if (!u) return { device: "Desconocido", browser: "—" };
+  let browser = "Navegador";
+  if (/Instagram/i.test(u)) browser = "App de Instagram";
+  else if (/FBAN|FBAV|FB_IAB/i.test(u)) browser = "App de Facebook";
+  else if (/TikTok|musical_ly|BytedanceWebview/i.test(u)) browser = "App de TikTok";
+  else if (/EdgA?\//.test(u)) browser = "Edge";
+  else if (/SamsungBrowser/i.test(u)) browser = "Samsung Internet";
+  else if (/OPR\/|Opera/i.test(u)) browser = "Opera";
+  else if (/Firefox|FxiOS/i.test(u)) browser = "Firefox";
+  else if (/CriOS|Chrome\//.test(u)) browser = "Chrome";
+  else if (/Safari\//.test(u)) browser = "Safari";
+  else if (/bot|crawl|spider|headless/i.test(u)) browser = "Bot";
+
+  const ios = u.match(/OS (\d+)[_.](\d+)/);
+  if (/iPhone/.test(u)) return { device: `iPhone · iOS ${ios ? ios[1] : ""}`.trim(), browser };
+  if (/iPad/.test(u)) return { device: `iPad · iOS ${ios ? ios[1] : ""}`.trim(), browser };
+  const and = u.match(/Android\s([\d.]+)(?:;\s*((?:[^;()]|\([^)]*\))+))?/);
+  if (and) {
+    let model = (and[2] || "").replace(/\s*Build\/.*$/i, "").trim();
+    if (!model || model === "K" || /^wv$/i.test(model)) return { device: `Android ${and[1].split(".")[0]} (modelo oculto)`, browser };
+    const brand =
+      /^SM-|^GT-/i.test(model) ? "Samsung " :
+      /^(Redmi|M\d{4}|2\d{6,}|POCO|Mi )/i.test(model) ? "Xiaomi " :
+      /^(CPH|PH[A-Z]\d)/i.test(model) ? "Oppo " :
+      /^RMX/i.test(model) ? "Realme " :
+      /^(moto|XT\d)/i.test(model) ? "Motorola " :
+      /^(V\d{4}|vivo)/i.test(model) ? "Vivo " :
+      /^(TECNO|Infinix|itel)/i.test(model) ? "" :
+      /^Pixel/i.test(model) ? "Google " :
+      /^(LM-|LG)/i.test(model) ? "LG " :
+      /^(HUAWEI|[A-Z]{3}-L\d)/i.test(model) ? "Huawei " : "";
+    return { device: `${brand}${model} · Android ${and[1].split(".")[0]}`, browser };
+  }
+  if (/Windows NT/.test(u)) return { device: "PC Windows", browser };
+  if (/Macintosh/.test(u)) return { device: "Mac", browser };
+  if (/CrOS/.test(u)) return { device: "Chromebook", browser };
+  if (/Linux/.test(u)) return { device: "Linux", browser };
+  return { device: "Otro dispositivo", browser };
+}
+
 interface Summary {
   visits: number;
   visitors: number;
@@ -227,6 +270,9 @@ export default function AdminCheckoutAbuse() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [loading, setLoading] = useState(false);
+  const [tab, setTab] = useState<"filled" | "empty">("filled");
+  const [countryFilter, setCountryFilter] = useState("");
+  const [shown, setShown] = useState(25);
 
   const load = async () => {
     setLoading(true);
@@ -270,6 +316,28 @@ export default function AdminCheckoutAbuse() {
       toast({ title: "Error al desbloquear", variant: "destructive" });
     }
   };
+
+  // Con correo: una fila por correo (la visita más reciente); sin llenar: una fila por IP.
+  const withEmail = (() => {
+    const m = new Map<string, StatRow>();
+    for (const r of top) {
+      if (!r.email) continue;
+      const k = r.email.trim().toLowerCase();
+      const prev = m.get(k);
+      if (!prev || String(r.last) > String(prev.last)) m.set(k, r);
+    }
+    return [...m.values()].sort((a, b) => String(b.last).localeCompare(String(a.last)));
+  })();
+  const withoutEmail = top.filter((r) => !r.email).sort((a, b) => String(b.last).localeCompare(String(a.last)));
+  const countryOptions = (() => {
+    const m = new Map<string, number>();
+    for (const r of tab === "filled" ? withEmail : withoutEmail) {
+      const c = (r.country || "").toUpperCase();
+      if (c) m.set(c, (m.get(c) || 0) + 1);
+    }
+    return [...m.entries()].sort((a, b) => b[1] - a[1]);
+  })();
+  const visible = (tab === "filled" ? withEmail : withoutEmail).filter((r) => !countryFilter || (r.country || "").toUpperCase() === countryFilter);
 
   const activeBans = bans.filter((b) => new Date(b.banned_until) > new Date());
 
@@ -315,36 +383,99 @@ export default function AdminCheckoutAbuse() {
         )}
 
         <section className="border rounded-lg overflow-hidden">
-          <div className="px-4 py-3 bg-muted/40 border-b">
-            <h2 className="font-semibold">Correos capturados · últimas 24 h ({leads.length})</h2>
-            <p className="text-xs text-muted-foreground mt-1">
-              Personas que escribieron su correo en el checkout, con su país y si compraron o abandonaron.
-            </p>
+          <div className="px-4 py-3 bg-muted/40 border-b space-y-3">
+            <div>
+              <h2 className="font-semibold">Visitantes del checkout · últimas 24 h</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Separados en dos pestañas: quienes dejaron su correo y quienes solo miraron. Con país, duración y modelo de teléfono.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {([
+                ["filled", `✍️ Con correo (${withEmail.length})`],
+                ["empty", `👤 Sin llenar (${withoutEmail.length})`],
+              ] as const).map(([k, label]) => (
+                <Button key={k} size="sm" variant={tab === k ? "default" : "outline"} onClick={() => { setTab(k); setShown(25); }}>
+                  {label}
+                </Button>
+              ))}
+              <select
+                value={countryFilter}
+                onChange={(e) => { setCountryFilter(e.target.value); setShown(25); }}
+                className="h-9 rounded-md border bg-background px-2 text-sm ml-auto"
+                aria-label="Filtrar por país"
+              >
+                <option value="">🌐 Todos los países</option>
+                {countryOptions.map(([code, n]) => (
+                  <option key={code} value={code}>{flagEmoji(code)} {COUNTRY_NAMES[code] || code} ({n})</option>
+                ))}
+              </select>
+            </div>
           </div>
-          {leads.length === 0 ? (
+          {visible.length === 0 ? (
             <p className="p-6 text-sm text-muted-foreground text-center">
-              Nadie llenó el formulario en las últimas 24 h.
+              {tab === "filled" ? "Nadie dejó su correo en este filtro." : "Sin visitantes sin llenar en este filtro."}
             </p>
           ) : (
             <div className="divide-y">
-              {leads.map((l, i) => (
-                <div key={`${l.email}-${i}`} className="p-3 flex flex-wrap items-center gap-2 text-sm">
-                  <CountryBadge code={l.country} />
-                  {l.city && <span className="text-xs text-muted-foreground">📍 {l.city}</span>}
-                  <a href={`mailto:${l.email}`} className="text-primary hover:underline break-all">{l.email}</a>
-                  <StatusBadge status={l.status} />
-                  {l.client_purchase_event && <ClientPurchaseWarning />}
-                  {(l.duration_sec ?? 0) > 0 && (
-                    <span className="inline-flex items-center gap-1 text-xs text-muted-foreground" title="Tiempo entre su primera y última visita al checkout">
-                      <Timer className="h-3.5 w-3.5" /> {fmtDuration(l.duration_sec)}
-                    </span>
-                  )}
-                  {l.status === "abandoned" && (
-                    <WhatsAppFollowUp url={recoveryWaUrl({ phone: l.cart?.phone, country: l.country, name: l.cart?.name, slugs: l.slugs, recoverUrl: l.cart?.recover_url })} />
-                  )}
-                  <span className="text-xs text-muted-foreground ml-auto">{new Date(l.last).toLocaleString()}</span>
+              {visible.slice(0, shown).map((r) => {
+                const d = parseDevice(r.ua);
+                const waUrl = r.status === "abandoned"
+                  ? recoveryWaUrl({ phone: r.cart?.phone, country: r.country, name: r.cart?.name, slugs: r.slugs, recoverUrl: r.cart?.recover_url })
+                  : null;
+                return (
+                  <details key={r.ip} className="group p-3">
+                    <summary className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm cursor-pointer list-none">
+                      <CountryBadge code={r.country} />
+                      {r.city && <span className="text-xs text-muted-foreground">📍 {r.city}</span>}
+                      <span className="inline-flex items-center gap-1 text-xs" title="Modelo de teléfono / dispositivo">
+                        <Smartphone className="h-3.5 w-3.5 text-muted-foreground" /> {d.device}
+                        <span className="text-muted-foreground">· {d.browser}</span>
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs" title="Tiempo entre su primera y última visita al checkout">
+                        <Timer className="h-3.5 w-3.5 text-muted-foreground" />
+                        {r.count > 1 ? fmtDuration(r.duration_sec) : "1 visita"}
+                      </span>
+                      <span className={`text-xs font-semibold ${r.count > 20 ? "text-destructive" : "text-muted-foreground"}`}>{r.count} hits</span>
+                      <StatusBadge status={r.status} />
+                      {r.client_purchase_event && <ClientPurchaseWarning />}
+                      {r.email && (
+                        <a href={`mailto:${r.email}`} onClick={(e) => e.stopPropagation()} className="text-xs text-primary hover:underline break-all">{r.email}</a>
+                      )}
+                      <span className="text-xs text-muted-foreground ml-auto">{new Date(r.last).toLocaleString()}</span>
+                    </summary>
+                    <div className="mt-2 pl-1 space-y-1.5 text-xs">
+                      <p className="text-foreground">{activityLabel(r)}</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {(r.sources.length ? r.sources : ["direct"]).map((src) => <SourceBadge key={src} source={src} />)}
+                        {r.first && <span className="text-muted-foreground">Primera visita: {new Date(r.first).toLocaleTimeString()}</span>}
+                        <span className="font-mono text-muted-foreground">{r.ip}</span>
+                        {(r.reminders ?? 0) > 0 && <span className="text-muted-foreground">· {r.reminders} recordatorio(s) enviados</span>}
+                        {r.status === "abandoned" && <WhatsAppFollowUp url={waUrl} />}
+                      </div>
+                      {r.slugs.length > 0 && (
+                        <div><span className="text-muted-foreground">Vio: </span>{r.slugs.join(", ")}</div>
+                      )}
+                      {r.referers.length > 0 && (
+                        <div className="space-y-0.5">
+                          <span className="text-muted-foreground">Origen:</span>
+                          {r.referers.map((u, i) => (
+                            <a key={i} href={u} target="_blank" rel="noopener noreferrer" className="block text-primary hover:underline truncate" title={u}>{u}</a>
+                          ))}
+                        </div>
+                      )}
+                      {r.ua && <div className="text-[10px] text-muted-foreground break-all">{r.ua}</div>}
+                    </div>
+                  </details>
+                );
+              })}
+              {visible.length > shown && (
+                <div className="p-3 text-center">
+                  <Button variant="outline" size="sm" onClick={() => setShown((n) => n + 25)}>
+                    Ver más ({visible.length - shown} restantes)
+                  </Button>
                 </div>
-              ))}
+              )}
             </div>
           )}
         </section>
@@ -437,93 +568,6 @@ export default function AdminCheckoutAbuse() {
           )}
         </section>
 
-        <section className="border rounded-lg overflow-hidden">
-          <div className="px-4 py-3 bg-muted/40 border-b">
-            <h2 className="font-semibold">Visitantes del checkout · últimas 24 h</h2>
-            <p className="text-xs text-muted-foreground mt-1">
-              Correo (si lo escribió), país y si terminó comprando o abandonó el carrito.
-            </p>
-          </div>
-          {top.length === 0 ? (
-            <p className="p-6 text-sm text-muted-foreground text-center">Sin actividad reciente.</p>
-          ) : (
-            <div className="divide-y">
-              {top.map((r) => (
-                <div key={r.ip} className="p-3 space-y-2">
-                  <div className="flex items-center justify-between gap-3 flex-wrap">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <CountryBadge code={r.country} />
-                      {r.city && (
-                        <span className="text-xs text-muted-foreground">📍 {r.city}</span>
-                      )}
-                      <span className="font-mono text-sm">{r.ip}</span>
-                      {(r.sources.length ? r.sources : ["direct"]).map((s) => (
-                        <SourceBadge key={s} source={s} />
-                      ))}
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className={`font-semibold ${r.count > 20 ? "text-destructive" : "text-foreground"}`}>{r.count} hits</span>
-                      <span>{new Date(r.last).toLocaleString()}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-x-4 gap-y-1 flex-wrap text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1 text-foreground">
-                      <Timer className="h-3.5 w-3.5" /> Estuvo {r.count > 1 ? fmtDuration(r.duration_sec) : "una sola visita (sin tiempo medible)"}
-                    </span>
-                    {r.first && <span>Primera visita: {new Date(r.first).toLocaleTimeString()}</span>}
-                    <span>Abrió el checkout {r.count} {r.count === 1 ? "vez" : "veces"}</span>
-                    <span className="text-foreground">{activityLabel(r)}</span>
-                  </div>
-                  <div className="flex items-center gap-2 flex-wrap text-xs">
-                    <StatusBadge status={r.status} />
-                    {r.status === "abandoned" && (
-                      <WhatsAppFollowUp url={recoveryWaUrl({ phone: r.cart?.phone, country: r.country, name: r.cart?.name, slugs: r.slugs, recoverUrl: r.cart?.recover_url })} />
-                    )}
-                    {r.client_purchase_event && <ClientPurchaseWarning />}
-                    {r.email ? (
-                      <a href={`mailto:${r.email}`} className="text-primary hover:underline break-all">
-                        {r.email}
-                      </a>
-                    ) : (
-                      <span className="text-muted-foreground">Sin correo — no llenó el formulario</span>
-                    )}
-                    {(r.reminders ?? 0) > 0 && (
-                      <span className="text-muted-foreground">· {r.reminders} recordatorio(s) enviados</span>
-                    )}
-                  </div>
-                  {r.slugs.length > 0 && (
-                    <div className="text-xs">
-                      <span className="text-muted-foreground">Productos: </span>
-                      <span className="text-foreground">{r.slugs.join(", ")}</span>
-                    </div>
-                  )}
-                  {r.referers.length > 0 && (
-                    <div className="text-xs space-y-1">
-                      <span className="text-muted-foreground">URLs de origen:</span>
-                      {r.referers.map((u, i) => (
-                        <a
-                          key={i}
-                          href={u}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block text-primary hover:underline truncate max-w-full"
-                          title={u}
-                        >
-                          {u}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                  {r.ua && (
-                    <div className="text-[10px] text-muted-foreground truncate" title={r.ua}>
-                      {r.ua}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
       </div>
     </div>
   );

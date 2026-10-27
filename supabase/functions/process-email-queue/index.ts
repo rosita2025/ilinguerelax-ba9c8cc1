@@ -146,7 +146,7 @@ Deno.serve(async (req) => {
       batch_size: batchSize,
       vt: 30,
     })) as unknown as {
-      data: Array<{ msg_id: number; read_ct: number; message: Record<string, unknown>; enqueued_at?: string }> | null
+      data: Array<{ msg_id: number; read_ct: number; message: any; enqueued_at?: string }> | null
       error: { message: string } | null
     }
 

@@ -160,8 +160,6 @@ function renderMethodBadge(badge: MethodBadge) {
   if (badge.label === "Apple Pay") return <ApplePayBadge key={badge.label} />;
   if (badge.label === "Hotmart") return <LogoBadge key={badge.label} src={hotmartLogo.url} alt="Hotmart" />;
   if (badge.label === "Mercado Pago") return <LogoBadge key={badge.label} src={mercadopagoLogo} alt="Mercado Pago" />;
-  if (badge.label === "OXXO") return <LogoBadge key={badge.label} src={oxxoLogo} alt="OXXO" />;
-  if (badge.label === "SPEI") return <LogoBadge key={badge.label} src={speiLogo} alt="SPEI" />;
   if (badge.label === "Google Pay") return <GooglePayBadge key={badge.label} />;
   if (badge.label === "Link") return <LinkBadge key={badge.label} />;
   return <BankBadge key={badge.label} {...badge} />;
@@ -2085,9 +2083,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     {
       id: "dlocal_wallet",
       icon: Wallet,
-      // Donde Mercado Pago está disponible (México, Argentina, Brasil, Perú…) se cobra a través de dLocal Go: la fila se llama
-      // "dLocal Go" y Mercado Pago sigue visible en el chip y en el texto; dLocal gestiona la billetera.
-      title: dlocalRails(country, "wallet").includes("Mercado Pago") ? "dLocal Go"
+      // Donde Mercado Pago está disponible (México, Argentina, Brasil, Perú…) la fila se llama Mercado Pago y usa su logo
+      // (el cobro lo gestiona dLocal Go por detrás).
+      title: dlocalRails(country, "wallet").includes("Mercado Pago") ? "Mercado Pago"
         : (getDlocalCountry(country)?.walletLabel
         ? `${getDlocalCountry(country)!.walletLabel}`
         : language === "en" ? "Digital wallet"
@@ -2514,8 +2512,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         const rowLogo: { src: string; alt: string } | null =
           m.id === "paypal" ? { src: paypalLogo, alt: "PayPal" }
           : m.id === "yape" ? { src: yapeLogo, alt: "Yape" }
-          : m.id === "clabe" || (m.id === "dlocal_transfer" && country === "MX") ? { src: speiLogo, alt: "SPEI" }
+          : m.id === "clabe" ? { src: speiLogo, alt: "SPEI" }
           : m.id === "dlocal_cash" && country === "MX" ? { src: oxxoLogo, alt: "OXXO" }
+          : m.id === "dlocal_wallet" && dlocalRails(country, "wallet").includes("Mercado Pago") ? { src: mercadopagoLogo, alt: "Mercado Pago" }
           : null;
         const section = methodSection(m.id);
         const prev = idx > 0 ? methods[idx - 1] : null;
@@ -2673,7 +2672,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   </div>
                 ) : m.id === "clabe" ? (
                   <div className="mt-1 flex items-center gap-1 flex-wrap">
-                    {renderMethodBadge({ label: "SPEI", bg: "#0A2540", color: "#ffffff" })}
+                    <BankBadge label="SPEI" bg="#0A2540" color="#ffffff" />
                     <BankBadge label="CLABE" bg="#006341" color="#ffffff" />
                     <BankBadge label="MXN" bg="#ffffff" color="#0A2540" />
                   </div>

@@ -2,7 +2,7 @@
 // El precio SIEMPRE se calcula en el servidor (catálogo + cupón), nunca se confía en el navegador.
 // Secretos de Supabase: PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET (y PAYPAL_ENV=sandbox solo para pruebas).
 const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
-import { z } from "npm:zod@3.23.8";
+import { z } from "npm:zod@3.25.76";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { resolveServerPricing, PricingError, localTotalFromPricing } from "../_shared/catalogPricing.ts";

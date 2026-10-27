@@ -2085,8 +2085,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     {
       id: "dlocal_wallet",
       icon: Wallet,
-      // Donde Mercado Pago está disponible (México, Argentina, Brasil, Perú…) la fila lo nombra y usa su logo.
-      title: dlocalRails(country, "wallet").includes("Mercado Pago") ? "Mercado Pago"
+      // Donde Mercado Pago está disponible (México, Argentina, Brasil, Perú…) se cobra a través de dLocal Go: la fila se llama
+      // "dLocal Go" y Mercado Pago sigue visible en el chip y en el texto; dLocal gestiona la billetera.
+      title: dlocalRails(country, "wallet").includes("Mercado Pago") ? "dLocal Go"
         : (getDlocalCountry(country)?.walletLabel
         ? `${getDlocalCountry(country)!.walletLabel}`
         : language === "en" ? "Digital wallet"
@@ -2515,7 +2516,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           : m.id === "yape" ? { src: yapeLogo, alt: "Yape" }
           : m.id === "clabe" || (m.id === "dlocal_transfer" && country === "MX") ? { src: speiLogo, alt: "SPEI" }
           : m.id === "dlocal_cash" && country === "MX" ? { src: oxxoLogo, alt: "OXXO" }
-          : m.id === "dlocal_wallet" && dlocalRails(country, "wallet").includes("Mercado Pago") ? { src: mercadopagoLogo, alt: "Mercado Pago" }
           : null;
         const section = methodSection(m.id);
         const prev = idx > 0 ? methods[idx - 1] : null;

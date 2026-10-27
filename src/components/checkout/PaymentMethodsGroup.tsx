@@ -28,6 +28,8 @@ import { trackPaymentError, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import { usePurchaseTracking } from "@/hooks/usePurchaseTracking";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
+import paypalLogo from "@/assets/paypal-logo.png";
+import yapeLogo from "@/assets/yape-logo.webp";
 
 // Formulario de pago nuevo (tipo Payment Element). ACTIVO para TODOS los países.
 // Para volver al formulario anterior en una prueba: agregar ?pe=0 al enlace del checkout
@@ -230,6 +232,8 @@ const methodHint = (id: string, language: string): { text: string; cls: string }
     language === "en" ? en : language === "fr" ? fr : language === "it" ? it : language === "pt" ? pt : es;
   if (["yape", "dlocal_wallet", "clabe", "stripe_cashapp", "stripe_bizum", "stripe_satispay", "stripe_mbway"].includes(id))
     return { text: L("Pago rápido", "Fast pay", "Paiement rapide", "Pagamento rapido", "Pagamento rápido"), cls: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200" };
+  if (id === "paypal")
+    return { text: L("Billetera", "Wallet", "Portefeuille", "Portafoglio", "Carteira"), cls: "bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-200" };
   if (id === "binance" || id === "stripe_crypto")
     return { text: L("Cripto", "Crypto", "Crypto", "Cripto", "Cripto"), cls: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200" };
   if (id === "cash" || id === "dlocal_cash")
@@ -2123,7 +2127,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         : language === "it" ? "Paga con il tuo conto PayPal o carta · sicuro"
         : "Paga con tu cuenta PayPal o con tarjeta · seguro",
       badge: finalPriceLabel,
-      badges: [{ label: "PayPal", bg: "#003087", color: "#ffffff" }],
     },
     {
       id: "hotmart_separator",
@@ -2539,7 +2542,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 !valid && "cursor-pointer",
               )}
             >
-              {m.id !== "hotmart" && (
+              {(m.id === "paypal" || m.id === "yape") && (
+                <div className="rounded-lg flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9 overflow-hidden">
+                  {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <img src={m.id === "paypal" ? paypalLogo : yapeLogo} alt={m.id === "paypal" ? "PayPal" : "Yape"} width={36} height={36} className="w-full h-full object-contain" />}
+                </div>
+              )}
+              {m.id !== "hotmart" && m.id !== "paypal" && m.id !== "yape" && (
                 <div className={cn(
                   "rounded-lg flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9",
                   isSelected

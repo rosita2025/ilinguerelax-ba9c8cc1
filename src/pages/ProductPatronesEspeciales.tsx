@@ -609,14 +609,6 @@ const PatronesContent = () => {
               </h2>
             </div>
             <ReviewSlider />
-            <div className="text-center mt-6">
-              <Button variant="hero" size="xl" onClick={handleBuy} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
-                <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-                {pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
-                <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
-              </Button>
-              <p className="text-xs text-muted-foreground mt-2">🔒 Pago seguro • ⬇️ Descarga inmediata • 🛡️ Garantía 7 días</p>
-            </div>
           </div>
         </div>
       </section>

@@ -88,7 +88,7 @@ export default function CheckoutFailure() {
             </Link>
           </Button>
           <Button asChild variant="ghost" size="lg" className="gap-2">
-            <a href={buildSupportUrl({ language, reason: "error", method: sp.get("provider") || undefined, error: [sp.get("order"), sp.get("reason") || sp.get("status")].filter(Boolean).join(" · ") || undefined })} target="_blank" rel="noopener noreferrer">
+            <a href={buildSupportUrl({ language, reason: "error", method: sp.get("provider") || undefined, orderNumber: sp.get("order"), error: sp.get("reason") || sp.get("status") || undefined })} target="_blank" rel="noopener noreferrer">
               <MessageCircle className="w-4 h-4" /> {t.contactSupport}
             </a>
           </Button>

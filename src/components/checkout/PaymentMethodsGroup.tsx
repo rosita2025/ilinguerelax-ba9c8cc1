@@ -935,8 +935,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         },
       }, { attempts: 2, baseDelayMs: 500 });
       if (error || !data?.approveUrl) {
-        const detail = await extractEdgeErrorMessage(error);
-        const e = error as { status?: number; message?: string } | null;
+        // invokeWithRetry ya leyó el cuerpo de la respuesta (solo se puede leer una vez): su texto va en edgeDetail.
+        const e = error as { status?: number; message?: string; edgeDetail?: string } | null;
+        const detail = e?.edgeDetail && !/^HTTP \d+$/.test(e.edgeDetail) ? e.edgeDetail : await extractEdgeErrorMessage(error);
         // Sin texto del servidor casi siempre es que la función aún no está desplegada o no responde: se deja la pista a la vista.
         throw new Error(detail || `${t.errorPayment} (Ref: paypal-order-create ${[e?.status, e?.message].filter(Boolean).join(" · ") || `respuesta sin enlace de PayPal${data ? ` (campos: ${Object.keys(data).join(",") || "ninguno"})` : ""}`})`);
       }

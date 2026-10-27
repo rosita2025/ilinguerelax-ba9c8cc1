@@ -50,6 +50,8 @@ export type SupportContext = {
   amountLabel?: string;
   error?: string;
   reason?: SupportReason;
+  /** Número de pedido real (p. ej. ILR-PP-ABC123) cuando ya existe: se muestra aunque el carrito esté vacío. */
+  orderNumber?: string | null;
 };
 
 /**
@@ -75,9 +77,23 @@ export function buildSupportUrl(ctx: SupportContext = {}): string {
   const filled = name.length >= 2 && /\S+@\S+\.\S+/.test(email);
   let link = "";
   try { link = `${window.location.origin}${window.location.pathname}`; } catch { /* sin ventana */ }
+  try {
+    // Con el carrito vacío (p. ej. en la pantalla de error) se recupera el producto y el checkout guardados al iniciar el pago.
+    const raw = localStorage.getItem("ilr_last_checkout") || sessionStorage.getItem("ilr_last_checkout");
+    if (raw) {
+      const mem = JSON.parse(raw) as { content_name?: string | null; page_path?: string | null };
+      if (!product && mem.content_name) product = String(mem.content_name);
+      if (mem.page_path && /^\/checkouts\//.test(window.location.pathname) && /^\/checkouts\/(failure|pending|success|return)/.test(window.location.pathname)) {
+        link = `${window.location.origin}${mem.page_path}`;
+      }
+    }
+  } catch { /* sin memoria */ }
 
   const lines: string[] = [t.reasons[ctx.reason ?? "problem"]];
-  if (filled) {
+  if (ctx.orderNumber) {
+    lines.push(`${t.order}: #${ctx.orderNumber}`);
+    if (filled) lines.push(`${t.name}: ${name}`, `${t.email}: ${email}`);
+  } else if (filled) {
     lines.push(`${t.order}: #${getOrderRef()}`, `${t.name}: ${name}`, `${t.email}: ${email}`);
   } else {
     lines.push(t.noOrder);

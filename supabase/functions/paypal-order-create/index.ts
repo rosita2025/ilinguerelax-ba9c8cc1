@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
             email_address: body.payerEmail,
             experience_context: {
               brand_name: "iLingue Relax",
-              landing_page: "LOGIN",
+              landing_page: "NO_PREFERENCE",
               shipping_preference: "NO_SHIPPING",
               user_action: "PAY_NOW",
               return_url: body.returnUrl,

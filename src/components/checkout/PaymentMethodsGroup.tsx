@@ -2113,7 +2113,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         : language === "pt" ? "Pague com sua conta PayPal ou cartão · seguro"
         : language === "fr" ? "Payez avec votre compte PayPal ou carte · sécurisé"
         : language === "it" ? "Paga con il tuo conto PayPal o carta · sicuro"
-        : "Paga con tu cuenta PayPal o tarjeta · seguro",
+        : "Paga con tu cuenta PayPal o con tarjeta · seguro",
       badge: finalPriceLabel,
       badges: [{ label: "PayPal", bg: "#003087", color: "#ffffff" }],
     },

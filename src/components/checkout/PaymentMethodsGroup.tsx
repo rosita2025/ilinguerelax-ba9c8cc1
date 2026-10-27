@@ -29,6 +29,7 @@ import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import { usePurchaseTracking } from "@/hooks/usePurchaseTracking";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 import paypalLogo from "@/assets/paypal-logo.png";
+import yapeLogo from "@/assets/yape-logo.webp";
 
 // Formulario de pago nuevo (tipo Payment Element). ACTIVO para TODOS los países.
 // Para volver al formulario anterior en una prueba: agregar ?pe=0 al enlace del checkout
@@ -2541,12 +2542,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 !valid && "cursor-pointer",
               )}
             >
-              {m.id === "paypal" && (
+              {(m.id === "paypal" || m.id === "yape") && (
                 <div className="rounded-lg flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9 overflow-hidden">
-                  {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <img src={paypalLogo} alt="PayPal" width={36} height={36} className="w-full h-full object-contain" />}
+                  {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <img src={m.id === "paypal" ? paypalLogo : yapeLogo} alt={m.id === "paypal" ? "PayPal" : "Yape"} width={36} height={36} className="w-full h-full object-contain" />}
                 </div>
               )}
-              {m.id !== "hotmart" && m.id !== "paypal" && (
+              {m.id !== "hotmart" && m.id !== "paypal" && m.id !== "yape" && (
                 <div className={cn(
                   "rounded-lg flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9",
                   isSelected

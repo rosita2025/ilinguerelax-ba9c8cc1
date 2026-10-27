@@ -11,7 +11,9 @@ export type OrderEventName =
   | "payment_paid"
   | "payment_failed"
   | "delivery_sent"
-  | "delivery_failed";
+  | "delivery_failed"
+  | "payment_error"
+  | "payment_mismatch";
 
 export interface OrderEventInput {
   orderNumber: string;

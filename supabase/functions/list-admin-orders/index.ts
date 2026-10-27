@@ -172,17 +172,17 @@ Deno.serve(async (req) => {
             : table === "shopify_sales"
               ? "customer_email, customer_name"
               : "email, customer_name";
-          const { data: orderData } = await admin
+          const { data: orderData } = (await admin
             .from(table)
             .select(selectCols)
             .eq(idField, orderId)
-            .maybeSingle();
+            .maybeSingle()) as { data: any };
 
           const email = orderData?.buyer_email || orderData?.customer_email || orderData?.email;
           const name = await resolveCustomerName(String(orderId));
 
           if (email) {
-            emailResult = await sendShippingEmail(admin, {
+            emailResult = <any>await sendShippingEmail(admin, {
               kind: prevTracking && prevTracking !== trackingCode
                 ? "tracking_updated"
                 : "tracking_new",
@@ -220,11 +220,11 @@ Deno.serve(async (req) => {
           ? "customer_email, customer_name, tracking_number, shipping_provider"
           : "email, customer_name, tracking_number, shipping_provider, status";
 
-      const { data: orderData } = await admin
+      const { data: orderData } = (await admin
         .from(table)
         .select(selectCols)
         .eq(idField, orderId)
-        .maybeSingle();
+        .maybeSingle()) as { data: any };
 
       const email = orderData?.buyer_email || orderData?.customer_email || orderData?.email;
       if (!email) {

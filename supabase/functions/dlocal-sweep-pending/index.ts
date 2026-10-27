@@ -66,7 +66,7 @@ function isSlowRail(method: string | null, status: string | null): boolean {
 
 /** Cierra los recordatorios de pago pendiente para que dejen de enviarse correos. */
 async function resolveReminders(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   orderNumber: string,
   reason: string,
 ) {

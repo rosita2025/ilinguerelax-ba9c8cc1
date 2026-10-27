@@ -225,7 +225,6 @@ Deno.serve(async (req) => {
           event_type: payment.status === "approved" ? "Purchase" : `mp_${payment.status}`,
           email: payerEmail,
           name: payerName,
-          country: payment.payer?.address?.country_id || "PE",
           product_id: (payment.metadata?.skus ? String(payment.metadata.skus).split(",")[0].trim() : "")
             || getPaymentSkus(payment)[0]
             || payment.metadata?.source
@@ -258,8 +257,8 @@ Deno.serve(async (req) => {
         // Send pending-payment emails for transferencia/efectivo/ticket/atm
         // so the customer keeps a receipt if the tab/battery dies.
         const isPending = payment.status === "pending" || payment.status === "in_process";
-        const payerEmail = payment.payer?.email || payment.metadata?.customer_email;
-        if (isPending && payerEmail) {
+        const pendingEmail = payment.payer?.email || payment.metadata?.customer_email;
+        if (isPending && pendingEmail) {
           const orderNumber = payment.external_reference || `MP-${payment.id}`;
           const method = payment.payment_type_id === "ticket"
             ? "Efectivo / Ticket (Mercado Pago)"
@@ -269,7 +268,7 @@ Deno.serve(async (req) => {
                 ? "Cajero / ATM (Mercado Pago)"
                 : `Mercado Pago (${payment.payment_method_id || payment.payment_type_id || "pendiente"})`;
           const customerName = [payment.payer?.first_name, payment.payer?.last_name]
-            .filter(Boolean).join(" ") || payment.metadata?.customer_name || payerEmail.split("@")[0];
+            .filter(Boolean).join(" ") || payment.metadata?.customer_name || pendingEmail.split("@")[0];
           const templateData = {
             orderNumber,
             customerName,
@@ -289,7 +288,7 @@ Deno.serve(async (req) => {
             method,
             reference: String(payment.id),
             detail: "Mercado Pago registró el pedido como pendiente de pago",
-            customerEmail: payerEmail,
+            customerEmail: pendingEmail,
             amount: payment.transaction_amount ?? null,
             currency: payment.currency_id || "PEN",
             metadata: { paymentType: payment.payment_type_id, skus: getPaymentSkus(payment) },
@@ -299,7 +298,7 @@ Deno.serve(async (req) => {
             supabase.functions.invoke("send-transactional-email", {
               body: {
                 templateName: "customer-manual-pending",
-                recipientEmail: payerEmail,
+                recipientEmail: pendingEmail,
                 idempotencyKey: `${idemBase}-customer`,
                 templateData,
               },
@@ -311,7 +310,7 @@ Deno.serve(async (req) => {
                 idempotencyKey: `${idemBase}-admin`,
                 templateData: {
                   ...templateData,
-                  customerEmail: payerEmail,
+                  customerEmail: pendingEmail,
                   customerWhatsapp: payment.payer?.phone
                     ? `${payment.payer.phone.area_code || ""}${payment.payer.phone.number || ""}`
                     : "",
@@ -323,9 +322,9 @@ Deno.serve(async (req) => {
         }
 
         // Approved payment → send customer thank-you + admin-sale notification
-        if (payment.status === "approved" && payerEmail) {
+        if (payment.status === "approved" && pendingEmail) {
           const customerName = [payment.payer?.first_name, payment.payer?.last_name]
-            .filter(Boolean).join(" ") || payment.metadata?.customer_name || payerEmail.split("@")[0];
+            .filter(Boolean).join(" ") || payment.metadata?.customer_name || pendingEmail.split("@")[0];
           const orderNumber = payment.external_reference || `ILR-MP-${payment.id}`;
           const couponCode = String(payment.metadata?.coupon_code || "").trim().toUpperCase() || undefined;
           const couponPctRaw = Number(payment.metadata?.coupon_percent);
@@ -346,7 +345,7 @@ Deno.serve(async (req) => {
               : `Mercado Pago (${payment.payment_method_id || payment.payment_type_id || "pago"})`,
             reference: String(payment.id),
             detail: "Pago confirmado por Mercado Pago",
-            customerEmail: payerEmail,
+            customerEmail: pendingEmail,
             amount: payment.transaction_amount ?? null,
             currency: payment.currency_id || "PEN",
             metadata: { skus: skusForDelivery },
@@ -355,7 +354,7 @@ Deno.serve(async (req) => {
           // regrese a la página de éxito (pixel del navegador puede no dispararse).
           await sendPurchaseCapi({
             eventId: `Purchase_${orderNumber}`,
-            email: payerEmail,
+            email: pendingEmail,
             country: payment.payer?.address?.country_id || null,
             value: payment.transaction_amount ?? null,
             currency: payment.currency_id || "PEN",
@@ -367,7 +366,7 @@ Deno.serve(async (req) => {
           // Si además hay SKUs digitales, luego se dispara la entrega de materiales.
           try {
             await sendThankYouEmail({
-              customerEmail: payerEmail,
+              customerEmail: pendingEmail,
               customerName,
               customerPhone: payment.metadata?.customer_phone || undefined,
               customerCountry: payment.payer?.address?.country_id || undefined,
@@ -388,7 +387,7 @@ Deno.serve(async (req) => {
             const skus = getPaymentSkus(payment);
             if (skus.length > 0) {
               const { error: digitalErr } = await invokeInternalFunction("send-digital-ilinguerelax", {
-                customerEmail: payerEmail,
+                customerEmail: pendingEmail,
                 customerName,
                 customerPhone: payment.metadata?.customer_phone || undefined,
                 customerCountry: payment.payer?.address?.country_id || undefined,
@@ -407,8 +406,8 @@ Deno.serve(async (req) => {
                 reference: String(payment.id),
                 detail: digitalErr
                   ? `Fallo al enviar la entrega digital: ${digitalErr.message}`
-                  : `Entrega digital enviada a ${payerEmail} (${skus.join(", ")})`,
-                customerEmail: payerEmail,
+                  : `Entrega digital enviada a ${pendingEmail} (${skus.join(", ")})`,
+                customerEmail: pendingEmail,
                 metadata: { skus },
               });
               if (digitalErr) console.error("MP digital delivery failed:", digitalErr);

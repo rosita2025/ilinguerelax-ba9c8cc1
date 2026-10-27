@@ -89,13 +89,18 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Perú (moneda de la cuenta MP): cobramos en SOLES el importe EXACTO que
-    // vio el comprador, usando el precio local del catálogo (`local_prices` /
-    // `price_pen`) en vez de dejar que MP aplique su propio tipo de cambio.
-    // En el resto de países la cuenta solo admite USD, así que se mantiene USD.
-    const buyerCountry = String(body.country ?? "PE").toUpperCase().slice(0, 2);
-    const penTotal = buyerCountry === "PE" ? await localTotalFromPricing(pricing, "PEN") : null;
+    // La cuenta de Mercado Pago cobra en SOLES: pedimos siempre el importe local del
+    // catálogo (`local_prices` / `price_pen`) y no el USD, para que el cliente pague
+    // lo mismo que vio. Si no se puede calcular, mejor un error claro que cobrar en USD.
+    const penTotal = await localTotalFromPricing(pricing, "PEN");
     const useLocal = penTotal != null && penTotal > 0;
+    if (!useLocal) {
+      console.error("MP: no se pudo calcular el total en soles", { totalUsd: pricing.totalUsd });
+      return new Response(
+        JSON.stringify({ error: "No pudimos calcular el importe en soles. Inténtalo de nuevo en un momento." }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     const usdSubtotal = pricing.items.reduce(
       (sum, i) => sum + i.unitUsd * discountMultiplier * i.quantity,

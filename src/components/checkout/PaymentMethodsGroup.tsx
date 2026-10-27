@@ -858,13 +858,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       const payload = getPaymentPayload(pricing, "mercadopago", countryCode);
 
       const mpOrderId = `ILR-MP-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
-      // Perú: Mercado Pago cobra en soles, así que el WhatsApp de "pago pendiente" lleva el importe en soles.
+      // Mercado Pago cobra en soles: el WhatsApp de "pago pendiente" lleva ese importe.
       rememberPendingOrder({
         orderNumber: mpOrderId,
         name: s.buyer.fullName.trim(),
         email: s.buyer.email.trim(),
         product: s.items.map((i) => i.name).join(" + "),
-        amountLabel: countryCode === "PE" ? localTotalLabel : `US$ ${currentUsdRef.toFixed(2)}`,
+        amountLabel: countryCode === "PE" ? localTotalLabel : undefined,
         method: paymentType === "cash" ? "Mercado Pago · Efectivo" : "Mercado Pago · Transferencia",
       });
       const { data, error } = await invokeWithRetry<{ init_point?: string }>("create-mercadopago-preference", {

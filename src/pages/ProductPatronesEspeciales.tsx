@@ -587,7 +587,7 @@ const PatronesContent = () => {
       </section>
 
       {/* Testimonios 1: reseñas reales por WhatsApp */}
-      <section className="py-10 md:py-14">
+      <section className="pt-10 pb-44 md:pt-14 md:pb-14">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-6">

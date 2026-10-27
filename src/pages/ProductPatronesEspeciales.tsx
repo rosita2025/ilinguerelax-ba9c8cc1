@@ -99,6 +99,98 @@ const ReviewSlider = () => {
   );
 };
 
+const writtenReviews = (priceLabel: string) => [
+  {
+    name: "María G.",
+    country: "México",
+    text: `Por fin entiendo por qué el inglés se pronuncia diferente a como se escribe. Los patrones especiales me abrieron los ojos. Vale muchísimo más de ${priceLabel}.`,
+    rating: 5,
+  },
+  {
+    name: "Carlos R.",
+    country: "Colombia",
+    text: "Compré por curiosidad por el precio y me sorprendió la calidad. El alfabeto con sonidos reales y las letras mudas están explicadas clarísimo.",
+    rating: 5,
+  },
+  {
+    name: "Ana L.",
+    country: "España",
+    text: "Llevaba años confundiéndome con la pronunciación. Este ebook con las combinaciones secretas me dio la confianza que necesitaba para hablar.",
+    rating: 5,
+  },
+  {
+    name: "Luis M.",
+    country: "Perú",
+    text: "Los mini retos son geniales. No es teoría aburrida, es práctico y directo. Lo leí en una tarde y ya noto la diferencia al escuchar inglés.",
+    rating: 5,
+  },
+  {
+    name: "Diana S.",
+    country: "Chile",
+    text: "Me encantó que incluya contracciones y habla rápida. Por fin entiendo lo que dicen en las películas sin subtítulos. Muy recomendado.",
+    rating: 5,
+  },
+  {
+    name: "Jorge H.",
+    country: "Argentina",
+    text: "Dudaba por el precio bajo, pero la vista previa me convenció. El PDF está bien editado, sin errores, y el método realmente funciona.",
+    rating: 5,
+  },
+];
+
+const TestimonialSlider = ({ priceLabel }: { priceLabel: string }) => {
+  const reviews = useMemo(() => writtenReviews(priceLabel), [priceLabel]);
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setIdx((i) => (i + 1) % reviews.length), 3500);
+    return () => clearInterval(t);
+  }, [reviews.length]);
+  return (
+    <div className="mx-auto max-w-2xl">
+      <div className="relative overflow-hidden">
+        <div
+          className="flex transition-transform duration-500 ease-out"
+          style={{ transform: `translateX(-${idx * 100}%)` }}
+        >
+          {reviews.map((r, i) => (
+            <figure key={`${r.name}-${i}`} className="w-full shrink-0 px-1">
+              <div className="bg-card rounded-2xl border border-border shadow-card p-5 flex flex-col h-full">
+                <div className="flex items-center gap-1 mb-3">
+                  {[...Array(r.rating)].map((_, s) => (
+                    <Star key={s} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <p className="text-foreground/90 text-sm leading-relaxed mb-4 flex-grow">"{r.text}"</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground text-xs font-bold">
+                    {r.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-foreground">{r.name}</p>
+                    <p className="text-xs text-muted-foreground">{r.country}</p>
+                  </div>
+                </div>
+              </div>
+            </figure>
+          ))}
+        </div>
+      </div>
+      <div className="mt-3 flex justify-center gap-2">
+        {reviews.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            aria-label={`Ver opinión ${i + 1}`}
+            onClick={() => setIdx(i)}
+            className={`h-2 rounded-full transition-all ${i === idx ? "w-6 bg-primary" : "w-2 bg-muted-foreground/40"}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+
 const features = [
   "Patrones especiales de pronunciación en inglés",
   "Alfabeto completo letra por letra",
@@ -699,64 +791,8 @@ const PatronesContent = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {[
-                {
-                  name: "María G.",
-                  country: "México",
-                  text: `Por fin entiendo por qué el inglés se pronuncia diferente a como se escribe. Los patrones especiales me abrieron los ojos. Vale muchísimo más de ${priceLabel}.`,
-                  rating: 5,
-                },
-                {
-                  name: "Carlos R.",
-                  country: "Colombia",
-                  text: "Compré por curiosidad por el precio y me sorprendió la calidad. El alfabeto con sonidos reales y las letras mudas están explicadas clarísimo.",
-                  rating: 5,
-                },
-                {
-                  name: "Ana L.",
-                  country: "España",
-                  text: "Llevaba años confundiéndome con la pronunciación. Este ebook con las combinaciones secretas me dio la confianza que necesitaba para hablar.",
-                  rating: 5,
-                },
-                {
-                  name: "Luis M.",
-                  country: "Perú",
-                  text: "Los mini retos son geniales. No es teoría aburrida, es práctico y directo. Lo leí en una tarde y ya noto la diferencia al escuchar inglés.",
-                  rating: 5,
-                },
-                {
-                  name: "Diana S.",
-                  country: "Chile",
-                  text: "Me encantó que incluya contracciones y habla rápida. Por fin entiendo lo que dicen en las películas sin subtítulos. Muy recomendado.",
-                  rating: 5,
-                },
-                {
-                  name: "Jorge H.",
-                  country: "Argentina",
-                  text: "Dudaba por el precio bajo, pero la vista previa me convenció. El PDF está bien editado, sin errores, y el método realmente funciona.",
-                  rating: 5,
-                },
-              ].map((t) => (
-                <div key={t.name} className="bg-card rounded-2xl border border-border shadow-card p-5 flex flex-col">
-                  <div className="flex items-center gap-1 mb-3">
-                    {[...Array(t.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-foreground/90 text-sm leading-relaxed mb-4 flex-grow">"{t.text}"</p>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground text-xs font-bold">
-                      {t.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground">{t.name}</p>
-                      <p className="text-xs text-muted-foreground">{t.country}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <TestimonialSlider priceLabel={priceLabel} />
+
 
             <div className="text-center mt-8">
               <Button

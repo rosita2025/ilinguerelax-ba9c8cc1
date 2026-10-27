@@ -26,11 +26,12 @@ export default function CheckoutPendienteManual() {
 
   const waMessage =
     `Hola! 👋 Acabo de pagar por ${method}.\n\n` +
-    (orderNumber ? `📦 Orden: ${orderNumber}\n` : "") +
+    (orderNumber ? `📦 Referencia: ${orderNumber}\n` : "") +
     (name ? `👤 Nombre: ${name}\n` : "") +
     (email ? `📧 Email: ${email}\n` : "") +
     (amount ? `💰 Monto: ${amount}\n` : "") +
     (method ? `💳 Método: ${method}\n` : "") +
+    `⏳ Estado: Pendiente de verificación\n` +
     (products ? `\n🛒 Productos:\n${products.split(" | ").map((p) => `• ${p}`).join("\n")}\n` : "") +
     `\nAdjunto captura del pago. Gracias!`;
 

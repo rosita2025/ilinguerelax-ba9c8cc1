@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { Clock, Mail, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/I18nContext";
-import { buildPaidSupportUrl } from "@/lib/support";
+import { buildPaidSupportUrl, buildPendingSupportUrl } from "@/lib/support";
 import { getCheckoutStrings } from "@/i18n/checkoutStatus";
 
 export default function CheckoutPending() {
@@ -12,6 +12,11 @@ export default function CheckoutPending() {
   const status = sp.get("status") || sp.get("collection_status");
   const { language } = useI18n();
   const t = getCheckoutStrings(language);
+  const isPaypal = (sp.get("provider") || "").toLowerCase() === "paypal";
+  // PayPal: "ya pagué". Transferencia/efectivo (Mercado Pago): "pago pendiente" con referencia, nombre, producto y monto.
+  const supportUrl = isPaypal
+    ? buildPaidSupportUrl({ language, orderNumber: sp.get("order"), method: "PayPal" })
+    : buildPendingSupportUrl({ language, orderNumber: sp.get("order") || sp.get("external_reference") || undefined });
 
   return (
     <div className="min-h-screen bg-background">
@@ -49,7 +54,7 @@ export default function CheckoutPending() {
               <div className="font-medium">{t.fasterReceipt}</div>
               <div className="text-muted-foreground text-xs">
                 {t.fasterReceiptDesc}{" "}
-                <a href={buildPaidSupportUrl({ language, orderNumber: sp.get("order"), method: (sp.get("provider") || "").toLowerCase() === "paypal" ? "PayPal" : "" })} target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                <a href={supportUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline">
                   WhatsApp +1 251 272 4704
                 </a>
               </div>
@@ -72,7 +77,7 @@ export default function CheckoutPending() {
           </Button>
           <Button asChild variant="outline" size="lg"><Link to="/">{t.backHome}</Link></Button>
           <Button asChild variant="outline" size="lg">
-            <a href={buildPaidSupportUrl({ language, orderNumber: sp.get("order"), method: (sp.get("provider") || "").toLowerCase() === "paypal" ? "PayPal" : "" })} target="_blank" rel="noopener noreferrer">{t.whatsappSupport}</a>
+            <a href={supportUrl} target="_blank" rel="noopener noreferrer">{t.whatsappSupport}</a>
           </Button>
         </div>
 

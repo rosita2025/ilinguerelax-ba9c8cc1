@@ -235,8 +235,10 @@ Deno.serve(async (req) => {
         reference: data.id ? String(data.id) : null,
         detail: "Instrucciones de pago (cupón / QR / transferencia) generadas en Mercado Pago",
         customerEmail: body.payerEmail ?? null,
-        amount: calculatedTotalUsd,
-        currency: "USD",
+        // Importe que realmente se cobra (soles en Perú): es el que muestran los
+        // recordatorios de pago pendiente, para que no digan "33 USD" cuando se pagan soles.
+        amount: useLocal ? (penTotal as number) : calculatedTotalUsd,
+        currency: useLocal ? "PEN" : "USD",
       });
     }
 

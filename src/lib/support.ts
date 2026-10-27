@@ -150,3 +150,56 @@ export function buildPaidSupportUrl(opts: { language?: string; orderNumber?: str
   if (checkoutLink) lines.push(`${t.link}: ${checkoutLink}`);
   return `https://wa.me/${SUPPORT_WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
 }
+
+const PENDING_KEY = "ilr_pending_order";
+
+export type PendingOrderInfo = {
+  orderNumber: string;
+  name?: string;
+  email?: string;
+  product?: string;
+  /** Importe tal como lo ve el cliente (soles en Perú, USD en el resto). */
+  amountLabel?: string;
+  method?: string;
+};
+
+/** Guarda los datos del pedido antes de salir a la pasarela, para el WhatsApp de la pantalla "pago pendiente". */
+export function rememberPendingOrder(info: PendingOrderInfo) {
+  try { localStorage.setItem(PENDING_KEY, JSON.stringify({ ...info, ts: Date.now() })); } catch { /* sin almacenamiento */ }
+}
+
+const PENDING: Record<Lang, { intro: string; order: string; name: string; product: string; amount: string; method: string; status: string; pending: string }> = {
+  es: { intro: "Hola, mi pago está pendiente. Te comparto mis datos:", order: "Referencia", name: "Nombre", product: "Producto", amount: "Monto", method: "Método", status: "Estado", pending: "Pendiente de pago" },
+  en: { intro: "Hi, my payment is pending. Here are my details:", order: "Reference", name: "Name", product: "Product", amount: "Amount", method: "Method", status: "Status", pending: "Payment pending" },
+  fr: { intro: "Bonjour, mon paiement est en attente. Voici mes informations :", order: "Référence", name: "Nom", product: "Produit", amount: "Montant", method: "Méthode", status: "Statut", pending: "Paiement en attente" },
+  pt: { intro: "Olá, meu pagamento está pendente. Seguem meus dados:", order: "Referência", name: "Nome", product: "Produto", amount: "Valor", method: "Método", status: "Status", pending: "Pagamento pendente" },
+  it: { intro: "Ciao, il mio pagamento è in sospeso. Ecco i miei dati:", order: "Riferimento", name: "Nome", product: "Prodotto", amount: "Importo", method: "Metodo", status: "Stato", pending: "Pagamento in sospeso" },
+};
+
+/**
+ * WhatsApp "pago pendiente" (transferencia o efectivo): referencia, nombre, producto, monto y estado.
+ * Usa lo que se guardó al iniciar el pago; lo que llegue en `info` tiene prioridad.
+ */
+export function buildPendingSupportUrl(info: Partial<PendingOrderInfo> & { language?: string } = {}): string {
+  const lang = (["es", "en", "fr", "pt", "it"].includes(info.language ?? "") ? info.language : "es") as Lang;
+  const t = PENDING[lang];
+  let mem: Partial<PendingOrderInfo> = {};
+  try {
+    const raw = localStorage.getItem(PENDING_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<PendingOrderInfo> & { ts?: number };
+      // Solo si es del mismo pedido (o si no sabemos cuál es) y reciente (7 días).
+      if ((!info.orderNumber || parsed.orderNumber === info.orderNumber) && Date.now() - (parsed.ts ?? 0) < 7 * 86400000) mem = parsed;
+    }
+  } catch { /* sin memoria */ }
+  const pick = <K extends keyof PendingOrderInfo>(k: K) => (info[k] || mem[k] || "") as string;
+  const lines = [t.intro];
+  const order = pick("orderNumber");
+  if (order) lines.push(`${t.order}: #${order}`);
+  if (pick("name")) lines.push(`${t.name}: ${pick("name")}`);
+  if (pick("product")) lines.push(`${t.product}: ${pick("product").slice(0, 160)}`);
+  if (pick("amountLabel")) lines.push(`${t.amount}: ${pick("amountLabel")}`);
+  if (pick("method")) lines.push(`${t.method}: ${pick("method")}`);
+  lines.push(`${t.status}: ${t.pending}`);
+  return `https://wa.me/${SUPPORT_WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
+}

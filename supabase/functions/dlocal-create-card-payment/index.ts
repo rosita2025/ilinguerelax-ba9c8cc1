@@ -2,7 +2,7 @@
 // El navegador nunca envía el PAN a nuestro backend: SmartFields tokeniza la
 // tarjeta en dLocal y aquí solo recibimos el token de un solo uso.
 const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
-import { z } from "npm:zod@3.23.8";
+import { z } from "npm:zod@3.25.76";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { resolveServerPricing, PricingError, localTotalFromPricing } from "../_shared/catalogPricing.ts";
 import { dlocalApiBase } from "../_shared/dlocal.ts";

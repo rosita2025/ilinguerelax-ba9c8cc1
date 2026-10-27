@@ -2,7 +2,7 @@
 // Es idempotente: si el cliente recarga la página, no se entrega dos veces.
 const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { z } from "npm:zod@3.23.8";
+import { z } from "npm:zod@3.25.76";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 import { invokeInternalFunction } from "../_shared/invokeInternal.ts";

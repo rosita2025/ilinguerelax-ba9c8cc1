@@ -1,5 +1,5 @@
 const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
-import { z } from "npm:zod@3.23.8";
+import { z } from "npm:zod@3.25.76";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { resolveServerPricing, PricingError, localTotalFromPricing } from "../_shared/catalogPricing.ts";

@@ -1,4 +1,4 @@
-import { z } from "npm:zod@3.23.8";
+import { z } from "npm:zod@3.25.76";
 import { type StripeEnv, createStripeClient } from "../_shared/stripe.ts";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { resolveServerPricing, PricingError, isRestrictedCurrency, tierForCountry } from "../_shared/catalogPricing.ts";

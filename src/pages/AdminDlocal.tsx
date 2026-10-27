@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -60,22 +60,33 @@ export default function AdminDlocal() {
   const [busy, setBusy] = useState<string | null>(null);
   const [bulk, setBulk] = useState(false);
   const [search, setSearch] = useState("");
+  // Copias siempre al día: en "Activar todos" el estado de React llega tarde y se creaban regiones/métodos repetidos.
+  const regionsRef = useRef<Region[]>([]);
+  const methodsRef = useRef<Method[]>([]);
+  const setRegionsBoth = (next: Region[] | ((p: Region[]) => Region[])) => {
+    regionsRef.current = typeof next === "function" ? next(regionsRef.current) : next;
+    setRegions(regionsRef.current);
+  };
+  const setMethodsBoth = (next: Method[] | ((p: Method[]) => Method[])) => {
+    methodsRef.current = typeof next === "function" ? next(methodsRef.current) : next;
+    setMethods(methodsRef.current);
+  };
 
   async function load() {
     invalidateCheckoutMethodsCache();
     setLoading(true);
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "list" } });
     if (error || data?.error) { toast.error(error?.message || data?.error); setLoading(false); return; }
-    setRegions(data.regions || []);
-    setMethods(data.methods || []);
+    setRegionsBoth(data.regions || []);
+    setMethodsBoth(data.methods || []);
     setLoading(false);
   }
   useEffect(() => { load(); }, []);
 
   /** Encuentra la región que atiende a un país (por código o country_codes). */
   function regionFor(country: string): Region | undefined {
-    return regions.find(r => r.code === country)
-      || regions.find(r => (r.country_codes || []).includes(country));
+    return regionsRef.current.find(r => r.code === country)
+      || regionsRef.current.find(r => (r.country_codes || []).includes(country));
   }
 
   function keyFor(country: string, kind: Kind) {
@@ -86,7 +97,7 @@ export default function AdminDlocal() {
   function methodFor(country: string, kind: Kind): Method | undefined {
     const r = regionFor(country);
     if (!r) return undefined;
-    return methods.find(m => m.region_code === r.code && m.method_key === keyFor(country, kind));
+    return methodsRef.current.find(m => m.region_code === r.code && m.method_key === keyFor(country, kind));
   }
 
   function isOn(country: string, kind: Kind) {
@@ -107,7 +118,7 @@ export default function AdminDlocal() {
       description: `Cobros locales vía dLocal Go en ${meta.name}`,
       country_codes: [country],
       enabled: true,
-      sort_order: (regions.reduce((mx, x) => Math.max(mx, x.sort_order), 0) || 0) + 1,
+      sort_order: (regionsRef.current.reduce((mx, x) => Math.max(mx, x.sort_order), 0) || 0) + 1,
     };
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
       body: { action: "save_region", region },
@@ -116,24 +127,24 @@ export default function AdminDlocal() {
       toast.error(`No se pudo crear la región ${country}: ${error?.message || data?.error}`);
       return null;
     }
-    setRegions(prev => [...prev, region]);
+    setRegionsBoth(prev => [...prev, region]);
     return region;
   }
 
-  async function toggle(country: string, kind: Kind, next: boolean) {
+  async function toggle(country: string, kind: Kind, next: boolean, silent = false) {
     const busyKey = `${country}:${kind}`;
     setBusy(busyKey);
     try {
       const region = await ensureRegion(country);
       if (!region) return;
-      const existing = methods.find(m => m.region_code === region.code && m.method_key === keyFor(country, kind));
+      const existing = methodsRef.current.find(m => m.region_code === region.code && m.method_key === keyFor(country, kind));
       if (existing?.id) {
-        setMethods(prev => prev.map(x => x.id === existing.id ? { ...x, enabled: next } : x));
+        setMethodsBoth(prev => prev.map(x => x.id === existing.id ? { ...x, enabled: next } : x));
         const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
           body: { action: "toggle_method", id: existing.id, enabled: next },
         });
         if (error || data?.error) {
-          setMethods(prev => prev.map(x => x.id === existing.id ? { ...x, enabled: existing.enabled } : x));
+          setMethodsBoth(prev => prev.map(x => x.id === existing.id ? { ...x, enabled: existing.enabled } : x));
           throw new Error(error?.message || data?.error);
         }
       } else {
@@ -149,20 +160,22 @@ export default function AdminDlocal() {
           note: LABELS[kind].note,
           icon: LABELS[kind].icon,
           enabled: next,
-          sort_order: methods.filter(m => m.region_code === region.code).length + 1,
+          sort_order: methodsRef.current.filter(m => m.region_code === region.code).length + 1,
         };
         const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
           body: { action: "save_method", method: payload },
         });
         if (error || data?.error) throw new Error(error?.message || data?.error);
-        setMethods(prev => [...prev, payload]);
+        setMethodsBoth(prev => [...prev, payload]);
       }
       invalidateCheckoutMethodsCache();
-      toast.success(`${next ? "✅ Activado" : "⏸️ Desactivado"} ${LABELS[kind].label} · ${country}`);
-      await load();
+      if (!silent) {
+        toast.success(`${next ? "✅ Activado" : "⏸️ Desactivado"} ${LABELS[kind].label} · ${country}`);
+        await load();
+      }
     } catch (e) {
-      toast.error(`❌ ${(e as Error).message || "Error al guardar"}`);
-      await load();
+      toast.error(`❌ ${country}: ${(e as Error).message || "Error al guardar"}`);
+      if (!silent) await load();
     } finally {
       setBusy(null);
     }
@@ -177,7 +190,7 @@ export default function AdminDlocal() {
           const supported = (k === "cash" ? c.cash : k === "wallet" ? (c.wallet ?? []) : c.transfer).length > 0;
           if (!supported) continue;
           if (isOn(c.code, k) === next) continue;
-          await toggle(c.code, k, next);
+          await toggle(c.code, k, next, true);
         }
       }
       toast.success(next ? "Cobertura dLocal Go activada" : "Cobertura dLocal Go desactivada");

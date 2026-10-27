@@ -99,13 +99,7 @@ const ReviewSlider = () => {
   );
 };
 
-const writtenReviews = (priceLabel: string) => [
-  {
-    name: "María G.",
-    country: "México",
-    text: `Por fin entiendo por qué el inglés se pronuncia diferente a como se escribe. Los patrones especiales me abrieron los ojos. Vale muchísimo más de ${priceLabel}.`,
-    rating: 5,
-  },
+const writtenReviews = (_priceLabel: string) => [
   {
     name: "Carlos R.",
     country: "Colombia",

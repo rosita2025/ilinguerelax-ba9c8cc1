@@ -2,7 +2,7 @@ import { BookOpen, Heart, Target, Award } from "lucide-react";
 
 export const AboutMe = () => {
   return (
-    <section id="sobre-mi" className="py-20 md:py-28 bg-secondary/30">
+    <section className="py-20 md:py-28 bg-secondary/30">
       <div className="container px-4 md:px-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}

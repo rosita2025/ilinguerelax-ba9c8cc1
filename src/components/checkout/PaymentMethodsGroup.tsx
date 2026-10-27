@@ -2608,10 +2608,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 </div>
                 {isPrimaryCard ? (
                   // Tira de marcas (Visa, Mastercard, Amex, Apple Pay, Google Pay) + "by Stripe", todo junto.
-                  <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-                    <img src={cardBrandsStrip} alt="Visa, Mastercard, American Express, Apple Pay, Google Pay" height={20} className="h-6 sm:h-7 w-auto" />
+                  <div className="mt-1 flex items-center gap-1 flex-nowrap min-w-0">
+                    <img src={cardBrandsStrip} alt="Visa, Mastercard, American Express, Apple Pay, Google Pay" height={20} className="h-[17px] sm:h-5 w-auto shrink-0" />
                     <span className="text-[10px] font-medium text-neutral-500 dark:text-neutral-400">by</span>
-                    <img src={stripeLogo} alt="Stripe" height={14} className="h-3.5 sm:h-[15px] w-auto" />
+                    <img src={stripeLogo} alt="Stripe" height={14} className="h-3 sm:h-[14px] w-auto shrink-0" />
                   </div>
                 ) : null}
 

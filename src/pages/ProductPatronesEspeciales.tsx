@@ -11,12 +11,11 @@ import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
-import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2, Download, Lock, FileText } from "lucide-react";
+import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2, Download, Lock, FileText, X, ZoomIn } from "lucide-react";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { motion } from "framer-motion";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { SpotifyLaunchBanner } from "@/components/SpotifyLaunchBanner";
 import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
 import { TercerBonoExamen } from "@/components/TercerBonoExamen";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
@@ -70,6 +69,185 @@ const photoReviews = [
   { src: resenaMx4.url, flag: "🇵🇪", country: "Perú", alt: "Reseña real por WhatsApp desde Perú sobre la pronunciación" },
 ];
 
+const ReviewSlider = () => {
+  const [idx, setIdx] = useState(0);
+  const [zoom, setZoom] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (zoom !== null) return; // pausa el slider mientras el zoom está abierto
+    const t = setInterval(() => setIdx((i) => (i + 1) % photoReviews.length), 3500);
+    return () => clearInterval(t);
+  }, [zoom]);
+
+  // Bloquea el scroll de la página y cierra con Escape mientras el zoom está abierto
+  useEffect(() => {
+    if (zoom === null) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setZoom(null); };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [zoom]);
+
+  const protect = {
+    onContextMenu: (e: React.MouseEvent) => e.preventDefault(),
+    onDragStart: (e: React.DragEvent) => e.preventDefault(),
+    draggable: false,
+  } as const;
+
+  return (
+    <div className="mx-auto max-w-sm">
+      <div className="relative overflow-hidden rounded-xl border border-border shadow-card bg-card">
+        <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${idx * 100}%)` }}>
+          {photoReviews.map((r, i) => (
+            <figure key={`${r.src}-${i}`} className="relative w-full shrink-0">
+              <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-background/90 text-foreground text-[11px] font-bold border border-border">
+                {r.flag} {r.country}
+              </div>
+              <button
+                type="button"
+                aria-label={`Ampliar reseña de ${r.country}`}
+                onClick={() => setZoom(i)}
+                className="block w-full cursor-zoom-in"
+              >
+                <img src={r.src} alt={r.alt} loading="lazy" decoding="async" className="w-full h-auto block select-none" {...protect} />
+              </button>
+              <div className="pointer-events-none absolute bottom-2 right-2 z-10 rounded-full bg-background/90 border border-border p-1.5">
+                <ZoomIn className="h-3.5 w-3.5 text-foreground" />
+              </div>
+            </figure>
+          ))}
+        </div>
+      </div>
+      <div className="mt-3 flex justify-center gap-2">
+        {photoReviews.map((_, i) => (
+          <button key={i} type="button" aria-label={`Ver reseña ${i + 1}`} onClick={() => setIdx(i)}
+            className={`h-2 rounded-full transition-all ${i === idx ? "w-6 bg-primary" : "w-2 bg-muted-foreground/40"}`} />
+        ))}
+      </div>
+
+      {zoom !== null && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Reseña ampliada"
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/95 p-4"
+          onClick={() => setZoom(null)}
+        >
+          <button
+            type="button"
+            aria-label="Cerrar"
+            onClick={() => setZoom(null)}
+            className="absolute top-4 right-4 z-10 rounded-full bg-white/10 border border-white/20 p-2 text-white hover:bg-white/20"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          <div className="absolute top-4 left-4 z-10 px-2 py-1 rounded-full bg-white/10 border border-white/20 text-white text-xs font-bold">
+            {photoReviews[zoom].flag} {photoReviews[zoom].country}
+          </div>
+          <img
+            src={photoReviews[zoom].src}
+            alt={photoReviews[zoom].alt}
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-full max-w-full object-contain select-none"
+            style={{ touchAction: "pinch-zoom", WebkitTouchCallout: "none", userSelect: "none" }}
+            {...protect}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+const writtenReviews = (_priceLabel: string) => [
+  {
+    name: "Carlos R.",
+    country: "Colombia",
+    text: "Compré por curiosidad por el precio y me sorprendió la calidad. El alfabeto con sonidos reales y las letras mudas están explicadas clarísimo.",
+    rating: 5,
+  },
+  {
+    name: "Ana L.",
+    country: "España",
+    text: "Llevaba años confundiéndome con la pronunciación. Este ebook con las combinaciones secretas me dio la confianza que necesitaba para hablar.",
+    rating: 5,
+  },
+  {
+    name: "Luis M.",
+    country: "Perú",
+    text: "Los mini retos son geniales. No es teoría aburrida, es práctico y directo. Lo leí en una tarde y ya noto la diferencia al escuchar inglés.",
+    rating: 5,
+  },
+  {
+    name: "Diana S.",
+    country: "Chile",
+    text: "Me encantó que incluya contracciones y habla rápida. Por fin entiendo lo que dicen en las películas sin subtítulos. Muy recomendado.",
+    rating: 5,
+  },
+  {
+    name: "Jorge H.",
+    country: "Argentina",
+    text: "Dudaba por el precio bajo, pero la vista previa me convenció. El PDF está bien editado, sin errores, y el método realmente funciona.",
+    rating: 5,
+  },
+];
+
+const TestimonialSlider = ({ priceLabel }: { priceLabel: string }) => {
+  const reviews = useMemo(() => writtenReviews(priceLabel), [priceLabel]);
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setIdx((i) => (i + 1) % reviews.length), 3500);
+    return () => clearInterval(t);
+  }, [reviews.length]);
+  return (
+    <div className="mx-auto max-w-2xl">
+      <div className="relative overflow-hidden">
+        <div
+          className="flex transition-transform duration-500 ease-out"
+          style={{ transform: `translateX(-${idx * 100}%)` }}
+        >
+          {reviews.map((r, i) => (
+            <figure key={`${r.name}-${i}`} className="w-full shrink-0 px-1">
+              <div className="bg-card rounded-2xl border border-border shadow-card p-5 flex flex-col h-full">
+                <div className="flex items-center gap-1 mb-3">
+                  {[...Array(r.rating)].map((_, s) => (
+                    <Star key={s} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <p className="text-foreground/90 text-sm leading-relaxed mb-4 flex-grow">"{r.text}"</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground text-xs font-bold">
+                    {r.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-foreground">{r.name}</p>
+                    <p className="text-xs text-muted-foreground">{r.country}</p>
+                  </div>
+                </div>
+              </div>
+            </figure>
+          ))}
+        </div>
+      </div>
+      <div className="mt-3 flex justify-center gap-2">
+        {reviews.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            aria-label={`Ver opinión ${i + 1}`}
+            onClick={() => setIdx(i)}
+            className={`h-2 rounded-full transition-all ${i === idx ? "w-6 bg-primary" : "w-2 bg-muted-foreground/40"}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+
 const features = [
   "Patrones especiales de pronunciación en inglés",
   "Alfabeto completo letra por letra",
@@ -113,7 +291,6 @@ const PatronesContent = () => {
 
 
   
-  const hasLongPriceLabel = priceLabel.length > 9;
 
   // Imagen del producto: usa la portada configurada en el admin y,
   // si aún no carga o no existe, cae a la imagen local por defecto.
@@ -253,7 +430,6 @@ const PatronesContent = () => {
       />
 
       <Navbar />
-      <SpotifyLaunchBanner />
 
       {/* Hero */}
       <section className="pt-4 pb-6 md:pt-8 md:pb-10">
@@ -306,9 +482,6 @@ const PatronesContent = () => {
                 </span>
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                {pricingAdmin.name ?? "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"}
-              </h1>
 
               <p className="text-lg md:text-xl font-bold text-foreground mb-2">
                 Deja de pronunciar el inglés como se escribe.
@@ -405,14 +578,6 @@ const PatronesContent = () => {
             <p className="text-center text-foreground font-bold text-lg mt-6">
               No es falta de talento. <span className="text-gradient">Es que nadie te enseñó los patrones.</span>
             </p>
-            <div className="text-center mt-6">
-              <Button variant="hero" size="xl" onClick={handleBuy} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
-                <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-                {pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
-                <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
-              </Button>
-              <p className="text-xs text-muted-foreground mt-2">🔒 Pago seguro • ⬇️ Descarga inmediata • 🛡️ Garantía 7 días</p>
-            </div>
           </div>
         </div>
       </section>
@@ -485,7 +650,7 @@ const PatronesContent = () => {
       </section>
 
       {/* Testimonios 1: reseñas reales por WhatsApp */}
-      <section className="py-10 md:py-14">
+      <section className="pt-10 pb-44 md:pt-14 md:pb-14">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-6">
@@ -496,24 +661,7 @@ const PatronesContent = () => {
                 Reseñas <span className="text-gradient">reales</span> de clientes
               </h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              {photoReviews.map((r, i) => (
-                <figure key={`${r.src}-${i}`} className="relative rounded-xl overflow-hidden border border-border shadow-card bg-card">
-                  <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-background/90 text-foreground text-[11px] font-bold border border-border">
-                    {r.flag} {r.country}
-                  </div>
-                  <LazyImg src={r.src} alt={r.alt} minHeight={260} className="w-full h-auto block" />
-                </figure>
-              ))}
-            </div>
-            <div className="text-center mt-6">
-              <Button variant="hero" size="xl" onClick={handleBuy} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
-                <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-                {pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
-                <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
-              </Button>
-              <p className="text-xs text-muted-foreground mt-2">🔒 Pago seguro • ⬇️ Descarga inmediata • 🛡️ Garantía 7 días</p>
-            </div>
+            <ReviewSlider />
           </div>
         </div>
       </section>
@@ -537,13 +685,6 @@ const PatronesContent = () => {
                   </div>
                 ))}
               </div>
-            </div>
-            <div className="text-center mt-8">
-              <Button variant="hero" size="xl" onClick={handleBuy} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
-                <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-                {pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
-                <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
-              </Button>
             </div>
           </div>
         </div>
@@ -649,24 +790,6 @@ const PatronesContent = () => {
 
 
 
-            <div className="text-center mt-8">
-              <Button
-                variant="hero"
-                size="xl"
-                onClick={handleBuy}
-                 disabled={!pricingReady}
-                className="w-full sm:w-auto max-w-full min-h-14 sm:min-h-[unset] px-4 sm:px-8 py-4 sm:py-6 shadow-2xl"
-              >
-                <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
-                <span className="min-w-0 flex-1 text-center leading-tight">
-                   <span className="block text-[15px] sm:text-lg font-extrabold">LO QUIERO</span>
-                  <span className={`block tabular-nums ${hasLongPriceLabel ? "text-xs sm:text-sm" : "text-sm sm:text-base"}`}>
-                     {pricingReady ? priceLabel : "Cargando precio…"}
-                  </span>
-                </span>
-                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
-              </Button>
-            </div>
           </div>
         </div>
       </section>
@@ -687,82 +810,9 @@ const PatronesContent = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {[
-                {
-                  name: "María G.",
-                  country: "México",
-                  text: `Por fin entiendo por qué el inglés se pronuncia diferente a como se escribe. Los patrones especiales me abrieron los ojos. Vale muchísimo más de ${priceLabel}.`,
-                  rating: 5,
-                },
-                {
-                  name: "Carlos R.",
-                  country: "Colombia",
-                  text: "Compré por curiosidad por el precio y me sorprendió la calidad. El alfabeto con sonidos reales y las letras mudas están explicadas clarísimo.",
-                  rating: 5,
-                },
-                {
-                  name: "Ana L.",
-                  country: "España",
-                  text: "Llevaba años confundiéndome con la pronunciación. Este ebook con las combinaciones secretas me dio la confianza que necesitaba para hablar.",
-                  rating: 5,
-                },
-                {
-                  name: "Luis M.",
-                  country: "Perú",
-                  text: "Los mini retos son geniales. No es teoría aburrida, es práctico y directo. Lo leí en una tarde y ya noto la diferencia al escuchar inglés.",
-                  rating: 5,
-                },
-                {
-                  name: "Diana S.",
-                  country: "Chile",
-                  text: "Me encantó que incluya contracciones y habla rápida. Por fin entiendo lo que dicen en las películas sin subtítulos. Muy recomendado.",
-                  rating: 5,
-                },
-                {
-                  name: "Jorge H.",
-                  country: "Argentina",
-                  text: "Dudaba por el precio bajo, pero la vista previa me convenció. El PDF está bien editado, sin errores, y el método realmente funciona.",
-                  rating: 5,
-                },
-              ].map((t) => (
-                <div key={t.name} className="bg-card rounded-2xl border border-border shadow-card p-5 flex flex-col">
-                  <div className="flex items-center gap-1 mb-3">
-                    {[...Array(t.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-foreground/90 text-sm leading-relaxed mb-4 flex-grow">"{t.text}"</p>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground text-xs font-bold">
-                      {t.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground">{t.name}</p>
-                      <p className="text-xs text-muted-foreground">{t.country}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <TestimonialSlider priceLabel={priceLabel} />
 
-            <div className="text-center mt-8">
-              <Button
-                variant="hero"
-                size="xl"
-                onClick={handleBuy}
-                className="w-full sm:w-auto max-w-full min-h-14 sm:min-h-[unset] px-4 sm:px-8 py-4 sm:py-6 shadow-2xl"
-              >
-                <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
-                <span className="min-w-0 flex-1 text-center leading-tight">
-                  <span className="block text-[15px] sm:text-lg font-extrabold">Comprar ahora</span>
-                  <span className={`block tabular-nums ${hasLongPriceLabel ? "text-xs sm:text-sm" : "text-sm sm:text-base"}`}>
-                    por {priceLabel}
-                  </span>
-                </span>
-                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
-              </Button>
-            </div>
+
           </div>
         </div>
       </section>

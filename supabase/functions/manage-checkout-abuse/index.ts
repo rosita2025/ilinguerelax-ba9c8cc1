@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
         );
       }
 
-      type Agg = { ip: string; count: number; last: string; slugs: Set<string>; sources: Set<string>; referers: Set<string>; ua: string | null; country: string | null; city: string | null; email: string | null };
+      type Agg = { ip: string; count: number; first: string; last: string; slugs: Set<string>; sources: Set<string>; referers: Set<string>; ua: string | null; country: string | null; city: string | null; email: string | null };
       const byIp = new Map<string, Agg>();
       const bySource = new Map<string, number>();
       const byCountry = new Map<string, number>();
@@ -129,10 +129,11 @@ Deno.serve(async (req) => {
           r.country = r.country || geo.country;
           r.city = r.city || geo.city;
         }
-        const cur = byIp.get(r.ip) || { ip: r.ip, count: 0, last: r.created_at, slugs: new Set(), sources: new Set(), referers: new Set(), ua: r.ua, country: r.country, city: r.city, email: r.email };
+        const cur = byIp.get(r.ip) || { ip: r.ip, count: 0, first: r.created_at, last: r.created_at, slugs: new Set(), sources: new Set(), referers: new Set(), ua: r.ua, country: r.country, city: r.city, email: r.email };
 
         cur.count += 1;
         if (r.created_at > cur.last) cur.last = r.created_at;
+        if (r.created_at < cur.first) cur.first = r.created_at;
         if (r.slug) cur.slugs.add(r.slug);
         if (r.source) cur.sources.add(r.source);
         if (r.referer) cur.referers.add(r.referer);
@@ -182,14 +183,24 @@ Deno.serve(async (req) => {
       if (purchased.size) void markCartsConverted(admin, [...purchased]);
 
       const openCarts = new Map<string, number>();
+      // Datos del carrito abierto (nombre, teléfono, cuándo empezó y última actividad) para el seguimiento por WhatsApp.
+      const cartInfo = new Map<string, { name: string; phone: string; started: string | null; last_activity: string | null; recover_url: string | null }>();
       if (emails.length) {
         const { data: carts } = await admin
           .from("persistent_carts")
-          .select("email, converted")
+          .select("email, converted, buyer, created_at, last_activity, cart_token")
           .in("email", emails)
           .eq("converted", false);
-        for (const c of (carts || []) as { email: string }[]) {
-          openCarts.set((c.email || "").toLowerCase(), 0);
+        for (const c of (carts || []) as { email: string; buyer: { name?: string; phone?: string } | null; created_at: string | null; last_activity: string | null; cart_token: string | null }[]) {
+          const k = (c.email || "").toLowerCase();
+          openCarts.set(k, 0);
+          cartInfo.set(k, {
+            name: String(c.buyer?.name || "").slice(0, 120),
+            phone: String(c.buyer?.phone || "").slice(0, 40),
+            started: c.created_at,
+            last_activity: c.last_activity,
+            recover_url: c.cart_token ? `https://ilinguerelax.com/recuperar-carrito?t=${encodeURIComponent(c.cart_token)}` : null,
+          });
         }
         const { data: sends } = await admin
           .from("cart_reminder_sends")
@@ -215,7 +226,11 @@ Deno.serve(async (req) => {
           return {
             ip: x.ip,
             count: x.count,
+            first: x.first,
             last: x.last,
+            // Tiempo entre la primera y la última vez que abrió el checkout (24 h).
+            duration_sec: Math.max(0, Math.round((new Date(x.last).getTime() - new Date(x.first).getTime()) / 1000)),
+            cart: cartInfo.get(key) ?? null,
             slugs: [...x.slugs].slice(0, 5),
             sources: [...x.sources],
             referers: [...x.referers].slice(0, 3),
@@ -259,14 +274,16 @@ Deno.serve(async (req) => {
       for (const r of top) {
         if (!r.email) continue;
         const k = r.email.trim().toLowerCase();
-        const row = { email: r.email, country: r.country, city: r.city, status: r.status, last: r.last, slugs: r.slugs, reminders: r.reminders, client_purchase_event: r.client_purchase_event };
+        const row = { email: r.email, country: r.country, city: r.city, status: r.status, first: r.first, last: r.last, duration_sec: r.duration_sec, cart: r.cart, slugs: r.slugs, reminders: r.reminders, client_purchase_event: r.client_purchase_event };
         const prev = leadMap.get(k);
         if (!prev) { leadMap.set(k, row); continue; }
         const best = (rank[row.status] ?? 0) > (rank[prev.status] ?? 0) ? row.status : prev.status;
         const newer = String(row.last) > String(prev.last) ? row : prev;
-        leadMap.set(k, { ...newer, status: best, slugs: [...new Set([...(prev.slugs || []), ...(row.slugs || [])])].slice(0, 5) });
+        leadMap.set(k, { ...newer, status: best, first: String(row.first) < String(prev.first) ? row.first : prev.first, duration_sec: Math.max(row.duration_sec ?? 0, prev.duration_sec ?? 0), cart: row.cart ?? prev.cart, slugs: [...new Set([...(prev.slugs || []), ...(row.slugs || [])])].slice(0, 5) });
       }
       const leads = [...leadMap.values()].sort((a, b) => String(b.last).localeCompare(String(a.last)));
+      const durations = top.filter((r) => r.count > 1 && r.duration_sec > 0).map((r) => r.duration_sec);
+      (summary as Record<string, unknown>).avg_duration_sec = durations.length ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length) : 0;
       summary.with_email = leads.length;
       summary.purchased = leads.filter((l) => l.status === "purchased").length;
       summary.abandoned = leads.filter((l) => l.status === "abandoned").length;

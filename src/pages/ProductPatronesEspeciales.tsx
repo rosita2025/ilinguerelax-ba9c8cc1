@@ -11,7 +11,7 @@ import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
-import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2, Download, Lock, FileText } from "lucide-react";
+import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2, Download, Lock, FileText, X, ZoomIn } from "lucide-react";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { motion } from "framer-motion";
@@ -71,10 +71,33 @@ const photoReviews = [
 
 const ReviewSlider = () => {
   const [idx, setIdx] = useState(0);
+  const [zoom, setZoom] = useState<number | null>(null);
+
   useEffect(() => {
+    if (zoom !== null) return; // pausa el slider mientras el zoom está abierto
     const t = setInterval(() => setIdx((i) => (i + 1) % photoReviews.length), 3500);
     return () => clearInterval(t);
-  }, []);
+  }, [zoom]);
+
+  // Bloquea el scroll de la página y cierra con Escape mientras el zoom está abierto
+  useEffect(() => {
+    if (zoom === null) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setZoom(null); };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [zoom]);
+
+  const protect = {
+    onContextMenu: (e: React.MouseEvent) => e.preventDefault(),
+    onDragStart: (e: React.DragEvent) => e.preventDefault(),
+    draggable: false,
+  } as const;
+
   return (
     <div className="mx-auto max-w-sm">
       <div className="relative overflow-hidden rounded-xl border border-border shadow-card bg-card">
@@ -84,7 +107,17 @@ const ReviewSlider = () => {
               <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-background/90 text-foreground text-[11px] font-bold border border-border">
                 {r.flag} {r.country}
               </div>
-              <img src={r.src} alt={r.alt} loading="lazy" decoding="async" className="w-full h-auto block" />
+              <button
+                type="button"
+                aria-label={`Ampliar reseña de ${r.country}`}
+                onClick={() => setZoom(i)}
+                className="block w-full cursor-zoom-in"
+              >
+                <img src={r.src} alt={r.alt} loading="lazy" decoding="async" className="w-full h-auto block select-none" {...protect} />
+              </button>
+              <div className="pointer-events-none absolute bottom-2 right-2 z-10 rounded-full bg-background/90 border border-border p-1.5">
+                <ZoomIn className="h-3.5 w-3.5 text-foreground" />
+              </div>
             </figure>
           ))}
         </div>
@@ -95,6 +128,36 @@ const ReviewSlider = () => {
             className={`h-2 rounded-full transition-all ${i === idx ? "w-6 bg-primary" : "w-2 bg-muted-foreground/40"}`} />
         ))}
       </div>
+
+      {zoom !== null && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Reseña ampliada"
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/95 p-4"
+          onClick={() => setZoom(null)}
+        >
+          <button
+            type="button"
+            aria-label="Cerrar"
+            onClick={() => setZoom(null)}
+            className="absolute top-4 right-4 z-10 rounded-full bg-white/10 border border-white/20 p-2 text-white hover:bg-white/20"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          <div className="absolute top-4 left-4 z-10 px-2 py-1 rounded-full bg-white/10 border border-white/20 text-white text-xs font-bold">
+            {photoReviews[zoom].flag} {photoReviews[zoom].country}
+          </div>
+          <img
+            src={photoReviews[zoom].src}
+            alt={photoReviews[zoom].alt}
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-full max-w-full object-contain select-none"
+            style={{ touchAction: "pinch-zoom", WebkitTouchCallout: "none", userSelect: "none" }}
+            {...protect}
+          />
+        </div>
+      )}
     </div>
   );
 };

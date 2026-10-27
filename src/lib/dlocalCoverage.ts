@@ -119,10 +119,6 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     transfer: ["Transferencia Bancaria", "Banco Popular", "FirstBank"],
     cash: ["Agentes locales"],
     wallet: ["ATH Móvil"], walletComingSoon: false, walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
-  { code: "US", name: "Estados Unidos", flag: "🇺🇸", currency: "USD",
-    transfer: ["Bank Transfer (ACH)", "Zelle", "Venmo"],
-    cash: ["Retail Stores"],
-    wallet: ["PayPal", "Google Pay", "Apple Pay"], walletComingSoon: false, walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
 ];
 
 export const RESTRICTED_CURRENCY_COUNTRIES = new Set(["HN", "AR", "VE", "CU", "NI"]);

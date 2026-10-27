@@ -16,7 +16,6 @@ import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { motion } from "framer-motion";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { SpotifyLaunchBanner } from "@/components/SpotifyLaunchBanner";
 import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
 import { TercerBonoExamen } from "@/components/TercerBonoExamen";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
@@ -283,7 +282,6 @@ const PatronesContent = () => {
       />
 
       <Navbar />
-      <SpotifyLaunchBanner />
 
       {/* Hero */}
       <section className="pt-4 pb-6 md:pt-8 md:pb-10">

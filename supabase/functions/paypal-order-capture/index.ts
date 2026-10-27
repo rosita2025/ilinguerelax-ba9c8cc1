@@ -15,7 +15,11 @@ const json = (body: unknown, status = 200) =>
 
 const paypalBase = () => (Deno.env.get("PAYPAL_ENV") === "sandbox" ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com");
 
+// El token de PayPal dura ~9 horas: se reutiliza mientras la instancia siga viva (ahorra una llamada a PayPal por pago).
+let cachedToken: { value: string; expiresAt: number } | null = null;
+
 async function accessToken(): Promise<string> {
+  if (cachedToken && cachedToken.expiresAt > Date.now()) return cachedToken.value;
   const id = Deno.env.get("PAYPAL_CLIENT_ID");
   // PAYPAL_CLIENT_SECRET es el nombre nuevo; PAYPAL_SECRET es el de la versión anterior: se prueban los dos si hace falta.
   const secrets = [Deno.env.get("PAYPAL_CLIENT_SECRET"), Deno.env.get("PAYPAL_SECRET")]
@@ -29,7 +33,10 @@ async function accessToken(): Promise<string> {
       body: "grant_type=client_credentials",
     });
     const data = await res.json().catch(() => ({}));
-    if (res.ok && data.access_token) return data.access_token as string;
+    if (res.ok && data.access_token) {
+      cachedToken = { value: data.access_token as string, expiresAt: Date.now() + Math.max(60, Math.min(Number(data.expires_in) || 3000, 3000) - 120) * 1000 };
+      return data.access_token as string;
+    }
     last = `PayPal auth ${res.status}: ${data?.error_description || data?.error || "sin token"} (${Deno.env.get("PAYPAL_ENV") === "sandbox" ? "modo sandbox" : "modo live"})`;
   }
   throw new Error(last);

@@ -32,7 +32,11 @@ const json = (body: unknown, status = 200) =>
 
 const paypalBase = () => (Deno.env.get("PAYPAL_ENV") === "sandbox" ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com");
 
+// El token de PayPal dura ~9 horas: se reutiliza mientras la instancia siga viva (ahorra una llamada a PayPal por pago).
+let cachedToken: { value: string; expiresAt: number } | null = null;
+
 async function accessToken(): Promise<string> {
+  if (cachedToken && cachedToken.expiresAt > Date.now()) return cachedToken.value;
   const id = Deno.env.get("PAYPAL_CLIENT_ID");
   // PAYPAL_CLIENT_SECRET es el nombre nuevo; PAYPAL_SECRET es el de la versión anterior: se prueban los dos si hace falta.
   const secrets = [Deno.env.get("PAYPAL_CLIENT_SECRET"), Deno.env.get("PAYPAL_SECRET")]
@@ -46,7 +50,10 @@ async function accessToken(): Promise<string> {
       body: "grant_type=client_credentials",
     });
     const data = await res.json().catch(() => ({}));
-    if (res.ok && data.access_token) return data.access_token as string;
+    if (res.ok && data.access_token) {
+      cachedToken = { value: data.access_token as string, expiresAt: Date.now() + Math.max(60, Math.min(Number(data.expires_in) || 3000, 3000) - 120) * 1000 };
+      return data.access_token as string;
+    }
     last = `PayPal auth ${res.status}: ${data?.error_description || data?.error || "sin token"} (${Deno.env.get("PAYPAL_ENV") === "sandbox" ? "modo sandbox" : "modo live"})`;
   }
   throw new Error(last);
@@ -60,6 +67,10 @@ Deno.serve(async (req) => {
     const parsed = BodySchema.safeParse(await req.json());
     if (!parsed.success) return json({ error: "Invalid input", details: parsed.error.flatten().fieldErrors }, 400);
     const body = parsed.data;
+
+    // El token de PayPal se pide en paralelo con el cálculo del precio (no uno después del otro).
+    const tokenPromise = accessToken();
+    tokenPromise.catch(() => {});
 
     let pricing;
     try {
@@ -90,7 +101,7 @@ Deno.serve(async (req) => {
     const skus = normalizeSkus(pricing.items.map((i) => i.sku));
     const orderNumber = (body.orderId ?? `ILR-PP-${crypto.randomUUID().slice(0, 6).toUpperCase()}`).toUpperCase();
 
-    const token = await accessToken();
+    const token = await tokenPromise;
     const res = await fetch(`${paypalBase()}/v2/checkout/orders`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", "PayPal-Request-Id": `create-${orderNumber}` },

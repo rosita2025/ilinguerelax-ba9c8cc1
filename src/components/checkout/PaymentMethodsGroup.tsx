@@ -1800,6 +1800,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const methodsConfig = useCheckoutMethodsConfig(country);
   // La lista de métodos solo se muestra cuando ya se conoce el país Y la configuración de ese país (evita que salga primero Tarjeta + Hotmart y luego cambie).
   const methodsReady = methodsConfig.loaded && !region.loading;
+  // Si PayPal está disponible, se "despierta" su función en cuanto carga el checkout: el primer clic ya no paga el arranque en frío.
+  useEffect(() => {
+    if (!methodsConfig.paypal) return;
+    try {
+      void fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/paypal-order-create`, { method: "OPTIONS", mode: "cors" }).catch(() => {});
+    } catch { /* sin red */ }
+  }, [methodsConfig.paypal]);
+
   const binanceCfg = useBinancePayConfig(methodsConfig.regionCode);
 
   // Hotmart 1-clic: resuelve URL y precio local por país

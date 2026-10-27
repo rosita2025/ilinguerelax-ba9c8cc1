@@ -141,11 +141,14 @@ Deno.serve(async (req) => {
 
   // 2. Process auth_emails first (priority), then transactional_emails
   for (const queue of ['auth_emails', 'transactional_emails']) {
-    const { data: messages, error: readError } = await supabase.rpc('read_email_batch', {
+    const { data: messages, error: readError } = (await supabase.rpc('read_email_batch', {
       queue_name: queue,
       batch_size: batchSize,
       vt: 30,
-    })
+    })) as unknown as {
+      data: Array<{ msg_id: number; read_ct: number; message: Record<string, unknown>; enqueued_at?: string }> | null
+      error: { message: string } | null
+    }
 
     if (readError) {
       console.error('Failed to read email batch', { queue, error: readError })

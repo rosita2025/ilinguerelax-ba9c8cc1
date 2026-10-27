@@ -143,7 +143,12 @@ export async function sendThankYouEmail(a: Args): Promise<void> {
   };
 
   await Promise.all([
-    invokeTemplate("thank-you", a.customerEmail, data, `thank-you-${key}`),
+    // "Pedido #… confirmado" se omite cuando hay entrega digital: el correo "Gracias por tu compra" de la entrega
+    // (send-digital-ilinguerelax) ya confirma el pedido y trae las descargas; mandar los dos duplicaba el aviso.
+    // Sin entrega digital (p. ej. libro físico) sí se envía. Para volver a enviarlo siempre: secreto ORDER_CONFIRMED_EMAIL=on.
+    (a.skus && a.skus.length > 0 && Deno.env.get("ORDER_CONFIRMED_EMAIL") !== "on")
+      ? Promise.resolve()
+      : invokeTemplate("thank-you", a.customerEmail, data, `thank-you-${key}`),
     // Aviso de venta a hola@ilinguerelax.com: apagado (las ventas se ven en /admin). Para volver a recibirlo,
     // crear el secreto ADMIN_SALE_EMAILS con el valor "on".
     Deno.env.get("ADMIN_SALE_EMAILS") === "on"

@@ -87,7 +87,7 @@ interface PaymentMethodRow {
 
 // Antes usaban una ruta temporal de Lovable (asset borrado del CDN) que no
 // sobrevivía al publicar; ahora usan archivos propios del proyecto.
-import { buildSupportUrl } from "@/lib/support";
+import { buildSupportUrl, rememberPendingOrder } from "@/lib/support";
 import { SupportWhatsApp } from "@/components/checkout/SupportWhatsApp";
 import { VisaBadge, MastercardBadge, AmexBadge, ApplePayBadge } from "@/components/checkout/CardBrandBadges";
 import visaLogoAsset from "@/assets/payment-logos/visa.png.asset.json";
@@ -857,9 +857,19 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       };
       const payload = getPaymentPayload(pricing, "mercadopago", countryCode);
 
+      const mpOrderId = `ILR-MP-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+      // Perú: Mercado Pago cobra en soles, así que el WhatsApp de "pago pendiente" lleva el importe en soles.
+      rememberPendingOrder({
+        orderNumber: mpOrderId,
+        name: s.buyer.fullName.trim(),
+        email: s.buyer.email.trim(),
+        product: s.items.map((i) => i.name).join(" + "),
+        amountLabel: countryCode === "PE" ? localTotalLabel : `US$ ${currentUsdRef.toFixed(2)}`,
+        method: paymentType === "cash" ? "Mercado Pago · Efectivo" : "Mercado Pago · Transferencia",
+      });
       const { data, error } = await invokeWithRetry<{ init_point?: string }>("create-mercadopago-preference", {
         body: {
-          orderId: `ILR-MP-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
+          orderId: mpOrderId,
           items: s.items.map((i) => {
             const abs = i.image && /^https?:\/\//i.test(i.image)
               ? i.image

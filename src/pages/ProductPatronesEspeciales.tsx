@@ -496,16 +496,8 @@ const PatronesContent = () => {
                 Reseñas <span className="text-gradient">reales</span> de clientes
               </h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              {photoReviews.map((r, i) => (
-                <figure key={`${r.src}-${i}`} className="relative rounded-xl overflow-hidden border border-border shadow-card bg-card">
-                  <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-background/90 text-foreground text-[11px] font-bold border border-border">
-                    {r.flag} {r.country}
-                  </div>
-                  <LazyImg src={r.src} alt={r.alt} minHeight={260} className="w-full h-auto block" />
-                </figure>
-              ))}
-            </div>
+            <ReviewSlider />
+          </div>
             <div className="text-center mt-6">
               <Button variant="hero" size="xl" onClick={handleBuy} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
                 <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />

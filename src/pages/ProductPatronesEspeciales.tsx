@@ -778,23 +778,6 @@ const PatronesContent = () => {
             <TestimonialSlider priceLabel={priceLabel} />
 
 
-            <div className="text-center mt-8">
-              <Button
-                variant="hero"
-                size="xl"
-                onClick={handleBuy}
-                className="w-full sm:w-auto max-w-full min-h-14 sm:min-h-[unset] px-4 sm:px-8 py-4 sm:py-6 shadow-2xl"
-              >
-                <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
-                <span className="min-w-0 flex-1 text-center leading-tight">
-                  <span className="block text-[15px] sm:text-lg font-extrabold">Comprar ahora</span>
-                  <span className={`block tabular-nums ${hasLongPriceLabel ? "text-xs sm:text-sm" : "text-sm sm:text-base"}`}>
-                    por {priceLabel}
-                  </span>
-                </span>
-                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
-              </Button>
-            </div>
           </div>
         </div>
       </section>

@@ -70,6 +70,36 @@ const photoReviews = [
   { src: resenaMx4.url, flag: "🇵🇪", country: "Perú", alt: "Reseña real por WhatsApp desde Perú sobre la pronunciación" },
 ];
 
+const ReviewSlider = () => {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setIdx((i) => (i + 1) % photoReviews.length), 3500);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div className="mx-auto max-w-sm">
+      <div className="relative overflow-hidden rounded-xl border border-border shadow-card bg-card">
+        <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${idx * 100}%)` }}>
+          {photoReviews.map((r, i) => (
+            <figure key={`${r.src}-${i}`} className="relative w-full shrink-0">
+              <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-background/90 text-foreground text-[11px] font-bold border border-border">
+                {r.flag} {r.country}
+              </div>
+              <img src={r.src} alt={r.alt} loading="lazy" decoding="async" className="w-full h-auto block" />
+            </figure>
+          ))}
+        </div>
+      </div>
+      <div className="mt-3 flex justify-center gap-2">
+        {photoReviews.map((_, i) => (
+          <button key={i} type="button" aria-label={`Ver reseña ${i + 1}`} onClick={() => setIdx(i)}
+            className={`h-2 rounded-full transition-all ${i === idx ? "w-6 bg-primary" : "w-2 bg-muted-foreground/40"}`} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const features = [
   "Patrones especiales de pronunciación en inglés",
   "Alfabeto completo letra por letra",
@@ -496,16 +526,7 @@ const PatronesContent = () => {
                 Reseñas <span className="text-gradient">reales</span> de clientes
               </h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              {photoReviews.map((r, i) => (
-                <figure key={`${r.src}-${i}`} className="relative rounded-xl overflow-hidden border border-border shadow-card bg-card">
-                  <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-background/90 text-foreground text-[11px] font-bold border border-border">
-                    {r.flag} {r.country}
-                  </div>
-                  <LazyImg src={r.src} alt={r.alt} minHeight={260} className="w-full h-auto block" />
-                </figure>
-              ))}
-            </div>
+            <ReviewSlider />
             <div className="text-center mt-6">
               <Button variant="hero" size="xl" onClick={handleBuy} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
                 <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />

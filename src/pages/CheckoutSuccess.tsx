@@ -7,6 +7,7 @@ import { useCheckoutPruebaStore, calcTotals, itemPrice } from "@/stores/checkout
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nContext";
+import { buildPaidSupportUrl } from "@/lib/support";
 import { getCheckoutStrings } from "@/i18n/checkoutStatus";
 import { useToast } from "@/hooks/use-toast";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -41,8 +42,12 @@ export default function CheckoutSuccess() {
   // comprador de dLocal caía en la pantalla "confirmación privada" y nunca veía
   // sus descargas.
   const dlocalOrder = (sp.get("provider") || "").toLowerCase() === "dlocal" ? sp.get("order") : null;
+  // PayPal directo vuelve con ?provider=paypal&order=ILR-PP-xxx (el servidor ya confirmó el cobro).
+  const paypalOrder = (sp.get("provider") || "").toLowerCase() === "paypal" ? sp.get("order") : null;
   const provider = dlocalOrder
     ? "dlocalgo"
+    : paypalOrder
+    ? "paypal"
     : sp.get("session_id")
     ? "stripe"
     : (paypalToken || sp.get("paypal_order"))
@@ -96,12 +101,12 @@ export default function CheckoutSuccess() {
   const refTail = rawRef ? rawRef.slice(-6).toUpperCase().padStart(6, "0") : Math.random().toString(36).slice(2, 8).toUpperCase();
   // Con dLocal usamos el número real del pedido (el mismo que conocen el
   // webhook y el historial), no uno derivado del navegador.
-  const orderNumber = dlocalOrder ? dlocalOrder.toUpperCase() : `ILR-${providerCode}-${refTail}`;
+  const orderNumber = dlocalOrder ? dlocalOrder.toUpperCase() : paypalOrder ? paypalOrder.toUpperCase() : `ILR-${providerCode}-${refTail}`;
 
   // Gate: only real buyers with an approved payment reference should see the
   // confirmation. A visitor without a valid reference OR without buyer info in
   // the session store is treated as public/unknown and gets a neutral screen.
-  const hasPaymentRef = Boolean(paymentId || externalRef || paypalToken || sp.get("paypal_order") || dlocalOrder);
+  const hasPaymentRef = Boolean(paymentId || externalRef || paypalToken || sp.get("paypal_order") || dlocalOrder || paypalOrder);
   const hasBuyerContext = Boolean(buyer.email) && items.length > 0;
   const initialVerified =
     hasPaymentRef &&
@@ -420,7 +425,7 @@ export default function CheckoutSuccess() {
                 <div className="text-muted-foreground">
                   {t.messageUsOn}{" "}
                   <a
-                    href="https://wa.me/12512724704"
+                    href={buildPaidSupportUrl({ language, orderNumber, method: provider === "paypal" ? "PayPal" : "", email: buyer.email })}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary underline"
@@ -648,7 +653,7 @@ export default function CheckoutSuccess() {
             <Link to="/"><ShoppingBag className="w-4 h-4" /> {t.continueShopping}</Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <a href="https://wa.me/12512724704" target="_blank" rel="noopener noreferrer">{t.contactSupport}</a>
+            <a href={buildPaidSupportUrl({ language, orderNumber, method: provider === "paypal" ? "PayPal" : "", email: buyer.email })} target="_blank" rel="noopener noreferrer">{t.contactSupport}</a>
           </Button>
         </div>
       </main>

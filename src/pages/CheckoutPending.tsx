@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { Clock, Mail, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/I18nContext";
+import { buildPaidSupportUrl } from "@/lib/support";
 import { getCheckoutStrings } from "@/i18n/checkoutStatus";
 
 export default function CheckoutPending() {
@@ -48,7 +49,7 @@ export default function CheckoutPending() {
               <div className="font-medium">{t.fasterReceipt}</div>
               <div className="text-muted-foreground text-xs">
                 {t.fasterReceiptDesc}{" "}
-                <a href="https://wa.me/12512724704" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                <a href={buildPaidSupportUrl({ language, orderNumber: sp.get("order"), method: (sp.get("provider") || "").toLowerCase() === "paypal" ? "PayPal" : "" })} target="_blank" rel="noopener noreferrer" className="text-primary underline">
                   WhatsApp +1 251 272 4704
                 </a>
               </div>
@@ -71,7 +72,7 @@ export default function CheckoutPending() {
           </Button>
           <Button asChild variant="outline" size="lg"><Link to="/">{t.backHome}</Link></Button>
           <Button asChild variant="outline" size="lg">
-            <a href="https://wa.me/12512724704" target="_blank" rel="noopener noreferrer">{t.whatsappSupport}</a>
+            <a href={buildPaidSupportUrl({ language, orderNumber: sp.get("order"), method: (sp.get("provider") || "").toLowerCase() === "paypal" ? "PayPal" : "" })} target="_blank" rel="noopener noreferrer">{t.whatsappSupport}</a>
           </Button>
         </div>
 

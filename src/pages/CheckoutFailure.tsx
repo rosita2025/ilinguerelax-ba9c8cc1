@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { XCircle, MessageCircle, RefreshCcw, ShieldAlert, Clock, PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/I18nContext";
+import { buildPaidSupportUrl } from "@/lib/support";
 import { getCheckoutStrings } from "@/i18n/checkoutStatus";
 import { mapStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
 import { isDlocalCode, mapDlocalStatus } from "@/lib/dlocalErrorMap";
@@ -87,7 +88,7 @@ export default function CheckoutFailure() {
             </Link>
           </Button>
           <Button asChild variant="ghost" size="lg" className="gap-2">
-            <a href="https://wa.me/12512724704" target="_blank" rel="noopener noreferrer">
+            <a href={buildPaidSupportUrl({ language, orderNumber: sp.get("order"), method: (sp.get("provider") || "").toLowerCase() === "paypal" ? "PayPal" : "" })} target="_blank" rel="noopener noreferrer">
               <MessageCircle className="w-4 h-4" /> {t.contactSupport}
             </a>
           </Button>

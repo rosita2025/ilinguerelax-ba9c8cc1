@@ -28,6 +28,10 @@ import { UrgencyTimerBar } from "@/components/UrgencyTimerBar";
 import { TikTokVideos } from "@/components/TikTokVideos";
 import introVideo from "@/assets/introduccion-patrones-16x9.mp4.asset.json";
 import introPoster from "@/assets/intro-patrones-poster.jpg.asset.json";
+import fastCover from "@/assets/patrones-new/patrones-cover-light.webp.asset.json";
+
+// Snapshot of the current admin cover, not a catalog or price override.
+const FAST_COVER_SOURCE = "https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/patrones-especiales-alfabeto-combinaciones-secretas-ingles/1789945794300-1sxv9.webp";
 
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
 // ÚNICA regla final para Patrones:
@@ -113,7 +117,7 @@ const ReviewSlider = () => {
                 onClick={() => setZoom(i)}
                 className="block w-full cursor-zoom-in"
               >
-                <img src={r.src} alt={r.alt} loading="lazy" decoding="async" className="w-full h-auto block select-none" {...protect} />
+                <LazyImg src={r.src} alt={r.alt} width={1024} height={1024} wrapperClassName="block aspect-square" className="w-full h-auto block select-none" {...protect} />
               </button>
               <div className="pointer-events-none absolute bottom-2 right-2 z-10 rounded-full bg-background/90 border border-border p-1.5">
                 <ZoomIn className="h-3.5 w-3.5 text-foreground" />
@@ -264,19 +268,23 @@ const PatronesContent = () => {
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   
-  // Precarga el paquete de JS del checkout en segundo plano (mismo fix que
-  // en ProductDynamic.tsx) para evitar la pantalla en blanco de 3-5s al
-  // tocar "comprar".
+  const [heroLoaded, setHeroLoaded] = useState(false);
+  const checkoutPrefetched = useRef(false);
+  const prefetchCheckout = () => {
+    if (checkoutPrefetched.current) return;
+    checkoutPrefetched.current = true;
+    void import("@/pages/Checkout");
+    void prefetchCheckoutProduct("patrones-especiales-alfabeto-combinaciones-secretas-ingles");
+  };
+
+  // Do not download payment code while the first image is still loading.
   useEffect(() => {
-    const prefetch = () => { import("@/pages/Checkout"); prefetchCheckoutProduct("patrones-especiales-alfabeto-combinaciones-secretas-ingles"); };
-    const w = window as typeof window & { requestIdleCallback?: (cb: () => void) => number };
-    if (typeof w.requestIdleCallback === "function") {
-      w.requestIdleCallback(prefetch);
-      return;
-    }
-    const timeoutId = window.setTimeout(prefetch, 2000);
+    if (!heroLoaded) return;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    if (connection?.saveData || connection?.effectiveType?.includes("2g")) return;
+    const timeoutId = window.setTimeout(prefetchCheckout, 3000);
     return () => window.clearTimeout(timeoutId);
-  }, []);
+  }, [heroLoaded]);
   const ADMIN_SKU = "patrones-especiales-alfabeto-combinaciones-secretas-ingles";
   const pricingAdmin = useAdminPricing(ADMIN_SKU);
   const tier = useCountryTierRouting(ADMIN_SKU, {
@@ -292,21 +300,17 @@ const PatronesContent = () => {
 
   
 
-  // Imagen del producto: usa la portada configurada en el admin y,
-  // si aún no carga o no existe, cae a la imagen local por defecto.
-  // Mientras el admin responde no mostramos la imagen local pesada para
-  // evitar descargar dos imágenes distintas (parpadeo y carga lenta).
-  // La última portada vista se recuerda en el navegador: así, quien ya visitó
-  // la página empieza a bajar la imagen sin esperar la respuesta del admin.
+  // First visits start the current cover immediately, independently of pricing.
+  // A different admin cover still takes precedence when catalog data arrives.
   const cachedCover = useMemo(() => readCachedCover(ADMIN_SKU), []);
   useEffect(() => {
     if (pricingAdmin.loaded) writeCachedCover(ADMIN_SKU, pricingAdmin.coverImageUrl);
   }, [pricingAdmin.loaded, pricingAdmin.coverImageUrl]);
   const heroImage = pricingAdmin.loaded
     ? (pricingAdmin.coverImageUrl ?? productImage)
-    : cachedCover;
+    : (cachedCover ?? FAST_COVER_SOURCE);
   const [heroFailed, setHeroFailed] = useState(false);
-  const heroLight = heroFailed ? heroImage : lightCoverUrl(heroImage);
+  const heroLight = heroFailed ? heroImage : heroImage === FAST_COVER_SOURCE ? fastCover.url : lightCoverUrl(heroImage);
   const heroImageAbsolute = heroImage
     ? (heroImage.startsWith("http") ? heroImage : `https://ilinguerelax.com${heroImage}`)
     : `https://ilinguerelax.com${productImage}`;
@@ -462,6 +466,7 @@ const PatronesContent = () => {
                     loading="eager"
                     decoding="async"
                     fetchPriority="high"
+                    onLoad={() => setHeroLoaded(true)}
                   />
                 ) : (
                   <div className="w-full aspect-[4/5] rounded-2xl bg-muted animate-pulse" />
@@ -532,6 +537,9 @@ const PatronesContent = () => {
                   size="xl"
                   className="w-full mb-2 text-lg py-6 shadow-2xl"
                   onClick={handleBuy}
+                  onPointerEnter={prefetchCheckout}
+                  onFocus={prefetchCheckout}
+                  onTouchStart={prefetchCheckout}
                   disabled={!pricingReady}
                 >
                   <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
@@ -613,7 +621,7 @@ const PatronesContent = () => {
             <TikTokVideos />
             </LazyMount>
             <div className="text-center mt-6">
-              <Button variant="hero" size="xl" onClick={handleBuy} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
+              <Button variant="hero" size="xl" onClick={handleBuy} onPointerEnter={prefetchCheckout} onFocus={prefetchCheckout} onTouchStart={prefetchCheckout} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
                 <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
                 {pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
                 <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
@@ -784,8 +792,8 @@ const PatronesContent = () => {
               </p>
             </div>
 
-            <SegundoBonoGramatica />
-            <TercerBonoExamen />
+            <LazyMount minHeight={400}><SegundoBonoGramatica /></LazyMount>
+            <LazyMount minHeight={400}><TercerBonoExamen /></LazyMount>
 
 
 

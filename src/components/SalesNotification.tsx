@@ -198,7 +198,7 @@ const SalesNotification = ({
           animate={{ x: 0, opacity: 1, scale: 1 }}
           exit={{ x: -100, opacity: 0, scale: 0.8 }}
           transition={{ type: "spring", stiffness: 300, damping: 25, duration: 0.5 }}
-          className="fixed left-3 sm:left-4 bottom-[calc(var(--sticky-bar-h,105px)+64px)] sm:bottom-[calc(var(--sticky-bar-h,105px)+78px)] z-[55] bg-white rounded-xl shadow-xl border border-gray-200 p-2.5 md:p-3 w-[calc(100vw-1.5rem)] max-w-[320px]"
+          className="fixed left-3 sm:left-4 bottom-[calc(var(--sticky-bar-h,105px)+64px)] sm:bottom-[calc(var(--sticky-bar-h,105px)+78px)] z-[55] bg-white rounded-xl shadow-xl border border-gray-200 p-2.5 md:p-3 w-[calc(100vw-5.75rem)] sm:w-[320px] max-w-[320px]"
         >
           <button
             onClick={closeForGood}
@@ -218,10 +218,10 @@ const SalesNotification = ({
                   height={48}
                   loading="lazy"
                   decoding="async"
-                  className="w-12 h-12 rounded-lg object-cover border border-gray-200 bg-gray-100"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover border border-gray-200 bg-gray-100"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-lg bg-emerald-50 border border-emerald-200" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-emerald-50 border border-emerald-200" />
               )}
               <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center" aria-hidden="true">
                 <Check className="w-3 h-3 text-white" strokeWidth={3.5} />
@@ -232,12 +232,12 @@ const SalesNotification = ({
               <p className="text-[13px] leading-tight font-bold text-gray-900 truncate">
                 {currentSale.name} <span className="font-normal text-gray-500">· {countryLabel}</span>
               </p>
-              <p className="text-xs leading-snug text-gray-700 line-clamp-2">
+              <p className="text-xs leading-snug text-gray-700 line-clamp-1 sm:line-clamp-2">
                 {lang === "en" ? "Purchased" : "Compró"} {currentSale.productName}
               </p>
               <p className="text-[11px] leading-tight text-gray-500">
                 <span className="text-emerald-600 font-semibold">✓ {lang === "en" ? "Verified purchase" : "Compra verificada"}</span>
-                {" · "}{providerLabel} · {timeAgo}
+                <span className="hidden sm:inline">{" · "}{providerLabel}</span>{" · "}{timeAgo}
               </p>
             </div>
           </div>

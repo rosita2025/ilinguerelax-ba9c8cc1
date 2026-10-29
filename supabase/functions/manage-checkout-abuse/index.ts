@@ -32,6 +32,8 @@ Deno.serve(async (req) => {
       action?: string;
       ip?: string;
       limit?: number;
+      range?: string;
+      tz_offset?: number;
     };
     const action = body.action || "list_bans";
     const admin = createClient(
@@ -70,11 +72,24 @@ Deno.serve(async (req) => {
     }
 
     if (action === "stats") {
-      const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+      // Rango: "today" (desde las 00:00 de hoy), "yesterday" (el día completo de ayer) o "24h" (por defecto).
+      // El día se corta con la hora local del administrador (tz_offset = minutos, como Date.getTimezoneOffset()).
+      const range = String(body.range ?? "24h");
+      const tzOffsetMin = Number.isFinite(Number(body.tz_offset)) ? Math.max(-840, Math.min(840, Number(body.tz_offset))) : 0;
+      const nowMs = Date.now();
+      const localNow = nowMs - tzOffsetMin * 60_000;
+      const startOfTodayMs = Math.floor(localNow / 86_400_000) * 86_400_000 + tzOffsetMin * 60_000;
+      let sinceMs = nowMs - 24 * 3600 * 1000;
+      let untilMs = nowMs + 60_000;
+      if (range === "today") sinceMs = startOfTodayMs;
+      else if (range === "yesterday") { sinceMs = startOfTodayMs - 86_400_000; untilMs = startOfTodayMs; }
+      const since = new Date(sinceMs).toISOString();
+      const until = new Date(untilMs).toISOString();
       const { data, error } = await admin
         .from("checkout_rate_hits")
         .select("ip, slug, created_at, source, referer, ua, country, email, city")
         .gte("created_at", since)
+        .lt("created_at", until)
         .limit(5000);
       if (error) throw error;
 
@@ -287,7 +302,7 @@ Deno.serve(async (req) => {
       summary.with_email = leads.length;
       summary.purchased = leads.filter((l) => l.status === "purchased").length;
       summary.abandoned = leads.filter((l) => l.status === "abandoned").length;
-      return json({ top, sources, countries, summary, leads, total: (data || []).length });
+      return json({ top, sources, countries, summary, leads, total: (data || []).length, range, since, until });
 
     }
 

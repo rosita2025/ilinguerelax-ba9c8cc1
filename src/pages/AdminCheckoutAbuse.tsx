@@ -270,6 +270,7 @@ export default function AdminCheckoutAbuse() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [loading, setLoading] = useState(false);
+  const [range, setRange] = useState<"today" | "yesterday" | "24h">("today");
   const [tab, setTab] = useState<"filled" | "empty">("filled");
   const [countryFilter, setCountryFilter] = useState("");
   const [shown, setShown] = useState(25);
@@ -279,7 +280,7 @@ export default function AdminCheckoutAbuse() {
     try {
       const [b, s] = await Promise.all([
         adminInvoke("manage-checkout-abuse", { body: { action: "list_bans" } }),
-        adminInvoke("manage-checkout-abuse", { body: { action: "stats" } }),
+        adminInvoke("manage-checkout-abuse", { body: { action: "stats", range, tz_offset: new Date().getTimezoneOffset() } }),
       ]);
       if (b.error) throw b.error;
       if (s.error) throw s.error;
@@ -302,7 +303,8 @@ export default function AdminCheckoutAbuse() {
     void load();
     const iv = setInterval(() => { if (!document.hidden) void load(); }, 30000);
     return () => clearInterval(iv);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [range]);
 
 
   const unban = async (ip: string) => {
@@ -339,6 +341,8 @@ export default function AdminCheckoutAbuse() {
   })();
   const visible = (tab === "filled" ? withEmail : withoutEmail).filter((r) => !countryFilter || (r.country || "").toUpperCase() === countryFilter);
 
+  const rangeLabel = range === "today" ? `hoy (${new Date().toLocaleDateString("es", { day: "numeric", month: "long" })})` : range === "yesterday" ? `ayer (${new Date(Date.now() - 86400000).toLocaleDateString("es", { day: "numeric", month: "long" })})` : "las últimas 24 h";
+
   const activeBans = bans.filter((b) => new Date(b.banned_until) > new Date());
 
   return (
@@ -352,14 +356,21 @@ export default function AdminCheckoutAbuse() {
               Checkout · anti-abuso
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Datos reales de las últimas 24 h · se actualiza solo cada 30 s
+              Datos reales de {rangeLabel} · se actualiza solo cada 30 s
               {updatedAt ? ` · actualizado ${updatedAt.toLocaleTimeString()}` : ""}
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-            Refrescar
-          </Button>
+          <div className="flex flex-wrap items-center gap-2 justify-end">
+            {([["today", "Hoy"], ["yesterday", "Ayer"], ["24h", "Últimas 24 h"]] as const).map(([k, label]) => (
+              <Button key={k} size="sm" variant={range === k ? "default" : "outline"} onClick={() => { setRange(k); setShown(25); setCountryFilter(""); }}>
+                {label}
+              </Button>
+            ))}
+            <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+              Refrescar
+            </Button>
+          </div>
         </div>
 
         {summary && (
@@ -385,7 +396,7 @@ export default function AdminCheckoutAbuse() {
         <section className="border rounded-lg overflow-hidden">
           <div className="px-4 py-3 bg-muted/40 border-b space-y-3">
             <div>
-              <h2 className="font-semibold">Visitantes del checkout · últimas 24 h</h2>
+              <h2 className="font-semibold">Visitantes del checkout · {rangeLabel}</h2>
               <p className="text-xs text-muted-foreground mt-1">
                 Separados en dos pestañas: quienes dejaron su correo y quienes solo miraron. Con país, duración y modelo de teléfono.
               </p>
@@ -528,7 +539,7 @@ export default function AdminCheckoutAbuse() {
 
         <section className="border rounded-lg overflow-hidden">
           <div className="px-4 py-3 bg-muted/40 border-b">
-            <h2 className="font-semibold">Origen del tráfico · últimas 24 h</h2>
+            <h2 className="font-semibold">Origen del tráfico · {rangeLabel}</h2>
             <p className="text-xs text-muted-foreground mt-1">
               De dónde vienen los visitantes que abren el checkout. Instagram/Facebook = humanos reales desde anuncios.
             </p>
@@ -549,7 +560,7 @@ export default function AdminCheckoutAbuse() {
 
         <section className="border rounded-lg overflow-hidden">
           <div className="px-4 py-3 bg-muted/40 border-b">
-            <h2 className="font-semibold">Países · últimas 24 h</h2>
+            <h2 className="font-semibold">Países · {rangeLabel}</h2>
             <p className="text-xs text-muted-foreground mt-1">
               Desde qué país se abre el checkout. Útil para saber si el método de pago mostrado es el correcto.
             </p>

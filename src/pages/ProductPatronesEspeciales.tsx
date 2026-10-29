@@ -552,15 +552,47 @@ const PatronesContent = () => {
         </div>
       </section>
 
-      {/* Dolores */}
-      <section className="py-10 md:py-14">
+      {/* Qué es y para qué sirve (resumen corto, justo debajo del hero) */}
+      <section className="py-6 md:py-8 bg-primary/5 border-y border-primary/10">
         <div className="container px-4 md:px-6">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-4xl mx-auto">
+            <p className="text-base md:text-lg text-foreground text-center mb-5">
+              <strong>Patrones Especiales</strong> te ayuda a aprender a leer y pronunciar palabras en inglés reconociendo patrones de letras y combinaciones que se repiten en muchas palabras.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              <div className="rounded-xl border border-border bg-card p-4 shadow-card">
+                <h2 className="text-base md:text-lg font-extrabold text-foreground mb-2">📘 ¿Para qué sirven los patrones?</h2>
+                <ul className="space-y-1.5 text-sm text-foreground">
+                  <li>✅ Para reconocer combinaciones de letras y entender cómo suenan en inglés.</li>
+                  <li>✅ Para aprender a pronunciar palabras nuevas con mayor facilidad.</li>
+                  <li>✅ Para mejorar tu lectura en inglés sin depender de memorizar cada palabra por separado.</li>
+                </ul>
+              </div>
+              <div className="rounded-xl border border-border bg-card p-4 shadow-card">
+                <h2 className="text-base md:text-lg font-extrabold text-foreground mb-2">Además, recibirás 3 bonos gratis:</h2>
+                <ul className="space-y-1.5 text-sm text-foreground">
+                  <li>🎁 1.000 palabras en inglés con pronunciación para hispanohablantes y audios.</li>
+                  <li>🎁 Estructuras gramaticales desde cero.</li>
+                  <li>🎁 Examen de vocabulario y pronunciación para practicar.</li>
+                </ul>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground text-center mt-4">
+              La idea es que tengas un material práctico para estudiar a tu propio ritmo. 😊
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Dolores */}
+      <section className="py-8 md:py-10">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-2">
               ¿Te pasa esto cuando <span className="text-gradient">hablas inglés</span>?
             </h2>
             <p className="text-center text-muted-foreground mb-6">Si dijiste sí a una sola, este ebook es para ti.</p>
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
                 "Lees una palabra y no sabes cómo suena. Escribes una cosa y se pronuncia otra.",
                 "Te da vergüenza hablar porque sientes que vas a pronunciar mal.",
@@ -569,7 +601,7 @@ const PatronesContent = () => {
                 "Las letras mudas y las combinaciones raras (gh, ough, tion) te confunden siempre.",
                 "Has probado cursos largos y caros, pero nadie te explica el porqué de los sonidos.",
               ].map((x) => (
-                <div key={x} className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4">
+                <div key={x} className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-3 md:p-4">
                   <span className="text-lg leading-none mt-0.5">❌</span>
                   <p className="text-foreground text-sm md:text-base">{x}</p>
                 </div>
@@ -619,31 +651,6 @@ const PatronesContent = () => {
                 <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
               </Button>
               <p className="text-xs text-muted-foreground mt-2">🔒 Pago seguro • ⬇️ Descarga inmediata • 🛡️ Garantía 7 días</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Subhero: qué recibes */}
-      <section className="py-6 md:py-8 bg-primary/5 border-y border-primary/10">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-2">
-              Un solo pago. <span className="text-gradient">4 materiales en tu correo.</span>
-            </h2>
-            <p className="text-muted-foreground mb-5">Todo en PDF, listo para leer en tu celular o imprimir.</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left">
-              {[
-                { t: "Patrones Especiales", d: "El ebook principal con alfabeto, combinaciones y letras mudas" },
-                { t: "Bono 1 · GRATIS", d: "1,000 palabras con pronunciación y fonética" },
-                { t: "Bono 2 · GRATIS", d: "Estructuras gramaticales de cero a A2" },
-                { t: "Bono 3 · GRATIS", d: "Examen de 98 preguntas con respuestas" },
-              ].map((x) => (
-                <div key={x.t} className="rounded-xl border border-border bg-card p-4 shadow-card">
-                  <p className="text-sm font-extrabold text-foreground flex items-center gap-2"><Check className="w-4 h-4 text-primary shrink-0" />{x.t}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{x.d}</p>
-                </div>
-              ))}
             </div>
           </div>
         </div>

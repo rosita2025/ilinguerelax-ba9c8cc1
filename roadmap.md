@@ -18,3 +18,4 @@
 - [x] Apply attached course-only sticky testimonial diff; ten tests passed and the real empty-review page hides testimonials. No purchases or emails.
 - [x] Connect Maglia Relax purchase-bar stars and count to its SKU's existing admin values, without adding written reviews or changing other products.
 - [x] Reduce Patrones first-load delay without changing prices or payments; cover rendered in 1.2 seconds with catalog artificially delayed six seconds, checkout deferred, review zoom verified, video preload remains none, build OK.
+- [ ] Accelerate Patrones further with earlier cover loading and deferred secondary code; measure actual loading without promising 0.5 seconds on every connection.

@@ -2,6 +2,17 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { PATRONES_COVER_SOURCE, PATRONES_FAST_COVER_URL, PATRONES_PRODUCT_SLUG } from "./src/lib/patronesCover";
+
+// Start the actual cover request while HTML is parsed, before React or the catalog.
+// No other product downloads this image. A cached different admin cover is respected.
+const patronesCoverPreload = () => ({
+  name: "patrones-cover-preload",
+  transformIndexHtml(html: string) {
+    const script = `<script>(function(){if(location.pathname!==${JSON.stringify(`/products/${PATRONES_PRODUCT_SLUG}`)})return;try{var c=localStorage.getItem(${JSON.stringify(`ilr_cover_${PATRONES_PRODUCT_SLUG}`)});if(c&&c!==${JSON.stringify(PATRONES_COVER_SOURCE)})return;}catch(e){}var l=document.createElement('link');l.rel='preload';l.as='image';l.href=${JSON.stringify(PATRONES_FAST_COVER_URL)};l.setAttribute('fetchpriority','high');document.head.appendChild(l);})();</script>`;
+    return html.replace("</head>", `${script}</head>`);
+  },
+});
 
 // El CSS principal deja de bloquear el primer pintado: la pantalla inicial (en index.html) usa estilos
 // en línea y el CSS se aplica en cuanto baja. React espera a que el CSS esté listo antes de dibujar.
@@ -67,7 +78,7 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
-  plugins: [react(), mode === "development" && componentTagger(), mode === "production" && asyncMainCss(), mode === "production" && productRoutePreload()].filter(Boolean),
+  plugins: [react(), mode === "development" && componentTagger(), patronesCoverPreload(), mode === "production" && asyncMainCss(), mode === "production" && productRoutePreload()].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

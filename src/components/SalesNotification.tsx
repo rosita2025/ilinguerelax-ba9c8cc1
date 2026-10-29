@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { X } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -10,7 +10,8 @@ type ProductKey =
   | "verbs1000"
   | "questions500"
   | "book5000"
-  | "book8000";
+  | "book8000"
+  | "patrones";
 
 interface RealSale {
   name: string;
@@ -29,6 +30,7 @@ const SKUS_BY_KEY: Record<ProductKey, string[]> = {
   questions500: ["500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes"],
   book5000: ["5-000-palabras-libro-fisico"],
   book8000: ["8-000-palabras-libro-fisico"],
+  patrones: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
   spanish5000: [
     "5-000-spanish-words-with-english-pronunciation-digital",
     "5-000-spanish-words-with-english-pronunciation-physical",
@@ -111,7 +113,10 @@ const SalesNotification = ({
         const all: RealSale[] = (data as any)?.sales ?? [];
         const wanted = productKey ? SKUS_BY_KEY[productKey] : null;
         const filtered = wanted ? all.filter((s) => s.sku && wanted.includes(s.sku)) : all;
-        const pool = filtered.length > 0 ? filtered : all;
+        const base = filtered.length > 0 ? filtered : all;
+        // Siempre ventas reales; si hay recientes (últimos 30 días) se muestran primero esas.
+        const recent = base.filter((s) => Date.now() - new Date(s.soldAt).getTime() < 30 * 86400000);
+        const pool = recent.length > 0 ? recent : base;
         if (pool.length === 0) return;
         setSales(pool);
         setSaleIndex(0);
@@ -184,20 +189,19 @@ const SalesNotification = ({
           animate={{ x: 0, opacity: 1, scale: 1 }}
           exit={{ x: -100, opacity: 0, scale: 0.8 }}
           transition={{ type: "spring", stiffness: 300, damping: 25, duration: 0.5 }}
-          className="fixed top-4 left-4 z-50 bg-white rounded-lg shadow-2xl border border-gray-200 p-2 md:p-3 max-w-[280px] md:max-w-xs"
+          className="fixed left-3 sm:left-4 bottom-[calc(var(--sticky-bar-h,105px)+64px)] sm:bottom-[calc(var(--sticky-bar-h,105px)+78px)] z-[55] bg-white rounded-xl shadow-xl border border-gray-200 p-2 md:p-3 max-w-[270px] md:max-w-xs"
         >
           <button
             onClick={() => setIsVisible(false)}
+            aria-label={lang === "en" ? "Close" : "Cerrar"}
             className="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2 bg-gray-100 hover:bg-gray-200 rounded-full p-0.5 md:p-1 transition-colors"
           >
             <X className="w-2.5 h-2.5 md:w-3 md:h-3 text-gray-500" />
           </button>
 
           <div className="flex items-center gap-2 md:gap-3">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-yellow-400 rounded flex items-center justify-center shrink-0">
-              <span className="text-[7px] md:text-[8px] font-bold text-black text-center leading-tight">
-                ✓<br />{lang === "en" ? "REAL" : "REAL"}
-              </span>
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-500 rounded-full flex items-center justify-center shrink-0" aria-hidden="true">
+              <Check className="w-4 h-4 md:w-5 md:h-5 text-white" strokeWidth={3} />
             </div>
 
             <div className="flex-1 min-w-0 flex flex-col">

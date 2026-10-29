@@ -105,9 +105,19 @@ const SalesNotification = ({
   const [sales, setSales] = useState<RealSale[]>([]);
   const [isVisible, setIsVisible] = useState(false);
   const [saleIndex, setSaleIndex] = useState(0);
+  // Si la persona cierra el aviso con la X, no vuelve a salir durante esta visita.
+  const [dismissed, setDismissed] = useState(() => {
+    try { return sessionStorage.getItem("ilr_sales_notif_closed") === "1"; } catch { return false; }
+  });
+  const closeForGood = () => {
+    setIsVisible(false);
+    setDismissed(true);
+    try { sessionStorage.setItem("ilr_sales_notif_closed", "1"); } catch { /* sin almacenamiento */ }
+  };
 
   // Load REAL sales (Stripe, dLocal Go, Mercado Pago, Hotmart, Binance, Shopify, transfers)
   useEffect(() => {
+    if (dismissed) return;
     let cancelled = false;
     (async () => {
       try {
@@ -128,18 +138,18 @@ const SalesNotification = ({
       }
     })();
     return () => { cancelled = true; };
-  }, [productKey]);
+  }, [productKey, dismissed]);
 
   const currentSale = sales[saleIndex] ?? null;
 
   useEffect(() => {
-    if (sales.length === 0) return;
+    if (sales.length === 0 || dismissed) return;
     const t = setTimeout(() => setIsVisible(true), 5000);
     return () => clearTimeout(t);
-  }, [sales.length]);
+  }, [sales.length, dismissed]);
 
   useEffect(() => {
-    if (sales.length === 0) return;
+    if (sales.length === 0 || dismissed) return;
     let intervalId: ReturnType<typeof setTimeout>;
 
     const scheduleNext = () => {
@@ -159,7 +169,7 @@ const SalesNotification = ({
       clearTimeout(firstTimeout);
       clearTimeout(intervalId);
     };
-  }, [sales]);
+  }, [sales, dismissed]);
 
   const timeAgo = useMemo(() => {
     if (!currentSale) return "";
@@ -171,7 +181,7 @@ const SalesNotification = ({
     return lang === "en" ? `${d}d ago` : `hace ${d} d`;
   }, [currentSale, lang]);
 
-  if (!currentSale) return null;
+  if (!currentSale || dismissed) return null;
 
   const code = (currentSale.country ?? "").toUpperCase();
   const countryInfo = COUNTRY_NAMES[code];
@@ -191,7 +201,7 @@ const SalesNotification = ({
           className="fixed left-3 sm:left-4 bottom-[calc(var(--sticky-bar-h,105px)+64px)] sm:bottom-[calc(var(--sticky-bar-h,105px)+78px)] z-[55] bg-white rounded-xl shadow-xl border border-gray-200 p-2.5 md:p-3 w-[calc(100vw-1.5rem)] max-w-[320px]"
         >
           <button
-            onClick={() => setIsVisible(false)}
+            onClick={closeForGood}
             aria-label={lang === "en" ? "Close" : "Cerrar"}
             className="absolute -top-2 -right-2 bg-white border border-gray-200 shadow hover:bg-gray-100 rounded-full p-1 transition-colors"
           >

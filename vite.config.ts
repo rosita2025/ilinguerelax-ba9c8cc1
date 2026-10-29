@@ -13,7 +13,10 @@ const patronesCoverPreload = () => ({
     const script = `<script>(function(){if(location.pathname!==${JSON.stringify(`/products/${PATRONES_PRODUCT_SLUG}`)})return;try{var c=localStorage.getItem(${JSON.stringify(`ilr_cover_${PATRONES_PRODUCT_SLUG}`)});if(c&&c!==${JSON.stringify(PATRONES_COVER_SOURCE)})return;}catch(e){}${hints}var l=document.createElement('link');l.rel='preload';l.as='image';if(!low){l.setAttribute('imagesrcset',${JSON.stringify(PATRONES_COVER_SRCSET)});l.setAttribute('imagesizes',${JSON.stringify(PATRONES_COVER_SIZES)});}l.href=u;l.setAttribute('fetchpriority','high');document.head.appendChild(l);})();</script>`;
     const shell = `<script>(function(){if(location.pathname!==${JSON.stringify(`/products/${PATRONES_PRODUCT_SLUG}`)})return;${hints}var custom=false;try{var c=localStorage.getItem(${JSON.stringify(`ilr_cover_${PATRONES_PRODUCT_SLUG}`)});if(c&&c!==${JSON.stringify(PATRONES_COVER_SOURCE)}){u=c;custom=true;}}catch(e){}var b=document.querySelector('#app-shell .box');if(!b)return;b.style.aspectRatio='4/5';var i=new Image();i.alt='Patrones Especiales en Inglés';i.width=1000;i.height=1250;i.decoding='async';i.setAttribute('fetchpriority','high');i.style.cssText='width:100%;height:auto;display:block;border-radius:inherit';if(!low&&!custom){i.sizes=${JSON.stringify(PATRONES_COVER_SIZES)};i.srcset=${JSON.stringify(PATRONES_COVER_SRCSET)};}i.src=u;b.replaceChildren(i);})();</script>`;
     // Insert at the end of the document: the shell exists before the module runs.
-    return html.replace("</head>", `${script}</head>`).replace("</body>", `${shell}</body>`);
+    return html
+      // Keep the early catalog promise, but do not download a second copy of the snapshot.
+      .replace("p.then(function (d) {", `p.then(function (d) { if(sku===${JSON.stringify(PATRONES_PRODUCT_SLUG)} && d && d.cover_image_url===${JSON.stringify(PATRONES_COVER_SOURCE)})return;`)
+      .replace("</head>", `${script}</head>`).replace("</body>", `${shell}</body>`);
   },
 });
 

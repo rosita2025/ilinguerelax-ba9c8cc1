@@ -115,7 +115,7 @@ const ReviewSlider = () => {
                 type="button"
                 aria-label={`Ampliar reseña de ${r.country}`}
                 onClick={() => setZoom(i)}
-                className="block w-full cursor-zoom-in"
+                className="block w-full aspect-square cursor-zoom-in"
               >
                 {i === idx && <LazyImg src={r.src} alt={r.alt} rootMargin="80px" width={1024} height={1024} wrapperClassName="block aspect-square" className="w-full h-auto block select-none" {...protect} />}
               </button>

@@ -1,5 +1,5 @@
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
-import { useMemo, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useMemo, useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -16,8 +16,6 @@ import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { motion } from "framer-motion";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { SegundoBonoGramatica } from "@/components/SegundoBonoGramatica";
-import { TercerBonoExamen } from "@/components/TercerBonoExamen";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useRegionTier } from "@/hooks/useRegionTier";
@@ -25,13 +23,14 @@ import { detectCurrency, formatPrice, formatCurrencyAmount, exchangeRates, type 
 import { useLocalOverrides } from "@/lib/livePrices";
 import { CheckoutLanguageProvider, useI18n } from "@/i18n/I18nContext";
 import { UrgencyTimerBar } from "@/components/UrgencyTimerBar";
-import { TikTokVideos } from "@/components/TikTokVideos";
 import introVideo from "@/assets/introduccion-patrones-16x9.mp4.asset.json";
 import introPoster from "@/assets/intro-patrones-poster.jpg.asset.json";
-import fastCover from "@/assets/patrones-new/patrones-cover-light.webp.asset.json";
+import { PATRONES_COVER_SOURCE as FAST_COVER_SOURCE, PATRONES_FAST_COVER_URL } from "@/lib/patronesCover";
 
-// Snapshot of the current admin cover, not a catalog or price override.
-const FAST_COVER_SOURCE = "https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/patrones-especiales-alfabeto-combinaciones-secretas-ingles/1789945794300-1sxv9.webp";
+// Below-the-fold modules download only when their sections approach the viewport.
+const SegundoBonoGramatica = lazy(() => import("@/components/SegundoBonoGramatica").then(m => ({ default: m.SegundoBonoGramatica })));
+const TercerBonoExamen = lazy(() => import("@/components/TercerBonoExamen").then(m => ({ default: m.TercerBonoExamen })));
+const TikTokVideos = lazy(() => import("@/components/TikTokVideos").then(m => ({ default: m.TikTokVideos })));
 
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
 // ÚNICA regla final para Patrones:
@@ -310,7 +309,7 @@ const PatronesContent = () => {
     ? (pricingAdmin.coverImageUrl ?? productImage)
     : (cachedCover ?? FAST_COVER_SOURCE);
   const [heroFailed, setHeroFailed] = useState(false);
-  const heroLight = heroFailed ? heroImage : heroImage === FAST_COVER_SOURCE ? fastCover.url : lightCoverUrl(heroImage);
+  const heroLight = heroFailed ? heroImage : heroImage === FAST_COVER_SOURCE ? PATRONES_FAST_COVER_URL : lightCoverUrl(heroImage);
   const heroImageAbsolute = heroImage
     ? (heroImage.startsWith("http") ? heroImage : `https://ilinguerelax.com${heroImage}`)
     : `https://ilinguerelax.com${productImage}`;
@@ -618,7 +617,7 @@ const PatronesContent = () => {
                   />
                 </div>
             </div>
-            <TikTokVideos />
+            <LazyMount minHeight={400}><Suspense fallback={<div className="min-h-[400px]" />}><TikTokVideos /></Suspense></LazyMount>
             </LazyMount>
             <div className="text-center mt-6">
               <Button variant="hero" size="xl" onClick={handleBuy} onPointerEnter={prefetchCheckout} onFocus={prefetchCheckout} onTouchStart={prefetchCheckout} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
@@ -792,8 +791,8 @@ const PatronesContent = () => {
               </p>
             </div>
 
-            <LazyMount minHeight={400}><SegundoBonoGramatica /></LazyMount>
-            <LazyMount minHeight={400}><TercerBonoExamen /></LazyMount>
+            <LazyMount minHeight={400}><Suspense fallback={<div className="min-h-[400px]" />}><SegundoBonoGramatica /></Suspense></LazyMount>
+            <LazyMount minHeight={400}><Suspense fallback={<div className="min-h-[400px]" />}><TercerBonoExamen /></Suspense></LazyMount>
 
 
 

@@ -10,7 +10,9 @@ const patronesCoverPreload = () => ({
   name: "patrones-cover-preload",
   transformIndexHtml(html: string) {
     const script = `<script>(function(){if(location.pathname!==${JSON.stringify(`/products/${PATRONES_PRODUCT_SLUG}`)})return;try{var c=localStorage.getItem(${JSON.stringify(`ilr_cover_${PATRONES_PRODUCT_SLUG}`)});if(c&&c!==${JSON.stringify(PATRONES_COVER_SOURCE)})return;}catch(e){}var l=document.createElement('link');l.rel='preload';l.as='image';l.href=${JSON.stringify(PATRONES_FAST_COVER_URL)};l.setAttribute('fetchpriority','high');document.head.appendChild(l);})();</script>`;
-    return html.replace("</head>", `${script}</head>`);
+    const shell = `<script>(function(){if(location.pathname!==${JSON.stringify(`/products/${PATRONES_PRODUCT_SLUG}`)})return;var u=${JSON.stringify(PATRONES_FAST_COVER_URL)};try{var c=localStorage.getItem(${JSON.stringify(`ilr_cover_${PATRONES_PRODUCT_SLUG}`)});if(c&&c!==${JSON.stringify(PATRONES_COVER_SOURCE)})u=c;}catch(e){}var b=document.querySelector('#app-shell .box');if(!b)return;b.style.aspectRatio='4/5';var i=new Image();i.alt='Patrones Especiales en Inglés';i.width=1000;i.height=1250;i.decoding='async';i.setAttribute('fetchpriority','high');i.style.cssText='width:100%;height:auto;display:block;border-radius:inherit';i.src=u;b.replaceChildren(i);})();</script>`;
+    // Insert at the end of the document: the shell exists before the module runs.
+    return html.replace("</head>", `${script}</head>`).replace("</body>", `${shell}</body>`);
   },
 });
 

@@ -627,6 +627,23 @@ const PatronesContent = () => {
         </div>
       </section>
 
+      {/* Testimonios 1: reseñas reales por WhatsApp */}
+      <section className="py-6 md:py-8">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-bold mb-2">
+                <Check className="w-3.5 h-3.5" /> Compras verificadas · WhatsApp 🇲🇽 🇵🇪
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                Reseñas <span className="text-gradient">reales</span> de clientes
+              </h2>
+            </div>
+            <ReviewSlider />
+          </div>
+        </div>
+      </section>
+
       {/* Presentación del producto */}
       <section className="py-8 md:py-10 bg-muted/30">
         <div className="container px-4 md:px-6">
@@ -665,23 +682,6 @@ const PatronesContent = () => {
               </Button>
               <p className="text-xs text-muted-foreground mt-2">🔒 Pago seguro • ⬇️ Descarga inmediata • 🛡️ Garantía 7 días</p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonios 1: reseñas reales por WhatsApp */}
-      <section className="pt-10 pb-44 md:pt-14 md:pb-14">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-bold mb-2">
-                <Check className="w-3.5 h-3.5" /> Compras verificadas · WhatsApp 🇲🇽 🇵🇪
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-                Reseñas <span className="text-gradient">reales</span> de clientes
-              </h2>
-            </div>
-            <ReviewSlider />
           </div>
         </div>
       </section>

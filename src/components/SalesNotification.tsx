@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { X } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -10,7 +10,8 @@ type ProductKey =
   | "verbs1000"
   | "questions500"
   | "book5000"
-  | "book8000";
+  | "book8000"
+  | "patrones";
 
 interface RealSale {
   name: string;
@@ -29,6 +30,7 @@ const SKUS_BY_KEY: Record<ProductKey, string[]> = {
   questions500: ["500-preguntas-en-ingles-con-pronunciacion-para-hispanohablantes"],
   book5000: ["5-000-palabras-libro-fisico"],
   book8000: ["8-000-palabras-libro-fisico"],
+  patrones: ["patrones-especiales-alfabeto-combinaciones-secretas-ingles"],
   spanish5000: [
     "5-000-spanish-words-with-english-pronunciation-digital",
     "5-000-spanish-words-with-english-pronunciation-physical",
@@ -91,11 +93,14 @@ interface SalesNotificationProps {
   lang?: "es" | "en";
   /** When provided, filters notifications to only this product. */
   productKey?: ProductKey;
+  /** Portada del producto: se muestra como miniatura (si no, un círculo verde con check). */
+  productImage?: string;
 }
 
 const SalesNotification = ({
   lang = "es",
   productKey,
+  productImage,
 }: SalesNotificationProps) => {
   const [sales, setSales] = useState<RealSale[]>([]);
   const [isVisible, setIsVisible] = useState(false);
@@ -111,7 +116,10 @@ const SalesNotification = ({
         const all: RealSale[] = (data as any)?.sales ?? [];
         const wanted = productKey ? SKUS_BY_KEY[productKey] : null;
         const filtered = wanted ? all.filter((s) => s.sku && wanted.includes(s.sku)) : all;
-        const pool = filtered.length > 0 ? filtered : all;
+        const base = filtered.length > 0 ? filtered : all;
+        // Siempre ventas reales; si hay recientes (últimos 30 días) se muestran primero esas.
+        const recent = base.filter((s) => Date.now() - new Date(s.soldAt).getTime() < 30 * 86400000);
+        const pool = recent.length > 0 ? recent : base;
         if (pool.length === 0) return;
         setSales(pool);
         setSaleIndex(0);
@@ -171,10 +179,6 @@ const SalesNotification = ({
     ? `${countryInfo.flag} ${lang === "en" ? countryInfo.en : countryInfo.es}`
     : code || (lang === "en" ? "International" : "Internacional");
   const providerLabel = PROVIDER_LABEL[currentSale.provider] ?? currentSale.provider;
-  const dateLabel = new Date(currentSale.soldAt).toLocaleDateString(lang === "en" ? "en-US" : "es-ES", {
-    day: "2-digit",
-    month: "short",
-  });
 
   return (
     <AnimatePresence>
@@ -184,43 +188,47 @@ const SalesNotification = ({
           animate={{ x: 0, opacity: 1, scale: 1 }}
           exit={{ x: -100, opacity: 0, scale: 0.8 }}
           transition={{ type: "spring", stiffness: 300, damping: 25, duration: 0.5 }}
-          className="fixed top-4 left-4 z-50 bg-white rounded-lg shadow-2xl border border-gray-200 p-2 md:p-3 max-w-[280px] md:max-w-xs"
+          className="fixed left-3 sm:left-4 bottom-[calc(var(--sticky-bar-h,105px)+64px)] sm:bottom-[calc(var(--sticky-bar-h,105px)+78px)] z-[55] bg-white rounded-xl shadow-xl border border-gray-200 p-2.5 md:p-3 w-[calc(100vw-1.5rem)] max-w-[320px]"
         >
           <button
             onClick={() => setIsVisible(false)}
-            className="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2 bg-gray-100 hover:bg-gray-200 rounded-full p-0.5 md:p-1 transition-colors"
+            aria-label={lang === "en" ? "Close" : "Cerrar"}
+            className="absolute -top-2 -right-2 bg-white border border-gray-200 shadow hover:bg-gray-100 rounded-full p-1 transition-colors"
           >
-            <X className="w-2.5 h-2.5 md:w-3 md:h-3 text-gray-500" />
+            <X className="w-3 h-3 text-gray-600" />
           </button>
 
-          <div className="flex items-center gap-2 md:gap-3">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-yellow-400 rounded flex items-center justify-center shrink-0">
-              <span className="text-[7px] md:text-[8px] font-bold text-black text-center leading-tight">
-                ✓<br />{lang === "en" ? "REAL" : "REAL"}
+          <div className="flex items-center gap-3">
+            <div className="relative shrink-0">
+              {productImage ? (
+                <img
+                  src={productImage}
+                  alt=""
+                  width={48}
+                  height={48}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-12 h-12 rounded-lg object-cover border border-gray-200 bg-gray-100"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-lg bg-emerald-50 border border-emerald-200" />
+              )}
+              <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center" aria-hidden="true">
+                <Check className="w-3 h-3 text-white" strokeWidth={3.5} />
               </span>
             </div>
 
-            <div className="flex-1 min-w-0 flex flex-col">
-              <div className="flex items-center gap-1 flex-wrap">
-                <p className="text-[10px] md:text-xs font-semibold text-gray-800 truncate">
-                  {currentSale.name}
-                </p>
-                <span className="text-[9px] md:text-[10px] text-muted-foreground">•</span>
-                <p className="text-[9px] md:text-[10px] text-gray-500 truncate">
-                  {countryLabel}
-                </p>
-              </div>
-              <p className="text-[9px] md:text-xs text-gray-600 line-clamp-2">
+            <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+              <p className="text-[13px] leading-tight font-bold text-gray-900 truncate">
+                {currentSale.name} <span className="font-normal text-gray-500">· {countryLabel}</span>
+              </p>
+              <p className="text-xs leading-snug text-gray-700 line-clamp-2">
                 {lang === "en" ? "Purchased" : "Compró"} {currentSale.productName}
               </p>
-              <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                <span className="text-[8px] md:text-[10px] text-green-600 font-medium">
-                  ✓ {lang === "en" ? "Verified Purchase" : "Compra Verificada"}
-                </span>
-                <span className="text-[8px] md:text-[9px] text-muted-foreground">
-                  {providerLabel} · {dateLabel} · {timeAgo}
-                </span>
-              </div>
+              <p className="text-[11px] leading-tight text-gray-500">
+                <span className="text-emerald-600 font-semibold">✓ {lang === "en" ? "Verified purchase" : "Compra verificada"}</span>
+                {" · "}{providerLabel} · {timeAgo}
+              </p>
             </div>
           </div>
         </motion.div>

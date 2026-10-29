@@ -873,7 +873,7 @@ const PatronesContent = () => {
 
       <div className="h-20 md:h-16" />
 
-      <SalesNotification />
+      <SalesNotification productKey="patrones" productImage={heroLight ?? heroImage ?? undefined} />
 <WhatsAppButton url="https://wa.link/5ta2ea" label="¿Dudas?" />
       <ScrollToTop showAfter={500} />
     </main>

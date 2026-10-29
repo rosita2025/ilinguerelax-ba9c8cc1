@@ -247,6 +247,14 @@ Deno.serve(async (req) => {
   // clic, webhook + página de éxito) con los mismos productos. El admin solo
   // debe recibir UN aviso por cliente y día.
   if (templateName === 'admin-sale') {
+    // Aviso de venta a hola@: apagado salvo que exista el secreto ADMIN_SALE_EMAILS=on.
+    // Se corta aquí para cubrir a TODAS las funciones que lo pidan (webhooks incluidos).
+    if (Deno.env.get('ADMIN_SALE_EMAILS') !== 'on') {
+      return new Response(
+        JSON.stringify({ success: true, sent: false, skipped: true, reason: 'admin_sale_notices_off' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      )
+    }
     const buyer = String(
       templateData?.customerEmail || templateData?.customer_email || recipientEmail || ''
     ).trim().toLowerCase()

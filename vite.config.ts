@@ -2,6 +2,23 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { PATRONES_COVER_SOURCE, PATRONES_FAST_COVER_URL, PATRONES_PRODUCT_SLUG, PATRONES_MOBILE_COVER_URL, PATRONES_COVER_SRCSET, PATRONES_COVER_SIZES } from "./src/lib/patronesCover";
+
+// Start the actual cover request while HTML is parsed, before React or the catalog.
+// No other product downloads this image. A cached different admin cover is respected.
+const patronesCoverPreload = () => ({
+  name: "patrones-cover-preload",
+  transformIndexHtml(html: string) {
+    const hints = `var n=navigator.connection;var low=!!(n&&(n.saveData||/^(slow-2g|2g|3g)$/.test(n.effectiveType)||n.downlink>0&&n.downlink<=1.5));var u=low?${JSON.stringify(PATRONES_MOBILE_COVER_URL)}:${JSON.stringify(PATRONES_FAST_COVER_URL)};`;
+    const script = `<script>(function(){if(location.pathname!==${JSON.stringify(`/products/${PATRONES_PRODUCT_SLUG}`)})return;try{var c=localStorage.getItem(${JSON.stringify(`ilr_cover_${PATRONES_PRODUCT_SLUG}`)});if(c&&c!==${JSON.stringify(PATRONES_COVER_SOURCE)})return;}catch(e){}${hints}var l=document.createElement('link');l.rel='preload';l.as='image';if(!low){l.setAttribute('imagesrcset',${JSON.stringify(PATRONES_COVER_SRCSET)});l.setAttribute('imagesizes',${JSON.stringify(PATRONES_COVER_SIZES)});}l.href=u;l.setAttribute('fetchpriority','high');document.head.appendChild(l);})();</script>`;
+    const shell = `<script>(function(){if(location.pathname!==${JSON.stringify(`/products/${PATRONES_PRODUCT_SLUG}`)})return;${hints}var custom=false;try{var c=localStorage.getItem(${JSON.stringify(`ilr_cover_${PATRONES_PRODUCT_SLUG}`)});if(c&&c!==${JSON.stringify(PATRONES_COVER_SOURCE)}){u=c;custom=true;}}catch(e){}var b=document.querySelector('#app-shell .box');if(!b)return;b.style.aspectRatio='4/5';var i=new Image();i.alt='Patrones Especiales en Inglés';i.width=1000;i.height=1250;i.decoding='async';i.setAttribute('fetchpriority','high');i.style.cssText='width:100%;height:auto;display:block;border-radius:inherit';if(!low&&!custom){i.sizes=${JSON.stringify(PATRONES_COVER_SIZES)};i.srcset=${JSON.stringify(PATRONES_COVER_SRCSET)};}i.src=u;b.replaceChildren(i);})();</script>`;
+    // Insert at the end of the document: the shell exists before the module runs.
+    return html
+      // Keep the early catalog promise, but do not download a second copy of the snapshot.
+      .replace("p.then(function (d) {", `p.then(function (d) { if(sku===${JSON.stringify(PATRONES_PRODUCT_SLUG)} && d && d.cover_image_url===${JSON.stringify(PATRONES_COVER_SOURCE)})return;`)
+      .replace("</head>", `${script}</head>`).replace("</body>", `${shell}</body>`);
+  },
+});
 
 // El CSS principal deja de bloquear el primer pintado: la pantalla inicial (en index.html) usa estilos
 // en línea y el CSS se aplica en cuanto baja. React espera a que el CSS esté listo antes de dibujar.
@@ -67,7 +84,7 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
-  plugins: [react(), mode === "development" && componentTagger(), mode === "production" && asyncMainCss(), mode === "production" && productRoutePreload()].filter(Boolean),
+  plugins: [react(), mode === "development" && componentTagger(), patronesCoverPreload(), mode === "production" && asyncMainCss(), mode === "production" && productRoutePreload()].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

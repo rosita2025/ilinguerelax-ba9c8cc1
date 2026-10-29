@@ -15,6 +15,9 @@ import { LivePricesProvider } from "@/lib/livePrices";
 import { getClientId, initClientIdSync } from "@/lib/clientId";
 import { captureMetaClickId } from "@/lib/metaAttribution";
 import { isInternalTraffic } from "@/hooks/useMetaPixel";
+import { PATRONES_COVER_SOURCE, PATRONES_FAST_COVER_URL, PATRONES_PRODUCT_SLUG, PATRONES_MOBILE_COVER_URL, PATRONES_COVER_SRCSET, PATRONES_COVER_SIZES } from "@/lib/patronesCover";
+import { getPatronesConnection, isPatronesConstrainedConnection } from "@/lib/patronesNetwork";
+import { readCachedCover } from "@/lib/coverImage";
 
 const Index = lazy(() => import("./pages/Index"));
 import { CookieConsent } from "@/components/CookieConsent";
@@ -227,10 +230,20 @@ const RouteTracker = () => {
 // Mismo esqueleto que el de index.html (#app-shell): al cargar una página no se pasa a una pantalla en blanco con
 // un círculo, sino que la maqueta ya visible se mantiene hasta que aparece el contenido real.
 const PageFallback = () => {
+  const { pathname } = useLocation();
+  const isPatrones = pathname === `/products/${PATRONES_PRODUCT_SLUG}`;
+  const cached = isPatrones ? readCachedCover(PATRONES_PRODUCT_SLUG) : null;
+  const customCover = cached && cached !== PATRONES_COVER_SOURCE;
+  const constrained = isPatronesConstrainedConnection(getPatronesConnection());
+  const cover = customCover ? cached : constrained ? PATRONES_MOBILE_COVER_URL : PATRONES_FAST_COVER_URL;
   return (
     <div id="app-shell" aria-hidden="true">
       <div className="bar"><span className="logo">iLingue <b>Relax</b></span></div>
-      <div className="box" />
+      {isPatrones ? (
+        <div className="box !aspect-[4/5]">
+          <img src={cover} srcSet={!customCover && !constrained ? PATRONES_COVER_SRCSET : undefined} sizes={!customCover && !constrained ? PATRONES_COVER_SIZES : undefined} alt="" width={1000} height={1250} loading="eager" decoding="async" fetchPriority="high" className="block w-full h-auto rounded-[inherit]" />
+        </div>
+      ) : <div className="box" />}
       <div className="line" />
       <div className="line s" />
     </div>

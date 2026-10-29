@@ -1,4 +1,5 @@
 - Keep Patrones preview images as CDN asset pointers under `src/assets/patrones-new/` and reuse them on the product and dedicated preview pages, so both pages stay synchronized without bundling large images.
+- Preload and display Patrones responsive CDN cover variants during HTML parsing on its product route only, sharing selection with the page and Suspense fallback; respect cached/admin cover changes, avoid speculative checkout on constrained connections, and load secondary media near visibility to prioritize the cover.
 - Scope checkout language through a nested i18n provider rather than changing the global site language, so product-audience copy stays consistent without changing country-based pricing.
 - Scope new product-audience localization through the same nested i18n provider; keep payment-method translations presentation-only so country, currency and purchase handlers remain unchanged.
 - Keep pre-payment upsell presentation in UpsellPopup and orchestration in PaymentMethodsGroup, reusing the checkout catalog loader and existing purchase check to avoid duplicating catalog or server logic.

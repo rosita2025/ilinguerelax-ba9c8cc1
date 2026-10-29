@@ -19,3 +19,4 @@
 - [x] Connect Maglia Relax purchase-bar stars and count to its SKU's existing admin values, without adding written reviews or changing other products.
 - [x] Reduce Patrones first-load delay without changing prices or payments; cover rendered in 1.2 seconds with catalog artificially delayed six seconds, checkout deferred, review zoom verified, video preload remains none, build OK.
 - [x] Accelerate Patrones with HTML cover preload/display and matching route fallback, plus deferred bonus/TikTok modules; first cover observed in 0.54–0.97 seconds, full page later, build OK, zoom verified, no purchases or emails. Production speed requires publishing and cannot be guaranteed across connections.
+- [ ] Optimize Patrones mobile cover and reduce speculative downloads on constrained connections; verify mobile with network throttling, without purchases or emails.

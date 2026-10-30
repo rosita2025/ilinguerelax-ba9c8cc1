@@ -354,6 +354,19 @@ export default function AdminCheckoutAbuse() {
   }, [range, onlyReal]);
 
 
+  const purgeTeam = async () => {
+    if (!confirm("¿Limpiar las visitas de pruebas del equipo? Se borran del checkout y se dejan de contar en funnels y visitas en vivo todas las IPs desde las que se ha entrado a este panel.")) return;
+    try {
+      const { data, error } = await adminInvoke("manage-checkout-abuse", { body: { action: "purge_team" } });
+      if (error) throw error;
+      const d = data as { checkout_deleted?: number; funnel_marked?: number; ips?: number } | null;
+      toast({ title: "Pruebas del equipo limpiadas", description: `${d?.ips ?? 0} IP(s) del equipo · ${d?.checkout_deleted ?? 0} aperturas de checkout borradas · ${d?.funnel_marked ?? 0} eventos de funnel excluidos` });
+      void load();
+    } catch {
+      toast({ title: "No se pudo limpiar", variant: "destructive" });
+    }
+  };
+
   const deleteVisitor = async (ip: string) => {
     if (!confirm(`¿Borrar de la lista las visitas de ${ip} (${rangeLabel})? Úsalo para pruebas propias o duplicados.`)) return;
     try {
@@ -428,6 +441,10 @@ export default function AdminCheckoutAbuse() {
             <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
               Refrescar
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => void purgeTeam()} title="Quita de checkout, funnels y visitas en vivo las visitas hechas desde las IPs del equipo">
+              <Trash2 className="h-4 w-4 mr-2" />
+              Limpiar pruebas del equipo
             </Button>
           </div>
         </div>

@@ -6,6 +6,7 @@
 //   - stats:      totales por ip en las últimas 24 h
 
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
+import { registerTeamIp, loadExcludedIps } from "../_shared/teamIps.ts";
 import { getPurchasedEmails, getClientSidePurchaseEmails, markCartsConverted } from "../_shared/purchasedEmails.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -43,6 +44,9 @@ Deno.serve(async (req) => {
       { auth: { persistSession: false } },
     );
 
+    // Quien usa este panel es del equipo: su IP se guarda para no contarla como visita.
+    void registerTeamIp(admin, req);
+
     if (action === "list_bans") {
       const { data, error } = await admin
         .from("checkout_ip_bans")
@@ -63,6 +67,27 @@ Deno.serve(async (req) => {
       const { data, error } = await q;
       if (error) throw error;
       return json({ hits: data || [] });
+    }
+
+    if (action === "purge_team") {
+      // Limpia lo ya guardado de las IPs del equipo: borra sus aperturas de checkout y marca como "no real"
+      // sus eventos de funnels / visitas en vivo (así dejan de contarse).
+      const ips = [...(await loadExcludedIps(admin))];
+      if (!ips.length) return json({ ok: true, checkout_deleted: 0, funnel_marked: 0, ips: 0 });
+      let checkoutDeleted = 0;
+      let funnelMarked = 0;
+      for (let i = 0; i < ips.length; i += 50) {
+        const chunk = ips.slice(i, i + 50);
+        const { count: c1 } = await admin.from("checkout_rate_hits").delete({ count: "exact" }).in("ip", chunk);
+        checkoutDeleted += c1 ?? 0;
+        const { count: c2 } = await admin
+          .from("funnel_events")
+          .update({ is_bot: true, bot_reason: "team_ip" }, { count: "exact" })
+          .in("ip", chunk)
+          .eq("is_bot", false);
+        funnelMarked += c2 ?? 0;
+      }
+      return json({ ok: true, checkout_deleted: checkoutDeleted, funnel_marked: funnelMarked, ips: ips.length });
     }
 
     if (action === "delete_visitor") {
@@ -119,7 +144,10 @@ Deno.serve(async (req) => {
       // "directas" sin origen y las que vienen de nuestro propio sitio (pruebas del equipo).
       const onlyReal = body.only_real !== false;
       const isRealSource = (src: string | null) => !!src && src !== "direct" && src !== "internal";
-      const data = onlyReal ? (rawData || []).filter((r) => isRealSource((r as { source: string | null }).source)) : (rawData || []);
+      // Las IPs del equipo (cualquier navegador o país desde el que se haya entrado al panel) nunca cuentan.
+      const teamIps = await loadExcludedIps(admin);
+      const notTeam = (rawData || []).filter((r) => !teamIps.has(String((r as { ip: string }).ip)));
+      const data = onlyReal ? notTeam.filter((r) => isRealSource((r as { source: string | null }).source)) : notTeam;
       const hiddenVisits = (rawData || []).length - data.length;
 
       // Resolvemos el país/ciudad real de las IPs que aún no lo tienen

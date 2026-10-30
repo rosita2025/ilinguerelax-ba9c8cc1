@@ -1971,6 +1971,18 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         ]);
 
 
+  // Nombre y descripción de Hotmart editables por región en /admin/checkout-methods.
+  // Si siguen con los textos por defecto del panel, se usa el texto automático (precio + impuestos + 1 clic).
+  const hotmartCustomLabel = (() => {
+    const raw = (methodsConfig.hotmartText?.label ?? "").trim();
+    if (!raw || /^hotmart\s*\((1[- ]?(clic|click|clique))\)$/i.test(raw)) return "";
+    return raw.replace(/hotmart\s*[·\-–—:]?\s*/gi, "").replace(/^\(|\)$/g, "").trim();
+  })();
+  const hotmartCustomNote = (() => {
+    const raw = (methodsConfig.hotmartText?.note ?? "").trim();
+    return !raw || /^redirige al enlace de hotmart/i.test(raw) ? "" : raw;
+  })();
+
   const hotmartMethodsHint = (() => {
 
     const entry = HOTMART_LOCAL_METHODS[country];
@@ -2591,7 +2603,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   {m.id === "hotmart" ? (
                     <>
                       <img src={hotmartLogo.url} alt="Hotmart" className="h-10 sm:h-12 w-auto object-contain -my-1 shrink-0" />
-                      <span className="min-w-0 truncate">{m.title}</span>
+                      {hotmartCustomLabel && <span className="min-w-0 truncate">{hotmartCustomLabel}</span>}
                     </>
                   ) : (
                     <span className="min-w-0 truncate">{m.title}</span>
@@ -2656,7 +2668,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     <div className="flex items-center gap-1 flex-wrap">
                       {(m.badges ?? []).map(renderMethodBadge)}
                     </div>
-                    <div className="mt-1 text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400">{m.sub}</div>
+                    <div className="mt-1 text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400">{hotmartCustomNote || m.sub}</div>
                   </div>
 
                 ) : (m.id === "dlocal_cash" || m.id === "dlocal_wallet") && rowLogo ? null : m.badges?.length ? (

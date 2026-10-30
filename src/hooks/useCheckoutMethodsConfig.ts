@@ -39,18 +39,20 @@ export interface CheckoutMethodsConfig {
   dlocalCard: boolean;
   /** Orden de las familias según el sort_order más bajo en la región activa. */
   familyOrder: FamilyKey[];
+  /** Nombre y descripción de Hotmart editados en /admin/checkout-methods para la región (null = sin fila activa). */
+  hotmartText: { label: string; note: string } | null;
 }
 
 const DEFAULT_ORDER: FamilyKey[] = ["stripe", "hotmart", "paypal", "transfer", "cash", "yape", "binance", "clabe", "dlocalTransfer", "dlocalCash", "dlocalWallet", "dlocalCard", "stripeAch", "stripeCashApp", "stripeKlarna", "stripeBizum", "stripeSatispay", "stripeIdeal", "stripeMbway", "stripeCrypto"];
 
-const DEFAULT_ALL_OFF: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder"> = {
+const DEFAULT_ALL_OFF: Omit<CheckoutMethodsConfig, "regionCode" | "loaded" | "enabledMethodKeys" | "familyOrder" | "hotmartText"> = {
   stripe: false, stripeAch: false, stripeCashApp: false, stripeKlarna: false, stripeBizum: false, stripeSatispay: false, stripeIdeal: false, stripeMbway: false, stripeCrypto: false, paypal: false, transfer: false, cash: false, yape: false, binance: false, clabe: false, hotmart: false, dlocalTransfer: false, dlocalCash: false, dlocalWallet: false, dlocalCard: false,
 };
 
 
 
 interface RegionRow { code: string; country_codes: string[] | null; enabled: boolean; sort_order: number | null }
-interface MethodRow { region_code: string; method_key: string; enabled: boolean; sort_order: number | null }
+interface MethodRow { region_code: string; method_key: string; enabled: boolean; sort_order: number | null; label?: string | null; note?: string | null }
 
 // Cache en memoria con TTL corto — evita re-consulta en cada montaje pero
 // permite ver cambios del admin sin recargar la pestaña por completo.
@@ -85,7 +87,7 @@ async function loadAll() {
   cachePromise = (async () => {
     const [{ data: regions }, { data: methods }] = await Promise.all([
       supabase.from("checkout_regions").select("code, country_codes, enabled, sort_order").eq("enabled", true),
-      supabase.from("checkout_payment_methods").select("region_code, method_key, enabled, sort_order"),
+      supabase.from("checkout_payment_methods").select("region_code, method_key, enabled, sort_order, label, note"),
     ]);
     return {
       regions: (regions ?? []) as RegionRow[],
@@ -124,7 +126,7 @@ function keyToFamily(key: string): FamilyKey | null {
 export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig {
   const [version, setVersion] = useState(0);
   const [state, setState] = useState<CheckoutMethodsConfig>({
-    loaded: false, regionCode: null, enabledMethodKeys: [], ...DEFAULT_ALL_OFF, familyOrder: DEFAULT_ORDER,
+    loaded: false, regionCode: null, enabledMethodKeys: [], ...DEFAULT_ALL_OFF, familyOrder: DEFAULT_ORDER, hotmartText: null,
   });
 
   useEffect(() => {
@@ -180,7 +182,8 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
           enabledMethodKeys: ["stripe_card"], 
           ...DEFAULT_ALL_OFF, 
           stripe: true, 
-          familyOrder: ["stripe", ...DEFAULT_ORDER.filter(f => f !== "stripe")] 
+          familyOrder: ["stripe", ...DEFAULT_ORDER.filter(f => f !== "stripe")],
+          hotmartText: null,
         });
         return;
       }
@@ -190,11 +193,15 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
       // PayPal directo solo aparece si el admin lo activa para la región (antes estaba siempre "encendido" sin fila en el checkout).
       const enabledMethodKeys: string[] = ["stripe_card"];
       let configuredMethods = 0;
+      let hotmartText: { label: string; note: string } | null = null;
       for (const m of methods) {
         if (m.region_code !== region.code) continue;
         configuredMethods += 1;
         if (!m.enabled) continue;
         enabledMethodKeys.push(m.method_key.toLowerCase());
+        if (!hotmartText && (m.method_key === "hotmart_1click" || m.method_key === "hotmart")) {
+          hotmartText = { label: String(m.label ?? ""), note: String(m.note ?? "") };
+        }
         const fam = keyToFamily(m.method_key);
         if (!fam) continue;
         enabledFamilies[fam] = true;
@@ -204,7 +211,7 @@ export function useCheckoutMethodsConfig(country: string): CheckoutMethodsConfig
       const families = configuredMethods > 0 ? enabledFamilies : DEFAULT_ALL_OFF;
       const familyOrder = (Object.keys(familyMinOrder) as FamilyKey[])
         .sort((a, b) => (familyMinOrder[a] - familyMinOrder[b]) || (DEFAULT_ORDER.indexOf(a) - DEFAULT_ORDER.indexOf(b)));
-      if (alive) setState({ loaded: true, regionCode: region.code, enabledMethodKeys, ...families, familyOrder });
+      if (alive) setState({ loaded: true, regionCode: region.code, enabledMethodKeys, ...families, familyOrder, hotmartText });
     })();
     return () => { alive = false; };
   }, [country, version]);

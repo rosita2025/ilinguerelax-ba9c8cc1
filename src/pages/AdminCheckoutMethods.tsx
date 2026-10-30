@@ -1185,6 +1185,11 @@ export default function AdminCheckoutMethods() {
               <div>
                 <Label>Nota</Label>
                 <Input value={methodEdit.note || ""} onChange={(e) => setMethodEdit({ ...methodEdit, note: e.target.value })} />
+                {/hotmart/i.test(methodEdit.method_key || "") && (
+                  <p className="text-[11px] text-muted-foreground mt-1">
+                    En el checkout de esta región se ve el logo de Hotmart. La <strong>etiqueta</strong> (sin repetir "Hotmart") aparece al lado del logo y la <strong>nota</strong> como descripción debajo (por ejemplo, impuestos locales). Si dejas los textos por defecto, se usa el texto automático con el precio.
+                  </p>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

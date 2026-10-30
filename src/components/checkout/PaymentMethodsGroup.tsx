@@ -28,6 +28,7 @@ import { trackPaymentError, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import { usePurchaseTracking } from "@/hooks/usePurchaseTracking";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
+import hotmartLogoFull from "@/assets/hotmart-logo-full.webp";
 import paypalLogo from "@/assets/paypal-logo.png";
 import yapeLogo from "@/assets/yape-logo.webp";
 import oxxoLogo from "@/assets/oxxo-logo.webp";
@@ -1973,11 +1974,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
   // Nombre y descripción de Hotmart editables por región en /admin/checkout-methods.
   // Si siguen con los textos por defecto del panel, se usa el texto automático (precio + impuestos + 1 clic).
-  const hotmartCustomLabel = (() => {
-    const raw = (methodsConfig.hotmartText?.label ?? "").trim();
-    if (!raw || /^hotmart\s*\((1[- ]?(clic|click|clique))\)$/i.test(raw)) return "";
-    return raw.replace(/hotmart\s*[·\-–—:]?\s*/gi, "").replace(/^\(|\)$/g, "").trim();
-  })();
   const hotmartCustomNote = (() => {
     const raw = (methodsConfig.hotmartText?.note ?? "").trim();
     return !raw || /^redirige al enlace de hotmart/i.test(raw) ? "" : raw;
@@ -1989,6 +1985,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     if (!entry) return null;
     return entry[(language as "es" | "en" | "pt" | "fr")] ?? entry.es;
   })();
+  // Hotmart cobra con tarjeta (y Mercado Pago donde existe). PayPal tiene su propia fila.
+  const hotmartHasMp = hotmartBadges.some((bd) => bd.label === "Mercado Pago");
+  const hotmartPayLabel = language === "en" ? (hotmartHasMp ? "Cards and Mercado Pago" : "Cards")
+    : language === "pt" ? (hotmartHasMp ? "Cartões e Mercado Pago" : "Cartões")
+    : language === "fr" ? (hotmartHasMp ? "Cartes et Mercado Pago" : "Cartes")
+    : language === "it" ? (hotmartHasMp ? "Carte e Mercado Pago" : "Carte")
+    : (hotmartHasMp ? "Tarjetas y Mercado Pago" : "Tarjetas");
   const hotmartTaxNote = language === "en"
     ? "includes local taxes (10-20%)"
     : language === "it" ? "include le imposte locali (10-20%)" : language === "pt"
@@ -2186,14 +2189,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           : language === "fr" ? "Hotmart · PayPal et plus (1 clic)"
           : language === "it" ? "Hotmart · PayPal e altro (1 clic)"
           : "Hotmart · PayPal y más (1 clic)"),
-      sub: language === "en"
-        ? `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 click`
-        : language === "pt"
-        ? `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 clique`
-        : language === "fr"
-        ? `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 clic`
-        : `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 clic`,
-
+      sub: `${hotmartPayLabel} · ${hotmartPriceLabel} · ${hotmartTaxNote}`,
 
       badge: isPeru ? hotmartPriceLabel : `USD $${totalUsd}`,
       badges: hotmartBadges,
@@ -2575,7 +2571,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 "w-full text-left flex items-center transition-colors",
                 "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl",
                 m.id === "hotmart"
-                  ? "px-3 pt-1.5 pb-2.5 sm:px-4 sm:pt-2 sm:pb-3 gap-2.5 sm:gap-3"
+                  ? "px-3 py-2 sm:px-4 sm:py-2.5 gap-3"
                   : "px-2.5 py-2 sm:px-3 sm:py-2.5 gap-2 sm:gap-2.5",
                 isSelected
                   ? "bg-neutral-200/60 dark:bg-neutral-800"
@@ -2602,8 +2598,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 <div className="font-semibold text-[13px] sm:text-sm flex items-center gap-2 flex-nowrap min-w-0 text-neutral-800 dark:text-neutral-100">
                   {m.id === "hotmart" ? (
                     <>
-                      <img src={hotmartLogo.url} alt="Hotmart" className="h-10 sm:h-12 w-auto object-contain -my-1 shrink-0" />
-                      {hotmartCustomLabel && <span className="min-w-0 truncate">{hotmartCustomLabel}</span>}
+                      {/* Solo el logo completo (sin texto de nombre al lado): la descripción va debajo. */}
+                      <img src={hotmartLogoFull} alt="Hotmart" width={165} height={48} className="h-6 sm:h-7 w-auto object-contain shrink-0" />
                     </>
                   ) : (
                     <span className="min-w-0 truncate">{m.title}</span>
@@ -2664,12 +2660,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     <BankBadge label={pick(language, "En cuotas", "Installments", "En plusieurs fois", "A rate", "Parcelas")} bg="#1F2937" color="#ffffff" />
                   </div>
                 ) : m.id === "hotmart" ? (
-                  <div className="mt-1.5">
-                    <div className="flex items-center gap-1 flex-wrap">
-                      {(m.badges ?? []).map(renderMethodBadge)}
-                    </div>
-                    <div className="mt-1 text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400">{hotmartCustomNote || m.sub}</div>
-                  </div>
+                  <p className="mt-1 text-[11px] sm:text-xs leading-snug text-neutral-600 dark:text-neutral-300">{hotmartCustomNote || m.sub}</p>
 
                 ) : (m.id === "dlocal_cash" || m.id === "dlocal_wallet") && rowLogo ? null : m.badges?.length ? (
                   <div className="mt-1 flex items-center gap-1 flex-wrap">

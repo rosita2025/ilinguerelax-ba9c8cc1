@@ -236,6 +236,16 @@ const PageFallback = () => {
   const customCover = cached && cached !== PATRONES_COVER_SOURCE;
   const constrained = isPatronesConstrainedConnection(getPatronesConnection());
   const cover = customCover ? cached : constrained ? PATRONES_MOBILE_COVER_URL : PATRONES_FAST_COVER_URL;
+  const variant = pathname.startsWith("/admin") ? "r-admin" : /^\/checkouts\/(?!success|return|failure|pending|pendiente)/.test(pathname) ? "r-checkout" : undefined;
+  if (variant) {
+    return (
+      <div id="app-shell" className={variant} aria-hidden="true">
+        <div className="bar"><span className="logo">iLingue <b>Relax</b></span></div>
+        <div className="adm"><div className="side"><i /><i /><i /><i /><i /><i /><i /></div><div className="main"><i className="t" /><div className="row"><i /><i /><i /><i /></div><i className="big" /></div></div>
+        <div className="chk"><i className="sum" /><i className="in" /><i className="in" /><i className="pay" /><i className="pay" /><i className="pay" /></div>
+      </div>
+    );
+  }
   return (
     <div id="app-shell" aria-hidden="true">
       <div className="bar"><span className="logo">iLingue <b>Relax</b></span></div>

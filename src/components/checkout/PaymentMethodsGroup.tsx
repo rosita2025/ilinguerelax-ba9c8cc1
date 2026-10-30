@@ -50,7 +50,7 @@ const isPaymentElementMode = (): boolean => {
   return PAYMENT_ELEMENT_ENABLED;
 };
 const StripePaymentElementBox = React.lazy(() => import("@/components/checkout/StripePaymentElementBox"));
-import { DLOCAL_COUNTRY_CODES, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";
+import { DLOCAL_COUNTRY_CODES, dlocalNeedsDocument, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";
 import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
 import { mapDlocalStatus } from "@/lib/dlocalErrorMap";
 import { saveDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
@@ -987,7 +987,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     // solicitud con error 400 en TODOS los intentos. Esto NO aplica a
     // Stripe, ni a los métodos manuales aparte (CLABE propia, Yape/Plin,
     // Binance) — esos no lo necesitan.
-    if ((kind === "cash" || kind === "transfer") && !dlocalDocument.trim()) {
+    if ((kind === "cash" || kind === "transfer") && dlocalNeedsDocument(region.country) && !dlocalDocument.trim()) {
       setMethodError({
         method: dlMethod,
         message: language === "en"
@@ -1049,7 +1049,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           payerEmail: s.buyer.email.trim(),
           payerName: s.buyer.fullName.trim(),
           payerPhone: (s.buyer.phone ?? "").trim() || undefined,
-          payerDocument: (kind === "cash" || kind === "transfer") ? dlocalDocument.trim() : undefined,
+          payerDocument: (kind === "cash" || kind === "transfer") && dlocalNeedsDocument(region.country) ? dlocalDocument.trim() : undefined,
           // Mismos datos que enviamos a Stripe: necesarios para despachar libros físicos.
           payerAddress: (s.buyer.address ?? "").trim().slice(0, 160) || undefined,
           payerCity: (s.buyer.city ?? "").trim().slice(0, 80) || undefined,
@@ -3008,7 +3008,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               </div>
             )}
 
-            {(m.id === "dlocal_cash" || m.id === "dlocal_transfer") && isSelected && (
+            {(m.id === "dlocal_cash" || m.id === "dlocal_transfer") && isSelected && dlocalNeedsDocument(country) && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-3">
                 <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 p-3">
                   <p className="text-xs text-amber-800 dark:text-amber-300">

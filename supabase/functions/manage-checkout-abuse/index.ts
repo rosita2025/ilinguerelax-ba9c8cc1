@@ -335,6 +335,30 @@ Deno.serve(async (req) => {
         }
       }
 
+      // Con qué pasarela PAGÓ quien compró (último pago confirmado, sin límite de fecha).
+      const paidByEmail = new Map<string, { provider: string; method: string }>();
+      if (purchased.size) {
+        const buyers = [...purchased];
+        for (let i = 0; i < buyers.length; i += 50) {
+          const chunk = buyers.slice(i, i + 50);
+          const orFilter = chunk.map((e) => `customer_email.ilike.${e.replace(/[%_]/g, (c) => `\\${c}`)}`).join(",");
+          const { data: paidRows } = await admin
+            .from("order_events")
+            .select("customer_email, provider, method, status, event, created_at")
+            .or(orFilter)
+            .order("created_at", { ascending: false })
+            .limit(1000);
+          for (const r of (paidRows || []) as { customer_email: string | null; provider: string | null; method: string | null; status: string | null; event: string | null }[]) {
+            const st = String(r.status ?? "").toLowerCase();
+            const ev = String(r.event ?? "").toLowerCase();
+            const isPaid = ["paid", "approved", "completed", "succeeded"].includes(st) || ev.includes("paid") || ev.includes("approved");
+            const k = String(r.customer_email ?? "").toLowerCase();
+            if (!isPaid || !k || paidByEmail.has(k)) continue;
+            paidByEmail.set(k, { provider: String(r.provider ?? "").toLowerCase(), method: String(r.method ?? "").toLowerCase() });
+          }
+        }
+      }
+
       const top = [...byIp.values()]
         .map((x) => {
           const key = (x.email || "").toLowerCase();
@@ -356,6 +380,7 @@ Deno.serve(async (req) => {
             cart: cartInfo.get(key) ?? null,
             payment_method: methodByEmail.get(key) ?? null,
             actions: actionsByIp.get(x.ip) ?? {},
+            paid_by: status === "purchased" ? (paidByEmail.get(key) ?? null) : null,
             providers: [...(providersByEmail.get(key) ?? [])],
             slugs: [...x.slugs].slice(0, 5),
             sources: [...x.sources],

@@ -28,6 +28,7 @@ interface StatRow {
   payment_method?: string | null;
   providers?: string[];
   actions?: Record<string, number>;
+  paid_by?: { provider: string; method: string } | null;
   first?: string;
   duration_sec?: number;
   cart?: CartInfo | null;
@@ -244,8 +245,20 @@ const methodTagFor = (m?: string | null): MethodTag | null => {
   return hit ? hit[1] : { label: k, className: "bg-muted text-foreground border-border" };
 };
 
-/** Qué método pulsó el cliente: etiqueta clara, o por qué no pulsó ninguno. */
-function PaymentMethodTag({ r }: { r: { email?: string | null; payment_method?: string | null; providers?: string[]; status?: string } }) {
+/** Nombre de la pasarela con la que se pagó (viene de los pagos confirmados). */
+const paidLabel = (p?: { provider: string; method: string } | null): MethodTag | null => {
+  if (!p) return null;
+  const text = `${p.provider} ${p.method}`;
+  if (/yape|plin/.test(text)) return methodTagFor("yape");
+  if (/binance/.test(text)) return methodTagFor("binance");
+  if (/spei|clabe/.test(text)) return methodTagFor("clabe");
+  if (/shopify/.test(text)) return { label: "Shopify", className: "bg-lime-500/10 text-lime-700 border-lime-500/30" };
+  if (/manual|transfer/.test(text)) return { label: "Transferencia manual", className: "bg-slate-500/10 text-slate-700 border-slate-500/30" };
+  return methodTagFor(p.provider) ?? methodTagFor(p.method);
+};
+
+/** Qué método pulsó el cliente / con cuál pagó: etiqueta clara, o por qué no hay ninguno. */
+function PaymentMethodTag({ r }: { r: { email?: string | null; payment_method?: string | null; providers?: string[]; status?: string; paid_by?: { provider: string; method: string } | null } }) {
   if (!r.email) {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border bg-muted text-muted-foreground border-border" title="No llenó nombre ni correo, así que ni siquiera llegó a elegir un método de pago">
@@ -253,11 +266,25 @@ function PaymentMethodTag({ r }: { r: { email?: string | null; payment_method?: 
       </span>
     );
   }
+  // Quien compró: se muestra la pasarela con la que PAGÓ (dato real del pago confirmado).
+  if (r.status === "purchased") {
+    const paid = paidLabel(r.paid_by) ?? methodTagFor(r.payment_method) ?? methodTagFor((r.providers ?? [])[0]);
+    return paid ? (
+      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border font-medium ${paid.className}`} title="Pasarela del pago confirmado">
+        ✅ Pagó con {paid.label}
+      </span>
+    ) : (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border bg-green-500/10 text-green-700 border-green-500/30" title="El pago está confirmado pero no se registró con qué pasarela">
+        ✅ Pago confirmado (pasarela no registrada)
+      </span>
+    );
+  }
   const tag = methodTagFor(r.payment_method) ?? methodTagFor((r.providers ?? [])[0]);
   if (!tag) {
+    // Con datos y sin otro método pulsado: el formulario de tarjeta de Stripe es el que se muestra por defecto.
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border bg-amber-500/10 text-amber-700 border-amber-500/30" title="Dejó su correo pero no pulsó ningún método de pago">
-        ⏸ Dejó datos, no eligió método
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border bg-indigo-500/10 text-indigo-700 border-indigo-500/30" title="Dejó sus datos y no pulsó otro método: vio el formulario de tarjeta (Stripe), que sale por defecto">
+        💳 Dejó datos · Stripe por defecto (no pulsó otro método)
       </span>
     );
   }

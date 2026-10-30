@@ -21,6 +21,7 @@ const ExpressCheckoutBox = lazy(() => import("@/components/checkout/ExpressCheck
 // Empieza a descargar los métodos de pago apenas se carga este módulo, en paralelo
 // con la consulta del producto, en vez de esperar a que se pinte esa sección.
 if (typeof window !== "undefined") void loadPaymentMethodsGroup().catch(() => {});
+if (typeof window !== "undefined") prefetchCheckoutMethodsConfig();
 import { StickyPayCTA } from "@/components/checkout/StickyPayCTA";
 import { UpsellPanel } from "@/components/checkout/UpsellPanel";
 
@@ -42,6 +43,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";
 import { trackHotmartEvent, trackBeginCheckout, isInternalTraffic } from "@/hooks/useMetaPixel";
+import { prefetchCheckoutMethodsConfig } from "@/hooks/useCheckoutMethodsConfig";
 import { cn } from "@/lib/utils";
 import { buildSupportUrl } from "@/lib/support";
 import { authorizeCheckout, evaluateCheckoutGate } from "@/lib/checkoutGate";

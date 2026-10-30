@@ -104,6 +104,17 @@ export async function detectCountryByIp(options: {
 } = {}): Promise<CountryDetectionResult | null> {
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 
+  // Si la página ya pidió ipapi desde el HTML (ver vite.config.ts), se reutiliza esa respuesta en vez de repetirla.
+  try {
+    const w = window as unknown as { __ilrGeo?: Promise<unknown> | null };
+    if (w.__ilrGeo) {
+      const early = w.__ilrGeo;
+      w.__ilrGeo = null;
+      const code = cleanCountryCode(PROVIDERS[0].parse(await early));
+      if (code) return { countryCode: code, source: "ip", provider: "ipapi" };
+    }
+  } catch { /* si falla, se sigue con el flujo normal */ }
+
   for (const provider of PROVIDERS) {
     try {
       const res = await fetch(provider.url, {

@@ -96,8 +96,12 @@ export default function Checkout() {
     import("@/lib/stripe").then((m) => { try { void m.getStripe(); } catch { /* sin Stripe configurado */ } }).catch(() => {});
   }, []);
 
+  // Una sola vez por checkout abierto: antes se repetía si cambiaba la función `navigate` (cambios de ruta/parámetros).
+  const gateSentForRef = useRef<string | null>(null);
   useEffect(() => {
     if (!slug) return;
+    if (gateSentForRef.current === slug) return;
+    gateSentForRef.current = slug;
     let cancelled = false;
     (async () => {
       // El gate ya nunca bloquea: solo renueva la ventana de compra.
@@ -120,7 +124,8 @@ export default function Checkout() {
       } catch { /* fail-open */ }
     })();
     return () => { cancelled = true; };
-  }, [slug, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
 
   // Cuando el comprador escribe su correo, lo asociamos al acceso ya
   // registrado (misma IP) para poder ver en /admin/checkout-abuse quién

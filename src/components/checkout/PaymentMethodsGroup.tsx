@@ -2571,7 +2571,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 "w-full text-left flex items-center transition-colors",
                 "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl",
                 m.id === "hotmart"
-                  ? "px-3 pt-1.5 pb-2.5 sm:px-4 sm:pt-2 sm:pb-3 gap-2.5 sm:gap-3"
+                  ? "px-3 py-3 sm:px-4 sm:py-3.5 gap-3"
                   : "px-2.5 py-2 sm:px-3 sm:py-2.5 gap-2 sm:gap-2.5",
                 isSelected
                   ? "bg-neutral-200/60 dark:bg-neutral-800"
@@ -2599,7 +2599,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   {m.id === "hotmart" ? (
                     <>
                       {/* Solo el logo completo (sin texto de nombre al lado): la descripción va debajo. */}
-                      <img src={hotmartLogoFull} alt="Hotmart" width={165} height={48} className="h-9 sm:h-10 w-auto object-contain shrink-0" />
+                      <img src={hotmartLogoFull} alt="Hotmart" width={165} height={48} className="h-8 sm:h-9 w-auto object-contain shrink-0" />
                     </>
                   ) : (
                     <span className="min-w-0 truncate">{m.title}</span>
@@ -2660,11 +2660,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     <BankBadge label={pick(language, "En cuotas", "Installments", "En plusieurs fois", "A rate", "Parcelas")} bg="#1F2937" color="#ffffff" />
                   </div>
                 ) : m.id === "hotmart" ? (
-                  <div className="mt-1.5">
+                  <div className="mt-2">
                     <div className="flex items-center gap-1 flex-wrap">
                       {(m.badges ?? []).map(renderMethodBadge)}
                     </div>
-                    <div className="mt-1 text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400">{hotmartCustomNote || m.sub}</div>
+                    <p className="mt-2 pt-2 border-t border-neutral-200/70 dark:border-neutral-700/70 text-[11px] sm:text-xs leading-snug text-neutral-600 dark:text-neutral-300">{hotmartCustomNote || m.sub}</p>
                   </div>
 
                 ) : (m.id === "dlocal_cash" || m.id === "dlocal_wallet") && rowLogo ? null : m.badges?.length ? (

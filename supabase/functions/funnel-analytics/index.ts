@@ -142,7 +142,7 @@ serve(async (req) => {
     }
 
     const filtered = rows.filter(
-      (r) => !isExcludedPath(r.page_path) && (includeBots || r.is_bot !== true),
+      (r) => r.event_name !== "CheckoutAction" && !isExcludedPath(r.page_path) && (includeBots || r.is_bot !== true),
     );
 
     // Fetch abandoned carts from persistent_carts

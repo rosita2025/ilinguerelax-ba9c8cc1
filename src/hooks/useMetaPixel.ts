@@ -54,7 +54,7 @@ const getSessionId = (): string => {
   }
 };
 
-const FUNNEL_EVENTS = new Set(["PageView", "ViewContent", "AddToCart", "InitiateCheckout", "BeginCheckout", "Purchase", "PaymentError", "Lead"]);
+const FUNNEL_EVENTS = new Set(["PageView", "ViewContent", "AddToCart", "InitiateCheckout", "BeginCheckout", "Purchase", "PaymentError", "Lead", "CheckoutAction"]);
 const CAPI_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Lead", "Purchase"]);
 
 // EU consent gating: in EU countries we must wait for explicit "accepted" before firing browser Pixel.
@@ -539,6 +539,18 @@ export const trackPaymentError = (params: {
     reason: (params.reason || "").slice(0, 300),
     value: typeof params.value === "number" ? params.value : null,
     currency: params.currency || null,
+  });
+};
+
+/**
+ * Acciones del visitante en el checkout que no son un evento del embudo (clic en WhatsApp, popups…).
+ * Se guardan como "CheckoutAction" y solo las lee /admin/checkout-abuse; el tráfico del equipo no se registra.
+ * Acciones: whatsapp_popup, whatsapp_ayuda, whatsapp_flotante, popup_cierres_visto, popup_cierres_cerrado.
+ */
+export const logCheckoutAction = (action: string, detail?: string) => {
+  logFunnelEvent("CheckoutAction", {
+    content_name: action,
+    provider: detail ? `${action}:${detail}` : action,
   });
 };
 

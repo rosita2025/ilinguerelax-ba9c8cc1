@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X, MessageCircle } from "lucide-react";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
+import { logCheckoutAction } from "@/hooks/useMetaPixel";
 
 const SESSION_KEY = "exit-coupon-shown-v1";
 // Sin temporizador: el popup solo sale en escritorio cuando el mouse sale por arriba de la ventana.
@@ -85,6 +86,7 @@ export function ExitIntentCouponPopup({ language }: Props) {
       shownRef.current = true;
       sessionStorage.setItem(SESSION_KEY, "1");
       setOpen(true);
+      logCheckoutAction("popup_cierres_visto");
     };
 
     // 1) Escritorio: mouse sale por arriba de la ventana.
@@ -136,6 +138,7 @@ export function ExitIntentCouponPopup({ language }: Props) {
 
         <a
           href={waUrl}
+          onClick={() => logCheckoutAction("whatsapp_popup")}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#25D366] px-4 py-3 text-sm font-semibold text-white hover:bg-[#20bd5a]"
@@ -145,7 +148,7 @@ export function ExitIntentCouponPopup({ language }: Props) {
         </a>
 
         <button
-          onClick={() => setOpen(false)}
+          onClick={() => { logCheckoutAction("popup_cierres_cerrado"); setOpen(false); }}
           className="mt-3 text-xs text-muted-foreground hover:text-foreground underline"
         >
           {t.close}

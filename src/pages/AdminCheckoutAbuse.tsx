@@ -27,6 +27,7 @@ interface StatRow {
   count: number;
   payment_method?: string | null;
   providers?: string[];
+  actions?: Record<string, number>;
   first?: string;
   duration_sec?: number;
   cart?: CartInfo | null;
@@ -264,6 +265,37 @@ function PaymentMethodTag({ r }: { r: { email?: string | null; payment_method?: 
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border font-medium ${tag.className}`} title="Último método de pago que pulsó">
       👆 Pulsó: {tag.label}
     </span>
+  );
+}
+
+const ACTION_LABELS: Record<string, { label: string; className: string }> = {
+  whatsapp_popup: { label: "💬 Clic en WhatsApp del popup «no cierres»", className: "bg-green-500/10 text-green-700 border-green-500/30" },
+  whatsapp_ayuda: { label: "💬 Clic en WhatsApp de ayuda de pago", className: "bg-green-500/10 text-green-700 border-green-500/30" },
+  whatsapp_flotante: { label: "💬 Clic en el botón flotante de WhatsApp", className: "bg-green-500/10 text-green-700 border-green-500/30" },
+  popup_cierres_visto: { label: "🪟 Vio el popup «no cierres»", className: "bg-slate-500/10 text-slate-700 border-slate-500/30" },
+  popup_cierres_cerrado: { label: "✖ Cerró el popup", className: "bg-slate-500/10 text-slate-600 border-slate-500/30" },
+};
+
+/** Clics en WhatsApp y popups. Para quien no llenó datos, resume qué hizo en lugar de pagar. */
+function ActionTags({ r }: { r: { email?: string | null; actions?: Record<string, number> } }) {
+  const a = r.actions ?? {};
+  const keys = Object.keys(ACTION_LABELS).filter((k) => (a[k] ?? 0) > 0);
+  const usedWhatsApp = ["whatsapp_popup", "whatsapp_ayuda", "whatsapp_flotante"].some((k) => (a[k] ?? 0) > 0);
+  const sawPopup = (a.popup_cierres_visto ?? 0) > 0;
+  const fromPopup = (a.whatsapp_popup ?? 0) > 0;
+  return (
+    <>
+      {!r.email && usedWhatsApp && (
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border font-semibold bg-green-600 text-white border-green-700" title="No llenó sus datos, pero escribió o intentó escribir por WhatsApp">
+          {fromPopup ? "💬 No llenó datos: fue a WhatsApp desde el popup" : sawPopup ? "💬 No llenó datos: usó WhatsApp (vio el popup, pero no desde él)" : "💬 No llenó datos: usó solo WhatsApp, sin popup"}
+        </span>
+      )}
+      {keys.map((k) => (
+        <span key={k} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border ${ACTION_LABELS[k].className}`}>
+          {ACTION_LABELS[k].label}{(a[k] ?? 0) > 1 ? ` ×${a[k]}` : ""}
+        </span>
+      ))}
+    </>
   );
 }
 
@@ -534,6 +566,7 @@ export default function AdminCheckoutAbuse() {
                       <span className={`text-xs font-semibold ${r.count > 20 ? "text-destructive" : "text-muted-foreground"}`}>{r.count} hits</span>
                       <StatusBadge status={r.status} />
                       <PaymentMethodTag r={r} />
+                      <ActionTags r={r} />
                       {r.client_purchase_event && <ClientPurchaseWarning />}
                       {r.email && (
                         <a href={`mailto:${r.email}`} onClick={(e) => e.stopPropagation()} className="text-xs text-primary hover:underline break-all">{r.email}</a>

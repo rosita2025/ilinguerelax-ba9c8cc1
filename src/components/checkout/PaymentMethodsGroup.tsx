@@ -1985,6 +1985,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     if (!entry) return null;
     return entry[(language as "es" | "en" | "pt" | "fr")] ?? entry.es;
   })();
+  // Hotmart cobra con tarjeta (y Mercado Pago donde existe). PayPal tiene su propia fila.
+  const hotmartHasMp = hotmartBadges.some((bd) => bd.label === "Mercado Pago");
+  const hotmartPayLabel = language === "en" ? (hotmartHasMp ? "Cards and Mercado Pago" : "Cards")
+    : language === "pt" ? (hotmartHasMp ? "Cartões e Mercado Pago" : "Cartões")
+    : language === "fr" ? (hotmartHasMp ? "Cartes et Mercado Pago" : "Cartes")
+    : language === "it" ? (hotmartHasMp ? "Carte e Mercado Pago" : "Carte")
+    : (hotmartHasMp ? "Tarjetas y Mercado Pago" : "Tarjetas");
   const hotmartTaxNote = language === "en"
     ? "includes local taxes (10-20%)"
     : language === "it" ? "include le imposte locali (10-20%)" : language === "pt"
@@ -2182,14 +2189,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           : language === "fr" ? "Hotmart · PayPal et plus (1 clic)"
           : language === "it" ? "Hotmart · PayPal e altro (1 clic)"
           : "Hotmart · PayPal y más (1 clic)"),
-      sub: language === "en"
-        ? `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 click`
-        : language === "pt"
-        ? `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 clique`
-        : language === "fr"
-        ? `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 clic`
-        : `${hotmartPriceLabel} · ${hotmartTaxNote} · 1 clic`,
-
+      sub: `${hotmartPayLabel} · ${hotmartPriceLabel} · ${hotmartTaxNote}`,
 
       badge: isPeru ? hotmartPriceLabel : `USD $${totalUsd}`,
       badges: hotmartBadges,
@@ -2571,7 +2571,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 "w-full text-left flex items-center transition-colors",
                 "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl",
                 m.id === "hotmart"
-                  ? "px-3 py-3 sm:px-4 sm:py-3.5 gap-3"
+                  ? "px-3 py-2 sm:px-4 sm:py-2.5 gap-3"
                   : "px-2.5 py-2 sm:px-3 sm:py-2.5 gap-2 sm:gap-2.5",
                 isSelected
                   ? "bg-neutral-200/60 dark:bg-neutral-800"
@@ -2599,7 +2599,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   {m.id === "hotmart" ? (
                     <>
                       {/* Solo el logo completo (sin texto de nombre al lado): la descripción va debajo. */}
-                      <img src={hotmartLogoFull} alt="Hotmart" width={165} height={48} className="h-8 sm:h-9 w-auto object-contain shrink-0" />
+                      <img src={hotmartLogoFull} alt="Hotmart" width={165} height={48} className="h-6 sm:h-7 w-auto object-contain shrink-0" />
                     </>
                   ) : (
                     <span className="min-w-0 truncate">{m.title}</span>
@@ -2660,12 +2660,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     <BankBadge label={pick(language, "En cuotas", "Installments", "En plusieurs fois", "A rate", "Parcelas")} bg="#1F2937" color="#ffffff" />
                   </div>
                 ) : m.id === "hotmart" ? (
-                  <div className="mt-2">
-                    <div className="flex items-center gap-1 flex-wrap">
-                      {(m.badges ?? []).map(renderMethodBadge)}
-                    </div>
-                    <p className="mt-2 pt-2 border-t border-neutral-200/70 dark:border-neutral-700/70 text-[11px] sm:text-xs leading-snug text-neutral-600 dark:text-neutral-300">{hotmartCustomNote || m.sub}</p>
-                  </div>
+                  <p className="mt-1 text-[11px] sm:text-xs leading-snug text-neutral-600 dark:text-neutral-300">{hotmartCustomNote || m.sub}</p>
 
                 ) : (m.id === "dlocal_cash" || m.id === "dlocal_wallet") && rowLogo ? null : m.badges?.length ? (
                   <div className="mt-1 flex items-center gap-1 flex-wrap">

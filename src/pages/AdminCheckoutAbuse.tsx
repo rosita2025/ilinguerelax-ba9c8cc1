@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Shield, Trash2, RefreshCw, MessageCircle, Timer, Smartphone } from "lucide-react";
+import { Shield, Trash2, RefreshCw, MessageCircle, Timer, Smartphone, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { useToast } from "@/hooks/use-toast";
@@ -429,6 +429,21 @@ export default function AdminCheckoutAbuse() {
   const [range, setRange] = useState<"today" | "yesterday" | "24h">("today");
   const [onlyReal, setOnlyReal] = useState(true);
   const [mergeDevices, setMergeDevices] = useState(true);
+  // Dispositivos marcados como "míos": se ocultan en este navegador al instante (sin depender del servidor).
+  const HIDDEN_KEY = "ilr_checkout_abuse_hidden_devices";
+  const [hiddenUAs, setHiddenUAs] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem(HIDDEN_KEY) || "[]") as string[]; } catch { return []; }
+  });
+  const [showHidden, setShowHidden] = useState(false);
+  const saveHidden = (next: string[]) => {
+    setHiddenUAs(next);
+    try { localStorage.setItem(HIDDEN_KEY, JSON.stringify(next)); } catch { /* sin almacenamiento */ }
+  };
+  const hideDevice = (ua?: string | null) => {
+    if (!ua) return;
+    if (!hiddenUAs.includes(ua)) saveHidden([...hiddenUAs, ua]);
+    toast({ title: "Dispositivo ocultado", description: "Ya no aparecerá en esta lista (ni en los totales). Puedes volver a mostrarlo abajo." });
+  };
   const [hiddenVisits, setHiddenVisits] = useState(0);
   const [tab, setTab] = useState<"filled" | "empty">("filled");
   const [countryFilter, setCountryFilter] = useState("");
@@ -480,7 +495,7 @@ export default function AdminCheckoutAbuse() {
     }
   };
 
-  const deleteVisitor = async (ips: string[]) => {
+  const deleteVisitor = async (ips: string[], ua?: string | null) => {
     if (!confirm(`¿Borrar de la lista las visitas de ${ips.join(", ")} (${rangeLabel})? Úsalo para pruebas propias o duplicados.`)) return;
     try {
       for (const ip of ips) {
@@ -490,7 +505,13 @@ export default function AdminCheckoutAbuse() {
       toast({ title: "Visitas borradas de la lista" });
       void load();
     } catch {
-      toast({ title: "No se pudo borrar", variant: "destructive" });
+      // El servidor aún no tiene el borrado (falta publicar/redesplegar): al menos se oculta este dispositivo aquí.
+      if (ua) {
+        hideDevice(ua);
+        toast({ title: "No se pudo borrar en el servidor, pero lo ocultamos en este navegador", description: "Se borrará de verdad cuando se redesplieguen las funciones del panel." });
+      } else {
+        toast({ title: "No se pudo borrar", variant: "destructive" });
+      }
     }
   };
 
@@ -506,7 +527,9 @@ export default function AdminCheckoutAbuse() {
     }
   };
 
-  const rowsBase = mergeDevices ? mergeSameDevice(top) : top;
+  const topVisible = showHidden ? top : top.filter((r) => !(r.ua && hiddenUAs.includes(r.ua)));
+  const hiddenCount = top.length - top.filter((r) => !(r.ua && hiddenUAs.includes(r.ua))).length;
+  const rowsBase = mergeDevices ? mergeSameDevice(topVisible) : topVisible;
   // Con correo: una fila por correo (la visita más reciente); sin llenar: una fila por IP.
   const withEmail = (() => {
     const m = new Map<string, StatRow>();
@@ -565,16 +588,29 @@ export default function AdminCheckoutAbuse() {
           </div>
         </div>
 
-        {summary && (
+        {summary && (() => {
+          const s2 = hiddenUAs.length && !showHidden
+            ? {
+                ...summary,
+                visitors: topVisible.length,
+                visits: topVisible.reduce((n, r) => n + r.count, 0),
+                countries: new Set(topVisible.map((r) => r.country).filter(Boolean)).size,
+                with_email: new Set(topVisible.map((r) => (r.email || "").toLowerCase()).filter(Boolean)).size,
+                without_email: topVisible.filter((r) => !r.email).length,
+                purchased: new Set(topVisible.filter((r) => r.status === "purchased" && r.email).map((r) => (r.email || "").toLowerCase())).size,
+                abandoned: new Set(topVisible.filter((r) => r.status === "abandoned" && r.email).map((r) => (r.email || "").toLowerCase())).size,
+              }
+            : summary;
+          return (
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
             {[
-              { label: "Visitantes", value: summary.visitors, hint: `${summary.visits} visitas` },
-              { label: "Países", value: summary.countries, hint: "distintos" },
-              { label: "Dejaron correo", value: summary.with_email, hint: "identificados" },
-              { label: "Sin correo", value: summary.without_email, hint: "no llenó formulario" },
-              { label: "Compraron", value: summary.purchased, hint: "confirmadas" },
-              { label: "Abandonaron", value: summary.abandoned, hint: "carrito abierto" },
-              { label: "Vuelven tras", value: fmtDuration(summary.avg_duration_sec), hint: "entre 1.ª y última apertura" },
+              { label: "Visitantes", value: s2.visitors, hint: `${s2.visits} visitas` },
+              { label: "Países", value: s2.countries, hint: "distintos" },
+              { label: "Dejaron correo", value: s2.with_email, hint: "identificados" },
+              { label: "Sin correo", value: s2.without_email, hint: "no llenó formulario" },
+              { label: "Compraron", value: s2.purchased, hint: "confirmadas" },
+              { label: "Abandonaron", value: s2.abandoned, hint: "carrito abierto" },
+              { label: "Vuelven tras", value: fmtDuration(s2.avg_duration_sec), hint: "entre 1.ª y última apertura" },
             ].map((k) => (
               <div key={k.label} className="border rounded-lg p-3">
                 <div className="text-xs text-muted-foreground">{k.label}</div>
@@ -583,7 +619,8 @@ export default function AdminCheckoutAbuse() {
               </div>
             ))}
           </div>
-        )}
+          );
+        })()}
 
         <section className="border rounded-lg overflow-hidden">
           <div className="px-4 py-3 bg-muted/40 border-b space-y-3">
@@ -629,6 +666,14 @@ export default function AdminCheckoutAbuse() {
                 {onlyReal && hiddenVisits > 0 ? ` · ${hiddenVisits} visitas ocultas` : ""}.
               </span>
             </label>
+            {hiddenUAs.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <Monitor className="h-3.5 w-3.5" />
+                <span>{hiddenUAs.length} dispositivo(s) marcados como tuyos{hiddenCount > 0 ? ` · ${hiddenCount} visita(s) ocultas` : ""}.</span>
+                <button type="button" className="underline hover:text-foreground" onClick={() => setShowHidden((v) => !v)}>{showHidden ? "Volver a ocultarlos" : "Mostrarlos"}</button>
+                <button type="button" className="underline hover:text-foreground" onClick={() => { saveHidden([]); setShowHidden(false); }}>Dejar de ocultar todos</button>
+              </div>
+            )}
           </div>
           {visible.length === 0 ? (
             <p className="p-6 text-sm text-muted-foreground text-center">
@@ -675,7 +720,16 @@ export default function AdminCheckoutAbuse() {
                       <span className="text-xs text-muted-foreground ml-auto">{new Date(r.last).toLocaleString()}</span>
                       <button
                         type="button"
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); void deleteVisitor(r.merged_ips ?? [r.ip]); }}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); hideDevice(r.ua); }}
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+                        title="Es mi equipo: ocultar todas las visitas de este dispositivo"
+                        aria-label="Es mi equipo: ocultar este dispositivo"
+                      >
+                        <Monitor className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); void deleteVisitor(r.merged_ips ?? [r.ip], r.ua); }}
                         className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive"
                         title="Borrar esta visita de la lista"
                         aria-label="Borrar esta visita"

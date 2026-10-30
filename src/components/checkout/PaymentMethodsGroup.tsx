@@ -28,6 +28,7 @@ import { trackPaymentError, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import { usePurchaseTracking } from "@/hooks/usePurchaseTracking";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
+import hotmartLogoFull from "@/assets/hotmart-logo-full.webp";
 import paypalLogo from "@/assets/paypal-logo.png";
 import yapeLogo from "@/assets/yape-logo.webp";
 import oxxoLogo from "@/assets/oxxo-logo.webp";
@@ -1973,11 +1974,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
   // Nombre y descripción de Hotmart editables por región en /admin/checkout-methods.
   // Si siguen con los textos por defecto del panel, se usa el texto automático (precio + impuestos + 1 clic).
-  const hotmartCustomLabel = (() => {
-    const raw = (methodsConfig.hotmartText?.label ?? "").trim();
-    if (!raw || /^hotmart\s*\((1[- ]?(clic|click|clique))\)$/i.test(raw)) return "";
-    return raw.replace(/hotmart\s*[·\-–—:]?\s*/gi, "").replace(/^\(|\)$/g, "").trim();
-  })();
   const hotmartCustomNote = (() => {
     const raw = (methodsConfig.hotmartText?.note ?? "").trim();
     return !raw || /^redirige al enlace de hotmart/i.test(raw) ? "" : raw;
@@ -2602,8 +2598,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 <div className="font-semibold text-[13px] sm:text-sm flex items-center gap-2 flex-nowrap min-w-0 text-neutral-800 dark:text-neutral-100">
                   {m.id === "hotmart" ? (
                     <>
-                      <img src={hotmartLogo.url} alt="Hotmart" className="h-10 sm:h-12 w-auto object-contain -my-1 shrink-0" />
-                      {hotmartCustomLabel && <span className="min-w-0 truncate">{hotmartCustomLabel}</span>}
+                      {/* Solo el logo completo (sin texto de nombre al lado): la descripción va debajo. */}
+                      <img src={hotmartLogoFull} alt="Hotmart" width={165} height={48} className="h-9 sm:h-10 w-auto object-contain shrink-0" />
                     </>
                   ) : (
                     <span className="min-w-0 truncate">{m.title}</span>

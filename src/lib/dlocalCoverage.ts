@@ -40,6 +40,8 @@ export type DlocalCountry = {
   transferComingSoon?: boolean;
   /** Si true, pago en efectivo se muestra como "Muy pronto" y no permite comprar. */
   cashComingSoon?: boolean;
+  /** Si true, dLocal no exige documento de identidad en este país (no se pide en el checkout). */
+  noDocument?: boolean;
 };
 
 export const DLOCAL_COVERAGE: DlocalCountry[] = [
@@ -119,6 +121,26 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     transfer: ["Transferencia Bancaria", "Banco Popular", "FirstBank"],
     cash: ["Agentes locales"],
     wallet: ["ATH Móvil"], walletComingSoon: false, walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
+  // Asia y África (no piden documento de identidad). Verifica los rails exactos en tu panel dLocal Go.
+  { code: "ID", name: "Indonesia", flag: "🇮🇩", currency: "IDR", noDocument: true,
+    transfer: ["Virtual Account", "BCA", "Mandiri", "BNI", "BRI"],
+    cash: ["Alfamart", "Indomaret"],
+    wallet: ["GoPay", "OVO", "DANA", "ShopeePay", "QRIS"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet",
+    walletComingSoon: false },
+  { code: "MY", name: "Malasia", flag: "🇲🇾", currency: "MYR", noDocument: true,
+    transfer: ["FPX", "Maybank", "CIMB", "Public Bank"],
+    cash: [],
+    wallet: ["Touch 'n Go", "GrabPay", "Boost"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet",
+    walletComingSoon: false },
+  { code: "KE", name: "Kenia", flag: "🇰🇪", currency: "KES", noDocument: true,
+    transfer: [],
+    cash: [],
+    wallet: ["M-Pesa", "Airtel Money"], walletLabel: "Dinero móvil", walletKey: "dlocal_wallet",
+    walletComingSoon: false },
+  { code: "NG", name: "Nigeria", flag: "🇳🇬", currency: "NGN", noDocument: true,
+    transfer: ["Bank Transfer", "USSD"],
+    cash: [],
+    wallet: [], walletKey: "dlocal_wallet" },
 ];
 
 export const RESTRICTED_CURRENCY_COUNTRIES = new Set(["HN", "AR", "VE", "CU", "NI"]);
@@ -129,6 +151,11 @@ const BY_CODE = new Map(DLOCAL_COVERAGE.map((c) => [c.code, c]));
 export function getDlocalCountry(country?: string | null): DlocalCountry | undefined {
   if (!country) return undefined;
   return BY_CODE.get(country.toUpperCase());
+}
+
+/** ¿Hay que pedir documento de identidad en transferencia/efectivo? (no en Asia ni África) */
+export function dlocalNeedsDocument(country: string | null | undefined): boolean {
+  return !getDlocalCountry(country)?.noDocument;
 }
 
 /** ¿dLocal Go soporta este tipo de cobro en este país? */

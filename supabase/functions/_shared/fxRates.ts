@@ -83,11 +83,15 @@ export const FX_USD_TO_LOCAL: Record<string, number> = {
   SGD: 1.34,
   HKD: 7.8,
   TWD: 32,
+  IDR: 16000,
+  MYR: 4.5,
+  NGN: 1550,
+  KES: 130,
 };
 
 /** Monedas que dLocal rechaza con decimales. */
 export const ZERO_DECIMAL_CURRENCIES = new Set([
-  "CLP", "PYG", "COP", "ARS", "CRC", "GTQ", "JPY",
+  "CLP", "PYG", "COP", "ARS", "CRC", "GTQ", "JPY", "IDR",
 ]);
 
 /**

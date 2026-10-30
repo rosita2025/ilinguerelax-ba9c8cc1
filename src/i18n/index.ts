@@ -10,7 +10,7 @@ export type Currency =
   | "BRL" | "MXN" | "COP" | "ARS" | "PEN"
   | "CLP" | "BOB" | "CRC" | "DOP" | "GTQ" | "HNL" | "NIO" | "CUP" | "PYG" | "UYU" | "HTG" | "VES"
   | "CHF" | "SEK" | "NOK" | "DKK" | "PLN" | "CZK"
-  | "JPY" | "KRW" | "CNY" | "INR" | "NZD" | "SGD" | "HKD" | "TWD"
+  | "JPY" | "KRW" | "CNY" | "INR" | "NZD" | "SGD" | "HKD" | "TWD" | "IDR" | "MYR"
   | "ZAR" | "NGN" | "EGP" | "KES" | "GHS" | "TZS" | "UGX" | "MAD";
 
 export const translations = {
@@ -135,7 +135,7 @@ const countryToCurrency: Record<string, Currency> = {
   PL: "PLN", CZ: "CZK",
 
   // Asia principal
-  JP: "JPY", KR: "KRW", CN: "CNY", IN: "INR", SG: "SGD", HK: "HKD", TW: "TWD",
+  JP: "JPY", KR: "KRW", CN: "CNY", IN: "INR", SG: "SGD", HK: "HKD", TW: "TWD", ID: "IDR", MY: "MYR",
   
   // Africa
   ZA: "ZAR", NG: "NGN", EG: "EGP", KE: "KES", GH: "GHS", TZ: "TZS", UG: "UGX", MA: "MAD",
@@ -179,6 +179,8 @@ export const currencyConfig: Record<Currency, { symbol: string; position: "befor
   SGD: { symbol: "S$", position: "before", decimals: 2 },
   HKD: { symbol: "HK$", position: "before", decimals: 2 },
   TWD: { symbol: "NT$", position: "before", decimals: 0 },
+  IDR: { symbol: "Rp ", position: "before", decimals: 0 },
+  MYR: { symbol: "RM ", position: "before", decimals: 2 },
   ZAR: { symbol: "R ", position: "before", decimals: 2 },
   NGN: { symbol: "₦", position: "before", decimals: 2 },
   EGP: { symbol: "E£", position: "before", decimals: 2 },
@@ -228,6 +230,8 @@ export let exchangeRates: Record<Currency, number> = {
   SGD: 1.34,
   HKD: 7.8,
   TWD: 32,
+  IDR: 16000,
+  MYR: 4.5,
   ZAR: 18.5,
   NGN: 1550,
   EGP: 48,

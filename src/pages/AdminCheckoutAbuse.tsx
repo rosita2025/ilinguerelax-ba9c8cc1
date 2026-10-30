@@ -271,6 +271,8 @@ export default function AdminCheckoutAbuse() {
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [loading, setLoading] = useState(false);
   const [range, setRange] = useState<"today" | "yesterday" | "24h">("today");
+  const [onlyReal, setOnlyReal] = useState(true);
+  const [hiddenVisits, setHiddenVisits] = useState(0);
   const [tab, setTab] = useState<"filled" | "empty">("filled");
   const [countryFilter, setCountryFilter] = useState("");
   const [shown, setShown] = useState(25);
@@ -280,12 +282,13 @@ export default function AdminCheckoutAbuse() {
     try {
       const [b, s] = await Promise.all([
         adminInvoke("manage-checkout-abuse", { body: { action: "list_bans" } }),
-        adminInvoke("manage-checkout-abuse", { body: { action: "stats", range, tz_offset: new Date().getTimezoneOffset() } }),
+        adminInvoke("manage-checkout-abuse", { body: { action: "stats", range, tz_offset: new Date().getTimezoneOffset(), only_real: onlyReal } }),
       ]);
       if (b.error) throw b.error;
       if (s.error) throw s.error;
       setBans(((b.data as { bans?: Ban[] } | null)?.bans) ?? []);
-      const stats = s.data as { top?: StatRow[]; sources?: SourceRow[]; countries?: CountryRow[]; summary?: Summary; leads?: Lead[] } | null;
+      const stats = s.data as { top?: StatRow[]; sources?: SourceRow[]; countries?: CountryRow[]; summary?: Summary; leads?: Lead[]; hidden_visits?: number } | null;
+      setHiddenVisits(stats?.hidden_visits ?? 0);
       setTop(stats?.top ?? []);
       setSources(stats?.sources ?? []);
       setCountries(stats?.countries ?? []);
@@ -304,8 +307,20 @@ export default function AdminCheckoutAbuse() {
     const iv = setInterval(() => { if (!document.hidden) void load(); }, 30000);
     return () => clearInterval(iv);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [range]);
+  }, [range, onlyReal]);
 
+
+  const deleteVisitor = async (ip: string) => {
+    if (!confirm(`¿Borrar de la lista las visitas de ${ip} (${rangeLabel})? Úsalo para pruebas propias o duplicados.`)) return;
+    try {
+      const { error } = await adminInvoke("manage-checkout-abuse", { body: { action: "delete_visitor", ip, range, tz_offset: new Date().getTimezoneOffset() } });
+      if (error) throw error;
+      toast({ title: "Visitas borradas de la lista" });
+      void load();
+    } catch {
+      toast({ title: "No se pudo borrar", variant: "destructive" });
+    }
+  };
 
   const unban = async (ip: string) => {
     if (!confirm(`¿Desbloquear IP ${ip}?`)) return;
@@ -422,6 +437,14 @@ export default function AdminCheckoutAbuse() {
                 ))}
               </select>
             </div>
+            <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
+              <input type="checkbox" className="mt-0.5" checked={onlyReal} onChange={(e) => { setOnlyReal(e.target.checked); setShown(25); }} />
+              <span>
+                <strong className="text-foreground">Solo tráfico real</strong>: anuncios de Meta y TikTok, redes sociales y orgánico (Google…).
+                Oculta visitas directas sin origen y las de nuestro propio sitio (pruebas del equipo)
+                {onlyReal && hiddenVisits > 0 ? ` · ${hiddenVisits} visitas ocultas` : ""}.
+              </span>
+            </label>
           </div>
           {visible.length === 0 ? (
             <p className="p-6 text-sm text-muted-foreground text-center">
@@ -454,6 +477,15 @@ export default function AdminCheckoutAbuse() {
                         <a href={`mailto:${r.email}`} onClick={(e) => e.stopPropagation()} className="text-xs text-primary hover:underline break-all">{r.email}</a>
                       )}
                       <span className="text-xs text-muted-foreground ml-auto">{new Date(r.last).toLocaleString()}</span>
+                      <button
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); void deleteVisitor(r.ip); }}
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive"
+                        title="Borrar esta visita de la lista"
+                        aria-label="Borrar esta visita"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
                     </summary>
                     <div className="mt-2 pl-1 space-y-1.5 text-xs">
                       <p className="text-foreground">{activityLabel(r)}</p>

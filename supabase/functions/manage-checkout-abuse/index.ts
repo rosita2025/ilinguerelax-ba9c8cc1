@@ -34,6 +34,7 @@ Deno.serve(async (req) => {
       limit?: number;
       range?: string;
       tz_offset?: number;
+      only_real?: boolean;
     };
     const action = body.action || "list_bans";
     const admin = createClient(
@@ -64,6 +65,28 @@ Deno.serve(async (req) => {
       return json({ hits: data || [] });
     }
 
+    if (action === "delete_visitor") {
+      // Borra de la lista las visitas de una IP en el rango pedido (pruebas propias, duplicados…).
+      const ip = String(body.ip ?? "").trim();
+      if (!ip) return json({ error: "missing ip" }, 400);
+      const range = String(body.range ?? "24h");
+      const tz = Number.isFinite(Number(body.tz_offset)) ? Math.max(-840, Math.min(840, Number(body.tz_offset))) : 0;
+      const nowMs = Date.now();
+      const startOfTodayMs = Math.floor((nowMs - tz * 60_000) / 86_400_000) * 86_400_000 + tz * 60_000;
+      let sinceMs = nowMs - 24 * 3600 * 1000;
+      let untilMs = nowMs + 60_000;
+      if (range === "today") sinceMs = startOfTodayMs;
+      else if (range === "yesterday") { sinceMs = startOfTodayMs - 86_400_000; untilMs = startOfTodayMs; }
+      const { error, count } = await admin
+        .from("checkout_rate_hits")
+        .delete({ count: "exact" })
+        .eq("ip", ip)
+        .gte("created_at", new Date(sinceMs).toISOString())
+        .lt("created_at", new Date(untilMs).toISOString());
+      if (error) throw error;
+      return json({ ok: true, deleted: count ?? 0 });
+    }
+
     if (action === "unban") {
       if (!body.ip) return json({ error: "missing ip" }, 400);
       const { error } = await admin.from("checkout_ip_bans").delete().eq("ip", body.ip);
@@ -85,13 +108,19 @@ Deno.serve(async (req) => {
       else if (range === "yesterday") { sinceMs = startOfTodayMs - 86_400_000; untilMs = startOfTodayMs; }
       const since = new Date(sinceMs).toISOString();
       const until = new Date(untilMs).toISOString();
-      const { data, error } = await admin
+      const { data: rawData, error } = await admin
         .from("checkout_rate_hits")
         .select("ip, slug, created_at, source, referer, ua, country, email, city")
         .gte("created_at", since)
         .lt("created_at", until)
         .limit(5000);
       if (error) throw error;
+      // Solo tráfico real (anuncios de Meta/TikTok, redes sociales y orgánico): se ocultan las visitas
+      // "directas" sin origen y las que vienen de nuestro propio sitio (pruebas del equipo).
+      const onlyReal = body.only_real !== false;
+      const isRealSource = (src: string | null) => !!src && src !== "direct" && src !== "internal";
+      const data = onlyReal ? (rawData || []).filter((r) => isRealSource((r as { source: string | null }).source)) : (rawData || []);
+      const hiddenVisits = (rawData || []).length - data.length;
 
       // Resolvemos el país/ciudad real de las IPs que aún no lo tienen
       // (visitas antiguas o cabeceras sin geo). Guardamos el resultado para
@@ -302,7 +331,7 @@ Deno.serve(async (req) => {
       summary.with_email = leads.length;
       summary.purchased = leads.filter((l) => l.status === "purchased").length;
       summary.abandoned = leads.filter((l) => l.status === "abandoned").length;
-      return json({ top, sources, countries, summary, leads, total: (data || []).length, range, since, until });
+      return json({ top, sources, countries, summary, leads, total: (data || []).length, range, since, until, only_real: onlyReal, hidden_visits: hiddenVisits });
 
     }
 

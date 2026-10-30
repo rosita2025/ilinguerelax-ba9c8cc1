@@ -352,6 +352,11 @@
       @keyframes ilr-bar{0%{background-position:-40% 0}100%{background-position:140% 0}}
       #app-shell .box,#app-shell .line,#app-shell .adm i,#app-shell .chk i{background:linear-gradient(90deg,#eceff1 25%,#f7f9fa 40%,#eceff1 60%);background-size:300% 100%;animation:ilr-sh 1.3s ease-in-out infinite}
       @keyframes ilr-sh{0%{background-position:100% 50%}100%{background-position:0 50%}}
+      /* Pantalla de arranque limpia: fondo blanco y solo la barrita de progreso (sin marca ni bloques grises).
+         La caja de la portada del producto se queda transparente: la imagen aparece apenas llega. */
+      #app-shell{background:#fff}
+      #app-shell .bar,#app-shell .line,#app-shell .adm,#app-shell .chk{display:none!important}
+      #app-shell .box{background:transparent;animation:none}
       @media (prefers-reduced-motion:reduce){#app-shell::before,#app-shell .box,#app-shell .line,#app-shell .adm i,#app-shell .chk i{animation:none}}
       @media (max-width:760px){#app-shell.r-admin .adm{grid-template-columns:1fr}#app-shell .adm .side{display:none}#app-shell .adm .main .row{grid-template-columns:repeat(2,1fr)}}
     </style>

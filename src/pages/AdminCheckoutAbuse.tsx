@@ -25,6 +25,8 @@ interface CartInfo {
 interface StatRow {
   ip: string;
   count: number;
+  payment_method?: string | null;
+  providers?: string[];
   first?: string;
   duration_sec?: number;
   cart?: CartInfo | null;
@@ -221,6 +223,48 @@ function parseDevice(ua?: string | null): { device: string; browser: string } {
   if (/CrOS/.test(u)) return { device: "Chromebook", browser };
   if (/Linux/.test(u)) return { device: "Linux", browser };
   return { device: "Otro dispositivo", browser };
+}
+
+type MethodTag = { label: string; className: string };
+const METHOD_TAGS: Array<[RegExp, MethodTag]> = [
+  [/hotmart/, { label: "Hotmart", className: "bg-orange-500/10 text-orange-700 border-orange-500/30" }],
+  [/binance/, { label: "Binance", className: "bg-yellow-500/10 text-yellow-700 border-yellow-500/30" }],
+  [/yape|plin/, { label: "Yape / Plin", className: "bg-purple-500/10 text-purple-700 border-purple-500/30" }],
+  [/paypal/, { label: "PayPal", className: "bg-sky-500/10 text-sky-700 border-sky-500/30" }],
+  [/dlocal/, { label: "dLocal Go", className: "bg-teal-500/10 text-teal-700 border-teal-500/30" }],
+  [/mercadopago|^cash$|^transfer$/, { label: "Mercado Pago", className: "bg-blue-500/10 text-blue-700 border-blue-500/30" }],
+  [/clabe|spei/, { label: "SPEI", className: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30" }],
+  [/stripe|card|link|apple|google|klarna|ach|cashapp|bizum|ideal|satispay|mbway|crypto/, { label: "Stripe", className: "bg-indigo-500/10 text-indigo-700 border-indigo-500/30" }],
+];
+const methodTagFor = (m?: string | null): MethodTag | null => {
+  const k = (m || "").toLowerCase();
+  if (!k || k === "not_selected") return null;
+  const hit = METHOD_TAGS.find(([re]) => re.test(k));
+  return hit ? hit[1] : { label: k, className: "bg-muted text-foreground border-border" };
+};
+
+/** Qué método pulsó el cliente: etiqueta clara, o por qué no pulsó ninguno. */
+function PaymentMethodTag({ r }: { r: { email?: string | null; payment_method?: string | null; providers?: string[]; status?: string } }) {
+  if (!r.email) {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border bg-muted text-muted-foreground border-border" title="No llenó nombre ni correo, así que ni siquiera llegó a elegir un método de pago">
+        ⛔ No pulsó ningún método (no llenó datos)
+      </span>
+    );
+  }
+  const tag = methodTagFor(r.payment_method) ?? methodTagFor((r.providers ?? [])[0]);
+  if (!tag) {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border bg-amber-500/10 text-amber-700 border-amber-500/30" title="Dejó su correo pero no pulsó ningún método de pago">
+        ⏸ Dejó datos, no eligió método
+      </span>
+    );
+  }
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border font-medium ${tag.className}`} title="Último método de pago que pulsó">
+      👆 Pulsó: {tag.label}
+    </span>
+  );
 }
 
 interface Summary {
@@ -472,6 +516,7 @@ export default function AdminCheckoutAbuse() {
                       </span>
                       <span className={`text-xs font-semibold ${r.count > 20 ? "text-destructive" : "text-muted-foreground"}`}>{r.count} hits</span>
                       <StatusBadge status={r.status} />
+                      <PaymentMethodTag r={r} />
                       {r.client_purchase_event && <ClientPurchaseWarning />}
                       {r.email && (
                         <a href={`mailto:${r.email}`} onClick={(e) => e.stopPropagation()} className="text-xs text-primary hover:underline break-all">{r.email}</a>

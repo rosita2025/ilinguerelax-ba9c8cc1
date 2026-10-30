@@ -44,6 +44,7 @@ import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";
 import { trackHotmartEvent, trackBeginCheckout, isInternalTraffic } from "@/hooks/useMetaPixel";
 import { prefetchCheckoutMethodsConfig } from "@/hooks/useCheckoutMethodsConfig";
+import { getPatronesConnection, isPatronesConstrainedConnection } from "@/lib/patronesNetwork";
 import { cn } from "@/lib/utils";
 import { buildSupportUrl } from "@/lib/support";
 import { authorizeCheckout, evaluateCheckoutGate } from "@/lib/checkoutGate";
@@ -99,6 +100,14 @@ export default function Checkout() {
   }, []);
 
   // Una sola vez por checkout abierto: antes se repetía si cambiaba la función `navigate` (cambios de ruta/parámetros).
+  // Pago rápido (Apple Pay / Google Pay): en conexión lenta aparece 5 s después, para que primero salgan datos y métodos.
+  const [expressReady, setExpressReady] = useState(() => !isPatronesConstrainedConnection(getPatronesConnection()));
+  useEffect(() => {
+    if (expressReady) return;
+    const t = setTimeout(() => setExpressReady(true), 5000);
+    return () => clearTimeout(t);
+  }, [expressReady]);
+
   const gateSentForRef = useRef<string | null>(null);
   useEffect(() => {
     if (!slug) return;
@@ -155,6 +164,8 @@ export default function Checkout() {
   // en cuanto se abre /checkouts, para que al mostrar el iframe ya esté caliente
   // (evita el cold start de 1-3 s en la primera compra del día).
   useEffect(() => {
+    // Conexión lenta: nada especulativo; Stripe y sus funciones se piden cuando el cliente realmente las necesita.
+    if (isPatronesConstrainedConnection(getPatronesConnection())) return;
     let warm = false;
     const warmup = async () => {
       if (warm) return;
@@ -747,11 +758,13 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
                   </p>
                 </div>
 
+                {expressReady && (
                 <SectionErrorBoundary name="express-checkout">
                   <Suspense fallback={null}>
                     <ExpressCheckoutBox language={language} />
                   </Suspense>
                 </SectionErrorBoundary>
+                )}
 
                 <SectionErrorBoundary name="buyer-info">
                   <div id="buyer-info-section">

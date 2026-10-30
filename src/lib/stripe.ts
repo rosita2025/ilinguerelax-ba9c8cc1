@@ -1,4 +1,5 @@
 import { loadStripe, Stripe } from "@stripe/stripe-js";
+import { getPatronesConnection, isPatronesConstrainedConnection } from "@/lib/patronesNetwork";
 
 type StripeEnv = "sandbox" | "live";
 
@@ -15,10 +16,27 @@ function paymentsEnvironment(): StripeEnv {
 
 let stripePromise: Promise<Stripe | null> | null = null;
 
+/**
+ * En conexión lenta (3G/2G o ahorro de datos) stripe.js (~100 KB) NO se descarga al abrir el checkout, porque competiría
+ * con el propio contenido de la página: se descarga recién cuando un formulario de Stripe lo usa (al hacer `.then`).
+ * En conexiones normales se sigue descargando enseguida, como antes.
+ */
+function lazyStripe(load: () => Promise<Stripe | null>): Promise<Stripe | null> {
+  let real: Promise<Stripe | null> | null = null;
+  const get = () => (real ??= load());
+  return {
+    then: (ok: never, fail: never) => get().then(ok, fail),
+    catch: (fail: never) => get().catch(fail),
+    finally: (fn: never) => get().finally(fn),
+    [Symbol.toStringTag]: "Promise",
+  } as unknown as Promise<Stripe | null>;
+}
+
 export function getStripe(): Promise<Stripe | null> {
   if (!stripePromise) {
     paymentsEnvironment();
-    stripePromise = loadStripe(clientToken as string);
+    const load = () => loadStripe(clientToken as string);
+    stripePromise = isPatronesConstrainedConnection(getPatronesConnection()) ? lazyStripe(load) : load();
   }
   return stripePromise;
 }

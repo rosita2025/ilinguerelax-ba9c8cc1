@@ -26,6 +26,7 @@ interface StatRow {
   ip: string;
   count: number;
   payment_method?: string | null;
+  raw_count?: number;
   providers?: string[];
   actions?: Record<string, number>;
   paid_by?: { provider: string; method: string } | null;
@@ -590,7 +591,12 @@ export default function AdminCheckoutAbuse() {
                         <Timer className="h-3.5 w-3.5 text-muted-foreground" />
                         {r.count > 1 ? fmtDuration(r.duration_sec) : "1 visita"}
                       </span>
-                      <span className={`text-xs font-semibold ${r.count > 20 ? "text-destructive" : "text-muted-foreground"}`}>{r.count} hits</span>
+                      <span
+                        className={`text-xs font-semibold ${r.count > 20 ? "text-destructive" : "text-muted-foreground"}`}
+                        title="Veces que abrió el checkout. Si recarga o lo abre dos veces en menos de 2 minutos cuenta una sola. No es del Pixel de Meta: es el registro del propio checkout."
+                      >
+                        {r.count} {r.count === 1 ? "apertura" : "aperturas"}
+                      </span>
                       <StatusBadge status={r.status} />
                       <PaymentMethodTag r={r} />
                       <ActionTags r={r} />

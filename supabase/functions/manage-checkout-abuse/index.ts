@@ -190,20 +190,30 @@ Deno.serve(async (req) => {
         );
       }
 
-      type Agg = { ip: string; count: number; first: string; last: string; slugs: Set<string>; sources: Set<string>; referers: Set<string>; ua: string | null; country: string | null; city: string | null; email: string | null };
+      type Agg = { ip: string; count: number; raw: number; first: string; last: string; slugs: Set<string>; sources: Set<string>; referers: Set<string>; ua: string | null; country: string | null; city: string | null; email: string | null };
       const byIp = new Map<string, Agg>();
       const bySource = new Map<string, number>();
       const byCountry = new Map<string, number>();
-      for (const row of data || []) {
+      // Una "apertura" = una vez que la persona abrió el checkout. Si la misma IP abre el mismo checkout otra vez
+      // en menos de 2 minutos (recarga, doble carga de la página) se cuenta como una sola.
+      const sortedHits = [...(data || [])].sort((x, y) => String((x as { created_at: string }).created_at).localeCompare(String((y as { created_at: string }).created_at)));
+      const lastOpenAt = new Map<string, number>();
+      let totalOpens = 0;
+      for (const row of sortedHits) {
         const r = row as { ip: string; slug: string | null; created_at: string; source: string | null; referer: string | null; ua: string | null; country: string | null; city: string | null; email: string | null };
+        const openKey = `${r.ip}|${r.slug ?? ""}`;
+        const ts = new Date(r.created_at).getTime();
+        const isRepeat = ts - (lastOpenAt.get(openKey) ?? -Infinity) < 120_000;
+        lastOpenAt.set(openKey, ts);
         const geo = resolved.get(r.ip);
         if (geo) {
           r.country = r.country || geo.country;
           r.city = r.city || geo.city;
         }
-        const cur = byIp.get(r.ip) || { ip: r.ip, count: 0, first: r.created_at, last: r.created_at, slugs: new Set(), sources: new Set(), referers: new Set(), ua: r.ua, country: r.country, city: r.city, email: r.email };
+        const cur = byIp.get(r.ip) || { ip: r.ip, count: 0, raw: 0, first: r.created_at, last: r.created_at, slugs: new Set(), sources: new Set(), referers: new Set(), ua: r.ua, country: r.country, city: r.city, email: r.email };
 
-        cur.count += 1;
+        cur.raw += 1;
+        if (!isRepeat) { cur.count += 1; totalOpens += 1; }
         if (r.created_at > cur.last) cur.last = r.created_at;
         if (r.created_at < cur.first) cur.first = r.created_at;
         if (r.slug) cur.slugs.add(r.slug);
@@ -214,6 +224,7 @@ Deno.serve(async (req) => {
         if (!cur.city && r.city) cur.city = r.city;
         if (!cur.email && r.email) cur.email = r.email;
         byIp.set(r.ip, cur);
+        if (isRepeat) continue;
         const src = r.source || "direct";
         bySource.set(src, (bySource.get(src) || 0) + 1);
         const c = (r.country || "").toUpperCase();
@@ -373,6 +384,7 @@ Deno.serve(async (req) => {
           return {
             ip: x.ip,
             count: x.count,
+            raw_count: x.raw,
             first: x.first,
             last: x.last,
             // Tiempo entre la primera y la última vez que abrió el checkout (24 h).
@@ -407,7 +419,7 @@ Deno.serve(async (req) => {
 
       // Resumen real de las últimas 24 h (lo más importante para decidir).
       const summary = {
-        visits: (data || []).length,
+        visits: totalOpens,
         visitors: byIp.size,
         with_email: top.filter((r) => !!r.email).length,
         without_email: top.filter((r) => !r.email).length,

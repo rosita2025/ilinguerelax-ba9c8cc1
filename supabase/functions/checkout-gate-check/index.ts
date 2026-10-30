@@ -76,6 +76,7 @@ Deno.serve(async (req) => {
       referer?: string;
       country?: string;
       email?: string;
+      internal?: boolean;
     };
     const slug = (body.slug || "").toString().slice(0, 120) || null;
     const ip = clientIp(req);
@@ -95,6 +96,9 @@ Deno.serve(async (req) => {
       (headerCountry || body.country || "").toString().trim().toUpperCase().slice(0, 2) || null;
     const rawEmail = (body.email || "").toString().trim().toLowerCase().slice(0, 200);
     const email = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(rawEmail) ? rawEmail : null;
+
+    // Navegador marcado como del equipo (?notrack=1): no se registra en el análisis del checkout.
+    if (body.internal === true) return json({ allowed: true, skipped: "internal" });
 
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,

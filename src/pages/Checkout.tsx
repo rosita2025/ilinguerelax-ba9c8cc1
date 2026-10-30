@@ -41,7 +41,7 @@ import { InAppBrowserBanner } from "@/components/checkout/InAppBrowserBanner";
 import { supabase } from "@/integrations/supabase/client";
 import { subscribeCatalogUpdates } from "@/lib/catalogSync";
 import { getStripe } from "@/lib/stripe";
-import { trackHotmartEvent, trackBeginCheckout } from "@/hooks/useMetaPixel";
+import { trackHotmartEvent, trackBeginCheckout, isInternalTraffic } from "@/hooks/useMetaPixel";
 import { cn } from "@/lib/utils";
 import { buildSupportUrl } from "@/lib/support";
 import { authorizeCheckout, evaluateCheckoutGate } from "@/lib/checkoutGate";
@@ -110,6 +110,7 @@ export default function Checkout() {
             slug,
             referer: (typeof document !== "undefined" && document.referrer) || "",
             country: (region.country || "").toUpperCase(),
+            internal: isInternalTraffic(),
           },
         });
         const res = data as { allowed?: boolean; reason?: string } | null;
@@ -134,7 +135,7 @@ export default function Checkout() {
     const tid = setTimeout(() => {
       supabase.functions
         .invoke("checkout-gate-check", {
-          body: { slug, email, country: (region.country || "").toUpperCase() },
+          body: { slug, email, country: (region.country || "").toUpperCase(), internal: isInternalTraffic() },
         })
         .catch(() => {});
     }, 1200);

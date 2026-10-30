@@ -1,4 +1,5 @@
 import { assertAdminCsrf } from "../_shared/adminCsrf.ts";
+import { registerTeamIp } from "../_shared/teamIps.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
@@ -89,6 +90,9 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Quien usa el panel es del equipo: su IP deja de contarse como visita.
+    void registerTeamIp(createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!), req);
 
     const fromDate = from ? new Date(from) : new Date(Date.now() - 24 * 3600 * 1000);
     const toDate = to ? new Date(to) : new Date();

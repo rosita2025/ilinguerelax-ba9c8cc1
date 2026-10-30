@@ -8,6 +8,7 @@
 //   200 { allowed: false, reason: "banned"|"rate" }    -> bloquear
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { loadExcludedIps } from "../_shared/teamIps.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -105,6 +106,9 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
       { auth: { persistSession: false } },
     );
+
+    // IPs del equipo (se registran al usar el panel admin): no se guardan en el análisis.
+    if ((await loadExcludedIps(admin)).has(ip)) return json({ allowed: true, skipped: "team_ip" });
 
     // Si el comprador ya escribió su correo, enriquecemos el último acceso de
     // esa IP en vez de crear otro hit (evita inflar el contador).

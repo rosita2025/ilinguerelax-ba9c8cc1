@@ -131,6 +131,16 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Recargas o doble carga de la página: si esta IP ya abrió este mismo checkout hace menos de 2 minutos, no se duplica.
+    const { data: recentSame } = await admin
+      .from("checkout_rate_hits")
+      .select("id")
+      .eq("ip", ip)
+      .eq("slug", slug ?? "")
+      .gte("created_at", new Date(Date.now() - 120_000).toISOString())
+      .limit(1);
+    if (slug && (recentSame as unknown[] | null)?.length) return json({ allowed: true, deduped: true });
+
     // Registrar el acceso para analítica y detección de abuso. Este endpoint
     // nunca bloquea compras: una IP puede ser compartida por una oficina,
     // operadora móvil, VPN o por la vista previa del administrador.

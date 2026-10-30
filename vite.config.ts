@@ -108,6 +108,9 @@ export default defineConfig(({ mode }) => ({
         },
       },
     },
+    // Los logos de pago pequeños (OXXO, SPEI, Mercado Pago, PayPal, Stripe) se quedan como archivos aparte:
+    // incrustados en el JS (base64) se descargaban en TODOS los checkouts aunque solo se usen en algunos países.
+    assetsInlineLimit: (file: string) => (/[\\/]src[\\/]assets[\\/](oxxo|spei|mercadopago|paypal|stripe|yape)-logo\./.test(file) ? false : undefined),
     chunkSizeWarningLimit: 1000,
   },
 }));

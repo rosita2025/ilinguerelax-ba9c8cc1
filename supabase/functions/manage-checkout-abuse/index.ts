@@ -256,6 +256,34 @@ Deno.serve(async (req) => {
         }
       }
 
+      // Último método de pago que el cliente pulsó (se guarda al elegirlo: Stripe, PayPal, Hotmart, Binance, Yape, dLocal…)
+      // y proveedores con los que llegó a crear un pedido.
+      const methodByEmail = new Map<string, string>();
+      const providersByEmail = new Map<string, Set<string>>();
+      if (emails.length) {
+        const { data: contacts } = await admin
+          .from("email_contacts")
+          .select("email, metadata, updated_at")
+          .in("email", emails)
+          .eq("source", "abandoned_cart");
+        for (const c of (contacts || []) as { email: string; metadata: { payment_method?: string } | null }[]) {
+          const m = String(c.metadata?.payment_method ?? "").trim().toLowerCase();
+          if (m) methodByEmail.set((c.email || "").toLowerCase(), m);
+        }
+        const { data: evs } = await admin
+          .from("order_events")
+          .select("customer_email, provider")
+          .in("customer_email", emails)
+          .gte("created_at", since)
+          .limit(2000);
+        for (const e of (evs || []) as { customer_email: string | null; provider: string | null }[]) {
+          const k = (e.customer_email || "").toLowerCase();
+          if (!k || !e.provider) continue;
+          if (!providersByEmail.has(k)) providersByEmail.set(k, new Set());
+          providersByEmail.get(k)!.add(String(e.provider).toLowerCase());
+        }
+      }
+
       const top = [...byIp.values()]
         .map((x) => {
           const key = (x.email || "").toLowerCase();
@@ -275,6 +303,8 @@ Deno.serve(async (req) => {
             // Tiempo entre la primera y la última vez que abrió el checkout (24 h).
             duration_sec: Math.max(0, Math.round((new Date(x.last).getTime() - new Date(x.first).getTime()) / 1000)),
             cart: cartInfo.get(key) ?? null,
+            payment_method: methodByEmail.get(key) ?? null,
+            providers: [...(providersByEmail.get(key) ?? [])],
             slugs: [...x.slugs].slice(0, 5),
             sources: [...x.sources],
             referers: [...x.referers].slice(0, 3),

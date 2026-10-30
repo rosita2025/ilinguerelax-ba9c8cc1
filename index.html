@@ -331,6 +331,23 @@
       #app-shell .box{margin:16px;border-radius:20px;background:#e8eef0;aspect-ratio:1/1;max-width:560px}
       #app-shell .line{margin:12px 16px;height:16px;border-radius:8px;background:#e8eef0;max-width:520px}
       #app-shell .line.s{width:60%}
+      /* Variantes por página: el administrador y el checkout no deben ver la maqueta de un producto. */
+      #app-shell .adm,#app-shell .chk{display:none}
+      #app-shell.r-admin .box,#app-shell.r-admin .line,#app-shell.r-checkout .box,#app-shell.r-checkout .line{display:none}
+      #app-shell.r-admin .adm{display:grid;grid-template-columns:200px 1fr;gap:0;min-height:calc(100vh - 53px)}
+      #app-shell .adm .side{background:#fff;border-right:1px solid #e5e7eb;padding:16px 12px}
+      #app-shell .adm .side i,#app-shell .adm .main i,#app-shell .chk i{display:block;border-radius:8px;background:#e8eef0}
+      #app-shell .adm .side i{height:14px;margin:0 0 14px}
+      #app-shell .adm .main{padding:20px 24px}
+      #app-shell .adm .main .t{height:22px;width:260px;max-width:70%;margin-bottom:18px}
+      #app-shell .adm .main .row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+      #app-shell .adm .main .row i{height:74px;border-radius:12px}
+      #app-shell .adm .main .big{height:260px;border-radius:14px}
+      #app-shell.r-checkout .chk{display:block;max-width:520px;margin:0 auto;padding:16px}
+      #app-shell .chk .sum{height:44px;border-radius:12px;margin-bottom:14px}
+      #app-shell .chk .in{height:46px;border-radius:12px;margin-bottom:12px}
+      #app-shell .chk .pay{height:62px;border-radius:14px;margin-bottom:10px}
+      @media (max-width:760px){#app-shell.r-admin .adm{grid-template-columns:1fr}#app-shell .adm .side{display:none}#app-shell .adm .main .row{grid-template-columns:repeat(2,1fr)}}
     </style>
     <script>
       /* Pide los datos del producto desde ya (en paralelo con la descarga del JS) y empieza a bajar la portada. */
@@ -376,7 +393,8 @@
         } catch (e) {}
       })();
     </script>
-    <div id="root"><div id="app-shell" aria-hidden="true"><div class="bar"><span class="logo">iLingue <b>Relax</b></span></div><div class="box"></div><div class="line"></div><div class="line s"></div></div></div>
+    <div id="root"><div id="app-shell" aria-hidden="true"><div class="bar"><span class="logo">iLingue <b>Relax</b></span></div><div class="box"></div><div class="line"></div><div class="line s"></div><div class="adm"><div class="side"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="main"><i class="t"></i><div class="row"><i></i><i></i><i></i><i></i></div><i class="big"></i></div></div><div class="chk"><i class="sum"></i><i class="in"></i><i class="in"></i><i class="pay"></i><i class="pay"></i><i class="pay"></i></div></div></div>
+    <script>(function(){try{var p=location.pathname,s=document.getElementById('app-shell');if(!s)return;if(p.indexOf('/admin')===0)s.className='r-admin';else if(/^\/checkouts\/(?!success|return|failure|pending|pendiente)/.test(p))s.className='r-checkout';}catch(e){}})();</script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

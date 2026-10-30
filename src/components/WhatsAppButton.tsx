@@ -1,3 +1,5 @@
+import { logCheckoutAction } from "@/hooks/useMetaPixel";
+
 interface WhatsAppButtonProps {
   url?: string;
   label?: string;
@@ -9,6 +11,7 @@ export const WhatsAppButton = ({ url, label = "¿Dudas?" }: WhatsAppButtonProps)
   return (
     <a
       href={url}
+      onClick={() => logCheckoutAction("whatsapp_flotante")}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"

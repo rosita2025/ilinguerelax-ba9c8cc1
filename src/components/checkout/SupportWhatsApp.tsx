@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronDown, MessageCircle } from "lucide-react";
 import { buildSupportUrl, type SupportContext, type SupportReason } from "@/lib/support";
+import { logCheckoutAction } from "@/hooks/useMetaPixel";
 
 const COPY: Record<string, { cta: string; pick: string; reasons: Record<SupportReason, string> }> = {
   es: { cta: "¿Problemas para pagar? Escríbenos por WhatsApp", pick: "¿Qué te pasó?", reasons: { problem: "Tengo un problema de pago", error: "Me salió un error de pago", other: "Quiero otro método de pago", question: "Tengo una duda" } },
@@ -38,6 +39,7 @@ export function SupportWhatsApp({
     return (
       <a
         href={link("error")}
+        onClick={() => logCheckoutAction("whatsapp_ayuda", "error")}
         target="_blank"
         rel="noopener noreferrer"
         className="mt-1 inline-flex min-h-9 items-center gap-1.5 text-sm font-medium text-[#128C7E] underline underline-offset-2"
@@ -65,6 +67,7 @@ export function SupportWhatsApp({
             <a
               key={r}
               href={link(r)}
+              onClick={() => logCheckoutAction("whatsapp_ayuda", r)}
               target="_blank"
               rel="noopener noreferrer"
               className={`inline-flex min-h-11 items-center justify-start gap-2.5 rounded-lg border px-3 py-2 text-sm font-semibold ${STYLE[r].cls}`}

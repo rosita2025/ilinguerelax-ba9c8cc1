@@ -235,7 +235,7 @@ serve(async (req) => {
     ]);
     if (error) throw error;
 
-    const allRows = (data || []).filter((row) => !isAdminPath((row.page_path as string) || null));
+    const allRows = (data || []).filter((row) => row.event_name !== "CheckoutAction" && !isAdminPath((row.page_path as string) || null));
 
     // Split humans vs bots
     const botRows = allRows.filter((r) => (r as { is_bot?: boolean }).is_bot === true);

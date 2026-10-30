@@ -312,6 +312,29 @@ Deno.serve(async (req) => {
         }
       }
 
+      // Clics en WhatsApp y popups (eventos "CheckoutAction" guardados por IP): para saber, sobre todo de quien
+      // no llenó datos, qué hizo en lugar de pagar.
+      const actionsByIp = new Map<string, Record<string, number>>();
+      const allIps = [...byIp.keys()].filter((ip) => ip && ip !== "unknown");
+      for (let i = 0; i < allIps.length; i += 100) {
+        const { data: acts } = await admin
+          .from("funnel_events")
+          .select("ip, provider")
+          .eq("event_name", "CheckoutAction")
+          .eq("is_bot", false)
+          .in("ip", allIps.slice(i, i + 100))
+          .gte("created_at", since)
+          .lt("created_at", until)
+          .limit(2000);
+        for (const a of (acts || []) as { ip: string; provider: string | null }[]) {
+          const key = String(a.provider ?? "").split(":")[0];
+          if (!key) continue;
+          const cur = actionsByIp.get(a.ip) ?? {};
+          cur[key] = (cur[key] ?? 0) + 1;
+          actionsByIp.set(a.ip, cur);
+        }
+      }
+
       const top = [...byIp.values()]
         .map((x) => {
           const key = (x.email || "").toLowerCase();
@@ -332,6 +355,7 @@ Deno.serve(async (req) => {
             duration_sec: Math.max(0, Math.round((new Date(x.last).getTime() - new Date(x.first).getTime()) / 1000)),
             cart: cartInfo.get(key) ?? null,
             payment_method: methodByEmail.get(key) ?? null,
+            actions: actionsByIp.get(x.ip) ?? {},
             providers: [...(providersByEmail.get(key) ?? [])],
             slugs: [...x.slugs].slice(0, 5),
             sources: [...x.sources],

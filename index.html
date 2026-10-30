@@ -347,6 +347,12 @@
       #app-shell .chk .sum{height:44px;border-radius:12px;margin-bottom:14px}
       #app-shell .chk .in{height:46px;border-radius:12px;margin-bottom:12px}
       #app-shell .chk .pay{height:62px;border-radius:14px;margin-bottom:10px}
+      /* Estilo "YouTube / Facebook": barrita de progreso arriba y bloques con brillo suave que se mueve (no gris quieto). */
+      #app-shell::before{content:"";position:fixed;top:0;left:0;width:100%;height:3px;z-index:9999;background:linear-gradient(90deg,transparent 0,#0d9488 50%,transparent 100%) no-repeat;background-size:40% 100%;animation:ilr-bar 1.1s linear infinite}
+      @keyframes ilr-bar{0%{background-position:-40% 0}100%{background-position:140% 0}}
+      #app-shell .box,#app-shell .line,#app-shell .adm i,#app-shell .chk i{background:linear-gradient(90deg,#eceff1 25%,#f7f9fa 40%,#eceff1 60%);background-size:300% 100%;animation:ilr-sh 1.3s ease-in-out infinite}
+      @keyframes ilr-sh{0%{background-position:100% 50%}100%{background-position:0 50%}}
+      @media (prefers-reduced-motion:reduce){#app-shell::before,#app-shell .box,#app-shell .line,#app-shell .adm i,#app-shell .chk i{animation:none}}
       @media (max-width:760px){#app-shell.r-admin .adm{grid-template-columns:1fr}#app-shell .adm .side{display:none}#app-shell .adm .main .row{grid-template-columns:repeat(2,1fr)}}
     </style>
     <script>

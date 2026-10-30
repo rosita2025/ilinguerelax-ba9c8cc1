@@ -418,6 +418,24 @@ export const useHotmartPixel = (params: ViewContentParams) => {
   }, [params.content_name]);
 };
 
+// Meta (y TikTok) no deben recibir el mismo AddToCart / InitiateCheckout dos veces del mismo visitante y producto:
+// pasa al recargar el checkout, volver a abrir el enlace desde Instagram/Facebook o tocar dos botones de compra.
+// Dentro de 30 minutos se envía una sola vez; el registro propio de funnels no se toca.
+const DEDUPE_EVENTS = new Set(["AddToCart", "InitiateCheckout"]);
+const DEDUPE_WINDOW_MS = 30 * 60 * 1000;
+const isRecentDuplicateEvent = (eventName: string, params: Record<string, unknown>): boolean => {
+  if (!DEDUPE_EVENTS.has(eventName) || typeof window === "undefined") return false;
+  try {
+    const ids = Array.isArray(params.content_ids) && params.content_ids.length ? String((params.content_ids as unknown[])[0]) : String(params.content_name ?? "");
+    const key = `ilr_ev_${eventName}_${ids}`.slice(0, 160);
+    const last = Number(localStorage.getItem(key) || "0");
+    const now = Date.now();
+    if (last && now - last < DEDUPE_WINDOW_MS) return true;
+    localStorage.setItem(key, String(now));
+  } catch { /* sin almacenamiento: se envía */ }
+  return false;
+};
+
 export const trackHotmartEvent = (
   eventName: string,
   params: Record<string, unknown> = {}
@@ -450,7 +468,8 @@ export const trackHotmartEvent = (
   const eventId = eventName === "Purchase" && orderId
     ? `Purchase_${orderId}`
     : generateEventId();
-  if (typeof window !== "undefined" && hasPixelConsent()) {
+  const isDupForAds = typeof window !== "undefined" && hasPixelConsent() ? isRecentDuplicateEvent(eventName, pixelParams) : false;
+  if (typeof window !== "undefined" && hasPixelConsent() && !isDupForAds) {
     if (window.fbq) window.fbq("track", eventName, { ...pixelParams, eventID: eventId });
     if (window.ttq && (eventName === "AddToCart" || eventName === "InitiateCheckout" || eventName === "CompleteRegistration" || eventName === "Purchase")) {
       window.ttq.track(eventName, {
@@ -463,7 +482,7 @@ export const trackHotmartEvent = (
     }
 
   }
-  sendCapiEvent(eventName, eventId, pixelParams, typeof userEmail === "string" ? userEmail : undefined);
+  if (!isDupForAds) sendCapiEvent(eventName, eventId, pixelParams, typeof userEmail === "string" ? userEmail : undefined);
   if (!__skipFunnelLog) logFunnelEvent(eventName, pixelParams);
   if (eventName === "ViewContent") markViewContentFired(pixelParams);
 };

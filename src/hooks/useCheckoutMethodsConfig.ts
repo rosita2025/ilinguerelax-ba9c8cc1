@@ -56,7 +56,7 @@ interface MethodRow { region_code: string; method_key: string; enabled: boolean;
 
 // Cache en memoria con TTL corto — evita re-consulta en cada montaje pero
 // permite ver cambios del admin sin recargar la pestaña por completo.
-const CACHE_TTL_MS = 3_000;
+let CACHE_TTL_MS = 3_000;
 let cachePromise: Promise<{ regions: RegionRow[]; methods: MethodRow[] }> | null = null;
 let cacheAt = 0;
 const CACHE_VERSION_KEY = "ilr_checkout_methods_version";
@@ -79,6 +79,16 @@ export function invalidateCheckoutMethodsCache() {
   try { localStorage.setItem(CACHE_VERSION_KEY, stamp); } catch { /* noop */ }
   try { getBroadcastChannel()?.postMessage({ type: "invalidate", stamp }); } catch { /* noop */ }
   try { window.dispatchEvent(new CustomEvent(SAME_TAB_EVENT, { detail: stamp })); } catch { /* noop */ }
+}
+
+/**
+ * Pide la configuración de métodos de pago apenas se carga la página de checkout (no depende del país),
+ * en vez de esperar a que se pinte el bloque de pagos. Esa primera respuesta se reutiliza hasta 30 s.
+ */
+export function prefetchCheckoutMethodsConfig() {
+  if (cachePromise && Date.now() - cacheAt < CACHE_TTL_MS) return;
+  CACHE_TTL_MS = 30_000;
+  void loadAll().finally(() => { setTimeout(() => { CACHE_TTL_MS = 3_000; }, 30_000); });
 }
 
 async function loadAll() {

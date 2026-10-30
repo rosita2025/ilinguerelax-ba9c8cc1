@@ -27,6 +27,7 @@ interface StatRow {
   count: number;
   payment_method?: string | null;
   raw_count?: number;
+  merged_ips?: string[];
   providers?: string[];
   actions?: Record<string, number>;
   paid_by?: { provider: string; method: string } | null;
@@ -327,6 +328,57 @@ function ActionTags({ r }: { r: { email?: string | null; actions?: Record<string
   );
 }
 
+const STATUS_RANK: Record<string, number> = { purchased: 3, abandoned: 2, browsing: 1, anonymous: 0 };
+const GENERIC_DEVICE = /^(iPhone|iPad|Mac|PC Windows|Linux|Chromebook|Otro dispositivo|Desconocido)/;
+
+/**
+ * Une visitas del MISMO dispositivo (mismo modelo de teléfono Android, navegador y país) aunque vengan de IPs distintas
+ * (el celular cambia de IP) o de días distintos: "no llenó el correo, volvió más tarde, y otro día sí lo dejó".
+ * Es una coincidencia probable, no una certeza; los iPhone, Mac y PC no se unen porque su identificador es igual para todos.
+ */
+function mergeSameDevice(rows: StatRow[]): StatRow[] {
+  const groups = new Map<string, StatRow[]>();
+  const out: StatRow[] = [];
+  for (const r of rows) {
+    const d = parseDevice(r.ua);
+    const key = !GENERIC_DEVICE.test(d.device) && !/modelo oculto/.test(d.device) && r.ua && r.country ? `${r.ua}|${r.country}` : null;
+    if (!key) { out.push(r); continue; }
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(r);
+  }
+  for (const list of groups.values()) {
+    if (list.length === 1) { out.push(list[0]); continue; }
+    const best = [...list].sort((a, b) => (STATUS_RANK[b.status ?? "anonymous"] ?? 0) - (STATUS_RANK[a.status ?? "anonymous"] ?? 0))[0];
+    const firsts = list.map((x) => x.first ?? x.last).sort();
+    const lasts = list.map((x) => x.last).sort();
+    const actions: Record<string, number> = {};
+    for (const x of list) for (const [k, v] of Object.entries(x.actions ?? {})) actions[k] = (actions[k] ?? 0) + v;
+    const first = firsts[0];
+    const last = lasts[lasts.length - 1];
+    out.push({
+      ...best,
+      ip: best.ip,
+      merged_ips: list.map((x) => x.ip),
+      count: list.reduce((n, x) => n + x.count, 0),
+      first,
+      last,
+      duration_sec: Math.max(0, Math.round((new Date(last).getTime() - new Date(first).getTime()) / 1000)),
+      email: list.find((x) => x.email)?.email ?? null,
+      status: best.status,
+      payment_method: best.payment_method ?? list.find((x) => x.payment_method)?.payment_method ?? null,
+      paid_by: list.find((x) => x.paid_by)?.paid_by ?? null,
+      cart: list.find((x) => x.cart)?.cart ?? null,
+      providers: [...new Set(list.flatMap((x) => x.providers ?? []))],
+      slugs: [...new Set(list.flatMap((x) => x.slugs))].slice(0, 5),
+      sources: [...new Set(list.flatMap((x) => x.sources))],
+      referers: [...new Set(list.flatMap((x) => x.referers))].slice(0, 3),
+      actions,
+      client_purchase_event: list.some((x) => x.client_purchase_event),
+    });
+  }
+  return out;
+}
+
 interface Summary {
   visits: number;
   visitors: number;
@@ -376,6 +428,7 @@ export default function AdminCheckoutAbuse() {
   const [loading, setLoading] = useState(false);
   const [range, setRange] = useState<"today" | "yesterday" | "24h">("today");
   const [onlyReal, setOnlyReal] = useState(true);
+  const [mergeDevices, setMergeDevices] = useState(true);
   const [hiddenVisits, setHiddenVisits] = useState(0);
   const [tab, setTab] = useState<"filled" | "empty">("filled");
   const [countryFilter, setCountryFilter] = useState("");
@@ -427,11 +480,13 @@ export default function AdminCheckoutAbuse() {
     }
   };
 
-  const deleteVisitor = async (ip: string) => {
-    if (!confirm(`¿Borrar de la lista las visitas de ${ip} (${rangeLabel})? Úsalo para pruebas propias o duplicados.`)) return;
+  const deleteVisitor = async (ips: string[]) => {
+    if (!confirm(`¿Borrar de la lista las visitas de ${ips.join(", ")} (${rangeLabel})? Úsalo para pruebas propias o duplicados.`)) return;
     try {
-      const { error } = await adminInvoke("manage-checkout-abuse", { body: { action: "delete_visitor", ip, range, tz_offset: new Date().getTimezoneOffset() } });
-      if (error) throw error;
+      for (const ip of ips) {
+        const { error } = await adminInvoke("manage-checkout-abuse", { body: { action: "delete_visitor", ip, range, tz_offset: new Date().getTimezoneOffset() } });
+        if (error) throw error;
+      }
       toast({ title: "Visitas borradas de la lista" });
       void load();
     } catch {
@@ -451,10 +506,11 @@ export default function AdminCheckoutAbuse() {
     }
   };
 
+  const rowsBase = mergeDevices ? mergeSameDevice(top) : top;
   // Con correo: una fila por correo (la visita más reciente); sin llenar: una fila por IP.
   const withEmail = (() => {
     const m = new Map<string, StatRow>();
-    for (const r of top) {
+    for (const r of rowsBase) {
       if (!r.email) continue;
       const k = r.email.trim().toLowerCase();
       const prev = m.get(k);
@@ -462,7 +518,7 @@ export default function AdminCheckoutAbuse() {
     }
     return [...m.values()].sort((a, b) => String(b.last).localeCompare(String(a.last)));
   })();
-  const withoutEmail = top.filter((r) => !r.email).sort((a, b) => String(b.last).localeCompare(String(a.last)));
+  const withoutEmail = rowsBase.filter((r) => !r.email).sort((a, b) => String(b.last).localeCompare(String(a.last)));
   const countryOptions = (() => {
     const m = new Map<string, number>();
     for (const r of tab === "filled" ? withEmail : withoutEmail) {
@@ -518,7 +574,7 @@ export default function AdminCheckoutAbuse() {
               { label: "Sin correo", value: summary.without_email, hint: "no llenó formulario" },
               { label: "Compraron", value: summary.purchased, hint: "confirmadas" },
               { label: "Abandonaron", value: summary.abandoned, hint: "carrito abierto" },
-              { label: "Tiempo medio", value: fmtDuration(summary.avg_duration_sec), hint: "en el checkout" },
+              { label: "Vuelven tras", value: fmtDuration(summary.avg_duration_sec), hint: "entre 1.ª y última apertura" },
             ].map((k) => (
               <div key={k.label} className="border rounded-lg p-3">
                 <div className="text-xs text-muted-foreground">{k.label}</div>
@@ -559,6 +615,13 @@ export default function AdminCheckoutAbuse() {
               </select>
             </div>
             <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
+              <input type="checkbox" className="mt-0.5" checked={mergeDevices} onChange={(e) => { setMergeDevices(e.target.checked); setShown(25); }} />
+              <span>
+                <strong className="text-foreground">Unir el mismo cliente</strong>: junta las visitas del mismo modelo de teléfono Android, navegador y país
+                (aunque cambie de IP o vuelva otro día). Es una coincidencia probable.
+              </span>
+            </label>
+            <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
               <input type="checkbox" className="mt-0.5" checked={onlyReal} onChange={(e) => { setOnlyReal(e.target.checked); setShown(25); }} />
               <span>
                 <strong className="text-foreground">Solo tráfico real</strong>: anuncios de Meta y TikTok, redes sociales y orgánico (Google…).
@@ -587,10 +650,15 @@ export default function AdminCheckoutAbuse() {
                         <Smartphone className="h-3.5 w-3.5 text-muted-foreground" /> {d.device}
                         <span className="text-muted-foreground">· {d.browser}</span>
                       </span>
-                      <span className="inline-flex items-center gap-1 text-xs" title="Tiempo entre su primera y última visita al checkout">
+                      <span className="inline-flex items-center gap-1 text-xs" title="No es el tiempo en pantalla: es el tiempo entre la primera y la última vez que abrió el checkout (puede volver horas después)">
                         <Timer className="h-3.5 w-3.5 text-muted-foreground" />
-                        {r.count > 1 ? fmtDuration(r.duration_sec) : "1 visita"}
+                        {r.count > 1 ? `volvió tras ${fmtDuration(r.duration_sec)}` : "1 visita"}
                       </span>
+                      {(r.merged_ips?.length ?? 0) > 1 && (
+                        <span className="text-xs px-2 py-0.5 rounded-full border bg-sky-500/10 text-sky-700 border-sky-500/30" title="Mismo modelo de teléfono, navegador y país con varias IPs o visitas: probablemente es el mismo cliente">
+                          🔁 Mismo cliente probable · {r.merged_ips!.length} IPs
+                        </span>
+                      )}
                       <span
                         className={`text-xs font-semibold ${r.count > 20 ? "text-destructive" : "text-muted-foreground"}`}
                         title="Veces que abrió el checkout. Si recarga o lo abre dos veces en menos de 2 minutos cuenta una sola. No es del Pixel de Meta: es el registro del propio checkout."
@@ -607,7 +675,7 @@ export default function AdminCheckoutAbuse() {
                       <span className="text-xs text-muted-foreground ml-auto">{new Date(r.last).toLocaleString()}</span>
                       <button
                         type="button"
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); void deleteVisitor(r.ip); }}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); void deleteVisitor(r.merged_ips ?? [r.ip]); }}
                         className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive"
                         title="Borrar esta visita de la lista"
                         aria-label="Borrar esta visita"

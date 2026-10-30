@@ -890,7 +890,7 @@ export default function AdminCheckoutMethods() {
                                 <span>{m.label}</span>
                                 {(() => { const tg = getMethodTag(m.method_key); return tg ? <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${tg.cls}`}>{tg.text}</span> : null; })()}
                               </div>
-                              {(dlNote || m.note) && <div className="text-[10px] sm:text-[11px] text-muted-foreground line-clamp-2 sm:truncate" title={dlNote || m.note || ""}>{dlNote || m.note}</div>}
+                              {(dlNote || m.note) && <div className={`text-[10px] sm:text-[11px] text-muted-foreground ${m.method_key === "dlocal_wallet" || m.method_key === "dlocal_mercadopago" ? "break-words" : "line-clamp-2 sm:truncate"}`} title={dlNote || m.note || ""}>{dlNote || m.note}</div>}
                             </div>
 
                             <Switch checked={m.enabled} onCheckedChange={() => toggleMethod(m)} className="shrink-0" />

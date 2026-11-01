@@ -76,12 +76,35 @@ const photoReviews = [
 const ReviewSlider = () => {
   const [idx, setIdx] = useState(0);
   const [zoom, setZoom] = useState<number | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  // Fotos ya montadas: la actual y la siguiente (y la que sale), para que nunca se vea una caja vacía al deslizar.
+  const [seen, setSeen] = useState<Set<number>>(() => new Set());
+
+  // Nada se descarga ni se mueve hasta que el carrusel está cerca de la pantalla.
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") { setVisible(true); return; }
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); io.disconnect(); } }, { rootMargin: "200px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
-    if (zoom !== null) return; // pausa el slider mientras el zoom está abierto
+    if (!visible) return;
+    setSeen((prev) => {
+      const next = new Set(prev);
+      next.add(idx);
+      next.add((idx + 1) % photoReviews.length);
+      return next;
+    });
+  }, [visible, idx]);
+
+  useEffect(() => {
+    if (!visible || zoom !== null) return; // pausa el slider mientras el zoom está abierto
     const t = setInterval(() => setIdx((i) => (i + 1) % photoReviews.length), 3500);
     return () => clearInterval(t);
-  }, [zoom]);
+  }, [visible, zoom]);
 
   // Bloquea el scroll de la página y cierra con Escape mientras el zoom está abierto
   useEffect(() => {
@@ -103,7 +126,7 @@ const ReviewSlider = () => {
   } as const;
 
   return (
-    <div className="mx-auto max-w-sm">
+    <div ref={rootRef} className="mx-auto max-w-sm">
       <div className="relative overflow-hidden rounded-xl border border-border shadow-card bg-card">
         <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${idx * 100}%)` }}>
           {photoReviews.map((r, i) => (
@@ -117,7 +140,7 @@ const ReviewSlider = () => {
                 onClick={() => setZoom(i)}
                 className="block w-full aspect-square cursor-zoom-in"
               >
-                {i === idx && <LazyImg src={r.src} alt={r.alt} rootMargin="80px" width={1024} height={1024} wrapperClassName="block aspect-square" className="w-full h-auto block select-none" {...protect} />}
+                {seen.has(i) && <LazyImg src={r.src} alt={r.alt} eager width={1024} height={1024} wrapperClassName="block aspect-square" className="w-full h-auto block select-none" {...protect} />}
               </button>
               <div className="pointer-events-none absolute bottom-2 right-2 z-10 rounded-full bg-background/90 border border-border p-1.5">
                 <ZoomIn className="h-3.5 w-3.5 text-foreground" />

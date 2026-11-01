@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Clock, Copy, Check } from "lucide-react";
-import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 
 const COUPON_CODE = "NEW10";
 const DURATION_SECONDS = 15 * 60; // 15 minutos
@@ -39,7 +38,6 @@ function formatTime(totalSeconds: number): string {
  * la página (usa sessionStorage con la hora de inicio real de esta visita).
  */
 export function UrgencyTimerBar({ productSlug, language = "es" }: Props) {
-  const applyCoupon = useCheckoutPruebaStore((s) => s.applyCoupon);
   const storageKey = `${STORAGE_KEY_PREFIX}${productSlug}`;
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
@@ -74,7 +72,6 @@ export function UrgencyTimerBar({ productSlug, language = "es" }: Props) {
   const expired = secondsLeft <= 0;
 
   const handleCopy = async () => {
-    applyCoupon(COUPON_CODE);
     try {
       await navigator.clipboard.writeText(COUPON_CODE);
       setCopied(true);

@@ -24,7 +24,7 @@ import { formatCurrencyAmount, formatAmountLocalized, exchangeRates } from "@/i1
 
 import { mapStripeError, type MappedStripeError, type Lang as StripeLang } from "@/lib/stripeErrorMap";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
-import { trackPaymentError, trackHotmartEvent } from "@/hooks/useMetaPixel";
+import { trackPaymentError, trackHotmartEvent, logCheckoutAction } from "@/hooks/useMetaPixel";
 import { trackAbandonedCheckoutNow } from "@/hooks/useAbandonedCheckoutTracker";
 import { usePurchaseTracking } from "@/hooks/usePurchaseTracking";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
@@ -48,6 +48,11 @@ const isPaymentElementMode = (): boolean => {
     if (flag === "1") return true;
   } catch { /* sin URL: usar el valor por defecto */ }
   return PAYMENT_ELEMENT_ENABLED;
+};
+// Tarjeta: se paga solo con el enlace de pago seguro de Stripe (página de Stripe, sin formulario embebido), que da menos
+// rechazos. Para ver el formulario embebido en una prueba: agregar ?form=1 al enlace del checkout.
+const isCardHostedOnly = (): boolean => {
+  try { return new URLSearchParams(window.location.search).get("form") !== "1"; } catch { return true; }
 };
 const StripePaymentElementBox = React.lazy(() => import("@/components/checkout/StripePaymentElementBox"));
 import { DLOCAL_COUNTRY_CODES, dlocalNeedsDocument, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";
@@ -607,6 +612,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const stripeAnchorRef = useRef<HTMLDivElement | null>(null);
   const paymentElementMode = useMemo(isPaymentElementMode, []);
   const [peUnavailable, setPeUnavailable] = useState(false);
+  const cardHostedOnly = useMemo(isCardHostedOnly, []);
   // Si el formulario nuevo no carga, se vuelve solo al anterior.
   const peActive = paymentElementMode && !peUnavailable;
   const stripeContainerRef = useRef<HTMLDivElement | null>(null);
@@ -1320,6 +1326,11 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         (await offerUpsellThen(() => { void handleBuyNow(); }))
       ) return;
 
+      if (selected === "card" && cardHostedOnly) {
+        logCheckoutAction("stripe_enlace_pago");
+        await payWithHostedFallback();
+        return;
+      }
       if (["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(selected)) {
         setShowStripe(true); 
         // Force fresh fetch on "Continuar" to handle stale sessions
@@ -2735,7 +2746,36 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
 
-            {isStripeRow && valid && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && peActive && (
+            {isStripeRow && valid && selected === m.id && selectedCardRow === rowKey && selected === "card" && cardHostedOnly && (
+              <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-3 sm:p-4 scroll-mt-24 space-y-3">
+                <p className="text-sm text-neutral-700 dark:text-neutral-200">
+                  {pick(language,
+                    "Te llevamos a la página de pago seguro de Stripe para que ingreses tu tarjeta de crédito o débito. Al terminar vuelves aquí.",
+                    "We take you to Stripe's secure payment page to enter your credit or debit card. When you finish you come back here.",
+                    "Nous vous menons à la page de paiement sécurisée de Stripe pour saisir votre carte. Ensuite, vous revenez ici.",
+                    "Ti portiamo alla pagina di pagamento sicura di Stripe per inserire la carta di credito o debito. Poi torni qui.",
+                    "Levamos você à página de pagamento segura da Stripe para inserir seu cartão. Depois você volta aqui.")}
+                </p>
+                <button
+                  type="button"
+                  disabled={hostedLoading}
+                  onClick={() => {
+                    logCheckoutAction("stripe_enlace_pago");
+                    void captureAbandonedCheckout("card", true);
+                    void payWithHostedFallback();
+                  }}
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-emerald-600 text-base font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {hostedLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
+                  {pick(language, "Pagar con tarjeta", "Pay with card", "Payer par carte", "Paga con carta", "Pagar com cartão")} {finalPriceLabel}
+                </button>
+                <p className="text-center text-[11px] text-neutral-500 dark:text-neutral-400">
+                  {pick(language, "Pago seguro procesado por Stripe", "Secure payment processed by Stripe", "Paiement sécurisé traité par Stripe", "Pagamento sicuro elaborato da Stripe", "Pagamento seguro processado pela Stripe")}
+                </p>
+              </div>
+            )}
+
+            {isStripeRow && valid && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && peActive && !(selected === "card" && cardHostedOnly) && (
               <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-3 sm:p-4 scroll-mt-24">
                 <React.Suspense fallback={null}>
                   <StripePaymentElementBox
@@ -2762,7 +2802,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               </div>
             )}
 
-            {isStripeRow && valid && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && !peActive && (
+            {isStripeRow && valid && selected === m.id && selectedCardRow === rowKey && showStripe && stripePromise && !peActive && !(selected === "card" && cardHostedOnly) && (
               <div ref={stripeAnchorRef} className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 scroll-mt-24">
                 <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
                   {isFallingBackToUsd && (

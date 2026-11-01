@@ -204,16 +204,30 @@ export async function resolveServerPricing(opts: {
     }
   }
 
-  // Descuentos máximos configurados por upsell (para order-bumps).
+  // Productos del carrito (SKU real del catálogo).
+  const cartSkuSet = new Set<string>();
+  for (const item of wanted) {
+    const n = normalizeSku(item.id);
+    const r = (n ? bySku.get(n) : undefined) ?? bySku.get(item.id);
+    if (r) cartSkuSet.add(String(r.sku));
+  }
+
+  // Descuentos configurados por upsell (para order-bumps): maxDiscount = el mayor de cualquier producto;
+  // bundleDiscount = solo si el producto "padre" del upsell también está en el carrito.
   const { data: upsellRows } = await supabase
     .from("product_upsells")
-    .select("upsell_sku, discount_pct")
-    .in("upsell_sku", skus);
+    .select("product_sku, upsell_sku, discount_pct")
+    .in("upsell_sku", Array.from(new Set([...skus, ...cartSkuSet])));
   const maxDiscount = new Map<string, number>();
+  const bundleDiscount = new Map<string, number>();
   for (const r of upsellRows ?? []) {
     const sku = String((r as { upsell_sku: string }).upsell_sku);
-    const pct = Number((r as { discount_pct: number }).discount_pct) || 0;
-    maxDiscount.set(sku, Math.max(maxDiscount.get(sku) ?? 0, Math.min(90, pct)));
+    const parent = String((r as { product_sku: string }).product_sku);
+    const pct = Math.min(90, Number((r as { discount_pct: number }).discount_pct) || 0);
+    maxDiscount.set(sku, Math.max(maxDiscount.get(sku) ?? 0, pct));
+    if (pct > 0 && parent !== sku && cartSkuSet.has(parent)) {
+      bundleDiscount.set(sku, Math.max(bundleDiscount.get(sku) ?? 0, pct));
+    }
   }
 
   const priced: PricedItem[] = [];
@@ -248,6 +262,10 @@ export async function resolveServerPricing(opts: {
       const staticPrice = STATIC_UPSELL_USD[item.id.toLowerCase()];
       const discounted = unit * (1 - pct / 100);
       unit = Math.min(...[discounted, ...(staticPrice ? [staticPrice] : [])]);
+    } else if (bundleDiscount.has(sku)) {
+      // Producto normal ofrecido como upsell (ej. 5,000 Palabras dentro del checkout de Patrones): el descuento se aplica
+      // sobre el MISMO precio regional del producto (LATAM 17, global 25…), solo mientras el producto padre siga en el carrito.
+      unit = unit * (1 - (bundleDiscount.get(sku) ?? 0) / 100);
     }
 
     // Si el navegador mandó un precio IGUAL O MAYOR (el que vio el cliente en

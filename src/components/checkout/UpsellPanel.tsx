@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { Check, Plus, Sparkles, Tag } from "lucide-react";
-import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
+import { useCheckoutPruebaStore, itemPrice, type PruebaItem } from "@/stores/checkoutStore";
 import { useI18n } from "@/i18n/I18nContext";
 import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 import { useLocalOverrides } from "@/lib/livePrices";
@@ -111,8 +111,22 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
     ? items.some((i) => i.id === mainProductId)
     : true;
 
-  const effectivePrice = (u: UpsellItem) =>
-    mainInCart ? u.price : (u.originalPrice ?? u.price);
+  // El upsell parte del MISMO precio que el visitante ve en el producto (LATAM, global o tienda) y sobre ese
+  // precio se aplica el descuento del upsell (ej. 17 USD − 15 % = 14,45 USD), no sobre el precio global.
+  const { tier } = useRegionTier();
+  const originalOf = (u: UpsellItem): number =>
+    u.regionPrices
+      ? itemPrice(
+          { id: u.id, name: u.name, price: u.regionPrices.global, quantity: 1, image: u.image, regionPrices: u.regionPrices } as PruebaItem,
+          tier,
+        )
+      : (u.originalPrice ?? u.price);
+  const bundleOf = (u: UpsellItem): number => {
+    if (!u.regionPrices) return u.price;
+    const pct = u.discountPct ?? 0;
+    return pct > 0 ? Math.round(originalOf(u) * (1 - pct / 100) * 100) / 100 : originalOf(u);
+  };
+  const effectivePrice = (u: UpsellItem) => (mainInCart ? bundleOf(u) : originalOf(u));
 
   // Keep any upsell already in the cart repriced to the effective price so the
   // order total reflects the bundle rule in real time (add/remove main product).
@@ -139,12 +153,12 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
     if (!mainInCart) return 0;
     return upsells.reduce((sum, u) => {
       const added = items.some((i) => i.id === u.id);
-      if (added && u.originalPrice && u.originalPrice > u.price) {
-        return sum + (u.originalPrice - u.price);
+      if (added && originalOf(u) > bundleOf(u)) {
+        return sum + (originalOf(u) - bundleOf(u));
       }
       return sum;
     }, 0);
-  }, [upsells, items, mainInCart]);
+  }, [upsells, items, mainInCart, tier]);
 
   if (!upsells?.length) return null;
 
@@ -167,10 +181,9 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
         {upsells.map((u) => {
           const added = items.some((i) => i.id === u.id);
           const shownPrice = effectivePrice(u);
-          const hasDiscount =
-            mainInCart && !!u.originalPrice && u.originalPrice > u.price;
+          const hasDiscount = mainInCart && originalOf(u) > bundleOf(u);
           const percentOff = hasDiscount
-            ? Math.round(((u.originalPrice! - u.price) / u.originalPrice!) * 100)
+            ? Math.round(((originalOf(u) - bundleOf(u)) / originalOf(u)) * 100)
             : 0;
 
           return (
@@ -263,7 +276,7 @@ export function UpsellPanel({ upsells, mainProductId }: Props) {
               </div>
 
               <div className="text-right shrink-0">
-                {hasDiscount && <Price usd={u.originalPrice!} strike sku={u.id} />}
+                {hasDiscount && <Price usd={originalOf(u)} strike sku={u.id} />}
                 <Price usd={shownPrice} pen={u.pricePen} emphasis added={added} prefix="+" sku={u.id} />
               </div>
             </button>

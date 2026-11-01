@@ -10,7 +10,7 @@ import { fetchStripeQuote } from "@/lib/stripeQuote";
 import { SupportWhatsApp } from "@/components/checkout/SupportWhatsApp";
 import { getOrderRef } from "@/lib/support";
 import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
-import { trackPaymentError } from "@/hooks/useMetaPixel";
+import { trackPaymentError, logCheckoutAction } from "@/hooks/useMetaPixel";
 import { savesCardForFutureUse } from "@/lib/cardSaving";
 
 /**
@@ -70,6 +70,14 @@ interface Props {
   alternatives?: { id: string; title: string }[];
   onPickAlternative?: (id: string) => void;
 }
+
+const HOSTED_COPY: Record<Lang, { hint: string; cta: string }> = {
+  es: { hint: "¿Tu tarjeta da problemas?", cta: "Pagar con enlace de pago seguro de Stripe" },
+  en: { hint: "Card giving you trouble?", cta: "Pay with Stripe's secure payment link" },
+  pt: { hint: "Seu cartão está dando problema?", cta: "Pagar com o link de pagamento seguro da Stripe" },
+  fr: { hint: "Votre carte pose problème ?", cta: "Payer avec le lien de paiement sécurisé Stripe" },
+  it: { hint: "La carta dà problemi?", cta: "Paga con il link di pagamento sicuro di Stripe" },
+};
 
 const DECLINE_CODES = new Set(["card_declined", "insufficient_funds", "expired_card", "3ds_failed", "processing"]);
 
@@ -358,6 +366,21 @@ const Inner = ({
           </>
         )}
       </button>
+
+      {onHostedFallback && (!method || method === "card") && (
+        <div className="text-center">
+          <p className="mb-1.5 text-xs text-muted-foreground">{HOSTED_COPY[lang].hint}</p>
+          <button
+            type="button"
+            disabled={hostedLoading || busy}
+            onClick={() => { logCheckoutAction("stripe_enlace_pago"); onHostedFallback(); }}
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-md border border-emerald-600 bg-white text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-neutral-950 dark:text-emerald-200 dark:hover:bg-emerald-950/30"
+          >
+            {hostedLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
+            {HOSTED_COPY[lang].cta}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

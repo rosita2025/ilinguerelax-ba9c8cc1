@@ -86,6 +86,8 @@ export async function loadCheckoutProduct(adminSku: string): Promise<CheckoutPro
       name: string;
       description: string | null;
       price_usd: number;
+      price_usd_latam?: number | string | null;
+      price_usd_tienda?: number | string | null;
       local_prices: Record<string, number> | null;
       cover_image_url: string | null;
       learner_language: string | null;
@@ -93,7 +95,7 @@ export async function loadCheckoutProduct(adminSku: string): Promise<CheckoutPro
     try {
       const result = await supabase
         .from("digital_products")
-        .select("sku, name, description, price_usd, local_prices, cover_image_url, learner_language")
+        .select("sku, name, description, price_usd, price_usd_latam, price_usd_tienda, local_prices, cover_image_url, learner_language")
         .in("sku", skus)
         .eq("active", true);
       upProducts = (result.data ?? []) as typeof upProducts;
@@ -114,8 +116,19 @@ export async function loadCheckoutProduct(adminSku: string): Promise<CheckoutPro
             ? Math.round(rawPen * (1 - discountPct / 100) * 100) / 100
             : undefined;
         const bust = `?v=${cb}`;
+        // Precio original por región: el upsell parte del mismo precio que el visitante ve en el producto
+        // (LATAM 17, global 25…) y SOBRE ESE precio se aplica el descuento del upsell.
+        const latamRaw = p.price_usd_latam != null && Number(p.price_usd_latam) > 0 ? Number(p.price_usd_latam) : null;
+        const tiendaRaw = p.price_usd_tienda != null && Number(p.price_usd_tienda) > 0 ? Number(p.price_usd_tienda) : null;
+        const regionPrices = {
+          latam: latamRaw ?? original,
+          global: original,
+          tienda: tiendaRaw ?? latamRaw ?? original,
+        };
         return {
           id: p.sku,
+          discountPct,
+          regionPrices,
           name: p.name,
           price,
           pricePen,

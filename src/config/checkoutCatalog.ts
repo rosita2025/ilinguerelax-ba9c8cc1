@@ -11,6 +11,10 @@ export interface UpsellItem {
   image: string;
   description?: string;
   badge?: string;
+  /** Porcentaje de descuento del upsell (admin → product_upsells). */
+  discountPct?: number;
+  /** Precio ORIGINAL del producto por región (USD), antes del descuento: el upsell parte del mismo precio que ve el visitante en el producto. */
+  regionPrices?: { latam: number; global: number; tienda?: number };
 }
 
 export interface CatalogItem extends Omit<PruebaItem, "quantity"> {

@@ -6,6 +6,7 @@ import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
 import { upsertPhysicalShipment } from "../_shared/physicalShipments.ts";
+import { lookupBuyerPhone } from "../_shared/buyerPhone.ts";
 
 // Monedas "sin decimales" según Stripe: el monto que Stripe devuelve para
 // estas YA es la unidad completa (ej. 16460 = ₡16.460), no hay que dividir
@@ -398,7 +399,7 @@ async function handlePaidCheckoutSession(session: any, eventType: string) {
     adminClient,
     customerEmail,
     customerName,
-    customerPhone: session.customer_details?.phone || session.metadata?.customer_phone || undefined,
+    customerPhone: await lookupBuyerPhone(adminClient, customerEmail),
     customerCountry: session.customer_details?.address?.country || session.metadata?.customer_country || undefined,
     purchase,
     orderNumber,
@@ -489,7 +490,7 @@ async function handleSucceededPaymentIntent(paymentIntent: any, eventType: strin
     adminClient,
     customerEmail,
     customerName,
-    customerPhone: metadata.customer_phone || undefined,
+    customerPhone: await lookupBuyerPhone(adminClient, customerEmail),
     customerCountry: metadata.customer_country || undefined,
     purchase,
     orderNumber,

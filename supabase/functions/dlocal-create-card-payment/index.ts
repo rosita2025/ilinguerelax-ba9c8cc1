@@ -106,7 +106,6 @@ Deno.serve(async (req) => {
       usd: String(calculatedUsd),
       ...(pricing.couponCode ? { coupon: pricing.couponCode } : {}),
       ...(pricing.couponPercent ? { coupon_pct: String(pricing.couponPercent) } : {}),
-      ...(body.payerPhone ? { phone: body.payerPhone } : {}),
     });
     const notificationUrl = supabaseUrl
       ? `${supabaseUrl}/functions/v1/dlocal-webhook?${notifyParams.toString()}`
@@ -134,7 +133,6 @@ Deno.serve(async (req) => {
       payer: {
         name: body.payerName.slice(0, 100),
         email: body.payerEmail,
-        ...(body.payerPhone ? { phone: body.payerPhone } : {}),
         ...(body.payerDocument ? { document: body.payerDocument } : {}),
         ...(body.payerAddress ? {
           address: {

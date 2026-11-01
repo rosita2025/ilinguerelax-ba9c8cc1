@@ -150,7 +150,6 @@ Deno.serve(async (req) => {
       source: body.source,
       customer_email: email,
       customer_name: fullName,
-      customer_phone: body.contact.phone ?? "",
       customer_country: country,
       ship_address: "",
       ship_city: "",

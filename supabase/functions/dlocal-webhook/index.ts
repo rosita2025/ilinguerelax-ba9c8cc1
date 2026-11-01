@@ -5,6 +5,7 @@
 const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-csrf, x-admin-2fa", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
+import { lookupBuyerPhone } from "../_shared/buyerPhone.ts";
 import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 import {
@@ -145,7 +146,7 @@ Deno.serve(async (req) => {
     const customerEmail = String(payment.payer?.email || q.get("email") || "").trim().toLowerCase();
     const customerName = String(payment.payer?.name || q.get("name") || customerEmail.split("@")[0] || "Cliente");
     const country = String(payment.country || q.get("country") || "").toUpperCase() || undefined;
-    const phone = q.get("phone") || undefined;
+    const phone = q.get("phone") || (await lookupBuyerPhone(supabase, customerEmail));
     const skus = normalizeSkus(splitSkuList(q.get("skus") ?? ""));
     const summary = q.get("summary") || payment.description || "Producto iLingue Relax";
     const amount = Number(payment.amount ?? q.get("usd") ?? 0) || undefined;

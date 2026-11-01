@@ -170,7 +170,6 @@ Deno.serve(async (req) => {
         skus: deliverySkus,
         customer_email: body.payerEmail ?? "",
         customer_name: body.payerName ?? "",
-        customer_phone: body.payerPhone ?? "",
       },
       // Filtrar tipos según selección del cliente
       payment_methods: {
@@ -192,10 +191,6 @@ Deno.serve(async (req) => {
       if (body.payerEmail) payer.email = body.payerEmail;
       if (nameParts[0]) payer.name = nameParts[0].slice(0, 50);
       if (nameParts.length > 1) payer.surname = nameParts.slice(1).join(" ").slice(0, 50);
-      if (body.payerPhone) {
-        const digits = body.payerPhone.replace(/\D/g, "");
-        if (digits) payer.phone = { area_code: "", number: digits };
-      }
       preferencePayload.payer = payer;
     }
 

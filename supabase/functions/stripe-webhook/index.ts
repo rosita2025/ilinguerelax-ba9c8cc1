@@ -429,7 +429,9 @@ async function handlePaidCheckoutSession(session: any, eventType: string) {
 
 async function handleSucceededPaymentIntent(paymentIntent: any, eventType: string) {
   const metadata = paymentIntent.metadata || {};
-  const isPaymentIntentFlow = metadata.source === "express-checkout" || metadata.source === "payment-element";
+  // "checkout-hosted-fallback" = página de pago de Stripe (Pagar con tarjeta): también se entrega aquí, por si el endpoint no recibe checkout.session.completed.
+  // handlePaidCheckoutSession usa el mismo id de pago, así que si llegan los dos eventos no se duplica nada.
+  const isPaymentIntentFlow = metadata.source === "express-checkout" || metadata.source === "payment-element" || metadata.source === "checkout-hosted-fallback";
   if (metadata.source !== "checkout-prueba-1" && !isPaymentIntentFlow && !metadata.skus) {
     console.log("[stripe-webhook] payment_intent.succeeded ignored; no checkout metadata", { paymentIntentId: paymentIntent.id });
     return { delivered: false, reason: "not_checkout" };

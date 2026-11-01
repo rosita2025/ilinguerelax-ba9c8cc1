@@ -26,9 +26,31 @@ const SITE = "https://www.ilinguerelax.com";
 const API_BASE = "https://api.dlocalgo.com/v1";
 
 const BodySchema = z.object({
-  orderId: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/),
+  orderId: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/).optional(),
+  // Stripe: la página de éxito solo conoce el id de la sesión (cs_…) o del pago (pi_…); el servidor calcula el número de pedido.
+  sessionId: z.string().trim().regex(/^(cs|pi)_[A-Za-z0-9_]{8,200}$/).optional(),
   email: z.string().trim().email().max(160),
-});
+}).refine((b) => b.orderId || b.sessionId, { message: "orderId o sessionId requerido" });
+
+// Número de pedido de Stripe: el mismo que calcula stripe-webhook (últimos 8 caracteres del PaymentIntent).
+async function stripeOrderNumberFromRef(ref: string): Promise<string | null> {
+  try {
+    const { createStripeClient } = await import("../_shared/stripe.ts");
+    for (const env of ["live", "sandbox"] as const) {
+      try {
+        const stripe = createStripeClient(env);
+        const piId = ref.startsWith("cs_")
+          ? String((await stripe.checkout.sessions.retrieve(ref)).payment_intent ?? "")
+          : ref;
+        if (!piId) continue;
+        return `ILR-ST-${piId.slice(-8).toUpperCase()}`;
+      } catch (_) { /* probamos el otro ambiente */ }
+    }
+  } catch (e) {
+    console.warn("[order-delivery] stripe order lookup:", e instanceof Error ? e.message : String(e));
+  }
+  return null;
+}
 
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -129,7 +151,9 @@ Deno.serve(async (req) => {
     const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) return json({ error: "Datos inválidos" }, 400);
 
-    const orderNumber = parsed.data.orderId.toUpperCase();
+    const resolvedStripe = parsed.data.sessionId ? await stripeOrderNumberFromRef(parsed.data.sessionId) : null;
+    const orderNumber = (resolvedStripe ?? parsed.data.orderId ?? "").toUpperCase();
+    if (!orderNumber) return json({ found: false, paid: false, items: [] }, 200);
     const email = canonical(parsed.data.email);
 
     const admin = createClient(
@@ -161,7 +185,7 @@ Deno.serve(async (req) => {
 
     if (owners.size === 0 || !owners.has(email)) {
       console.warn("[order-delivery] acceso denegado", { orderNumber, ip });
-      return json({ found: false, paid: false, items: [] }, 200);
+      return json({ found: false, paid: false, items: [], orderNumber }, 200);
     }
 
     // ---- ¿Está pagado de verdad? ------------------------------------------
@@ -208,7 +232,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (!paid) return json({ found: true, paid: false, items: [] }, 200);
+    if (!paid) return json({ found: true, paid: false, items: [], orderNumber }, 200);
 
     // Customer de Stripe del pago (para el upsell post-compra de 1 clic).
     // La referencia guardada por el webhook es el PaymentIntent (pi_…) o, en
@@ -241,7 +265,7 @@ Deno.serve(async (req) => {
 
     // ---- Enlaces: producto + bonos + upsells del pedido --------------------
     const rawSkus = await skusForOrder(admin, orderNumber, email);
-    if (!rawSkus.length) return json({ found: true, paid: true, items: [], stripeCustomerId }, 200);
+    if (!rawSkus.length) return json({ found: true, paid: true, items: [], stripeCustomerId, orderNumber }, 200);
 
     let skus = normalizeSkus(rawSkus);
     // Alias configurados en admin (digital_products.sku_aliases)
@@ -313,7 +337,7 @@ Deno.serve(async (req) => {
       console.warn("[order-delivery] token:", e instanceof Error ? e.message : String(e));
     }
 
-    return json({ found: true, paid: true, items, downloadUrl, stripeCustomerId });
+    return json({ found: true, paid: true, items, downloadUrl, stripeCustomerId, orderNumber });
 
   } catch (err) {
     console.error("order-delivery error:", err);

@@ -1,16 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Elements, ExpressCheckoutElement, LinkAuthenticationElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { Elements, LinkAuthenticationElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { Loader2, Lock } from "lucide-react";
 import type { StripeExpressCheckoutElementConfirmEvent } from "@stripe/stripe-js";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
-import { isBuyerValid } from "@/components/checkout/BuyerInfoForm";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { fetchStripeQuote } from "@/lib/stripeQuote";
 import { SupportWhatsApp } from "@/components/checkout/SupportWhatsApp";
 import { getOrderRef } from "@/lib/support";
 import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
-import { trackPaymentError, logCheckoutAction } from "@/hooks/useMetaPixel";
+import { trackPaymentError } from "@/hooks/useMetaPixel";
 import { savesCardForFutureUse } from "@/lib/cardSaving";
 
 /**
@@ -71,14 +70,6 @@ interface Props {
   onPickAlternative?: (id: string) => void;
 }
 
-const HOSTED_COPY: Record<Lang, { hint: string; cta: string }> = {
-  es: { hint: "¿Tu tarjeta da problemas?", cta: "Pagar con enlace de pago seguro de Stripe" },
-  en: { hint: "Card giving you trouble?", cta: "Pay with Stripe's secure payment link" },
-  pt: { hint: "Seu cartão está dando problema?", cta: "Pagar com o link de pagamento seguro da Stripe" },
-  fr: { hint: "Votre carte pose problème ?", cta: "Payer avec le lien de paiement sécurisé Stripe" },
-  it: { hint: "La carta dà problemi?", cta: "Paga con il link di pagamento sicuro di Stripe" },
-};
-
 const DECLINE_CODES = new Set(["card_declined", "insufficient_funds", "expired_card", "3ds_failed", "processing"]);
 
 const ALT_COPY: Record<Lang, string> = {
@@ -122,8 +113,6 @@ const Inner = ({
   const [detail, setDetail] = useState<string | null>(null);
   // El banco rechazó la tarjeta: se ofrecen los otros métodos disponibles en el país.
   const [declined, setDeclined] = useState(false);
-  const [tab, setTab] = useState<"card" | "link">("card");
-  const [linkOk, setLinkOk] = useState<boolean | null>(null);
 
   // Si el formulario no carga (error de Stripe o sin respuesta), se vuelve al formulario anterior.
   useEffect(() => {
@@ -230,17 +219,6 @@ const Inner = ({
   const s0 = useCheckoutPruebaStore.getState();
   const buyer = useCheckoutPruebaStore((st) => st.buyer);
   const setBuyer = useCheckoutPruebaStore((st) => st.setBuyer);
-  // Una vez mostrados, los campos se quedan aunque ya sean válidos (no se pierde el foco al escribir).
-  const [needsContact] = useState(() => !isBuyerValid(useCheckoutPruebaStore.getState().buyer));
-  const inputCls = "h-11 w-full rounded-md border border-neutral-300 bg-white px-3 text-base text-neutral-900 outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100";
-  const contactLabels = {
-    es: ["Nombre completo", "Correo electrónico"],
-    en: ["Full name", "Email"],
-    pt: ["Nome completo", "E-mail"],
-    fr: ["Nom complet", "E-mail"],
-    it: ["Nome completo", "E-mail"],
-  }[lang];
-
   return (
     <div className="space-y-3">
       <div className="grid gap-2">
@@ -260,41 +238,7 @@ const Inner = ({
         </div>
       )}
       {currencyToggle}
-      {(!method || method === "card") && (
-        <div role="tablist" aria-label="Método de pago" className="grid grid-cols-2 gap-2">
-          {([["card", { es: "Tarjeta", en: "Card", pt: "Cartão", fr: "Carte", it: "Carta" }[lang]], ["link", "Link"]] as const).map(([id, label]) => (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              aria-selected={tab === id}
-              onClick={() => setTab(id)}
-              className={`h-11 rounded-md border text-sm font-semibold transition ${tab === id ? "border-emerald-600 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200" : "border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"}`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      )}
-      {tab === "link" && (!method || method === "card") && (
-        <div className="space-y-2">
-          <ExpressCheckoutElement
-            options={{
-              buttonHeight: 48,
-              emailRequired: true,
-              paymentMethods: { link: "auto", applePay: "never", googlePay: "never", amazonPay: "never", paypal: "never" },
-            }}
-            onReady={(e) => setLinkOk(!!e.availablePaymentMethods?.link)}
-            onConfirm={(e) => { void runPayment("express-checkout", e); }}
-          />
-          {linkOk === false && (
-            <p className="text-sm text-muted-foreground">
-              {{ es: "Link no está disponible para este pago. Elige Tarjeta.", en: "Link isn't available for this payment. Choose Card.", pt: "O Link não está disponível para este pagamento. Escolha Cartão.", fr: "Link n'est pas disponible pour ce paiement. Choisissez Carte.", it: "Link non è disponibile per questo pagamento. Scegli Carta." }[lang]}
-            </p>
-          )}
-        </div>
-      )}
-      <div className={tab === "link" && (!method || method === "card") ? "hidden" : ready ? "" : "h-0 overflow-hidden opacity-0"}>
+      <div className={ready ? "" : "h-0 overflow-hidden opacity-0"}>
         <PaymentElement
           options={{
             layout: { type: "tabs", defaultCollapsed: false },
@@ -310,17 +254,6 @@ const Inner = ({
           onLoadError={() => onUnavailable?.()}
         />
       </div>
-      <label className={`grid gap-1 text-sm font-medium text-neutral-700 dark:text-neutral-200 ${tab === "link" && (!method || method === "card") ? "hidden" : ""}`}>
-        {{ es: "Nombre en la tarjeta", en: "Name on card", pt: "Nome no cartão", fr: "Nom sur la carte", it: "Nome sulla carta" }[lang]}
-        <input
-          type="text"
-          autoComplete="cc-name"
-          placeholder={contactLabels[0]}
-          value={buyer.fullName}
-          onChange={(e) => setBuyer({ fullName: e.target.value })}
-          className={inputCls}
-        />
-      </label>
 
       {error && (
         <div>
@@ -352,7 +285,6 @@ const Inner = ({
       <button
         type="button"
         onClick={handlePay}
-        hidden={tab === "link" && (!method || method === "card")}
         disabled={!ready || busy || !stripe || refreshing}
         className="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-emerald-600 text-base font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
@@ -367,20 +299,6 @@ const Inner = ({
         )}
       </button>
 
-      {onHostedFallback && (!method || method === "card") && (
-        <div className="text-center">
-          <p className="mb-1.5 text-xs text-muted-foreground">{HOSTED_COPY[lang].hint}</p>
-          <button
-            type="button"
-            disabled={hostedLoading || busy}
-            onClick={() => { logCheckoutAction("stripe_enlace_pago"); onHostedFallback(); }}
-            className="flex h-11 w-full items-center justify-center gap-2 rounded-md border border-emerald-600 bg-white text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-neutral-950 dark:text-emerald-200 dark:hover:bg-emerald-950/30"
-          >
-            {hostedLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
-            {HOSTED_COPY[lang].cta}
-          </button>
-        </div>
-      )}
     </div>
   );
 };

@@ -49,8 +49,8 @@ const isPaymentElementMode = (): boolean => {
   } catch { /* sin URL: usar el valor por defecto */ }
   return PAYMENT_ELEMENT_ENABLED;
 };
-// Tarjeta: se paga solo con el enlace de pago seguro de Stripe (página de Stripe, sin formulario embebido), que da menos
-// rechazos. Para ver el formulario embebido en una prueba: agregar ?form=1 al enlace del checkout.
+// Tarjeta: se paga con "Pagar con tarjeta", que abre la página de pago seguro de Stripe con el correo ya puesto (sin el
+// formulario embebido con Link, que confundía). Para ver el formulario embebido en una prueba: agregar ?form=1 al enlace.
 const isCardHostedOnly = (): boolean => {
   try { return new URLSearchParams(window.location.search).get("form") !== "1"; } catch { return true; }
 };

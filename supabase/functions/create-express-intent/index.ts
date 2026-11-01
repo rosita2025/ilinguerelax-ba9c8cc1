@@ -3,6 +3,7 @@ import { type StripeEnv, createStripeClient } from "../_shared/stripe.ts";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { resolveServerPricing, PricingError, isRestrictedCurrency } from "../_shared/catalogPricing.ts";
 import { localAmountFromUsd } from "../_shared/fxRates.ts";
+import { savesCardForFutureUse } from "../_shared/cardSaving.ts";
 
 /**
  * Stripe EXPRESS CHECKOUT (Apple Pay / Google Pay / Link).
@@ -201,7 +202,7 @@ Deno.serve(async (req) => {
       ...(customerId ? { customer: customerId } : {}),
       receipt_email: email,
       description: `${body.orderRef ? `[${body.orderRef}] ` : ""}${productSummary || "iLingue Relax Digital"}`.slice(0, 300),
-      setup_future_usage: "off_session",
+      ...(savesCardForFutureUse(country) ? { setup_future_usage: "off_session" as const } : {}),
       automatic_payment_methods: {
         enabled: true,
         allow_redirects: body.source === "payment-element" ? "always" : "never",

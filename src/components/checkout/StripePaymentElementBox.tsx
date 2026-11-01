@@ -11,6 +11,7 @@ import { SupportWhatsApp } from "@/components/checkout/SupportWhatsApp";
 import { getOrderRef } from "@/lib/support";
 import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
 import { trackPaymentError } from "@/hooks/useMetaPixel";
+import { savesCardForFutureUse } from "@/lib/cardSaving";
 
 /**
  * Formulario de pago de Stripe estilo "Payment Element": pestañas de método
@@ -476,7 +477,7 @@ export default function StripePaymentElementBox(props: Props) {
         mode: "payment",
         amount: quote.amount,
         currency: quote.currency,
-        ...(props.method && props.method !== "card" ? {} : { setupFutureUsage: "off_session" as const }),
+        ...(props.method && props.method !== "card" || !savesCardForFutureUse(country) ? {} : { setupFutureUsage: "off_session" as const }),
         // Este formulario maneja solo tarjeta de crédito/débito; las billeteras rápidas van arriba.
         // Tarjeta: el pago se crea en el servidor con métodos automáticos, así que el formulario también debe ser automático
         // (si se fijan paymentMethodTypes aquí, Stripe rechaza la confirmación: "cannot be confirmed through the API configured with automatic payment methods").

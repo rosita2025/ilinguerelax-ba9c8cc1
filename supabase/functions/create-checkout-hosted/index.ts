@@ -224,6 +224,9 @@ Deno.serve(async (req) => {
     const session = await stripe.checkout.sessions.create({
       line_items,
       mode: "payment",
+      // Solo tarjeta de crédito/débito (Apple Pay y Google Pay van dentro de "card"). Sin "link" en la lista Stripe no muestra
+      // Link ("Confirma que eres tú" con teléfono) ni otros métodos, que confundían al comprador.
+      payment_method_types: ["card"],
       // CAMBIO 1: sin ui_mode → Stripe usa "hosted" (página completa, no iframe).
       // CAMBIO 2: success_url / cancel_url en vez de return_url.
       success_url: body.returnUrl,

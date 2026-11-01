@@ -102,7 +102,11 @@ export default function CheckoutSuccess() {
   const refTail = rawRef ? rawRef.slice(-6).toUpperCase().padStart(6, "0") : Math.random().toString(36).slice(2, 8).toUpperCase();
   // Con dLocal usamos el número real del pedido (el mismo que conocen el
   // webhook y el historial), no uno derivado del navegador.
-  const orderNumber = dlocalOrder ? dlocalOrder.toUpperCase() : paypalOrder ? paypalOrder.toUpperCase() : `ILR-${providerCode}-${refTail}`;
+  const localOrderNumber = dlocalOrder ? dlocalOrder.toUpperCase() : paypalOrder ? paypalOrder.toUpperCase() : `ILR-${providerCode}-${refTail}`;
+  // Stripe: el número real del pedido lo calcula el servidor a partir del id de la sesión/pago (el mismo que usa el webhook,
+  // el correo, /admin/orders y el evento Purchase de Facebook). Hasta que responda se muestra el provisional.
+  const [serverOrderNumber, setServerOrderNumber] = useState<string | null>(null);
+  const orderNumber = serverOrderNumber || localOrderNumber;
 
   // Gate: only real buyers with an approved payment reference should see the
   // confirmation. A visitor without a valid reference OR without buyer info in
@@ -214,22 +218,39 @@ export default function CheckoutSuccess() {
   // Enlaces de descarga (producto + bonos + upsells). El backend sólo los
   // devuelve si el pedido tiene un pago confirmado; nunca se piden por SKU.
   useEffect(() => {
-    if (!isVerifiedBuyer || !buyer.email || !orderNumber) return;
+    if (!isVerifiedBuyer || !buyer.email || !localOrderNumber) return;
     setDeliveryLoading(true);
-    supabase.functions
-      .invoke("order-delivery", { body: { orderId: orderNumber, email: buyer.email } })
-      .then(({ data, error }) => {
-        if (error) throw error;
-        const deliveredItems = (data?.items ?? []) as DeliveryItem[];
-        setDelivery(deliveredItems);
-        setDownloadUrl((data?.downloadUrl ?? null) as string | null);
-        setStripeCustomerId((data?.stripeCustomerId ?? null) as string | null);
-        // El servidor confirma el pago (paid:true) aunque el pedido no traiga
-        // archivos descargables todavía (p. ej. entrega retenida o solo físico).
-        if (data?.paid === true || deliveredItems.length > 0) setServerVerifiedPaid(true);
-      })
-      .catch((e) => console.error("order-delivery failed", e))
-      .finally(() => setDeliveryLoading(false));
+    let cancelled = false;
+    // El webhook de la pasarela puede tardar unos segundos en registrar el pago: se consulta varias veces antes de rendirse.
+    const MAX_ATTEMPTS = 8;
+    const run = async () => {
+      for (let attempt = 0; attempt < MAX_ATTEMPTS && !cancelled; attempt++) {
+        try {
+          const body: Record<string, unknown> = { email: buyer.email };
+          if (provider === "stripe" && paymentId) body.sessionId = paymentId;
+          else body.orderId = localOrderNumber;
+          const { data, error } = await supabase.functions.invoke("order-delivery", { body });
+          if (error) throw error;
+          if (cancelled) return;
+          if (data?.orderNumber) setServerOrderNumber(String(data.orderNumber));
+          const deliveredItems = (data?.items ?? []) as DeliveryItem[];
+          if (data?.paid === true || deliveredItems.length > 0) {
+            setDelivery(deliveredItems);
+            setDownloadUrl((data?.downloadUrl ?? null) as string | null);
+            setStripeCustomerId((data?.stripeCustomerId ?? null) as string | null);
+            // El servidor confirma el pago (paid:true) aunque el pedido no traiga
+            // archivos descargables todavía (p. ej. entrega retenida o solo físico).
+            setServerVerifiedPaid(true);
+            return;
+          }
+        } catch (e) {
+          console.error("order-delivery failed", e);
+        }
+        await new Promise((r) => setTimeout(r, 2500));
+      }
+    };
+    void run().finally(() => { if (!cancelled) setDeliveryLoading(false); });
+    return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

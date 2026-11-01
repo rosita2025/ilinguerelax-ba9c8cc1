@@ -24,12 +24,12 @@ import { savesCardForFutureUse } from "@/lib/cardSaving";
  * El monto lo calcula el servidor (create-express-intent), nunca el navegador.
  */
 
-const COPY: Record<Lang, { pay: string; paying: string; secure: string; error: string; loading: string; or: string }> = {
-  es: { pay: "Pagar", paying: "Procesando…", secure: "Pago seguro procesado por Stripe", error: "No se pudo completar el pago. Intenta de nuevo.", loading: "Cargando formulario de pago…", or: "o paga con tarjeta" },
-  en: { pay: "Pay", paying: "Processing…", secure: "Secure payment processed by Stripe", error: "The payment could not be completed. Please try again.", loading: "Loading payment form…", or: "or pay with card" },
-  pt: { pay: "Pagar", paying: "Processando…", secure: "Pagamento seguro processado pela Stripe", error: "Não foi possível concluir o pagamento. Tente novamente.", loading: "Carregando formulário de pagamento…", or: "ou pague com cartão" },
-  fr: { pay: "Payer", paying: "Traitement…", secure: "Paiement sécurisé traité par Stripe", error: "Le paiement n'a pas pu être finalisé. Réessaie.", loading: "Chargement du formulaire de paiement…", or: "ou payez par carte" },
-  it: { pay: "Paga", paying: "Elaborazione…", secure: "Pagamento sicuro elaborato da Stripe", error: "Non è stato possibile completare il pagamento. Riprova.", loading: "Caricamento del modulo di pagamento…", or: "o paga con carta" },
+const COPY: Record<Lang, { pay: string; paying: string; secure: string; error: string; loading: string; or: string; linkHint: string }> = {
+  es: { pay: "Pagar", paying: "Procesando…", secure: "Pago seguro procesado por Stripe", error: "No se pudo completar el pago. Intenta de nuevo.", loading: "Cargando formulario de pago…", or: "o paga con tarjeta", linkHint: "Correo electrónico — con Link pagas más rápido con tu tarjeta guardada" },
+  en: { pay: "Pay", paying: "Processing…", secure: "Secure payment processed by Stripe", error: "The payment could not be completed. Please try again.", loading: "Loading payment form…", or: "or pay with card", linkHint: "Email — with Link you pay faster using your saved card" },
+  pt: { pay: "Pagar", paying: "Processando…", secure: "Pagamento seguro processado pela Stripe", error: "Não foi possível concluir o pagamento. Tente novamente.", loading: "Carregando formulário de pagamento…", or: "ou pague com cartão", linkHint: "E-mail — com o Link você paga mais rápido com seu cartão salvo" },
+  fr: { pay: "Payer", paying: "Traitement…", secure: "Paiement sécurisé traité par Stripe", error: "Le paiement n'a pas pu être finalisé. Réessaie.", loading: "Chargement du formulaire de paiement…", or: "ou payez par carte", linkHint: "E-mail — avec Link, payez plus vite avec votre carte enregistrée" },
+  it: { pay: "Paga", paying: "Elaborazione…", secure: "Pagamento sicuro elaborato da Stripe", error: "Non è stato possibile completare il pagamento. Riprova.", loading: "Caricamento del modulo di pagamento…", or: "o paga con carta", linkHint: "E-mail — con Link paghi più in fretta con la carta salvata" },
 };
 
 const ZERO_DECIMAL = new Set(["bif", "clp", "djf", "gnf", "jpy", "kmf", "krw", "mga", "pyg", "rwf", "ugx", "vnd", "vuv", "xaf", "xof", "xpf"]);
@@ -237,6 +237,7 @@ const Inner = ({
     <div className="space-y-3">
       <div className="grid gap-2">
         {/* Como el ejemplo de Stripe: correo arriba; si el cliente ya usó Link, se ofrece su tarjeta guardada. */}
+        <p className="text-sm font-medium text-neutral-700 dark:text-neutral-200">{t.linkHint}</p>
         <LinkAuthenticationElement
           options={{ defaultValues: { email: buyer.email } }}
           onChange={(e) => {
@@ -485,7 +486,8 @@ export default function StripePaymentElementBox(props: Props) {
         // Los métodos locales (Bizum, iDEAL…) sí se crean con su tipo fijo en el servidor.
         ...(props.method && props.method !== "card" ? { paymentMethodTypes: [props.method] } : {}),
         locale,
-        appearance: { theme: "stripe" },
+        // Etiquetas encima de cada campo (Número de tarjeta, Fecha de caducidad, Código de seguridad), como en el ejemplo de Stripe con Link.
+        appearance: { theme: "stripe", labels: "above", variables: { spacingGridRow: "14px" } },
       }}
     >
       <Inner

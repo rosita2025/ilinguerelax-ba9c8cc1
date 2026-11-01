@@ -1729,8 +1729,20 @@ const AdminProductEdit = () => {
             {upsells.length === 0 && <p className="text-sm text-muted-foreground italic">Sin upsells configurados.</p>}
             {upsells.map((u, i) => {
               const target = allProducts.find((p) => p.sku === u.upsell_sku);
+              // Precio original del upsell en cada región y con el descuento (lo mismo que ve y paga el cliente en el checkout).
+              const factor = 1 - Math.max(0, Math.min(90, Number(u.discount_pct) || 0)) / 100;
+              const usd = (n: number) => `$${n.toFixed(2)}`;
+              const penNative = target?.local_prices?.PEN != null && Number(target.local_prices.PEN) > 0 ? Number(target.local_prices.PEN) : null;
+              const priceRows = target
+                ? [
+                    { label: "LATAM", base: Number(target.price_usd_latam ?? target.price_usd) || 0 },
+                    { label: "Global (angloparlantes y Europa)", base: Number(target.price_usd) || 0 },
+                    { label: "Tienda (resto del mundo)", base: Number(target.price_usd_tienda ?? target.price_usd_latam ?? target.price_usd) || 0 },
+                  ]
+                : [];
               return (
-                <div key={i} className="flex items-center gap-2 bg-muted/40 p-3 rounded-lg">
+                <div key={i} className="bg-muted/40 p-3 rounded-lg space-y-2">
+                <div className="flex items-center gap-2">
                   <div className="flex-1">
                     <div className="font-medium text-sm">{target?.name ?? u.upsell_sku}</div>
                     <div className="text-xs text-muted-foreground font-mono">{u.upsell_sku}</div>
@@ -1745,6 +1757,28 @@ const AdminProductEdit = () => {
                   <Button size="sm" variant="ghost" onClick={() => setUpsells((arr) => arr.filter((_, idx) => idx !== i))}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
+                </div>
+                {priceRows.length > 0 && (
+                  <div className="text-xs rounded-md border border-border bg-background overflow-hidden">
+                    <div className="grid grid-cols-[1fr_auto_auto] gap-x-4 px-3 py-1.5 font-semibold text-muted-foreground border-b border-border">
+                      <span>Región</span><span className="text-right">Original</span><span className="text-right">Con {Number(u.discount_pct) || 0}% dscto</span>
+                    </div>
+                    {priceRows.map((r) => (
+                      <div key={r.label} className="grid grid-cols-[1fr_auto_auto] gap-x-4 px-3 py-1">
+                        <span>{r.label}</span>
+                        <span className="text-right line-through text-muted-foreground">{usd(r.base)}</span>
+                        <span className="text-right font-semibold text-emerald-700">{usd(Math.round(r.base * factor * 100) / 100)}</span>
+                      </div>
+                    ))}
+                    {penNative && (
+                      <div className="grid grid-cols-[1fr_auto_auto] gap-x-4 px-3 py-1 border-t border-border">
+                        <span>Perú (soles)</span>
+                        <span className="text-right line-through text-muted-foreground">S/ {penNative.toFixed(2)}</span>
+                        <span className="text-right font-semibold text-emerald-700">S/ {(Math.round(penNative * factor * 100) / 100).toFixed(2)}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
                 </div>
               );
             })}

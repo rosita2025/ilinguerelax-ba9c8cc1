@@ -22,9 +22,8 @@ export function isBuyerValid(buyer: {
   try {
     const nameValid = (buyer.fullName || "").trim().length >= 3;
     const emailValid = checkEmail(buyer.email || "").ok;
-    // El teléfono es opcional: solo se valida si el comprador escribió algo.
-    const phoneTyped = (buyer.phone || "").trim();
-    const phoneValid = phoneTyped.length === 0 || phoneTyped.length >= 7;
+    // El teléfono (WhatsApp) es obligatorio: se usa para seguimiento y soporte. No se envía a Stripe.
+    const phoneValid = (buyer.phone || "").trim().length >= 7;
 
     const basicOk = nameValid && emailValid && phoneValid;
     
@@ -75,7 +74,6 @@ export function BuyerInfoForm() {
   const [localCountry, setLocalCountry] = useState(buyer.country || "");
 
   const [showErrors, setShowErrors] = useState(false);
-  const [showPhoneField, setShowPhoneField] = useState(false);
   const [shake, setShake] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const nameRef = useRef<HTMLInputElement | null>(null);
@@ -144,7 +142,7 @@ export function BuyerInfoForm() {
   const nameInvalid = localName.trim().length < 3;
   const emailCheckResult = useMemo(() => checkEmail(localEmail), [localEmail]);
   const emailInvalid = !emailCheckResult.ok;
-  const phoneInvalid = localPhone.trim().length > 0 && localPhone.trim().length < 7;
+  const phoneInvalid = localPhone.trim().length < 7;
 
   // Aviso informativo: ¿este correo ya compró el producto principal del
   // carrito? Solo informa, nunca bloquea el pago.
@@ -339,21 +337,10 @@ export function BuyerInfoForm() {
           </div>
         )}
 
-        {/* Para productos digitales el teléfono es opcional y la mayoría no
-            lo llena: lo escondemos detrás de un enlace para que el formulario
-            se vea de solo 2 campos (nombre + correo) y asuste menos. */}
-        {!hasPhysicalItems && !showPhoneField && !localPhone ? (
-          <button
-            type="button"
-            onClick={() => setShowPhoneField(true)}
-            className="text-xs text-primary hover:underline font-medium py-2.5 -my-1"
-          >
-            + {t.whatsappOptional}
-          </button>
-        ) : (
+        {/* El teléfono es obligatorio para todos los productos. */}
         <label className="block">
           <span className="text-xs font-medium text-muted-foreground">
-            {t.whatsappOptional}
+            {t.whatsappRequired}
           </span>
           <div className="mt-1 phone-input-wrap">
             <Suspense fallback={<div className="w-full h-[42px] rounded-lg border bg-background" />}>
@@ -373,10 +360,9 @@ export function BuyerInfoForm() {
             </Suspense>
           </div>
           {showPhoneError && (
-            <p className="text-[11px] text-destructive mt-1">If you provide a phone number, it must be at least 7 digits.</p>
+            <p className="text-[11px] text-destructive mt-1">{t.phoneError}</p>
           )}
         </label>
-        )}
 
         {hasPhysicalItems && (
           <div className="space-y-3 pt-3 border-t">

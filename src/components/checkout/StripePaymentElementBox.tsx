@@ -185,7 +185,7 @@ const Inner = ({
         confirmParams: {
           return_url: `${window.location.origin}/checkouts/return?session_id=${encodeURIComponent(data.paymentIntentId)}`,
           ...(source === "payment-element"
-            ? { payment_method_data: { billing_details: { name: name || undefined, email, phone: (s.buyer.phone ?? "").trim() || undefined } } }
+            ? { payment_method_data: { billing_details: { name: name || undefined, email } } }
             : {}),
         },
       });
@@ -291,7 +291,8 @@ const Inner = ({
             layout: { type: "tabs", defaultCollapsed: false },
             // Solo dos opciones: Tarjeta y Link. Apple Pay / Google Pay quedan en "Pago rápido" (arriba de la página).
             wallets: { applePay: "never", googlePay: "never" },
-            // Nombre y correo ya los tenemos arriba: no se vuelven a pedir.
+            // Nombre y correo ya los tenemos arriba: no se vuelven a pedir. El teléfono se guarda en nuestro
+            // sistema (seguimiento por WhatsApp) y NO se envía a Stripe como dato de la tarjeta.
             // phone en "auto": con "never" Stripe exige mandar el teléfono al pagar y lanza IntegrationError si el cliente no lo escribió (la tarjeta no lo pide).
             fields: { billingDetails: { name: "never", email: "never", phone: "auto" } },
             defaultValues: { billingDetails: { email: s0.buyer.email.trim(), name: s0.buyer.fullName.trim() } },

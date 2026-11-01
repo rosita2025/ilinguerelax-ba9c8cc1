@@ -49,10 +49,10 @@ const isPaymentElementMode = (): boolean => {
   } catch { /* sin URL: usar el valor por defecto */ }
   return PAYMENT_ELEMENT_ENABLED;
 };
-// Tarjeta: por defecto se usa el formulario de Stripe con Link (correo + tarjeta/débito). Para probar el pago solo con el
-// enlace de pago seguro de Stripe (página de Stripe, sin formulario embebido): agregar ?hosted=1 al enlace del checkout.
+// Tarjeta: se paga con "Pagar con tarjeta", que abre la página de pago seguro de Stripe con el correo ya puesto (sin el
+// formulario embebido con Link, que confundía). Para ver el formulario embebido en una prueba: agregar ?form=1 al enlace.
 const isCardHostedOnly = (): boolean => {
-  try { return new URLSearchParams(window.location.search).get("hosted") === "1"; } catch { return false; }
+  try { return new URLSearchParams(window.location.search).get("form") !== "1"; } catch { return true; }
 };
 const StripePaymentElementBox = React.lazy(() => import("@/components/checkout/StripePaymentElementBox"));
 import { DLOCAL_COUNTRY_CODES, dlocalNeedsDocument, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";

@@ -2727,6 +2727,16 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     onUnavailable={() => setPeUnavailable(true)}
                     onHostedFallback={payWithHostedFallback}
                     hostedLoading={hostedLoading}
+                    alternatives={methods
+                      .filter((x) => !(x as any).isSeparator && !["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(x.id))
+                      .slice(0, 3)
+                      .map((x) => ({ id: x.id, title: x.title }))}
+                    onPickAlternative={(id) => {
+                      const alt = methods.find((x) => x.id === id);
+                      if (!alt) return;
+                      setSelectedCardRow(`${alt.id}-${alt.title}`);
+                      handleSelect(alt.id);
+                    }}
                   />
                 </React.Suspense>
               </div>

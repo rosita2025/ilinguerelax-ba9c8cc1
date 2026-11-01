@@ -64,7 +64,20 @@ interface Props {
   /** Abre la página completa de Stripe (checkout.stripe.com) como alternativa si el formulario da error. */
   onHostedFallback?: () => void;
   hostedLoading?: boolean;
+  /** Otros métodos del país (PayPal, Mercado Pago, Hotmart…) que se ofrecen si el banco rechaza la tarjeta. */
+  alternatives?: { id: string; title: string }[];
+  onPickAlternative?: (id: string) => void;
 }
+
+const DECLINE_CODES = new Set(["card_declined", "insufficient_funds", "expired_card", "3ds_failed"]);
+
+const ALT_COPY: Record<Lang, string> = {
+  es: "¿Tu banco rechazó la tarjeta? Prueba con otro método:",
+  en: "Did your bank decline the card? Try another method:",
+  pt: "Seu banco recusou o cartão? Tente outro método:",
+  fr: "Ta banque a refusé la carte ? Essaie un autre moyen :",
+  it: "La tua banca ha rifiutato la carta? Prova un altro metodo:",
+};
 
 const Inner = ({
   language,
@@ -77,6 +90,8 @@ const Inner = ({
   onUnavailable,
   onHostedFallback,
   hostedLoading,
+  alternatives,
+  onPickAlternative,
   refreshing,
   currencyToggle,
 }: Omit<Props, "currency"> & { quote: Quote; refreshing?: boolean; currencyToggle?: React.ReactNode }) => {
@@ -95,6 +110,8 @@ const Inner = ({
   const [error, setError] = useState<string | null>(null);
   // Detalle técnico (código de Stripe / de la función) para poder diagnosticar el error real.
   const [detail, setDetail] = useState<string | null>(null);
+  // El banco rechazó la tarjeta: se ofrecen los otros métodos disponibles en el país.
+  const [declined, setDeclined] = useState(false);
   const [tab, setTab] = useState<"card" | "link">("card");
   const [linkOk, setLinkOk] = useState<boolean | null>(null);
 
@@ -114,6 +131,7 @@ const Inner = ({
     }
     setBusy(true);
     setError(null);
+    setDeclined(false);
     try {
       const { error: submitError } = await elements.submit();
       if (submitError) {
@@ -174,6 +192,7 @@ const Inner = ({
         console.error("[payment-element] confirm failed", confirmError);
         setDetail([confirmError.type, confirmError.code, confirmError.decline_code, confirmError.message].filter(Boolean).join(" · ").slice(0, 200));
         const mapped = mapStripeError(confirmError, lang);
+        setDeclined(DECLINE_CODES.has(mapped.code));
         // Si no reconocemos el error, se muestra el mensaje real de Stripe en vez de uno genérico.
         setError(mapped.code === "unknown" ? confirmError.message || mapped.message || t.error : mapped.message || confirmError.message || t.error);
       }
@@ -288,6 +307,23 @@ const Inner = ({
             {error}
           </p>
           {detail && <p className="mt-1 break-words text-[11px] text-muted-foreground">Ref: {detail}</p>}
+          {declined && alternatives && alternatives.length > 0 && onPickAlternative && (
+            <div className="mt-2 rounded-lg border border-neutral-200 bg-neutral-50 p-2.5 dark:border-neutral-700 dark:bg-neutral-900">
+              <p className="mb-2 text-xs font-semibold text-neutral-700 dark:text-neutral-200">{ALT_COPY[lang]}</p>
+              <div className="flex flex-wrap gap-2">
+                {alternatives.map((a) => (
+                  <button
+                    key={a.id}
+                    type="button"
+                    onClick={() => onPickAlternative(a.id)}
+                    className="rounded-md border border-emerald-600 bg-white px-3 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50 dark:bg-neutral-950 dark:text-emerald-200 dark:hover:bg-emerald-950/30"
+                  >
+                    {a.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <SupportWhatsApp variant="error" language={lang} country={country} method={method === "card" ? "card" : method} amountLabel={formatMinor(quote.amount, quote.currency, language)} error={detail ? `${error} (${detail})` : error} />
         </div>
       )}
@@ -450,6 +486,8 @@ export default function StripePaymentElementBox(props: Props) {
         onUnavailable={props.onUnavailable}
         onHostedFallback={props.onHostedFallback}
         hostedLoading={props.hostedLoading}
+        alternatives={props.alternatives}
+        onPickAlternative={props.onPickAlternative}
         refreshing={refreshing}
         currencyToggle={currencyToggle}
         quote={quote}

@@ -15,12 +15,12 @@ const COPY: Record<string, { label: string; reserved: string; expired: string }>
   es: {
     label: "10% OFF con el código",
     reserved: "reservado por",
-    expired: "Oferta expirada — recarga la página para ver el precio actual",
+    expired: "Oferta expirada — este es el precio actual",
   },
   en: {
     label: "10% OFF with code",
     reserved: "reserved for",
-    expired: "Offer expired — reload the page to see the current price",
+    expired: "Offer expired — this is the current price",
   },
 };
 
@@ -36,7 +36,7 @@ function formatTime(totalSeconds: number): string {
  * dice "se acaba el stock" (eso sería manipulador, el producto es digital
  * e ilimitado) — dice que el DESCUENTO está reservado por tiempo limitado,
  * que sí es cierto: el temporizador es real y no se reinicia si recargas
- * la página (usa localStorage con la hora de inicio real de esta visita).
+ * la página (usa sessionStorage con la hora de inicio real de esta visita).
  */
 export function UrgencyTimerBar({ productSlug, language = "es" }: Props) {
   const applyCoupon = useCheckoutPruebaStore((s) => s.applyCoupon);
@@ -45,10 +45,16 @@ export function UrgencyTimerBar({ productSlug, language = "es" }: Props) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    let startedAt = Number(localStorage.getItem(storageKey));
+    // La cuenta regresiva es por visita (sessionStorage): sobrevive a recargar la página pero quien vuelve otro
+    // día ve una cuenta nueva y el código, no un "Oferta expirada" fijo. Un valor viejo de localStorage se descarta.
+    let startedAt = 0;
+    try {
+      localStorage.removeItem(storageKey);
+      startedAt = Number(sessionStorage.getItem(storageKey));
+    } catch { /* sin almacenamiento: la cuenta empieza ahora */ }
     if (!startedAt) {
       startedAt = Date.now();
-      localStorage.setItem(storageKey, String(startedAt));
+      try { sessionStorage.setItem(storageKey, String(startedAt)); } catch { /* sin almacenamiento */ }
     }
 
     const tick = () => {

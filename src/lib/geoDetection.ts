@@ -110,7 +110,10 @@ export async function detectCountryByIp(options: {
     if (w.__ilrGeo) {
       const early = w.__ilrGeo;
       w.__ilrGeo = null;
-      const code = cleanCountryCode(PROVIDERS[0].parse(await early));
+      // Con conexión lenta la respuesta adelantada puede no llegar nunca: se espera como máximo `timeoutMs`
+      // y luego se sigue con el flujo normal (otros proveedores / zona horaria).
+      const data = await Promise.race([early, new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs))]);
+      const code = data ? cleanCountryCode(PROVIDERS[0].parse(data)) : null;
       if (code) return { countryCode: code, source: "ip", provider: "ipapi" };
     }
   } catch { /* si falla, se sigue con el flujo normal */ }

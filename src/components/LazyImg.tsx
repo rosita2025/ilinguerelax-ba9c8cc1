@@ -14,9 +14,11 @@ type Props = Omit<ImgHTMLAttributes<HTMLImageElement>, "loading"> & {
   wrapperClassName?: string;
   /** Alto reservado mientras la imagen no ha bajado (evita saltos de diseño). */
   minHeight?: number;
+  /** Descarga de inmediato (para imágenes fuera de pantalla que se verán enseguida, como la siguiente de un carrusel). */
+  eager?: boolean;
 };
 
-export function LazyImg({ src, alt, rootMargin = "300px", wrapperClassName = "block", minHeight, onLoad, onError, ...rest }: Props) {
+export function LazyImg({ src, alt, rootMargin = "300px", wrapperClassName = "block", minHeight, eager = false, onLoad, onError, ...rest }: Props) {
   const ref = useRef<HTMLSpanElement>(null);
   const [show, setShow] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -25,7 +27,7 @@ export function LazyImg({ src, alt, rootMargin = "300px", wrapperClassName = "bl
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (typeof IntersectionObserver === "undefined") {
+    if (eager || typeof IntersectionObserver === "undefined") {
       setShow(true);
       return;
     }
@@ -40,7 +42,7 @@ export function LazyImg({ src, alt, rootMargin = "300px", wrapperClassName = "bl
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [rootMargin]);
+  }, [rootMargin, eager]);
 
   // Mientras baja (o si el CDN falla una vez) se ve un fondo suave en vez de un hueco en blanco;
   // si falla, reintenta hasta 2 veces con una pequeña espera.

@@ -8,6 +8,7 @@ import { normalizeSkus, splitSkuList } from "../_shared/digitalSku.ts";
 import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
 import { invokeInternalFunction } from "../_shared/invokeInternal.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
+import { lookupBuyerPhone } from "../_shared/buyerPhone.ts";
 
 const encoder = new TextEncoder();
 
@@ -219,6 +220,7 @@ Deno.serve(async (req) => {
       case "payment": {
         const payment = await fetchPayment(dataId);
         const payerEmail = payment.metadata?.customer_email || payment.payer?.email;
+        const buyerPhone = await lookupBuyerPhone(supabase, payerEmail || payment.payer?.email);
         const payerName = [payment.payer?.first_name, payment.payer?.last_name].filter(Boolean).join(" ") || payment.metadata?.customer_name || payerEmail?.split("@")[0] || null;
         
         logged = {
@@ -246,7 +248,7 @@ Deno.serve(async (req) => {
             payer_email: payment.payer?.email || payment.metadata?.customer_email,
             customer_email: payment.payer?.email || payment.metadata?.customer_email,
             customer_name: payment.metadata?.customer_name,
-            customer_phone: payment.metadata?.customer_phone,
+            customer_phone: buyerPhone ?? null,
             preference_id: payment.metadata?.preference_id,
             external_reference: payment.external_reference,
             items_summary: payment.metadata?.items_summary || payment.description,
@@ -311,9 +313,10 @@ Deno.serve(async (req) => {
                 templateData: {
                   ...templateData,
                   customerEmail: pendingEmail,
-                  customerWhatsapp: payment.payer?.phone
-                    ? `${payment.payer.phone.area_code || ""}${payment.payer.phone.number || ""}`
-                    : "",
+                  customerWhatsapp: buyerPhone
+                    || (payment.payer?.phone
+                      ? `${payment.payer.phone.area_code || ""}${payment.payer.phone.number || ""}`
+                      : ""),
                   country: payment.payer?.address?.country_id || "",
                 },
               },
@@ -368,7 +371,7 @@ Deno.serve(async (req) => {
             await sendThankYouEmail({
               customerEmail: pendingEmail,
               customerName,
-              customerPhone: payment.metadata?.customer_phone || undefined,
+              customerPhone: buyerPhone || undefined,
               customerCountry: payment.payer?.address?.country_id || undefined,
               productName: payment.metadata?.items_summary || payment.description || "Producto iLingue Relax",
               skus: skusForDelivery,
@@ -389,7 +392,7 @@ Deno.serve(async (req) => {
               const { error: digitalErr } = await invokeInternalFunction("send-digital-ilinguerelax", {
                 customerEmail: pendingEmail,
                 customerName,
-                customerPhone: payment.metadata?.customer_phone || undefined,
+                customerPhone: buyerPhone || undefined,
                 customerCountry: payment.payer?.address?.country_id || undefined,
                 orderId: orderNumber,
                 skus,

@@ -142,6 +142,8 @@ const pick = (language: string, es: string, en: string, fr: string, it: string, 
   language === "en" ? en : language === "fr" ? fr : language === "it" ? it : language === "pt" ? pt : es;
 
 // Europa: no se ofrece Hotmart (en Europa se paga con Stripe: tarjeta, billeteras y métodos locales).
+// Klarna en el formulario de pago: EE. UU. (USD) y estos 10 países del euro. Mantener igual que KLARNA_EUR en create-express-intent.
+const KLARNA_COUNTRIES = new Set(["US", "AT", "BE", "DE", "ES", "FI", "FR", "IE", "IT", "NL", "PT"]);
 const HOSTED_ALT_ID = "__hosted_link";
 const EUROPE_COUNTRIES = new Set(["AL","AD","AT","BA","BE","BG","BY","CH","CY","CZ","DE","DK","EE","ES","FI","FR","GB","GR","HR","HU","IE","IS","IT","LI","LT","LU","LV","MC","MD","ME","MK","MT","NL","NO","PL","PT","RO","RS","SE","SI","SK","SM","UA","VA","XK"]);
 
@@ -2219,7 +2221,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         if (m.id === "stripe_ideal") return methodsConfig.stripeIdeal && country === "NL"; // iDEAL: solo Países Bajos
         if (m.id === "stripe_mbway") return methodsConfig.stripeMbway && country === "PT"; // MB WAY: solo Portugal
         if (m.id === "stripe_crypto") return methodsConfig.stripeCrypto && (EUROPE_COUNTRIES.has(country) || country === "US"); // Stablecoins: Europa y EE. UU. (se cobra en USD)
-        if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna && !LATAM_COUNTRIES.has(country); // Klarna no opera en Latinoamérica
+        if (m.id === "stripe_klarna") return methodsConfig.stripeKlarna && KLARNA_COUNTRIES.has(country); // Solo donde el formulario de pago lo acepta (igual que create-express-intent)
         
         // Rails locales de Perú (transferencia BCP/Interbank, efectivo, Yape/Plin)
         // SOLO deben verse desde Perú. Un comprador en México no puede pagar a

@@ -142,6 +142,7 @@ const pick = (language: string, es: string, en: string, fr: string, it: string, 
   language === "en" ? en : language === "fr" ? fr : language === "it" ? it : language === "pt" ? pt : es;
 
 // Europa: no se ofrece Hotmart (en Europa se paga con Stripe: tarjeta, billeteras y métodos locales).
+const HOSTED_ALT_ID = "__hosted_link";
 const EUROPE_COUNTRIES = new Set(["AL","AD","AT","BA","BE","BG","BY","CH","CY","CZ","DE","DK","EE","ES","FI","FR","GB","GR","HR","HU","IE","IS","IT","LI","LT","LU","LV","MC","MD","ME","MK","MT","NL","NO","PL","PT","RO","RS","SE","SI","SK","SM","UA","VA","XK"]);
 
 const LATAM_COUNTRIES = new Set(["AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV", "GT", "HN", "MX", "NI", "PA", "PE", "PY", "PR", "UY", "VE"]);
@@ -2281,6 +2282,25 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   );
   const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(m.id));
 
+  // Si el banco rechaza la tarjeta se ofrecen otras opciones según el país:
+  // LATAM → dLocal primero; Europa → enlace de pago seguro de Stripe y PayPal; resto → PayPal y enlace.
+  const stripeAlternatives = (() => {
+    const isLatamDlocal = !!getDlocalCountry(country);
+    const isEurope = EUROPE_COUNTRIES.has(country);
+    const hostedTitle = ({ es: "Enlace de pago seguro", en: "Secure payment link", pt: "Link de pagamento seguro", fr: "Lien de paiement sécurisé", it: "Link di pagamento sicuro" } as Record<string, string>)[language] ?? "Secure payment link";
+    const order = (id: string): number => {
+      if (isLatamDlocal) return ({ dlocal_card: 0, dlocal_wallet: 1, dlocal_transfer: 2, dlocal_cash: 3, paypal: 4, [HOSTED_ALT_ID]: 5, hotmart: 6 } as Record<string, number>)[id] ?? 7;
+      if (isEurope) return ({ [HOSTED_ALT_ID]: 0, paypal: 1 } as Record<string, number>)[id] ?? 5;
+      return ({ paypal: 0, [HOSTED_ALT_ID]: 1, hotmart: 2 } as Record<string, number>)[id] ?? 5;
+    };
+    const stripeIds = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"];
+    return [
+      ...methods.filter((x) => !(x as any).isSeparator && !stripeIds.includes(x.id)).map((x) => ({ id: x.id as string, title: x.title })),
+      { id: HOSTED_ALT_ID, title: hostedTitle },
+    ]
+      .sort((a, b) => order(a.id) - order(b.id))
+      .slice(0, 4);
+  })();
 
 
 
@@ -2727,11 +2747,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     onUnavailable={() => setPeUnavailable(true)}
                     onHostedFallback={payWithHostedFallback}
                     hostedLoading={hostedLoading}
-                    alternatives={methods
-                      .filter((x) => !(x as any).isSeparator && !["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(x.id))
-                      .slice(0, 3)
-                      .map((x) => ({ id: x.id, title: x.title }))}
+                    alternatives={stripeAlternatives}
                     onPickAlternative={(id) => {
+                      if (id === HOSTED_ALT_ID) { void payWithHostedFallback(); return; }
                       const alt = methods.find((x) => x.id === id);
                       if (!alt) return;
                       setSelectedCardRow(`${alt.id}-${alt.title}`);

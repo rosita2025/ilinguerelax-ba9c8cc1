@@ -10,6 +10,7 @@ import { fetchStripeQuote } from "@/lib/stripeQuote";
 import { SupportWhatsApp } from "@/components/checkout/SupportWhatsApp";
 import { getOrderRef } from "@/lib/support";
 import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
+import { trackPaymentError } from "@/hooks/useMetaPixel";
 
 /**
  * Formulario de pago de Stripe estilo "Payment Element": pestañas de método
@@ -69,7 +70,7 @@ interface Props {
   onPickAlternative?: (id: string) => void;
 }
 
-const DECLINE_CODES = new Set(["card_declined", "insufficient_funds", "expired_card", "3ds_failed"]);
+const DECLINE_CODES = new Set(["card_declined", "insufficient_funds", "expired_card", "3ds_failed", "processing"]);
 
 const ALT_COPY: Record<Lang, string> = {
   es: "¿Tu banco rechazó la tarjeta? Prueba con otro método:",
@@ -172,6 +173,7 @@ const Inner = ({
         const fe = fnError as { edgeDetail?: string; status?: number; message?: string } | null;
         const dd = data as { reason?: string; error?: string } | null;
         setDetail([fe?.status, dd?.reason, dd?.error, fe?.edgeDetail || fe?.message].filter(Boolean).join(" · ").slice(0, 200) || "create-intent");
+        trackPaymentError({ skus: s.items.map((i) => i.id), provider: "stripe", reason: `create_intent · ${country} · ${[fe?.status, dd?.reason, dd?.error, fe?.edgeDetail || fe?.message].filter(Boolean).join(" · ")}`, value: ZERO_DECIMAL.has(quote.currency.toLowerCase()) ? quote.amount : quote.amount / 100, currency: quote.currency });
         setError(mapStripeError(fnError, lang).message || t.error);
         return;
       }
@@ -193,6 +195,14 @@ const Inner = ({
         setDetail([confirmError.type, confirmError.code, confirmError.decline_code, confirmError.message].filter(Boolean).join(" · ").slice(0, 200));
         const mapped = mapStripeError(confirmError, lang);
         setDeclined(DECLINE_CODES.has(mapped.code));
+        // Se guarda el motivo real (código del banco/Stripe) y el ID del pago para verlo en /admin/payment-errors.
+        trackPaymentError({
+          skus: s.items.map((i) => i.id),
+          provider: "stripe",
+          reason: [confirmError.decline_code || confirmError.code || confirmError.type, country, data.paymentIntentId, confirmError.message].filter(Boolean).join(" · "),
+          value: ZERO_DECIMAL.has(quote.currency.toLowerCase()) ? quote.amount : quote.amount / 100,
+          currency: quote.currency,
+        });
         // Si no reconocemos el error, se muestra el mensaje real de Stripe en vez de uno genérico.
         setError(mapped.code === "unknown" ? confirmError.message || mapped.message || t.error : mapped.message || confirmError.message || t.error);
       }

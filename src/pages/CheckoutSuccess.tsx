@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { savesCardForFutureUse } from "@/lib/cardSaving";
 import { useSearchParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { CheckCircle2, Mail, MessageCircle, ShoppingBag, Package, Download, Gift } from "lucide-react";
@@ -240,6 +241,9 @@ export default function CheckoutSuccess() {
 
   useEffect(() => {
     if (!stripeCustomerId || delivery.length === 0) return;
+    // En Europa y LATAM la tarjeta no se guarda, así que no hay upsell de 1 clic que ofrecer.
+    const buyerCountry = buyer.country || (() => { try { return localStorage.getItem("ilr_country") || ""; } catch { return ""; } })();
+    if (buyerCountry && !savesCardForFutureUse(buyerCountry)) return;
     const mainSku = delivery[0]?.sku;
     if (!mainSku) return;
     const purchased = new Set(delivery.map((d) => d.sku.toLowerCase()));

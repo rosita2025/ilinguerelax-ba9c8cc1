@@ -10,6 +10,8 @@ import { fetchStripeQuote } from "@/lib/stripeQuote";
 import { SupportWhatsApp } from "@/components/checkout/SupportWhatsApp";
 import { getOrderRef } from "@/lib/support";
 import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
+import { trackPaymentError } from "@/hooks/useMetaPixel";
+import { savesCardForFutureUse } from "@/lib/cardSaving";
 
 /**
  * Formulario de pago de Stripe estilo "Payment Element": pestañas de método
@@ -64,7 +66,20 @@ interface Props {
   /** Abre la página completa de Stripe (checkout.stripe.com) como alternativa si el formulario da error. */
   onHostedFallback?: () => void;
   hostedLoading?: boolean;
+  /** Otros métodos del país (PayPal, Mercado Pago, Hotmart…) que se ofrecen si el banco rechaza la tarjeta. */
+  alternatives?: { id: string; title: string }[];
+  onPickAlternative?: (id: string) => void;
 }
+
+const DECLINE_CODES = new Set(["card_declined", "insufficient_funds", "expired_card", "3ds_failed", "processing"]);
+
+const ALT_COPY: Record<Lang, string> = {
+  es: "¿Tu banco rechazó la tarjeta? Prueba con otro método:",
+  en: "Did your bank decline the card? Try another method:",
+  pt: "Seu banco recusou o cartão? Tente outro método:",
+  fr: "Ta banque a refusé la carte ? Essaie un autre moyen :",
+  it: "La tua banca ha rifiutato la carta? Prova un altro metodo:",
+};
 
 const Inner = ({
   language,
@@ -77,6 +92,8 @@ const Inner = ({
   onUnavailable,
   onHostedFallback,
   hostedLoading,
+  alternatives,
+  onPickAlternative,
   refreshing,
   currencyToggle,
 }: Omit<Props, "currency"> & { quote: Quote; refreshing?: boolean; currencyToggle?: React.ReactNode }) => {
@@ -95,6 +112,8 @@ const Inner = ({
   const [error, setError] = useState<string | null>(null);
   // Detalle técnico (código de Stripe / de la función) para poder diagnosticar el error real.
   const [detail, setDetail] = useState<string | null>(null);
+  // El banco rechazó la tarjeta: se ofrecen los otros métodos disponibles en el país.
+  const [declined, setDeclined] = useState(false);
   const [tab, setTab] = useState<"card" | "link">("card");
   const [linkOk, setLinkOk] = useState<boolean | null>(null);
 
@@ -114,6 +133,7 @@ const Inner = ({
     }
     setBusy(true);
     setError(null);
+    setDeclined(false);
     try {
       const { error: submitError } = await elements.submit();
       if (submitError) {
@@ -154,6 +174,7 @@ const Inner = ({
         const fe = fnError as { edgeDetail?: string; status?: number; message?: string } | null;
         const dd = data as { reason?: string; error?: string } | null;
         setDetail([fe?.status, dd?.reason, dd?.error, fe?.edgeDetail || fe?.message].filter(Boolean).join(" · ").slice(0, 200) || "create-intent");
+        trackPaymentError({ skus: s.items.map((i) => i.id), provider: "stripe", reason: `create_intent · ${country} · ${[fe?.status, dd?.reason, dd?.error, fe?.edgeDetail || fe?.message].filter(Boolean).join(" · ")}`, value: ZERO_DECIMAL.has(quote.currency.toLowerCase()) ? quote.amount : quote.amount / 100, currency: quote.currency });
         setError(mapStripeError(fnError, lang).message || t.error);
         return;
       }
@@ -164,7 +185,7 @@ const Inner = ({
         confirmParams: {
           return_url: `${window.location.origin}/checkouts/return?session_id=${encodeURIComponent(data.paymentIntentId)}`,
           ...(source === "payment-element"
-            ? { payment_method_data: { billing_details: { name: name || undefined, email, phone: (s.buyer.phone ?? "").trim() || undefined } } }
+            ? { payment_method_data: { billing_details: { name: name || undefined, email } } }
             : {}),
         },
       });
@@ -174,6 +195,15 @@ const Inner = ({
         console.error("[payment-element] confirm failed", confirmError);
         setDetail([confirmError.type, confirmError.code, confirmError.decline_code, confirmError.message].filter(Boolean).join(" · ").slice(0, 200));
         const mapped = mapStripeError(confirmError, lang);
+        setDeclined(DECLINE_CODES.has(mapped.code));
+        // Se guarda el motivo real (código del banco/Stripe) y el ID del pago para verlo en /admin/payment-errors.
+        trackPaymentError({
+          skus: s.items.map((i) => i.id),
+          provider: "stripe",
+          reason: [confirmError.decline_code || confirmError.code || confirmError.type, country, data.paymentIntentId, confirmError.message].filter(Boolean).join(" · "),
+          value: ZERO_DECIMAL.has(quote.currency.toLowerCase()) ? quote.amount : quote.amount / 100,
+          currency: quote.currency,
+        });
         // Si no reconocemos el error, se muestra el mensaje real de Stripe en vez de uno genérico.
         setError(mapped.code === "unknown" ? confirmError.message || mapped.message || t.error : mapped.message || confirmError.message || t.error);
       }
@@ -261,7 +291,8 @@ const Inner = ({
             layout: { type: "tabs", defaultCollapsed: false },
             // Solo dos opciones: Tarjeta y Link. Apple Pay / Google Pay quedan en "Pago rápido" (arriba de la página).
             wallets: { applePay: "never", googlePay: "never" },
-            // Nombre y correo ya los tenemos arriba: no se vuelven a pedir.
+            // Nombre y correo ya los tenemos arriba: no se vuelven a pedir. El teléfono se guarda en nuestro
+            // sistema (seguimiento por WhatsApp) y NO se envía a Stripe como dato de la tarjeta.
             // phone en "auto": con "never" Stripe exige mandar el teléfono al pagar y lanza IntegrationError si el cliente no lo escribió (la tarjeta no lo pide).
             fields: { billingDetails: { name: "never", email: "never", phone: "auto" } },
             defaultValues: { billingDetails: { email: s0.buyer.email.trim(), name: s0.buyer.fullName.trim() } },
@@ -288,6 +319,23 @@ const Inner = ({
             {error}
           </p>
           {detail && <p className="mt-1 break-words text-[11px] text-muted-foreground">Ref: {detail}</p>}
+          {declined && alternatives && alternatives.length > 0 && onPickAlternative && (
+            <div className="mt-2 rounded-lg border border-neutral-200 bg-neutral-50 p-2.5 dark:border-neutral-700 dark:bg-neutral-900">
+              <p className="mb-2 text-xs font-semibold text-neutral-700 dark:text-neutral-200">{ALT_COPY[lang]}</p>
+              <div className="flex flex-wrap gap-2">
+                {alternatives.map((a) => (
+                  <button
+                    key={a.id}
+                    type="button"
+                    onClick={() => onPickAlternative(a.id)}
+                    className="rounded-md border border-emerald-600 bg-white px-3 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50 dark:bg-neutral-950 dark:text-emerald-200 dark:hover:bg-emerald-950/30"
+                  >
+                    {a.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <SupportWhatsApp variant="error" language={lang} country={country} method={method === "card" ? "card" : method} amountLabel={formatMinor(quote.amount, quote.currency, language)} error={detail ? `${error} (${detail})` : error} />
         </div>
       )}
@@ -430,7 +478,7 @@ export default function StripePaymentElementBox(props: Props) {
         mode: "payment",
         amount: quote.amount,
         currency: quote.currency,
-        ...(props.method && props.method !== "card" ? {} : { setupFutureUsage: "off_session" as const }),
+        ...(props.method && props.method !== "card" || !savesCardForFutureUse(country) ? {} : { setupFutureUsage: "off_session" as const }),
         // Este formulario maneja solo tarjeta de crédito/débito; las billeteras rápidas van arriba.
         // Tarjeta: el pago se crea en el servidor con métodos automáticos, así que el formulario también debe ser automático
         // (si se fijan paymentMethodTypes aquí, Stripe rechaza la confirmación: "cannot be confirmed through the API configured with automatic payment methods").
@@ -450,6 +498,8 @@ export default function StripePaymentElementBox(props: Props) {
         onUnavailable={props.onUnavailable}
         onHostedFallback={props.onHostedFallback}
         hostedLoading={props.hostedLoading}
+        alternatives={props.alternatives}
+        onPickAlternative={props.onPickAlternative}
         refreshing={refreshing}
         currencyToggle={currencyToggle}
         quote={quote}

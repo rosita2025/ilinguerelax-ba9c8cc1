@@ -23,6 +23,8 @@ export interface CheckoutUIStrings {
   emailError: string;
   emailHint: string;
   whatsappOptional: string;
+  whatsappRequired: string;
+  phoneError: string;
   shippingAddress: string;
   addressPlaceholder: string;
   city: string;
@@ -140,6 +142,8 @@ const es: CheckoutUIStrings = {
   emailError: "Ingresa un correo válido.",
   emailHint: "Aquí enviaremos tu acceso al producto digital.",
   whatsappOptional: "WhatsApp (opcional)",
+  whatsappRequired: "WhatsApp / teléfono *",
+  phoneError: "Ingresa tu número de WhatsApp (mínimo 7 dígitos).",
   shippingAddress: "Dirección de envío",
   addressPlaceholder: "Calle, número, departamento...",
   city: "Ciudad",
@@ -253,6 +257,8 @@ const en: CheckoutUIStrings = {
   emailError: "Please enter a valid email.",
   emailHint: "Your digital access will be sent here immediately.",
   whatsappOptional: "WhatsApp (optional)",
+  whatsappRequired: "WhatsApp / phone *",
+  phoneError: "Enter your WhatsApp number (at least 7 digits).",
   shippingAddress: "Shipping Address",
   addressPlaceholder: "Street, number, apartment...",
   city: "City",
@@ -366,6 +372,8 @@ const pt: CheckoutUIStrings = {
   emailError: "Digite um e-mail válido.",
   emailHint: "Aqui enviaremos seu acesso ao produto digital.",
   whatsappOptional: "WhatsApp (opcional)",
+  whatsappRequired: "WhatsApp / telefone *",
+  phoneError: "Digite seu número de WhatsApp (mínimo 7 dígitos).",
   shippingAddress: "Endereço de entrega",
   addressPlaceholder: "Rua, número, apartamento...",
   city: "Cidade",
@@ -479,6 +487,8 @@ const fr: CheckoutUIStrings = {
   emailError: "Veuillez saisir un e-mail valide.",
   emailHint: "Nous vous enverrons l'accès au produit ici.",
   whatsappOptional: "WhatsApp (facultatif)",
+  whatsappRequired: "WhatsApp / téléphone *",
+  phoneError: "Saisis ton numéro WhatsApp (7 chiffres minimum).",
   shippingAddress: "Adresse de livraison",
   addressPlaceholder: "Rue, numéro, appartement...",
   city: "Ville",
@@ -592,6 +602,8 @@ const it: CheckoutUIStrings = {
   emailError: "Inserisci un'email valida.",
   emailHint: "Qui ti invieremo l'accesso al prodotto digitale.",
   whatsappOptional: "WhatsApp (facoltativo)",
+  whatsappRequired: "WhatsApp / telefono *",
+  phoneError: "Inserisci il tuo numero WhatsApp (almeno 7 cifre).",
   shippingAddress: "Indirizzo di spedizione",
   addressPlaceholder: "Via, numero, interno...",
   city: "Città",

@@ -124,6 +124,10 @@ const PHANTOM_IDS = new Set([
   "prueba-3",
 ]);
 
+const keepStoredCoupon = (): boolean => {
+  try { return /^\/checkouts\/(success|return|pending|failure)/.test(window.location.pathname); } catch { return false; }
+};
+
 const VALID_COUPONS: Record<string, number> = {
   NEW10: 10,
   PRUEBA20: 20,
@@ -308,6 +312,10 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
           ...current,
           ...p,
           items: cleanItems,
+          // El checkout empieza limpio: un cupón guardado de otra visita no vuelve a aparecer solo.
+          // El cliente escribe NEW10 (o su cupón) o paga sin cupón. En las pantallas de después del pago
+          // (éxito / retorno) se conserva, para mostrar el total real y reportar el valor correcto al Pixel.
+          ...(keepStoredCoupon() ? { coupon: p.coupon ?? null, couponPercent: p.couponPercent ?? 0 } : { coupon: null, couponPercent: 0 }),
           buyer: {
             ...current.buyer,
             ...((p as { buyer?: BuyerInfo })?.buyer ?? {}),

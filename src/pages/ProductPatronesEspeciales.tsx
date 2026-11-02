@@ -53,6 +53,7 @@ import resenaMx3 from "@/assets/resena-mx3.webp.asset.json";
 import resenaMx4 from "@/assets/resena-mx4.webp.asset.json";
 import { PinterestSave } from "@/components/PinterestSave";
 import { LazyImg, LazyMount } from "@/components/LazyImg";
+import patronesComparativaAsset from "@/assets/patrones-new/patrones-comparativa.png.asset.json";
 import { lightCoverUrl, disableImageTransform, readCachedCover, writeCachedCover } from "@/lib/coverImage";
 
 const previews = [
@@ -680,6 +681,25 @@ const PatronesContent = () => {
             <p className="text-center text-foreground font-bold text-lg mt-6">
               No es falta de talento. <span className="text-gradient">Es que nadie te enseñó los patrones.</span>
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Comparativa: Patrones Especiales vs apps y academias */}
+      <section className="py-6 md:py-8">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-2xl mx-auto">
+            <img
+              src={patronesComparativaAsset.url}
+              alt="Comparativa: Patrones Especiales frente a apps de inglés y academias"
+              width={1254}
+              height={1254}
+              loading="lazy"
+              decoding="async"
+              draggable={false}
+              onContextMenu={(e) => e.preventDefault()}
+              className="w-full h-auto rounded-2xl shadow-card select-none"
+            />
           </div>
         </div>
       </section>

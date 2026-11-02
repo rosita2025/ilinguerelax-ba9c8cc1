@@ -64,12 +64,13 @@ const productRoutePreload = () => ({
         return [...seen].map((f) => `/${f}`).filter((u) => !html.includes(u));
       };
       const patrones = closure("pages/ProductPatronesEspeciales");
+      const palabras5000 = closure("pages/Product5000.tsx");
       const dynamic = closure("pages/ProductDynamic");
       const home = closure("pages/Index");
       // Checkout: la página y su bloque grande de métodos de pago (PaymentMethodsGroup, que se pedía recién al terminar
       // de ejecutar la página) bajan en paralelo desde que llega el HTML.
       const checkout = [...new Set([...closure("pages/Checkout.tsx"), ...closure("components/checkout/PaymentMethodsGroup")])];
-      if (!patrones.length && !dynamic.length && !home.length && !checkout.length) return html;
+      if (!patrones.length && !palabras5000.length && !dynamic.length && !home.length && !checkout.length) return html;
       const script =
         `<script>(function(){try{var p=location.pathname;` +
         // País por IP: se pide ya, en paralelo con el JS, para que precios y métodos de pago no esperen a que cargue la app.
@@ -78,7 +79,7 @@ const productRoutePreload = () => ({
         `if(p==='/'){H.forEach(function(u){var l=document.createElement('link');l.rel='modulepreload';l.href=u;document.head.appendChild(l);});return;}` +
         `var C=${JSON.stringify(checkout)};if(/^\\/checkouts\\/(?!success|return|failure|pending|pendiente)[^/]+/.test(p)){C.forEach(function(u){var l=document.createElement('link');l.rel='modulepreload';l.href=u;document.head.appendChild(l);});return;}` +
         `if(p.indexOf('/products/')!==0)return;` +
-        `var L=p.indexOf('patrones-especiales-alfabeto-combinaciones-secretas-ingles')>-1?${JSON.stringify(patrones)}:${JSON.stringify(dynamic)};` +
+        `var L=p.indexOf('patrones-especiales-alfabeto-combinaciones-secretas-ingles')>-1?${JSON.stringify(patrones)}:p==='/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa'?${JSON.stringify(palabras5000)}:${JSON.stringify(dynamic)};` +
         `L.forEach(function(u){var l=document.createElement('link');l.rel='modulepreload';l.href=u;document.head.appendChild(l);});}catch(e){}})();</script>`;
       return html.replace("</head>", `${script}</head>`);
     },

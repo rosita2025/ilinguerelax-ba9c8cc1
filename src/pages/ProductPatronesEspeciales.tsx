@@ -53,7 +53,7 @@ import resenaMx3 from "@/assets/resena-mx3.webp.asset.json";
 import resenaMx4 from "@/assets/resena-mx4.webp.asset.json";
 import { PinterestSave } from "@/components/PinterestSave";
 import { LazyImg, LazyMount } from "@/components/LazyImg";
-import patronesComparativaAsset from "@/assets/patrones-new/patrones-comparativa.png.asset.json";
+import patronesComparativaAsset from "@/assets/patrones-new/patrones-comparativa.webp.asset.json";
 import { lightCoverUrl, disableImageTransform, readCachedCover, writeCachedCover } from "@/lib/coverImage";
 
 const previews = [
@@ -692,8 +692,8 @@ const PatronesContent = () => {
             <img
               src={patronesComparativaAsset.url}
               alt="Comparativa: Patrones Especiales frente a apps de inglés y academias"
-              width={1254}
-              height={1254}
+              width={900}
+              height={900}
               loading="lazy"
               decoding="async"
               draggable={false}
@@ -817,7 +817,7 @@ const PatronesContent = () => {
                       rootMargin={mediaMargin}
                       alt={p.alt}
                       wrapperClassName="absolute inset-0 block"
-                      width={1254}
+                      width={900}
                       height={1254}
                       className="w-full h-full object-contain"
                     />

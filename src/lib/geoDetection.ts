@@ -97,12 +97,27 @@ export function getCountryFromTimezone(): string | null {
   }
 }
 
+/** Resuelve con `null` si `p` no termina en `ms` (o falla): la detección nunca se queda colgada, aunque el navegador no soporte AbortSignal.timeout. */
+function within<T>(p: Promise<T>, ms: number): Promise<T | null> {
+  return new Promise((resolve) => {
+    const id = setTimeout(() => resolve(null), Math.max(0, ms));
+    p.then(
+      (v) => { clearTimeout(id); resolve(v); },
+      () => { clearTimeout(id); resolve(null); },
+    );
+  });
+}
+
 export async function detectCountryByIp(options: {
   timeoutMs?: number;
   allowTimezoneFallback?: boolean;
   fallbackCountry?: string | null;
 } = {}): Promise<CountryDetectionResult | null> {
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  // Plazo TOTAL: la consulta adelantada y todos los proveedores juntos esperan como máximo `timeoutMs`;
+  // después se usa la zona horaria del dispositivo (así los precios y métodos de pago nunca quedan colgados).
+  const deadline = Date.now() + timeoutMs;
+  const remaining = () => Math.max(0, deadline - Date.now());
 
   // Si la página ya pidió ipapi desde el HTML (ver vite.config.ts), se reutiliza esa respuesta en vez de repetirla.
   try {
@@ -110,22 +125,22 @@ export async function detectCountryByIp(options: {
     if (w.__ilrGeo) {
       const early = w.__ilrGeo;
       w.__ilrGeo = null;
-      // Con conexión lenta la respuesta adelantada puede no llegar nunca: se espera como máximo `timeoutMs`
-      // y luego se sigue con el flujo normal (otros proveedores / zona horaria).
-      const data = await Promise.race([early, new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs))]);
+      const data = await within(early, remaining());
       const code = data ? cleanCountryCode(PROVIDERS[0].parse(data)) : null;
       if (code) return { countryCode: code, source: "ip", provider: "ipapi" };
     }
   } catch { /* si falla, se sigue con el flujo normal */ }
 
   for (const provider of PROVIDERS) {
+    if (remaining() <= 0) break;
     try {
-      const res = await fetch(provider.url, {
-        cache: "no-store",
-        signal: timeoutSignal(timeoutMs),
-      });
-      if (!res.ok) continue;
-      const data = await res.json();
+      const res = await within(
+        fetch(provider.url, { cache: "no-store", signal: timeoutSignal(remaining()) }),
+        remaining(),
+      );
+      if (!res || !res.ok) continue;
+      const data = await within(res.json(), remaining());
+      if (!data) continue;
       const countryCode = cleanCountryCode(provider.parse(data));
       if (countryCode) return { countryCode, source: "ip", provider: provider.name };
     } catch {

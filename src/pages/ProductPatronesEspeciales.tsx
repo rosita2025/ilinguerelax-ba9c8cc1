@@ -491,7 +491,7 @@ const PatronesContent = () => {
                     src={activeExtraView}
                     alt={`Patrones Especiales - vista adicional ${heroView}`}
                     className="w-full h-auto rounded-2xl shadow-hero"
-                    width={900}
+                    width={1254}
                     height={1254}
                     decoding="async"
                   />
@@ -693,7 +693,7 @@ const PatronesContent = () => {
               src={patronesComparativaAsset.url}
               alt="Comparativa: Patrones Especiales frente a apps de inglés y academias"
               width={900}
-              height={1254}
+              height={900}
               loading="lazy"
               decoding="async"
               draggable={false}

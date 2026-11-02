@@ -73,7 +73,7 @@ import bonus5Estudiar from "@/assets/bonus-5-como-estudiar-ingles-6-meses.webp";
 
 // About section image
 import aboutIlingueRelax from "@/assets/about-ilingue-relax.webp";
-import comparativaAsset from "@/assets/product-5000/ingles-relax-comparativa.webp.asset.json";
+import comparativaAsset from "@/assets/product-5000/ingles-relax-comparativa-light.webp.asset.json";
 
 // Partner logos
 import logoAmazon from "@/assets/logo-amazon.png";
@@ -770,8 +770,8 @@ const Product5000 = () => {
             <img
               src={comparativaAsset.url}
               alt="La opción más completa para mejorar tu inglés: Inglés Relax comparado con academias y apps de inglés"
-              width={1254}
-              height={1254}
+              width={900}
+              height={900}
               loading="lazy"
               decoding="async"
               className="w-full h-auto rounded-2xl shadow-card"

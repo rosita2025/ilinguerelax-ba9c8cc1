@@ -53,6 +53,7 @@ const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
 const MagliaRelaxLanding = lazy(() => import("@/components/landing/MagliaRelaxLanding").then(m => ({ default: m.MagliaRelaxLanding })));
 const SpanishRelaxLanding = lazy(() => import("@/components/landing/SpanishRelaxLanding").then(m => ({ default: m.SpanishRelaxLanding })));
+const DominaVocabularioLanding = lazy(() => import("@/components/landing/DominaVocabularioLanding").then(m => ({ default: m.DominaVocabularioLanding })));
 const SpanishRelaxClosing = lazy(() => import("@/components/landing/SpanishRelaxLanding").then(m => ({ default: m.SpanishRelaxClosing })));
 const LooxStyleReviews = lazy(() => import("@/components/LooxStyleReviews").then(m => ({ default: m.LooxStyleReviews })));
 
@@ -309,6 +310,8 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
   
   // Landing propia de Spanish Relax (digital, en inglés): mismo precio, botón, métodos de pago y barra fija.
   const isRelax = product.sku === "5-000-spanish-words-with-english-pronunciation-digital";
+  // Landing propia de "Domina el vocabulario en inglés" (PDF para hispanohablantes, SIN bonos): dolor, beneficios y objeciones.
+  const isDomina = product.sku === "dominaelvocabularioeningles";
   const isEs = product.learner_language === "es";
   const isIt = product.learner_language === "it";
   // Curso de video de tejido (Maglia Relax): usa la landing italiana propia en lugar de las secciones de PDF.
@@ -631,7 +634,7 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
           </div>
 
           {/* Features Section */}
-          {!isCourse && !isRelax && (
+          {!isCourse && !isRelax && !isDomina && (
           <section className="mt-4 py-3 border-t border-slate-100">
             <div className="grid lg:grid-cols-2 gap-6">
               <div>
@@ -661,7 +664,7 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
           )}
 
           {/* Look Inside Gallery */}
-          {!isCourse && !isRelax && (
+          {!isCourse && !isRelax && !isDomina && (
           <section className="mt-4 py-3 bg-slate-900 rounded-[1.5rem] text-white overflow-hidden">
             <div className="px-4 md:px-8">
               <div className="text-center mb-4">
@@ -707,6 +710,16 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
           {isRelax && (
             <Suspense fallback={<Skeleton className="h-96 w-full" />}>
               <SpanishRelaxLanding
+                price={priceReady ? displayFormatted : null}
+                onBuy={handleBuy}
+                buyDisabled={!priceReady}
+              />
+            </Suspense>
+          )}
+
+          {isDomina && (
+            <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+              <DominaVocabularioLanding
                 price={priceReady ? displayFormatted : null}
                 onBuy={handleBuy}
                 buyDisabled={!priceReady}

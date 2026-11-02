@@ -816,6 +816,43 @@ const Product5000 = () => {
         </div>
       </section>
 
+      {/* Preview Cards - Compact */}
+      <LazyMount minHeight={460} rootMargin={mediaMargin}>
+      <section className="py-8 md:py-10">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-3">
+              📖 Vista Previa del Contenido
+            </h2>
+            <p className="text-center text-sm text-muted-foreground mb-8 max-w-xl mx-auto">
+              🔍 Te recomendamos ver la vista previa antes de comprar para conocer exactamente lo que recibirás.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img src={previewIndice} alt="Vista previa del índice completo del libro de inglés" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
+                </div>
+                <div className="p-3 text-center">
+                  <h3 className="font-bold text-foreground text-sm">Índice Completo</h3>
+                  <p className="text-xs text-muted-foreground">52 capítulos</p>
+                </div>
+              </div>
+              <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img src={previewVocabulario} alt="Vista previa del vocabulario inglés con pronunciación" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
+                </div>
+                <div className="p-3 text-center">
+                  <h3 className="font-bold text-foreground text-sm">5,000 Palabras</h3>
+                  <p className="text-xs text-muted-foreground">Con pronunciación</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      </LazyMount>
+
       {/* 2 Bonus GRATIS Section */}
       <LazyMount minHeight={520} rootMargin={mediaMargin}>
       <section className="py-10 md:py-14 bg-gradient-to-b from-accent/5 to-background">
@@ -874,43 +911,6 @@ const Product5000 = () => {
                   </div>
                 </motion.div>
               ))}
-            </div>
-          </div>
-        </div>
-      </section>
-      </LazyMount>
-
-      {/* Preview Cards - Compact */}
-      <LazyMount minHeight={460} rootMargin={mediaMargin}>
-      <section className="py-8 md:py-10">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-3">
-              📖 Vista Previa del Contenido
-            </h2>
-            <p className="text-center text-sm text-muted-foreground mb-8 max-w-xl mx-auto">
-              🔍 Te recomendamos ver la vista previa antes de comprar para conocer exactamente lo que recibirás.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img src={previewIndice} alt="Vista previa del índice completo del libro de inglés" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
-                </div>
-                <div className="p-3 text-center">
-                  <h3 className="font-bold text-foreground text-sm">Índice Completo</h3>
-                  <p className="text-xs text-muted-foreground">52 capítulos</p>
-                </div>
-              </div>
-              <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img src={previewVocabulario} alt="Vista previa del vocabulario inglés con pronunciación" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
-                </div>
-                <div className="p-3 text-center">
-                  <h3 className="font-bold text-foreground text-sm">5,000 Palabras</h3>
-                  <p className="text-xs text-muted-foreground">Con pronunciación</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>

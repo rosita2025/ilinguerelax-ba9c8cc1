@@ -110,7 +110,7 @@ export const CustomerReviewsCarousel = () => {
             ))}
           </div>
           <h3 className="text-xl md:text-2xl font-black text-foreground">
-            Reseñas reales de clientes
+            Mis estudiantes extranjeros están agradecidos, ¡gracias por su confianza!
           </h3>
           <p className="text-xs md:text-sm text-muted-foreground mt-1">
             Capturas verificadas de compradores

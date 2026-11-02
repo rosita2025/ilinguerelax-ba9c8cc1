@@ -1110,7 +1110,7 @@ const Product5000 = () => {
         rating={4.8}
         reviewCount={800}
         showReviews={true}
-        ctaText={"LO QUIERO"}
+        ctaText={pricing5000Ready ? `QUIERO COMPRAR • ${safePriceLabel}` : "QUIERO COMPRAR"}
         onBuyClick={handleBuy}
       />
 

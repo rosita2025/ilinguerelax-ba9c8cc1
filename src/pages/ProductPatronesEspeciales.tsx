@@ -923,7 +923,7 @@ const PatronesContent = () => {
         reviewCount={pricingAdmin.reviewCount != null ? pricingAdmin.reviewCount : 6}
         showReviews={true}
         onBuyClick={handleBuy}
-        ctaText={pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
+        ctaText={pricingReady ? `QUIERO COMPRAR • ${priceLabel}` : "QUIERO COMPRAR"}
         isLoading={!pricingReady}
         localUsdPrices={pricingAdmin.localUsdPrices}
       />

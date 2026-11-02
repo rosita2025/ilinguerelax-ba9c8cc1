@@ -17,6 +17,8 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { CompactBuyCard } from "@/components/CompactBuyCard";
 import { LazyMount } from "@/components/LazyImg";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { INGLES_5000_INDEX } from "@/components/landing/ingles5000Index";
 import { getPatronesConnection, isPatronesConstrainedConnection } from "@/lib/patronesNetwork";
 
 // Lazy-loaded below-the-fold components for faster initial load
@@ -121,7 +123,7 @@ const previewImages = [
   {
     src: previewIndice,
     title: "Índice Completo",
-    subtitle: "52 capítulos temáticos organizados",
+    subtitle: "50 capítulos temáticos organizados",
   },
   {
     src: previewGramatica,
@@ -144,7 +146,7 @@ const features = [
   "Pronunciación adaptada para hispanohablantes",
   "Fonética internacional UK/USA incluida",
   "Estructura gramatical desde Nivel Cero hasta Avanzado C1",
-  "52 capítulos temáticos organizados",
+  "50 capítulos temáticos organizados",
   "Significado en español de cada palabra",
   "Entrega digital inmediata",
   "Acceso de por vida",
@@ -186,26 +188,8 @@ const benefitCards = [
   {
     icon: GraduationCap,
     title: "Avanza a tu ritmo",
-    description: "Estructura gramatical desde Nivel Cero hasta Avanzado C1, organizada en 52 capítulos temáticos.",
+    description: "Estructura gramatical desde Nivel Cero hasta Avanzado C1, organizada en 50 capítulos temáticos.",
   },
-];
-const chapters = [
-  "Casa y Hogar",
-  "Comidas y Bebidas",
-  "Transportes",
-  "Profesiones",
-  "Lugares",
-  "Países y Ciudades",
-  "Ambiente y Naturaleza",
-  "Tecnología",
-  "Universidad",
-  "Vida Cotidiana",
-  "Trabajo",
-  "Viajes",
-  "Emociones",
-  "Deportes",
-  "Expresiones Comunes",
-  "Y mucho más...",
 ];
 // Monta su contenido tarde (cuando el navegador está libre o tras `delay` ms), para que avisos y popups no compitan con la carga de la página.
 const LateMount = ({ children, delay = 6000 }: { children: React.ReactNode; delay?: number }) => {
@@ -360,7 +344,7 @@ const Product5000 = () => {
     <main className="min-h-screen bg-background">
       <SEO
         title={pricing5000.name ?? "5,000 Palabras en Inglés PDF con Pronunciación"}
-        description={pricing5000.description ?? "Libro digital con 5,000 palabras en inglés, pronunciación en español y fonética UK/USA. 52 capítulos, nivel A1–C1. PDF descargable al instante."}
+        description={pricing5000.description ?? "Libro digital con 5,000 palabras en inglés, pronunciación en español y fonética UK/USA. 50 capítulos, nivel A1–C1. PDF descargable al instante."}
         canonicalUrl="https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa"
         image={pricing5000.coverImageUrl ?? "https://ilinguerelax.com/images/product-5000.webp"}
         type="product"
@@ -808,11 +792,26 @@ const Product5000 = () => {
                 </li>
               ))}
             </ul>
-            <div className="flex flex-wrap justify-center gap-2">
-              {chapters.map((c) => (
-                <span key={c} className="rounded-full border border-border bg-background px-3 py-1 text-xs text-muted-foreground">{c}</span>
-              ))}
-            </div>
+            <Accordion type="single" collapsible className="rounded-xl border border-border bg-card px-4">
+              <AccordionItem value="indice" className="border-b-0">
+                <AccordionTrigger className="text-left text-sm md:text-base font-bold text-foreground">
+                  📖 Leer índice completo (50 capítulos)
+                </AccordionTrigger>
+                <AccordionContent>
+                  <ol className="max-h-[420px] space-y-3 overflow-y-auto pr-2">
+                    {INGLES_5000_INDEX.map((c) => (
+                      <li key={c.n} className="border-b border-border/60 pb-2 last:border-b-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-sm font-semibold text-foreground">CAP {c.n}. {c.title}</span>
+                          <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">{c.level}</span>
+                        </div>
+                        {c.topics && <p className="mt-0.5 text-xs text-muted-foreground">{c.topics}</p>}
+                      </li>
+                    ))}
+                  </ol>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         </div>
       </section>
@@ -836,7 +835,7 @@ const Product5000 = () => {
                 </div>
                 <div className="p-3 text-center">
                   <h3 className="font-bold text-foreground text-sm">Índice Completo</h3>
-                  <p className="text-xs text-muted-foreground">52 capítulos</p>
+                  <p className="text-xs text-muted-foreground">50 capítulos</p>
                 </div>
               </div>
               <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">

@@ -64,7 +64,8 @@ import { motion } from "framer-motion";
 import previewIndice from "@/assets/preview-indice.webp";
 import previewGramatica from "@/assets/preview-gramatica-estructura.webp";
 import previewFrases from "@/assets/preview-frases-verbos.webp";
-import previewVocabulario from "@/assets/preview-vocabulario.webp";
+import previewVocabularioAsset from "@/assets/product-5000/vista-previa-vocabulario-5000.webp.asset.json";
+const previewVocabulario = previewVocabularioAsset.url;
 const product5000Image = productoPrincipalInglesRelax;
 
 // Bonus images (5 regalos)

@@ -942,6 +942,32 @@ const Product5000 = () => {
         socialProof="María y 12,000+ personas más ya lo compraron"
         noteText="NOTA: Quedan pocas plazas a este precio. ¡No esperes!"
       />
+      {/* Testimonios reales de compradores (textos enviados por la dueña) */}
+      <section className="py-6 md:py-8">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-xl md:text-2xl font-bold text-center text-foreground mb-1">Lo que dicen mis compradores</h2>
+            <p className="text-center text-xs text-muted-foreground mb-4">Compradores desde 2025</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                { text: "Gracias por mejorar el libro Inglés Relax, sin aburrimiento. ¡Saludos desde México!", who: "Comprador · México 🇲🇽" },
+                { text: "Gracias por este libro, es mejor sin suscripción.", who: "Comprador verificado" },
+              ].map((r) => (
+                <div key={r.text} className="rounded-xl border border-border bg-card p-4 shadow-card">
+                  <div className="flex gap-0.5 mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+                  <p className="text-sm text-foreground">"{r.text}"</p>
+                  <p className="mt-2 text-xs font-semibold text-muted-foreground">{r.who}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ Section */}
       <LazyMount minHeight={640} rootMargin={mediaMargin}>
       <Suspense fallback={null}>

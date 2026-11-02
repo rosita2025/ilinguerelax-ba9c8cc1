@@ -341,6 +341,13 @@ const PatronesContent = () => {
     ? (heroImage.startsWith("http") ? heroImage : `https://ilinguerelax.com${heroImage}`)
     : `https://ilinguerelax.com${productImage}`;
   const cartImage = heroImage ?? productImage;
+  // Vistas adicionales del admin (galería). La portada (índice 0) sigue usando la carga rápida.
+  const extraViews = useMemo(
+    () => (pricingAdmin.galleryImages ?? []).filter((u): u is string => typeof u === "string" && u.trim().length > 0 && u !== pricingAdmin.coverImageUrl),
+    [pricingAdmin.galleryImages, pricingAdmin.coverImageUrl],
+  );
+  const [heroView, setHeroView] = useState(0);
+  const activeExtraView = heroView > 0 ? extraViews[heroView - 1] : undefined;
   
   const pixelParams = useMemo(() => ({
     content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
@@ -478,7 +485,16 @@ const PatronesContent = () => {
             <div className="relative">
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative">
-                {heroImage ? (
+                {activeExtraView ? (
+                  <img
+                    src={activeExtraView}
+                    alt={`Patrones Especiales - vista adicional ${heroView}`}
+                    className="w-full h-auto rounded-2xl shadow-hero"
+                    width={1254}
+                    height={1254}
+                    decoding="async"
+                  />
+                ) : heroImage ? (
                   <img
                     src={heroLight ?? heroImage}
                     srcSet={snapshotCover && !constrainedNetwork ? PATRONES_COVER_SRCSET : undefined}
@@ -498,6 +514,24 @@ const PatronesContent = () => {
                   />
                 ) : (
                   <div className="w-full aspect-[4/5] rounded-2xl bg-muted animate-pulse" />
+                )}
+                {extraViews.length > 0 && heroImage && (
+                  <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+                    {[heroLight ?? heroImage, ...extraViews].map((src, i) => (
+                      <button
+                        key={`${i}-${src}`}
+                        type="button"
+                        onClick={() => setHeroView(i)}
+                        aria-label={i === 0 ? "Ver portada" : `Ver vista adicional ${i}`}
+                        aria-pressed={i === heroView}
+                        className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                          i === heroView ? "border-primary" : "border-border opacity-70 hover:opacity-100"
+                        }`}
+                      >
+                        <img src={src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
                 )}
                 <PinterestSave 
                   overlay 

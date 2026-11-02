@@ -16,6 +16,8 @@ import { LiveViewers } from "@/components/LiveViewers";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { CompactBuyCard } from "@/components/CompactBuyCard";
+import { LazyMount } from "@/components/LazyImg";
+import { getPatronesConnection, isPatronesConstrainedConnection } from "@/lib/patronesNetwork";
 
 // Lazy-loaded below-the-fold components for faster initial load
 const FAQ = lazy(() => import("@/components/FAQ").then(m => ({ default: m.FAQ })));
@@ -179,7 +181,20 @@ const chapters = [
   "Expresiones Comunes",
   "Y mucho más...",
 ];
+// Monta su contenido tarde (cuando el navegador está libre o tras `delay` ms), para que avisos y popups no compitan con la carga de la página.
+const LateMount = ({ children, delay = 6000 }: { children: React.ReactNode; delay?: number }) => {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const id = window.setTimeout(() => setReady(true), delay);
+    return () => window.clearTimeout(id);
+  }, [delay]);
+  return ready ? <Suspense fallback={null}>{children}</Suspense> : null;
+};
+
 const Product5000 = () => {
+  // Con conexión lenta o ahorro de datos, lo que está más abajo (vista previa, bonos, reseñas, preguntas) solo baja al acercarse.
+  const constrainedNetwork = isPatronesConstrainedConnection(getPatronesConnection());
+  const mediaMargin = constrainedNetwork ? "0px" : "300px";
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [bonusLightboxOpen, setBonusLightboxOpen] = useState(false);
@@ -669,6 +684,7 @@ const Product5000 = () => {
       </section>
 
       {/* Preview Cards - Compact */}
+      <LazyMount minHeight={460} rootMargin={mediaMargin}>
       <section className="py-8 md:py-10">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
@@ -702,8 +718,10 @@ const Product5000 = () => {
           </div>
         </div>
       </section>
+      </LazyMount>
 
       {/* 2 Bonus GRATIS Section */}
+      <LazyMount minHeight={520} rootMargin={mediaMargin}>
       <section className="py-10 md:py-14 bg-gradient-to-b from-accent/5 to-background">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
@@ -764,10 +782,13 @@ const Product5000 = () => {
           </div>
         </div>
       </section>
+      </LazyMount>
 
-      <Suspense fallback={null}>
-        <CustomerReviewsCarousel />
-      </Suspense>
+      <LazyMount minHeight={420} rootMargin={mediaMargin}>
+        <Suspense fallback={null}>
+          <CustomerReviewsCarousel />
+        </Suspense>
+      </LazyMount>
 
       <CompactBuyCard
         title="Inglés Relax 5,000"
@@ -789,6 +810,7 @@ const Product5000 = () => {
         noteText="NOTA: Quedan pocas plazas a este precio. ¡No esperes!"
       />
       {/* FAQ Section */}
+      <LazyMount minHeight={640} rootMargin={mediaMargin}>
       <Suspense fallback={null}>
       <FAQ
         items={[
@@ -836,8 +858,10 @@ const Product5000 = () => {
         subtitle="Resolvemos tus dudas sobre INGLÉS RELAX"
       />
       </Suspense>
+      </LazyMount>
 
       {/* About Me / Sobre Mí Section */}
+      <LazyMount minHeight={380} rootMargin={mediaMargin}>
       <section className="py-16 md:py-20 relative overflow-hidden">
         {/* Gradient Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#1a0a2e] via-[#2d1b4e] to-[#1a0a2e]" />
@@ -872,6 +896,7 @@ const Product5000 = () => {
           </motion.div>
         </div>
       </section>
+      </LazyMount>
 
       {/* WhatsApp Banner - Final CTA */}
       <section className="py-12 md:py-16 relative overflow-hidden">
@@ -934,9 +959,9 @@ const Product5000 = () => {
       <div className="h-20 md:h-16" />
 
       {/* Sales Notification Popup */}
-      <Suspense fallback={null}>
+      <LateMount delay={constrainedNetwork ? 15000 : 7000}>
         <SalesNotification />
-      </Suspense>
+      </LateMount>
 
       {/* Exit Intent Popup */}
       <Suspense fallback={null}>

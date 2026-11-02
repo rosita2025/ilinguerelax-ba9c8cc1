@@ -264,9 +264,17 @@ const Product5000 = () => {
   const buyUrl = TIENDA_CHECKOUT_5000;
   const safePriceLabel = pricing5000Ready ? displayPrice : "Cargando precio…";
 
-  const heroImages = [productoPrincipalInglesRelax];
-  const heroThumbs = [productoPrincipalInglesRelax];
+  // Portada y vistas adicionales vienen del admin (/admin/productos/:sku). Mientras
+  // el admin no responde (primera visita) se reserva el espacio sin mostrar la portada vieja.
+  const heroImages = useMemo(() => {
+    const list = [pricing5000.coverImageUrl, ...(pricing5000.galleryImages ?? [])]
+      .filter((u): u is string => typeof u === "string" && u.trim().length > 0);
+    const unique = Array.from(new Set(list));
+    if (unique.length) return unique;
+    return pricing5000.loaded ? [productoPrincipalInglesRelax] : [];
+  }, [pricing5000.coverImageUrl, pricing5000.galleryImages, pricing5000.loaded]);
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
+  const activeHeroImage = heroImages[Math.min(currentHeroImage, Math.max(heroImages.length - 1, 0))];
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(
@@ -483,18 +491,42 @@ const Product5000 = () => {
                   <Eye className="w-4 h-4" />
                   VISTA PREVIA O DEMO
                 </div>
-                <img
-                  src={heroImages[currentHeroImage]}
-                  alt={
-                    currentHeroImage === 0
-                      ? "Inglés Relax 5,000 palabras - Libro digital con pronunciación para hispanohablantes y fonética UK/USA"
-                      : "Inglés Relax 5,000 palabras - Aprende inglés en 6 meses con estructuras gramaticales desde cero hasta intermedio"
-                  }
-                  className="w-full h-auto rounded-2xl shadow-hero"
-                  loading="eager"
-                  fetchPriority="high"
-                  decoding="async"
-                />
+                {activeHeroImage ? (
+                  <img
+                    src={activeHeroImage}
+                    alt={
+                      currentHeroImage === 0
+                        ? "Inglés Relax 5,000 palabras - Libro digital con pronunciación para hispanohablantes y fonética UK/USA"
+                        : `Inglés Relax 5,000 palabras - vista adicional ${currentHeroImage}`
+                    }
+                    width={1254}
+                    height={1254}
+                    className="w-full h-auto aspect-square object-contain rounded-2xl shadow-hero bg-card"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
+                  />
+                ) : (
+                  <div className="w-full aspect-square rounded-2xl bg-muted animate-pulse" aria-hidden="true" />
+                )}
+                {heroImages.length > 1 && (
+                  <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+                    {heroImages.map((src, i) => (
+                      <button
+                        key={src}
+                        type="button"
+                        onClick={() => setCurrentHeroImage(i)}
+                        aria-label={i === 0 ? "Ver portada" : `Ver vista adicional ${i}`}
+                        aria-pressed={i === currentHeroImage}
+                        className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                          i === currentHeroImage ? "border-primary" : "border-border opacity-70 hover:opacity-100"
+                        }`}
+                      >
+                        <img src={src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <PinterestSave overlay />
               </div>
             </div>

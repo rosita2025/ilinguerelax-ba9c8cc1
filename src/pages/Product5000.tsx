@@ -163,6 +163,30 @@ const bonuses = [
     image: bonus5Estudiar,
   },
 ];
+const painPoints = [
+  "Estudias inglés, pero no sabes cómo se pronuncia cada palabra.",
+  "Lees la palabra en inglés y la dices como se escribe en español.",
+  "Buscas cada palabra en el diccionario y pierdes tiempo y motivación.",
+  "Te da vergüenza hablar por miedo a pronunciar mal.",
+  "No sabes qué palabras aprender primero ni por dónde empezar.",
+];
+const benefitCards = [
+  {
+    icon: Eye,
+    title: "Pronuncia con confianza",
+    description: "Cada palabra con su pronunciación escrita en español, más la fonética UK y USA, para que la digas sin miedo.",
+  },
+  {
+    icon: BookOpen,
+    title: "Aprende sin diccionario",
+    description: "El significado en español de cada palabra está en el mismo lugar: no tienes que buscar nada aparte.",
+  },
+  {
+    icon: GraduationCap,
+    title: "Avanza a tu ritmo",
+    description: "Estructura gramatical desde Nivel Cero hasta Avanzado C1, organizada en 52 capítulos temáticos.",
+  },
+];
 const chapters = [
   "Casa y Hogar",
   "Comidas y Bebidas",
@@ -683,42 +707,64 @@ const Product5000 = () => {
         </div>
       </section>
 
-      {/* Preview Cards - Compact */}
-      <LazyMount minHeight={460} rootMargin={mediaMargin}>
+      {/* Dolor: lo que le pasa al comprador */}
       <section className="py-8 md:py-10">
         <div className="container px-4 md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-3">
-              📖 Vista Previa del Contenido
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-2">
+              ¿Te pasa esto cuando estudias inglés?
             </h2>
-            <p className="text-center text-sm text-muted-foreground mb-8 max-w-xl mx-auto">
-              🔍 Te recomendamos ver la vista previa antes de comprar para conocer exactamente lo que recibirás.
+            <p className="text-center text-sm text-muted-foreground mb-6">Es más común de lo que crees.</p>
+            <ul className="space-y-3">
+              {painPoints.map((text) => (
+                <li key={text} className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3">
+                  <X className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500" aria-hidden="true" />
+                  <span className="text-sm md:text-base text-foreground">{text}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 text-center text-base md:text-lg font-semibold text-foreground">
+              Si te identificas con alguno, este libro fue creado para ti.
             </p>
+          </div>
+        </div>
+      </section>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img src={previewIndice} alt="Vista previa del índice completo del libro de inglés" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
+      {/* Beneficios: lo que recibe */}
+      <section className="py-8 md:py-10 bg-gradient-to-b from-primary/5 to-background">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-2">
+              Esto es lo que recibes
+            </h2>
+            <p className="text-center text-sm text-muted-foreground mb-8">Todo en un solo PDF, con descarga inmediata.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              {benefitCards.map(({ icon: Icon, title, description }) => (
+                <div key={title} className="rounded-xl border border-border bg-card p-5 shadow-card">
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                    <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
+                  </div>
+                  <h3 className="font-bold text-foreground mb-1">{title}</h3>
+                  <p className="text-sm text-muted-foreground">{description}</p>
                 </div>
-                <div className="p-3 text-center">
-                  <h3 className="font-bold text-foreground text-sm">Índice Completo</h3>
-                  <p className="text-xs text-muted-foreground">52 capítulos</p>
-                </div>
-              </div>
-              <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img src={previewVocabulario} alt="Vista previa del vocabulario inglés con pronunciación" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
-                </div>
-                <div className="p-3 text-center">
-                  <h3 className="font-bold text-foreground text-sm">5,000 Palabras</h3>
-                  <p className="text-xs text-muted-foreground">Con pronunciación</p>
-                </div>
-              </div>
+              ))}
+            </div>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 mb-6">
+              {features.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm text-foreground">
+                  <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600" aria-hidden="true" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="flex flex-wrap justify-center gap-2">
+              {chapters.map((c) => (
+                <span key={c} className="rounded-full border border-border bg-background px-3 py-1 text-xs text-muted-foreground">{c}</span>
+              ))}
             </div>
           </div>
         </div>
       </section>
-      </LazyMount>
 
       {/* 2 Bonus GRATIS Section */}
       <LazyMount minHeight={520} rootMargin={mediaMargin}>
@@ -778,6 +824,43 @@ const Product5000 = () => {
                   </div>
                 </motion.div>
               ))}
+            </div>
+          </div>
+        </div>
+      </section>
+      </LazyMount>
+
+      {/* Preview Cards - Compact */}
+      <LazyMount minHeight={460} rootMargin={mediaMargin}>
+      <section className="py-8 md:py-10">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-3">
+              📖 Vista Previa del Contenido
+            </h2>
+            <p className="text-center text-sm text-muted-foreground mb-8 max-w-xl mx-auto">
+              🔍 Te recomendamos ver la vista previa antes de comprar para conocer exactamente lo que recibirás.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img src={previewIndice} alt="Vista previa del índice completo del libro de inglés" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
+                </div>
+                <div className="p-3 text-center">
+                  <h3 className="font-bold text-foreground text-sm">Índice Completo</h3>
+                  <p className="text-xs text-muted-foreground">52 capítulos</p>
+                </div>
+              </div>
+              <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img src={previewVocabulario} alt="Vista previa del vocabulario inglés con pronunciación" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
+                </div>
+                <div className="p-3 text-center">
+                  <h3 className="font-bold text-foreground text-sm">5,000 Palabras</h3>
+                  <p className="text-xs text-muted-foreground">Con pronunciación</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

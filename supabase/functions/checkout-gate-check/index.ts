@@ -78,6 +78,8 @@ Deno.serve(async (req) => {
       country?: string;
       email?: string;
       internal?: boolean;
+      campaign?: string | null;
+      ad?: string | null;
     };
     const slug = (body.slug || "").toString().slice(0, 120) || null;
     const ip = clientIp(req);
@@ -95,6 +97,8 @@ Deno.serve(async (req) => {
       "";
     const country =
       (headerCountry || body.country || "").toString().trim().toUpperCase().slice(0, 2) || null;
+    const campaign = (body.campaign || "").toString().trim().slice(0, 150) || null;
+    const ad = (body.ad || "").toString().trim().slice(0, 150) || null;
     const rawEmail = (body.email || "").toString().trim().toLowerCase().slice(0, 200);
     const email = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(rawEmail) ? rawEmail : null;
 
@@ -144,7 +148,7 @@ Deno.serve(async (req) => {
     // Registrar el acceso para analítica y detección de abuso. Este endpoint
     // nunca bloquea compras: una IP puede ser compartida por una oficina,
     // operadora móvil, VPN o por la vista previa del administrador.
-    await admin.from("checkout_rate_hits").insert({ ip, ua, slug, referer, source, country, email });
+    await admin.from("checkout_rate_hits").insert({ ip, ua, slug, referer, source, country, email, campaign, ad });
     return json({ allowed: true });
   } catch (err) {
     console.error("checkout-gate-check error", err);

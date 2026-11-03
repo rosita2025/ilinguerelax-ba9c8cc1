@@ -135,7 +135,7 @@ Deno.serve(async (req) => {
       const until = new Date(untilMs).toISOString();
       const { data: rawData, error } = await admin
         .from("checkout_rate_hits")
-        .select("ip, slug, created_at, source, referer, ua, country, email, city")
+        .select("ip, slug, created_at, source, referer, ua, country, email, city, campaign, ad")
         .gte("created_at", since)
         .lt("created_at", until)
         .limit(5000);
@@ -190,7 +190,7 @@ Deno.serve(async (req) => {
         );
       }
 
-      type Agg = { ip: string; count: number; raw: number; first: string; last: string; slugs: Set<string>; sources: Set<string>; referers: Set<string>; ua: string | null; country: string | null; city: string | null; email: string | null };
+      type Agg = { ip: string; count: number; raw: number; first: string; last: string; slugs: Set<string>; sources: Set<string>; referers: Set<string>; campaigns: Set<string>; ua: string | null; country: string | null; city: string | null; email: string | null };
       const byIp = new Map<string, Agg>();
       const bySource = new Map<string, number>();
       const byCountry = new Map<string, number>();
@@ -200,7 +200,7 @@ Deno.serve(async (req) => {
       const lastOpenAt = new Map<string, number>();
       let totalOpens = 0;
       for (const row of sortedHits) {
-        const r = row as { ip: string; slug: string | null; created_at: string; source: string | null; referer: string | null; ua: string | null; country: string | null; city: string | null; email: string | null };
+        const r = row as { ip: string; slug: string | null; created_at: string; source: string | null; referer: string | null; ua: string | null; country: string | null; city: string | null; email: string | null; campaign?: string | null; ad?: string | null };
         const openKey = `${r.ip}|${r.slug ?? ""}`;
         const ts = new Date(r.created_at).getTime();
         const isRepeat = ts - (lastOpenAt.get(openKey) ?? -Infinity) < 120_000;
@@ -210,7 +210,7 @@ Deno.serve(async (req) => {
           r.country = r.country || geo.country;
           r.city = r.city || geo.city;
         }
-        const cur = byIp.get(r.ip) || { ip: r.ip, count: 0, raw: 0, first: r.created_at, last: r.created_at, slugs: new Set(), sources: new Set(), referers: new Set(), ua: r.ua, country: r.country, city: r.city, email: r.email };
+        const cur = byIp.get(r.ip) || { ip: r.ip, count: 0, raw: 0, first: r.created_at, last: r.created_at, slugs: new Set(), sources: new Set(), referers: new Set(), campaigns: new Set(), ua: r.ua, country: r.country, city: r.city, email: r.email };
 
         cur.raw += 1;
         if (!isRepeat) { cur.count += 1; totalOpens += 1; }
@@ -219,6 +219,7 @@ Deno.serve(async (req) => {
         if (r.slug) cur.slugs.add(r.slug);
         if (r.source) cur.sources.add(r.source);
         if (r.referer) cur.referers.add(r.referer);
+        if (r.campaign || r.ad) cur.campaigns.add([r.campaign, r.ad].filter(Boolean).join(" · "));
         if (!cur.ua && r.ua) cur.ua = r.ua;
         if (!cur.country && r.country) cur.country = r.country;
         if (!cur.city && r.city) cur.city = r.city;
@@ -397,6 +398,7 @@ Deno.serve(async (req) => {
             slugs: [...x.slugs].slice(0, 5),
             sources: [...x.sources],
             referers: [...x.referers].slice(0, 3),
+            campaigns: [...x.campaigns].slice(0, 3),
             ua: x.ua,
             country: x.country,
             city: x.city,

@@ -26,6 +26,34 @@ export const captureMetaClickId = (): void => {
   } catch { /* noop */ }
 };
 
+// Campaña y anuncio de Meta (vienen en el enlace del anuncio como utm_campaign / utm_content).
+const AD_CAMPAIGN_KEY = "ilr_ad_campaign";
+
+/** Guarda utm_campaign y utm_content del enlace actual (se conservan 28 días). */
+export const captureAdCampaign = (): void => {
+  if (typeof window === "undefined") return;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const campaign = (params.get("utm_campaign") || "").trim().slice(0, 150);
+    const ad = (params.get("utm_content") || "").trim().slice(0, 150);
+    if (!campaign && !ad) return;
+    localStorage.setItem(AD_CAMPAIGN_KEY, JSON.stringify({ campaign, ad, until: Date.now() + WINDOW_MS }));
+  } catch { /* noop */ }
+};
+
+export const getAdCampaign = (): { campaign: string | null; ad: string | null } => {
+  if (typeof window === "undefined") return { campaign: null, ad: null };
+  try {
+    const raw = localStorage.getItem(AD_CAMPAIGN_KEY);
+    if (!raw) return { campaign: null, ad: null };
+    const v = JSON.parse(raw) as { campaign?: string; ad?: string; until?: number };
+    if (!v.until || v.until < Date.now()) return { campaign: null, ad: null };
+    return { campaign: v.campaign || null, ad: v.ad || null };
+  } catch {
+    return { campaign: null, ad: null };
+  }
+};
+
 export interface MetaAttribution {
   attributed: boolean;
   fbc: string | null;

@@ -15,6 +15,13 @@
       "when": 1792093201963,
       "tag": "0001_postpurchase_upsell_table",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793727808233,
+      "tag": "0002_checkout_hits_campaign",
+      "breakpoints": true
     }
   ]
 }

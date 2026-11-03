@@ -38,6 +38,8 @@ interface StatRow {
   slugs: string[];
   sources: string[];
   referers: string[];
+  /** "Campaña · Anuncio" de Meta (solo si el enlace del anuncio trae utm_campaign / utm_content). */
+  campaigns?: string[];
   ua: string | null;
   country?: string | null;
   city?: string | null;
@@ -372,6 +374,7 @@ function mergeSameDevice(rows: StatRow[]): StatRow[] {
       slugs: [...new Set(list.flatMap((x) => x.slugs))].slice(0, 5),
       sources: [...new Set(list.flatMap((x) => x.sources))],
       referers: [...new Set(list.flatMap((x) => x.referers))].slice(0, 3),
+      campaigns: [...new Set(list.flatMap((x) => x.campaigns ?? []))].slice(0, 3),
       actions,
       client_purchase_event: list.some((x) => x.client_purchase_event),
     });
@@ -748,6 +751,13 @@ export default function AdminCheckoutAbuse() {
                       </div>
                       {r.slugs.length > 0 && (
                         <div><span className="text-muted-foreground">Vio: </span>{r.slugs.join(", ")}</div>
+                      )}
+                      {(r.campaigns?.length ?? 0) > 0 ? (
+                        <div><span className="text-muted-foreground">📣 Campaña · Anuncio: </span><span className="font-medium">{r.campaigns!.join(" | ")}</span></div>
+                      ) : (
+                        r.sources.some((s) => ["facebook", "instagram"].includes(s)) && (
+                          <div className="text-muted-foreground">📣 Campaña: no viene en el enlace del anuncio (agrega los parámetros de URL en Meta).</div>
+                        )
                       )}
                       {r.referers.length > 0 && (
                         <div className="space-y-0.5">

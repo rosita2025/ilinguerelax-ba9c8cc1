@@ -55,6 +55,34 @@ async function lookupAttribution(email?: string | null): Promise<{ fbc: string |
 }
 
 /**
+ * Última visita al checkout de ese correo: de ahí salen la IP y el navegador reales
+ * del comprador (Meta los pide en eventos de sitio web y mejoran la coincidencia con el anuncio).
+ */
+async function lookupVisit(email?: string | null): Promise<{ ip: string | null; ua: string | null } | null> {
+  const clean = String(email || "").trim().toLowerCase();
+  if (!clean) return null;
+  try {
+    const url = Deno.env.get("SUPABASE_URL");
+    const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!url || !key) return null;
+    const { createClient } = await import("npm:@supabase/supabase-js@2");
+    const supabase = createClient(url, key);
+    const { data } = await supabase
+      .from("checkout_rate_hits")
+      .select("ip, ua")
+      .eq("email", clean)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    const row = (data as { ip?: string | null; ua?: string | null }[] | null)?.[0];
+    if (!row) return null;
+    return { ip: row.ip || null, ua: row.ua || null };
+  } catch (e) {
+    console.error("meta-capi visit lookup failed", e);
+    return null;
+  }
+}
+
+/**
  * Fire-and-forget: never throws, never blocks the webhook's 200 response.
  * Envía la compra siempre que haya correo; usa fbc/fbp si existen para mejorar
  * la coincidencia con el anuncio.
@@ -80,7 +108,10 @@ export async function sendPurchaseCapi(input: CapiPurchaseInput): Promise<void> 
       console.log("meta-capi: sin fbc/fbp, se envía solo con correo cifrado", input.eventId);
     }
 
+    const visit = await lookupVisit(input.email);
     const user_data: Record<string, unknown> = {};
+    if (visit?.ip) user_data.client_ip_address = visit.ip;
+    if (visit?.ua) user_data.client_user_agent = visit.ua;
     if (attribution?.fbc) user_data.fbc = attribution.fbc;
     if (attribution?.fbp) user_data.fbp = attribution.fbp;
     if (input.email) user_data.em = [await sha256(String(input.email).toLowerCase().trim())];
@@ -104,7 +135,7 @@ export async function sendPurchaseCapi(input: CapiPurchaseInput): Promise<void> 
           event_name: input.eventName || "Purchase",
           event_time: Math.floor(Date.now() / 1000),
           event_id: input.eventId,
-          event_source_url: input.eventSourceUrl || "https://ilinguerelax.com/checkout-success",
+          event_source_url: input.eventSourceUrl || "https://ilinguerelax.com/checkouts/success",
           action_source: "website",
           user_data,
           custom_data,

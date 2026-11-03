@@ -199,12 +199,19 @@ Deno.serve(async (req) => {
       const sortedHits = [...(data || [])].sort((x, y) => String((x as { created_at: string }).created_at).localeCompare(String((y as { created_at: string }).created_at)));
       const lastOpenAt = new Map<string, number>();
       let totalOpens = 0;
+      // Resumen por campaña + producto (slug del checkout): aperturas y personas distintas.
+      const pairAgg = new Map<string, { campaign: string | null; slug: string | null; opens: number; ips: Set<string> }>();
       for (const row of sortedHits) {
         const r = row as { ip: string; slug: string | null; created_at: string; source: string | null; referer: string | null; ua: string | null; country: string | null; city: string | null; email: string | null; campaign?: string | null; ad?: string | null };
         const openKey = `${r.ip}|${r.slug ?? ""}`;
         const ts = new Date(r.created_at).getTime();
         const isRepeat = ts - (lastOpenAt.get(openKey) ?? -Infinity) < 120_000;
         lastOpenAt.set(openKey, ts);
+        const pairKey = `${r.campaign || ""}|${r.slug || ""}`;
+        const pair = pairAgg.get(pairKey) || { campaign: r.campaign || null, slug: r.slug || null, opens: 0, ips: new Set<string>() };
+        if (!isRepeat) pair.opens += 1;
+        pair.ips.add(r.ip);
+        pairAgg.set(pairKey, pair);
         const geo = resolved.get(r.ip);
         if (geo) {
           r.country = r.country || geo.country;
@@ -452,7 +459,22 @@ Deno.serve(async (req) => {
       summary.with_email = leads.length;
       summary.purchased = leads.filter((l) => l.status === "purchased").length;
       summary.abandoned = leads.filter((l) => l.status === "abandoned").length;
-      return json({ top, sources, countries, summary, leads, total: (data || []).length, range, since, until, only_real: onlyReal, hidden_visits: hiddenVisits });
+      // Campaña × producto: cuántos abrieron el checkout, dejaron correo y compraron.
+      const by_campaign_product = [...pairAgg.values()]
+        .map((p) => {
+          let withEmail = 0;
+          let bought = 0;
+          for (const ip of p.ips) {
+            const em = (byIp.get(ip)?.email || "").toLowerCase();
+            if (!em) continue;
+            withEmail += 1;
+            if (purchased.has(em)) bought += 1;
+          }
+          return { campaign: p.campaign, slug: p.slug, opens: p.opens, visitors: p.ips.size, with_email: withEmail, purchased: bought };
+        })
+        .sort((a, b) => b.purchased - a.purchased || b.opens - a.opens)
+        .slice(0, 60);
+      return json({ top, sources, countries, summary, leads, by_campaign_product, total: (data || []).length, range, since, until, only_real: onlyReal, hidden_visits: hiddenVisits });
 
     }
 

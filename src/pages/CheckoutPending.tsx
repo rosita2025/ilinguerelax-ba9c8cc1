@@ -39,15 +39,6 @@ export default function CheckoutPending() {
         </div>
         <h1 className="text-3xl font-bold">{t.paymentPending}</h1>
         <p className="text-muted-foreground">{t.pendingDesc}</p>
-        {sp.get("reason") === "oxxo_pending" && (
-          <p className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-200">
-            {language === "en"
-              ? "Pay your OXXO voucher at any OXXO store within 3 days. When the payment is confirmed (it can take up to 1 business day) you will receive your product by email."
-              : language === "pt"
-              ? "Pague seu voucher OXXO em qualquer loja OXXO em até 3 dias. Quando o pagamento for confirmado (pode levar até 1 dia útil) você receberá seu produto por e-mail."
-              : "Paga tu voucher de OXXO en cualquier tienda OXXO dentro de 3 días. Cuando se confirme el pago (puede tardar hasta 1 día hábil) recibirás tu producto por correo."}
-          </p>
-        )}
 
         <div className="rounded-xl border bg-card p-4 text-left text-sm space-y-2">
           <div className="flex gap-3">

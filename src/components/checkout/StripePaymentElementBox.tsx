@@ -208,6 +208,17 @@ const Inner = ({
       console.error("[payment-element] unexpected error", err);
       const ex = err as { name?: string; type?: string; code?: string; message?: string };
       setDetail(["excepción", ex?.name, ex?.type, ex?.code, ex?.message].filter(Boolean).join(" · ").slice(0, 200));
+      // También se guarda en «Fallos de pago» (antes solo se mostraba en pantalla): así se ve qué pasó con Bizum, Klarna, etc.
+      try {
+        const st = useCheckoutPruebaStore.getState();
+        trackPaymentError({
+          skus: st.items.map((i) => i.id),
+          provider: "stripe",
+          reason: ["exception", method, country, ex?.name, ex?.type, ex?.code, ex?.message].filter(Boolean).join(" · ").slice(0, 300),
+          value: ZERO_DECIMAL.has(quote.currency.toLowerCase()) ? quote.amount : quote.amount / 100,
+          currency: quote.currency,
+        });
+      } catch { /* el registro no debe romper el pago */ }
       setError(mapStripeError(err, lang).message || t.error);
     } finally {
       setBusy(false);

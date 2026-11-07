@@ -135,7 +135,7 @@ Deno.serve(async (req) => {
       const until = new Date(untilMs).toISOString();
       const { data: rawData, error } = await admin
         .from("checkout_rate_hits")
-        .select("ip, slug, created_at, source, referer, ua, country, email, city")
+        .select("ip, slug, created_at, source, referer, ua, country, email, city, campaign, ad")
         .gte("created_at", since)
         .lt("created_at", until)
         .limit(5000);
@@ -190,7 +190,7 @@ Deno.serve(async (req) => {
         );
       }
 
-      type Agg = { ip: string; count: number; raw: number; first: string; last: string; slugs: Set<string>; sources: Set<string>; referers: Set<string>; ua: string | null; country: string | null; city: string | null; email: string | null };
+      type Agg = { ip: string; count: number; raw: number; first: string; last: string; slugs: Set<string>; sources: Set<string>; referers: Set<string>; campaigns: Set<string>; ua: string | null; country: string | null; city: string | null; email: string | null };
       const byIp = new Map<string, Agg>();
       const bySource = new Map<string, number>();
       const byCountry = new Map<string, number>();
@@ -199,18 +199,25 @@ Deno.serve(async (req) => {
       const sortedHits = [...(data || [])].sort((x, y) => String((x as { created_at: string }).created_at).localeCompare(String((y as { created_at: string }).created_at)));
       const lastOpenAt = new Map<string, number>();
       let totalOpens = 0;
+      // Resumen por campaña + producto (slug del checkout): aperturas y personas distintas.
+      const pairAgg = new Map<string, { campaign: string | null; slug: string | null; opens: number; ips: Set<string> }>();
       for (const row of sortedHits) {
-        const r = row as { ip: string; slug: string | null; created_at: string; source: string | null; referer: string | null; ua: string | null; country: string | null; city: string | null; email: string | null };
+        const r = row as { ip: string; slug: string | null; created_at: string; source: string | null; referer: string | null; ua: string | null; country: string | null; city: string | null; email: string | null; campaign?: string | null; ad?: string | null };
         const openKey = `${r.ip}|${r.slug ?? ""}`;
         const ts = new Date(r.created_at).getTime();
         const isRepeat = ts - (lastOpenAt.get(openKey) ?? -Infinity) < 120_000;
         lastOpenAt.set(openKey, ts);
+        const pairKey = `${r.campaign || ""}|${r.slug || ""}`;
+        const pair = pairAgg.get(pairKey) || { campaign: r.campaign || null, slug: r.slug || null, opens: 0, ips: new Set<string>() };
+        if (!isRepeat) pair.opens += 1;
+        pair.ips.add(r.ip);
+        pairAgg.set(pairKey, pair);
         const geo = resolved.get(r.ip);
         if (geo) {
           r.country = r.country || geo.country;
           r.city = r.city || geo.city;
         }
-        const cur = byIp.get(r.ip) || { ip: r.ip, count: 0, raw: 0, first: r.created_at, last: r.created_at, slugs: new Set(), sources: new Set(), referers: new Set(), ua: r.ua, country: r.country, city: r.city, email: r.email };
+        const cur = byIp.get(r.ip) || { ip: r.ip, count: 0, raw: 0, first: r.created_at, last: r.created_at, slugs: new Set(), sources: new Set(), referers: new Set(), campaigns: new Set(), ua: r.ua, country: r.country, city: r.city, email: r.email };
 
         cur.raw += 1;
         if (!isRepeat) { cur.count += 1; totalOpens += 1; }
@@ -219,6 +226,7 @@ Deno.serve(async (req) => {
         if (r.slug) cur.slugs.add(r.slug);
         if (r.source) cur.sources.add(r.source);
         if (r.referer) cur.referers.add(r.referer);
+        if (r.campaign || r.ad) cur.campaigns.add([r.campaign, r.ad].filter(Boolean).join(" · "));
         if (!cur.ua && r.ua) cur.ua = r.ua;
         if (!cur.country && r.country) cur.country = r.country;
         if (!cur.city && r.city) cur.city = r.city;
@@ -397,6 +405,7 @@ Deno.serve(async (req) => {
             slugs: [...x.slugs].slice(0, 5),
             sources: [...x.sources],
             referers: [...x.referers].slice(0, 3),
+            campaigns: [...x.campaigns].slice(0, 3),
             ua: x.ua,
             country: x.country,
             city: x.city,
@@ -450,7 +459,22 @@ Deno.serve(async (req) => {
       summary.with_email = leads.length;
       summary.purchased = leads.filter((l) => l.status === "purchased").length;
       summary.abandoned = leads.filter((l) => l.status === "abandoned").length;
-      return json({ top, sources, countries, summary, leads, total: (data || []).length, range, since, until, only_real: onlyReal, hidden_visits: hiddenVisits });
+      // Campaña × producto: cuántos abrieron el checkout, dejaron correo y compraron.
+      const by_campaign_product = [...pairAgg.values()]
+        .map((p) => {
+          let withEmail = 0;
+          let bought = 0;
+          for (const ip of p.ips) {
+            const em = (byIp.get(ip)?.email || "").toLowerCase();
+            if (!em) continue;
+            withEmail += 1;
+            if (purchased.has(em)) bought += 1;
+          }
+          return { campaign: p.campaign, slug: p.slug, opens: p.opens, visitors: p.ips.size, with_email: withEmail, purchased: bought };
+        })
+        .sort((a, b) => b.purchased - a.purchased || b.opens - a.opens)
+        .slice(0, 60);
+      return json({ top, sources, countries, summary, leads, by_campaign_product, total: (data || []).length, range, since, until, only_real: onlyReal, hidden_visits: hiddenVisits });
 
     }
 

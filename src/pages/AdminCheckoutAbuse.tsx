@@ -38,6 +38,8 @@ interface StatRow {
   slugs: string[];
   sources: string[];
   referers: string[];
+  /** "Campaña · Anuncio" de Meta (solo si el enlace del anuncio trae utm_campaign / utm_content). */
+  campaigns?: string[];
   ua: string | null;
   country?: string | null;
   city?: string | null;
@@ -372,6 +374,7 @@ function mergeSameDevice(rows: StatRow[]): StatRow[] {
       slugs: [...new Set(list.flatMap((x) => x.slugs))].slice(0, 5),
       sources: [...new Set(list.flatMap((x) => x.sources))],
       referers: [...new Set(list.flatMap((x) => x.referers))].slice(0, 3),
+      campaigns: [...new Set(list.flatMap((x) => x.campaigns ?? []))].slice(0, 3),
       actions,
       client_purchase_event: list.some((x) => x.client_purchase_event),
     });
@@ -389,6 +392,15 @@ interface Summary {
   countries: number;
   avg_duration_sec?: number;
   generated_at: string;
+}
+
+interface CampaignProductRow {
+  campaign: string | null;
+  slug: string | null;
+  opens: number;
+  visitors: number;
+  with_email: number;
+  purchased: number;
 }
 
 interface Lead {
@@ -424,6 +436,7 @@ export default function AdminCheckoutAbuse() {
   const [countries, setCountries] = useState<CountryRow[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [byCampaignProduct, setByCampaignProduct] = useState<CampaignProductRow[]>([]);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [loading, setLoading] = useState(false);
   const [range, setRange] = useState<"today" | "yesterday" | "24h">("today");
@@ -459,13 +472,14 @@ export default function AdminCheckoutAbuse() {
       if (b.error) throw b.error;
       if (s.error) throw s.error;
       setBans(((b.data as { bans?: Ban[] } | null)?.bans) ?? []);
-      const stats = s.data as { top?: StatRow[]; sources?: SourceRow[]; countries?: CountryRow[]; summary?: Summary; leads?: Lead[]; hidden_visits?: number } | null;
+      const stats = s.data as { top?: StatRow[]; sources?: SourceRow[]; countries?: CountryRow[]; summary?: Summary; leads?: Lead[]; by_campaign_product?: CampaignProductRow[]; hidden_visits?: number } | null;
       setHiddenVisits(stats?.hidden_visits ?? 0);
       setTop(stats?.top ?? []);
       setSources(stats?.sources ?? []);
       setCountries(stats?.countries ?? []);
       setSummary(stats?.summary ?? null);
       setLeads(stats?.leads ?? []);
+      setByCampaignProduct(stats?.by_campaign_product ?? []);
       setUpdatedAt(new Date());
     } catch {
       toast({ title: "Error al cargar datos", variant: "destructive" });
@@ -623,6 +637,50 @@ export default function AdminCheckoutAbuse() {
         })()}
 
         <section className="border rounded-lg overflow-hidden">
+          <div className="px-4 py-3 bg-muted/40 border-b">
+            <h2 className="font-semibold">Campañas y productos · {rangeLabel}</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              Qué producto vio la gente de cada campaña: cuántos abrieron el checkout, cuántos dejaron correo y cuántos compraron.
+              La campaña sale del enlace del anuncio (utm_campaign); las visitas anteriores a ese cambio salen como "sin campaña".
+            </p>
+          </div>
+          {byCampaignProduct.length === 0 ? (
+            <p className="p-6 text-sm text-muted-foreground text-center">Sin actividad reciente.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/20 text-xs uppercase text-muted-foreground">
+                  <tr>
+                    <th className="text-left px-4 py-2">Campaña</th>
+                    <th className="text-left px-4 py-2">Producto</th>
+                    <th className="text-right px-4 py-2">Aperturas</th>
+                    <th className="text-right px-4 py-2">Personas</th>
+                    <th className="text-right px-4 py-2">Dejaron correo</th>
+                    <th className="text-right px-4 py-2">Compraron</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {byCampaignProduct.map((c, i) => (
+                    <tr key={`${c.campaign ?? ""}|${c.slug ?? ""}|${i}`} className="border-t">
+                      <td className="px-4 py-2 max-w-[260px] truncate" title={c.campaign ?? ""}>
+                        {c.campaign ?? <span className="text-muted-foreground">sin campaña</span>}
+                      </td>
+                      <td className="px-4 py-2 max-w-[260px] truncate" title={c.slug ?? ""}>
+                        {c.slug ? c.slug.replace(/-/g, " ") : "—"}
+                      </td>
+                      <td className="px-4 py-2 text-right font-mono">{c.opens}</td>
+                      <td className="px-4 py-2 text-right font-mono">{c.visitors}</td>
+                      <td className="px-4 py-2 text-right font-mono">{c.with_email}</td>
+                      <td className={`px-4 py-2 text-right font-mono ${c.purchased > 0 ? "font-bold text-green-700" : ""}`}>{c.purchased}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        <section className="border rounded-lg overflow-hidden">
           <div className="px-4 py-3 bg-muted/40 border-b space-y-3">
             <div>
               <h2 className="font-semibold">Visitantes del checkout · {rangeLabel}</h2>
@@ -748,6 +806,13 @@ export default function AdminCheckoutAbuse() {
                       </div>
                       {r.slugs.length > 0 && (
                         <div><span className="text-muted-foreground">Vio: </span>{r.slugs.join(", ")}</div>
+                      )}
+                      {(r.campaigns?.length ?? 0) > 0 ? (
+                        <div><span className="text-muted-foreground">📣 Campaña · Anuncio: </span><span className="font-medium">{r.campaigns!.join(" | ")}</span></div>
+                      ) : (
+                        r.sources.some((s) => ["facebook", "instagram"].includes(s)) && (
+                          <div className="text-muted-foreground">📣 Campaña: no viene en el enlace del anuncio (agrega los parámetros de URL en Meta).</div>
+                        )
                       )}
                       {r.referers.length > 0 && (
                         <div className="space-y-0.5">

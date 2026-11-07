@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, lazy, Suspense } from "react";
+import { getAdCampaign } from "@/lib/metaAttribution";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Lock, ShieldCheck, MessageCircle, ArrowLeft, Zap, BadgeCheck, Users, Clock, Package } from "lucide-react";
@@ -126,6 +127,7 @@ export default function Checkout() {
             referer: (typeof document !== "undefined" && document.referrer) || "",
             country: (region.country || "").toUpperCase(),
             internal: isInternalTraffic(),
+            ...getAdCampaign(),
           },
         });
         const res = data as { allowed?: boolean; reason?: string } | null;

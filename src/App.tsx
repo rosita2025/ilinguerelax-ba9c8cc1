@@ -13,7 +13,7 @@ import { I18nProvider } from "@/i18n/I18nContext";
 import { supabase } from "@/integrations/supabase/client";
 import { LivePricesProvider } from "@/lib/livePrices";
 import { getClientId, initClientIdSync } from "@/lib/clientId";
-import { captureMetaClickId } from "@/lib/metaAttribution";
+import { captureMetaClickId, captureAdCampaign } from "@/lib/metaAttribution";
 import { isInternalTraffic } from "@/hooks/useMetaPixel";
 import { PATRONES_COVER_SOURCE, PATRONES_FAST_COVER_URL, PATRONES_PRODUCT_SLUG, PATRONES_MOBILE_COVER_URL, PATRONES_COVER_SRCSET, PATRONES_COVER_SIZES } from "@/lib/patronesCover";
 import { getPatronesConnection, isPatronesConstrainedConnection } from "@/lib/patronesNetwork";
@@ -205,7 +205,7 @@ const RouteTracker = () => {
   const location = useLocation();
   useEffect(() => { initClientIdSync(); }, []);
   // Captura el fbclid del anuncio en cualquier página (home, blog, productos).
-  useEffect(() => { captureMetaClickId(); }, [location.search]);
+  useEffect(() => { captureMetaClickId(); captureAdCampaign(); }, [location.search]);
   useEffect(() => {
 
     if (location.pathname.startsWith("/admin")) return;

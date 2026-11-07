@@ -174,13 +174,16 @@ export default function ExpressCheckoutBox({ language }: { language: string }) {
   }, []);
 
   const hasPhysical = items.some((i) => i.isPhysical);
+  // Latinoamérica: NO se ofrece el "Pago rápido" (Apple Pay / Google Pay / Link). Dejaba pagos incompletos sin método de pago
+  // (p. ej. México); allí la tarjeta se paga siempre en la página de pago de Stripe (checkout.stripe.com).
+  const latam = region.tier === "latam";
   const signature = JSON.stringify({ items: items.map((i) => [i.id, i.quantity]), coupon, currency, country });
   const [quote, setQuote] = useState<Quote | null>(null);
   const [available, setAvailable] = useState(false);
 
   useEffect(() => {
     setQuote(null);
-    if (!enabled || !stripePromise || hasPhysical || items.length === 0 || country.length !== 2) return;
+    if (!enabled || latam || !stripePromise || hasPhysical || items.length === 0 || country.length !== 2) return;
     let cancelled = false;
     (async () => {
       const q = await fetchStripeQuote({ items, currency: String(currency || "USD"), country, couponCode: coupon });
@@ -191,9 +194,9 @@ export default function ExpressCheckoutBox({ language }: { language: string }) {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signature, enabled, stripePromise, hasPhysical]);
+  }, [signature, enabled, stripePromise, hasPhysical, latam]);
 
-  if (!enabled || !stripePromise || !quote || hasPhysical || !methods.loaded || !methods.enabledMethodKeys.includes("stripe_card")) return null;
+  if (!enabled || latam || !stripePromise || !quote || hasPhysical || !methods.loaded || !methods.enabledMethodKeys.includes("stripe_card")) return null;
 
   return (
     <div className="rounded-xl border bg-card p-3 sm:p-4 shadow-sm">

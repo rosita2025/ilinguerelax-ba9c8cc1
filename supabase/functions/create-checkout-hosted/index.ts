@@ -219,12 +219,6 @@ Deno.serve(async (req) => {
       shipping_usd: String(shippingUsd),
     };
 
-    // México: la página de pago de Stripe ofrece tarjeta Y OXXO (efectivo en tienda, voucher válido 3 días).
-    // Solo en pesos mexicanos y solo productos digitales. OXXO es un pago diferido: la entrega la hace el webhook
-    // cuando llega checkout.session.async_payment_succeeded (no se entrega con el voucher sin pagar).
-    // Adaptive Pricing se apaga aquí: el cobro ya es en MXN y OXXO solo acepta MXN.
-    const offerOxxo = country === "MX" && targetCurrency === "mxn" && !isPhysical;
-
     console.log(`[Stripe Hosted Fallback] Creating session. TargetCurrency: ${targetCurrency}, Total: ${totalCents}, Country: ${country}`);
 
     const session = await stripe.checkout.sessions.create({
@@ -232,13 +226,12 @@ Deno.serve(async (req) => {
       mode: "payment",
       // Solo tarjeta de crédito/débito (Apple Pay y Google Pay van dentro de "card"). Sin "link" en la lista Stripe no muestra
       // Link ("Confirma que eres tú" con teléfono) ni otros métodos, que confundían al comprador.
-      payment_method_types: offerOxxo ? ["card", "oxxo"] : ["card"],
-      ...(offerOxxo ? { payment_method_options: { oxxo: { expires_after_days: 3 } } } : {}),
+      payment_method_types: ["card"],
       // CAMBIO 1: sin ui_mode → Stripe usa "hosted" (página completa, no iframe).
       // CAMBIO 2: success_url / cancel_url en vez de return_url.
       success_url: body.returnUrl,
       cancel_url: body.cancelUrl ?? body.returnUrl,
-      adaptive_pricing: { enabled: !forceUsd && !offerOxxo },
+      adaptive_pricing: { enabled: !forceUsd },
       currency: targetCurrency,
       customer_email: body.contact.email,
       payment_intent_data: {

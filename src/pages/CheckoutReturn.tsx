@@ -7,6 +7,7 @@ import { getCheckoutStrings } from "@/i18n/checkoutStatus";
 import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { readDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
 import { dlocalCodeFromStatus } from "@/lib/dlocalErrorMap";
+import { getStripeEnvironment } from "@/lib/stripe";
 
 /**
  * Pantalla puente del checkout.
@@ -151,8 +152,31 @@ export default function CheckoutReturn() {
       navigate(`/checkouts/failure?${params.toString()}`, { replace: true });
       return;
     }
-    params.set("status", "approved");
-    navigate(`/checkouts/success?${params.toString()}`, { replace: true });
+    let cancelled = false;
+    (async () => {
+      // Página de pago de Stripe: si el pago es diferido y todavía no está pagado (voucher de OXXO en México),
+      // no es una compra aprobada: se muestra "pago pendiente". Si la consulta falla, se sigue como siempre.
+      if (sessionId && sessionId.startsWith("cs_")) {
+        try {
+          const { data } = await invokeWithRetry<{ payment_status?: string }>(
+            "checkout-session-status",
+            { body: { environment: getStripeEnvironment(), session_id: sessionId } },
+            { attempts: 2, baseDelayMs: 500 },
+          );
+          if (cancelled) return;
+          if (data?.payment_status === "unpaid") {
+            params.set("status", "pending");
+            params.set("reason", "oxxo_pending");
+            navigate(`/checkouts/pending?${params.toString()}`, { replace: true });
+            return;
+          }
+        } catch { /* se sigue al flujo normal */ }
+      }
+      if (cancelled) return;
+      params.set("status", "approved");
+      navigate(`/checkouts/success?${params.toString()}`, { replace: true });
+    })();
+    return () => { cancelled = true; };
   }, [sessionId, navigate, sp, isDlocal, isPaypal]);
 
   return (

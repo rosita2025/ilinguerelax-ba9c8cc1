@@ -10,6 +10,8 @@ import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { fetchStripeQuote } from "@/lib/stripeQuote";
 import { getOrderRef } from "@/lib/support";
 import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
+import { savesCardForFutureUse } from "@/lib/cardSaving";
+import { trackPaymentError } from "@/hooks/useMetaPixel";
 
 /**
  * EXPRESS CHECKOUT de Stripe: botones de Apple Pay, Google Pay y Link arriba del checkout.
@@ -110,6 +112,9 @@ const ExpressInner = ({ language, country, currency, onAvailable, available }: I
 
       if (fnError || !data?.clientSecret || !data.paymentIntentId) {
         console.error("[express-checkout] create intent failed", fnError, data);
+        const fe = fnError as { edgeDetail?: string; status?: number; message?: string } | null;
+        const dd = data as { reason?: string; error?: string } | null;
+        trackPaymentError({ skus: s.items.map((i) => i.id), provider: "stripe", reason: ["express create_intent", country, fe?.status, dd?.reason, dd?.error, fe?.edgeDetail || fe?.message].filter(Boolean).join(" · ").slice(0, 300), value: 0, currency });
         setError(t.genericError);
         return;
       }
@@ -124,10 +129,15 @@ const ExpressInner = ({ language, country, currency, onAvailable, available }: I
 
       // Si todo sale bien, Stripe redirige solo a return_url (no llegamos aquí).
       if (confirmError) {
+        trackPaymentError({ skus: s.items.map((i) => i.id), provider: "stripe", reason: ["express confirm", confirmError.decline_code || confirmError.code || confirmError.type, country, data.paymentIntentId, confirmError.message].filter(Boolean).join(" · ").slice(0, 300), value: 0, currency });
         setError(mapStripeError(confirmError, language).message || t.genericError);
       }
     } catch (err) {
       console.error("[express-checkout] unexpected error", err);
+      try {
+        const ex = err as { name?: string; type?: string; code?: string; message?: string };
+        trackPaymentError({ skus: useCheckoutPruebaStore.getState().items.map((i) => i.id), provider: "stripe", reason: ["express exception", country, ex?.name, ex?.type, ex?.code, ex?.message].filter(Boolean).join(" · ").slice(0, 300), value: 0, currency });
+      } catch { /* el registro no debe romper el pago */ }
       setError(mapStripeError(err, language).message || t.genericError);
     }
   };
@@ -174,16 +184,13 @@ export default function ExpressCheckoutBox({ language }: { language: string }) {
   }, []);
 
   const hasPhysical = items.some((i) => i.isPhysical);
-  // Latinoamérica: NO se ofrece el "Pago rápido" (Apple Pay / Google Pay / Link). Dejaba pagos incompletos sin método de pago
-  // (p. ej. México); allí la tarjeta se paga siempre en la página de pago de Stripe (checkout.stripe.com).
-  const latam = region.tier === "latam";
   const signature = JSON.stringify({ items: items.map((i) => [i.id, i.quantity]), coupon, currency, country });
   const [quote, setQuote] = useState<Quote | null>(null);
   const [available, setAvailable] = useState(false);
 
   useEffect(() => {
     setQuote(null);
-    if (!enabled || latam || !stripePromise || hasPhysical || items.length === 0 || country.length !== 2) return;
+    if (!enabled || !stripePromise || hasPhysical || items.length === 0 || country.length !== 2) return;
     let cancelled = false;
     (async () => {
       const q = await fetchStripeQuote({ items, currency: String(currency || "USD"), country, couponCode: coupon });
@@ -194,9 +201,9 @@ export default function ExpressCheckoutBox({ language }: { language: string }) {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signature, enabled, stripePromise, hasPhysical, latam]);
+  }, [signature, enabled, stripePromise, hasPhysical]);
 
-  if (!enabled || latam || !stripePromise || !quote || hasPhysical || !methods.loaded || !methods.enabledMethodKeys.includes("stripe_card")) return null;
+  if (!enabled || !stripePromise || !quote || hasPhysical || !methods.loaded || !methods.enabledMethodKeys.includes("stripe_card")) return null;
 
   return (
     <div className="rounded-xl border bg-card p-3 sm:p-4 shadow-sm">
@@ -207,7 +214,10 @@ export default function ExpressCheckoutBox({ language }: { language: string }) {
           mode: "payment",
           amount: quote.amount,
           currency: quote.currency,
-          setupFutureUsage: "off_session",
+          // Debe coincidir con el pago que crea el servidor (create-express-intent): en Latinoamérica y Europa la tarjeta NO se
+          // guarda (savesCardForFutureUse = false). Si aquí se pedía "off_session" y el servidor no, Stripe rechazaba la
+          // confirmación y el pago quedaba «Incompleto» sin método de pago (México).
+          ...(savesCardForFutureUse(country) ? { setupFutureUsage: "off_session" as const } : {}),
           appearance: { theme: "stripe" },
         }}
       >

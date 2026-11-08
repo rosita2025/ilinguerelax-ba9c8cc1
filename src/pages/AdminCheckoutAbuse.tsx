@@ -755,15 +755,20 @@ export default function AdminCheckoutAbuse() {
                       </span>
                       <span className="inline-flex items-center gap-1 text-xs" title="No es el tiempo en pantalla: es el tiempo entre la primera y la última vez que abrió el checkout (puede volver horas después)">
                         <Timer className="h-3.5 w-3.5 text-muted-foreground" />
-                        {r.count > 1 ? `volvió tras ${fmtDuration(r.duration_sec)}` : "1 visita"}
+                        {r.ip.startsWith("carrito:") ? "—" : r.count > 1 ? `volvió tras ${fmtDuration(r.duration_sec)}` : "1 visita"}
                       </span>
                       {(r.merged_ips?.length ?? 0) > 1 && (
                         <span className="text-xs px-2 py-0.5 rounded-full border bg-sky-500/10 text-sky-700 border-sky-500/30" title="Mismo modelo de teléfono, navegador y país con varias IPs o visitas: probablemente es el mismo cliente">
                           🔁 Mismo cliente probable · {r.merged_ips!.length} IPs
                         </span>
                       )}
+                      {r.ip.startsWith("carrito:") && (
+                        <span className="text-xs px-2 py-0.5 rounded-full border bg-amber-500/10 text-amber-700 border-amber-500/30" title="Dejó su correo en el checkout (carrito guardado), pero su visita no está registrada: llegó por otro enlace, sin origen o desde otro producto.">
+                          🛒 Dejó su correo · sin visita registrada
+                        </span>
+                      )}
                       <span
-                        className={`text-xs font-semibold ${r.count > 20 ? "text-destructive" : "text-muted-foreground"}`}
+                        className={`text-xs font-semibold ${r.count > 20 ? "text-destructive" : "text-muted-foreground"} ${r.ip.startsWith("carrito:") ? "hidden" : ""}`}
                         title="Veces que abrió el checkout. Si recarga o lo abre dos veces en menos de 2 minutos cuenta una sola. No es del Pixel de Meta: es el registro del propio checkout."
                       >
                         {r.count} {r.count === 1 ? "apertura" : "aperturas"}
@@ -800,7 +805,7 @@ export default function AdminCheckoutAbuse() {
                       <div className="flex flex-wrap items-center gap-2">
                         {(r.sources.length ? r.sources : ["direct"]).map((src) => <SourceBadge key={src} source={src} />)}
                         {r.first && <span className="text-muted-foreground">Primera visita: {new Date(r.first).toLocaleTimeString()}</span>}
-                        <span className="font-mono text-muted-foreground">{r.ip}</span>
+                        {!r.ip.startsWith("carrito:") && <span className="font-mono text-muted-foreground">{r.ip}</span>}
                         {(r.reminders ?? 0) > 0 && <span className="text-muted-foreground">· {r.reminders} recordatorio(s) enviados</span>}
                         {r.status === "abandoned" && <WhatsAppFollowUp url={waUrl} />}
                       </div>

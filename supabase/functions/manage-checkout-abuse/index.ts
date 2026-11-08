@@ -419,6 +419,66 @@ Deno.serve(async (req) => {
         })
         .sort((a, b) => b.count - a.count)
         .slice(0, 100);
+      // Quien dejó su correo en el checkout de CUALQUIER producto debe salir en la lista, aunque su visita no esté registrada
+      // (otro checkout, origen «directo» oculto por «Solo tráfico real», o IP del equipo): se completan desde los carritos del rango.
+      try {
+        const known = new Set(top.map((r) => (r.email || "").toLowerCase()).filter(Boolean));
+        const { data: cartRows } = await admin
+          .from("persistent_carts")
+          .select("*")
+          .or(`and(last_activity.gte.${since},last_activity.lt.${until}),and(created_at.gte.${since},created_at.lt.${until})`)
+          .limit(500);
+        const extra = ((cartRows || []) as Record<string, unknown>[]).filter((c) => {
+          const em = String(c.email ?? "").trim().toLowerCase();
+          return em && !known.has(em);
+        });
+        if (extra.length) {
+          const extraEmails = [...new Set(extra.map((c) => String(c.email).trim().toLowerCase()))];
+          const boughtExtra = await getPurchasedEmails(admin, extraEmails);
+          for (const c of extra) {
+            const em = String(c.email).trim().toLowerCase();
+            if (known.has(em)) continue;
+            known.add(em);
+            const buyer = (c.buyer ?? {}) as { name?: string; phone?: string };
+            const items = Array.isArray(c.items) ? (c.items as Record<string, unknown>[]) : [];
+            const slugs = items.map((i) => String(i.slug ?? i.id ?? i.sku ?? "")).filter(Boolean).slice(0, 5);
+            const last = String(c.last_activity ?? c.created_at ?? new Date().toISOString());
+            const first = String(c.created_at ?? last);
+            top.push({
+              ip: `carrito:${em}`,
+              count: 0,
+              raw_count: 0,
+              first,
+              last,
+              duration_sec: Math.max(0, Math.round((new Date(last).getTime() - new Date(first).getTime()) / 1000)),
+              cart: {
+                name: String(buyer.name ?? "").slice(0, 120),
+                phone: String(buyer.phone ?? "").slice(0, 40),
+                started: (c.created_at as string | null) ?? null,
+                last_activity: (c.last_activity as string | null) ?? null,
+                recover_url: c.cart_token ? `https://ilinguerelax.com/recuperar-carrito?t=${encodeURIComponent(String(c.cart_token))}` : null,
+              },
+              payment_method: methodByEmail.get(em) ?? null,
+              actions: {},
+              paid_by: null,
+              providers: [...(providersByEmail.get(em) ?? [])],
+              slugs,
+              sources: [],
+              referers: [],
+              campaigns: [],
+              ua: null,
+              country: null,
+              city: null,
+              email: em,
+              status: boughtExtra.has(em) || c.converted === true ? "purchased" : "abandoned",
+              client_purchase_event: false,
+              reminders: 0,
+            });
+          }
+        }
+      } catch (e) {
+        console.error("checkout-abuse: no se pudieron completar visitantes desde carritos", e);
+      }
       const sources = [...bySource.entries()]
         .map(([source, count]) => ({ source, count }))
         .sort((a, b) => b.count - a.count);

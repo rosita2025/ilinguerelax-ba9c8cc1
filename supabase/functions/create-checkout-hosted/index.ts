@@ -111,7 +111,11 @@ Deno.serve(async (req) => {
     }
 
     const discountMultiplier = 1 - pricing.couponPercent / 100;
-    const forceUsd = body.isRestrictedRetry || isRestrictedCurrency(country);
+    const initialForceUsd = body.isRestrictedRetry || isRestrictedCurrency(country);
+
+    // Crea la sesión en la moneda local del comprador o, con forceUsd, en dólares.
+    // Si Stripe no acepta la moneda local (ej. cuenta sin esa moneda), se reintenta solo en USD: el comprador nunca ve un error por la moneda.
+    const createSession = async (forceUsd: boolean): Promise<{ session: { url?: string | null } } | { tooSmall: true }> => {
     const targetCurrency = forceUsd ? "usd" : currency;
 
     // --- LÓGICA DE ENVÍO (idéntica a create-checkout-prueba) ---
@@ -185,12 +189,7 @@ Deno.serve(async (req) => {
 
     const totalCents = line_items.reduce((sum, item) => sum + (item.price_data.unit_amount * item.quantity), 0);
 
-    if (totalCents < 50) {
-      return new Response(
-        JSON.stringify({ error: "El monto total debe ser al menos $0.50 USD" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
+    if (totalCents < 50) return { tooSmall: true };
 
     const fullName = `${body.contact.firstName} ${body.contact.lastName}`.trim().slice(0, 100);
 
@@ -241,6 +240,26 @@ Deno.serve(async (req) => {
       },
       metadata: checkoutMetadata,
     });
+    return { session };
+    };
+
+    let created;
+    try {
+      created = await createSession(initialForceUsd);
+    } catch (firstErr) {
+      const fe = firstErr as any;
+      const currencyRejected = fe?.code === "currency_not_supported" || /currency|adaptive pricing|not supported/i.test(String(fe?.message ?? ""));
+      if (initialForceUsd || !currencyRejected) throw firstErr;
+      console.warn(`[Stripe Hosted] Moneda ${currency.toUpperCase()} rechazada (${fe?.code ?? fe?.message}); reintentando en USD`);
+      created = await createSession(true);
+    }
+    if ("tooSmall" in created) {
+      return new Response(
+        JSON.stringify({ error: "El monto total debe ser al menos $0.50 USD" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+    const session = created.session;
 
     // CAMBIO 3: devolvemos la URL hospedada en vez de clientSecret.
     return new Response(JSON.stringify({ url: session.url }), {

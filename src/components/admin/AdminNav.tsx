@@ -19,6 +19,7 @@ import {
   AlertTriangle,
   Sparkles,
   ShieldAlert,
+  Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAdminKey } from "./AdminGate";
@@ -66,6 +67,7 @@ const groups: Group[] = [
       { to: "/admin/orders", label: "Órdenes / Pedidos", icon: Mail },
       { to: "/admin/orders-physical", label: "Pedidos físicos", icon: Package },
       { to: "/admin/purchases-status", label: "Pagos · Estado", icon: CreditCard },
+      { to: "/admin/meta-compras", label: "Meta · Compras enviadas", icon: Megaphone },
       { to: "/admin/checkout-methods", label: "Métodos de pago Stripe", icon: CreditCard },
       { to: "/admin/manual-payments", label: "Pago manual", icon: Wallet },
       

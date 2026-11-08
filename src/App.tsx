@@ -104,6 +104,7 @@ const AdminEmailTest = lazy(() => import("./pages/AdminEmailTest"));
 const AdminPhysicalOrders = lazy(() => import("./pages/AdminPhysicalOrders"));
 
 const AdminPurchasesStatus = lazy(() => import("./pages/AdminPurchasesStatus"));
+const AdminMetaCompras = lazy(() => import("./pages/AdminMetaCompras"));
 const AdminCheckoutAbuse = lazy(() => import("./pages/AdminCheckoutAbuse"));
 const AdminPaymentErrors = lazy(() => import("./pages/AdminPaymentErrors"));
 
@@ -378,6 +379,7 @@ const App = () => (
                   <Route path="/admin/orders-physical" element={<AdminGate><AdminPhysicalOrders /></AdminGate>} />
                   
                   <Route path="/admin/purchases-status" element={<AdminGate><AdminPurchasesStatus /></AdminGate>} />
+                  <Route path="/admin/meta-compras" element={<AdminGate><AdminMetaCompras /></AdminGate>} />
                   <Route path="/admin/checkout-abuse" element={<AdminGate><AdminCheckoutAbuse /></AdminGate>} />
                   <Route path="/admin/payment-errors" element={<AdminGate><AdminPaymentErrors /></AdminGate>} />
                   <Route path="/admin/email-rules" element={<AdminGate><AdminEmailRules /></AdminGate>} />

@@ -105,29 +105,56 @@ async function logCapiFailure(input: CapiPurchaseInput, message: string, detail:
   }
 }
 
+export type CapiResult = { ok: boolean; skipped?: string; error?: string; eventsReceived?: number; fbtraceId?: string };
+
+/** Guarda cada intento en meta_capi_log (si la tabla aún no existe, no pasa nada). */
+async function logCapiAttempt(input: CapiPurchaseInput, r: CapiResult): Promise<void> {
+  try {
+    const url = Deno.env.get("SUPABASE_URL");
+    const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!url || !key) return;
+    const { createClient } = await import("npm:@supabase/supabase-js@2");
+    const supabase = createClient(url, key);
+    const ref = String(input.orderId || input.eventId.replace(/^Purchase_/, "").replace(/_v\d+$/, "")).slice(0, 80);
+    await supabase.from("meta_capi_log").insert({
+      event_id: input.eventId.slice(0, 120),
+      order_ref: ref,
+      email: input.email ? String(input.email).toLowerCase().slice(0, 200) : null,
+      value: typeof input.value === "number" && Number.isFinite(input.value) ? input.value : null,
+      currency: (input.currency || "USD").toUpperCase().slice(0, 3),
+      ok: !!r.ok,
+      events_received: r.eventsReceived ?? null,
+      fbtrace_id: r.fbtraceId ?? null,
+      error: r.ok ? null : String(r.error || r.skipped || "sin detalle").slice(0, 300),
+    });
+  } catch (e) {
+    console.error("meta-capi: no se pudo registrar el envío", e instanceof Error ? e.message : String(e));
+  }
+}
+
 /**
- * Fire-and-forget: never throws, never blocks the webhook's 200 response.
- * Envía la compra siempre que haya correo; usa fbc/fbp si existen para mejorar
- * la coincidencia con el anuncio.
+ * Envía la compra a Meta y devuelve el resultado (nunca lanza). Cada intento queda en meta_capi_log.
+ * Envía siempre que haya correo; usa fbc/fbp si existen para mejorar la coincidencia con el anuncio.
  */
-export async function sendPurchaseCapi(input: CapiPurchaseInput): Promise<void> {
+export async function sendPurchaseCapiResult(input: CapiPurchaseInput): Promise<CapiResult> {
+  let result: CapiResult;
   try {
     const accessToken = Deno.env.get("FB_CONVERSIONS_API_TOKEN");
     if (!accessToken) {
       console.log("meta-capi: no FB_CONVERSIONS_API_TOKEN, skipped");
       await logCapiFailure(input, "Falta el secreto FB_CONVERSIONS_API_TOKEN: la compra NO se envió a Meta");
-      return;
+      result = { ok: false, error: "Falta el secreto FB_CONVERSIONS_API_TOKEN" };
+      await logCapiAttempt(input, result);
+      return result;
     }
 
-    // Antes se omitía la compra si no había fbc/fbp guardados (pasaba con dLocal:
-    // el cliente paga minutos después, por otro dispositivo o sin pasar por la
-    // página de gracias). Ahora se envía igual con el correo cifrado (SHA-256):
-    // Meta decide si esa compra viene de un anuncio. Sin correo no hay con qué enviar.
     const attribution = await lookupAttribution(input.email);
     if (!attribution?.fbc && !attribution?.fbp) {
       if (!input.email) {
         console.log("meta-capi: sin correo ni atribución, evento omitido", input.eventId);
-        return;
+        result = { ok: false, skipped: "Sin correo del comprador: no hay con qué enviarla" };
+        await logCapiAttempt(input, result);
+        return result;
       }
       console.log("meta-capi: sin fbc/fbp, se envía solo con correo cifrado", input.eventId);
     }
@@ -142,7 +169,6 @@ export async function sendPurchaseCapi(input: CapiPurchaseInput): Promise<void> 
     if (input.firstName) user_data.fn = [await sha256(String(input.firstName).toLowerCase().trim())];
     if (input.lastName) user_data.ln = [await sha256(String(input.lastName).toLowerCase().trim())];
     if (input.country) user_data.country = [await sha256(String(input.country).toLowerCase().trim())];
-
 
     const custom_data: Record<string, unknown> = {
       currency: (input.currency || "USD").toUpperCase(),
@@ -176,11 +202,22 @@ export async function sendPurchaseCapi(input: CapiPurchaseInput): Promise<void> 
       console.error("meta-capi error", JSON.stringify(json));
       const err = (json as { error?: { message?: string; code?: number; error_subcode?: number } }).error;
       await logCapiFailure(input, `Meta rechazó la compra (HTTP ${res.status}): ${err?.message ?? "sin detalle"}`, { status: res.status, code: err?.code ?? null, subcode: err?.error_subcode ?? null });
+      result = { ok: false, error: `Meta rechazó la compra (HTTP ${res.status}): ${err?.message ?? "sin detalle"}` };
     } else {
       console.log("meta-capi sent", input.eventName || "Purchase", input.eventId, JSON.stringify(json));
+      const j = json as { events_received?: number; fbtrace_id?: string };
+      result = { ok: true, eventsReceived: j.events_received, fbtraceId: j.fbtrace_id };
     }
   } catch (e) {
     console.error("meta-capi exception", e instanceof Error ? e.message : String(e));
     await logCapiFailure(input, `Error de red al enviar la compra a Meta: ${e instanceof Error ? e.message : String(e)}`);
+    result = { ok: false, error: `Error de red: ${e instanceof Error ? e.message : String(e)}` };
   }
+  await logCapiAttempt(input, result);
+  return result;
+}
+
+/** Fire-and-forget: nunca lanza ni bloquea la respuesta 200 del webhook. */
+export async function sendPurchaseCapi(input: CapiPurchaseInput): Promise<void> {
+  await sendPurchaseCapiResult(input);
 }

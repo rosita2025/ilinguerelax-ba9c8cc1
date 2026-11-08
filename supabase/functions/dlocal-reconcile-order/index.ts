@@ -45,7 +45,7 @@ const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
 
 const BodySchema = z.object({
-  action: z.enum(["inspect", "sync", "approve", "reject", "list_pending", "retry_delivery"]),
+  action: z.enum(["inspect", "sync", "approve", "reject", "list_pending", "retry_delivery", "set_amount"]),
   orderNumber: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/).optional(),
   // Opcional: el acceso ya está protegido por origen + CSRF + 2FA (assertAdminCsrf).
   // Si se envía, debe coincidir; si no se envía, no se pide.
@@ -53,6 +53,9 @@ const BodySchema = z.object({
   reason: z.string().trim().max(300).optional(),
   operator: z.string().trim().max(120).optional(),
   force: z.boolean().optional(),
+  // Monto total del pedido (ej. 47.86 USD): sirve cuando el pedido no guardó su monto y por eso no aparece en Pedidos ni en Analíticas.
+  amount: z.number().positive().max(100000).optional(),
+  currency: z.string().trim().length(3).optional(),
 });
 
 
@@ -298,8 +301,10 @@ Deno.serve(async (req) => {
     const email = events.map((e) => e.customer_email).filter(Boolean).pop() ?? "";
     const name = email ? email.split("@")[0] : "Cliente";
     const reference = events.map((e) => e.reference).filter(Boolean).pop() ?? orderNumber;
-    const amount = events.map((e) => e.amount).filter((v): v is number => typeof v === "number").pop();
-    const currency = events.map((e) => e.currency).filter(Boolean).pop() ?? "USD";
+    let amount = events.map((e) => e.amount).filter((v): v is number => typeof v === "number").pop();
+    let currency = events.map((e) => e.currency).filter(Boolean).pop() ?? "USD";
+    const adminAmount = typeof parsed.data.amount === "number" ? Number(parsed.data.amount.toFixed(2)) : null;
+    const adminCurrency = (parsed.data.currency ?? "USD").toUpperCase();
     const method = events.find((e) => e.method)?.method ?? null;
     const metaSkus = events
       .map((e) => (Array.isArray(e.metadata?.skus) ? e.metadata!.skus as string[] : []))
@@ -323,6 +328,11 @@ Deno.serve(async (req) => {
         remoteStatus = String(payment.status ?? "").toUpperCase() || null;
         remoteAmount = extractRemoteAmount(payment);
       }
+    }
+    // Pedido sin monto guardado: se usa el que escribió el admin o, si no, el que dLocal tiene registrado. Así el pago sí aparece con su precio en Pedidos y Analíticas.
+    if (amount == null) {
+      if (adminAmount != null) { amount = adminAmount; currency = adminCurrency; }
+      else if (typeof remoteAmount.amount === "number" && remoteAmount.amount > 0) { amount = remoteAmount.amount; currency = remoteAmount.currency ?? currency; }
     }
     // Validación de montos: comparamos lo que cobramos (16.65, 3.70, …) contra
     // lo que dLocal dice que se acreditó. Un pago de menos nunca se entrega.
@@ -348,6 +358,18 @@ Deno.serve(async (req) => {
     };
 
     if (action === "inspect") return json({ ok: true, summary });
+
+    // Corregir el monto de un pedido (aunque ya esté pagado): actualiza las filas de «pedido creado» y «pago» para que se vea en Pedidos y Analíticas.
+    if (action === "set_amount") {
+      if (adminAmount == null) return json({ error: "Escribe el monto total del pedido (ej. 47.86)", summary }, 400);
+      const { error: updErr } = await supabase
+        .from("order_events")
+        .update({ amount: adminAmount, currency: adminCurrency })
+        .eq("order_number", orderNumber)
+        .in("event", ["order_created", "payment_paid", "payment_pending"]);
+      if (updErr) return json({ error: "No se pudo guardar el monto", summary }, 500);
+      return json({ ok: true, applied: "amount_set", summary: { ...summary, amount: adminAmount, currency: adminCurrency } });
+    }
 
     // Reintento de entrega: vuelve a enviar el material sin tocar el estado.
     if (action === "retry_delivery") {

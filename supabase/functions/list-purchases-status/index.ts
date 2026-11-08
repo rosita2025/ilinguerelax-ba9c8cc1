@@ -3,7 +3,8 @@
 // into a single normalised list with "why blocked" / "failed step" reasons.
 import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { getPurchasedEmails } from "../_shared/purchasedEmails.ts";
+import { getPurchasedEmails, markCartsConverted } from "../_shared/purchasedEmails.ts";
+import { matchCartsToPaidOrders } from "../_shared/cartPurchaseMatch.ts";
 
 const corsHeaders = adminCorsHeaders;
 
@@ -358,7 +359,14 @@ Deno.serve(async (req) => {
       const cartEmails = (data ?? []).map((r) => r.email).filter(Boolean) as string[];
       const purchasedCartEmails = cartEmails.length ? await getPurchasedEmails(admin, cartEmails) : new Set<string>();
 
+      // Carritos cuyo correo no coincide con ninguna compra pero que SÍ compraron con otro correo (se une por nombre + teléfono/país).
+      const unmatched = (data ?? []).filter((r) => !(r.email && purchasedCartEmails.has(String(r.email).trim().toLowerCase())));
+      const linked = await matchCartsToPaidOrders(admin, unmatched as any[]);
+      if (linked.size) void markCartsConverted(admin, unmatched.filter((r) => linked.has(String(r.id))).map((r) => String(r.email ?? "")));
+
       for (const r of data ?? []) {
+        // Ya compró con otro correo: la compra real ya aparece en la lista; este carrito no se muestra como abandonado.
+        if (linked.has(String(r.id))) continue;
         const buyer = r.buyer || {};
         const items = Array.isArray(r.items) ? r.items : [];
         const productSummary = items.map((it: any) => it.id).join(", ");

@@ -118,7 +118,8 @@ Deno.serve(async (req) => {
             email_address: body.payerEmail,
             experience_context: {
               brand_name: "iLingue Relax",
-              landing_page: "NO_PREFERENCE",
+              // Pago con tarjeta sin cuenta PayPal (invitado): abre directo el formulario de tarjeta; si el país no lo permite, PayPal pide el acceso normal.
+              landing_page: "GUEST_CHECKOUT",
               shipping_preference: "NO_SHIPPING",
               user_action: "PAY_NOW",
               return_url: body.returnUrl,

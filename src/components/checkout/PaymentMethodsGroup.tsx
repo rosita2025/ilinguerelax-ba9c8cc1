@@ -567,6 +567,25 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const [stripeLoading, setStripeLoading] = useState(false);
   const [stripeError, setStripeError] = useState<MappedStripeError | null>(null);
   const [hostedLoading, setHostedLoading] = useState(false);
+  // Regreso desde la página de Stripe sin pagar: cuántas veces pasó en esta sesión (la tarjeta se permite reintentar solo 2 veces más).
+  const MAX_CARD_RETRIES = 2;
+  const [stripeBackCount, setStripeBackCount] = useState(() => {
+    try { return Number(sessionStorage.getItem("ilr_stripe_back") || "0") || 0; } catch { return 0; }
+  });
+  const [showStripeBack, setShowStripeBack] = useState(false);
+  useEffect(() => {
+    try {
+      const u = new URL(window.location.href);
+      if (u.searchParams.get("stripe") !== "cancelado") return;
+      const n = (Number(sessionStorage.getItem("ilr_stripe_back") || "0") || 0) + 1;
+      sessionStorage.setItem("ilr_stripe_back", String(n));
+      setStripeBackCount(n);
+      setShowStripeBack(true);
+      u.searchParams.delete("stripe");
+      window.history.replaceState(null, "", u.toString());
+    } catch { /* sin almacenamiento */ }
+  }, []);
+  const cardRetriesLeft = Math.max(0, MAX_CARD_RETRIES + 1 - stripeBackCount);
 
   // `selectedMethod` en el store se guarda en localStorage. Sin este reinicio,
   // un método elegido en una visita anterior (abandonada) podría quedar
@@ -1414,7 +1433,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             zip: (s.buyer.zip ?? "").slice(0, 24) || undefined,
           },
           returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: window.location.href,
+          // Al volver de la página de Stripe sin pagar (rechazo o cancelación) se muestra el aviso con otras opciones.
+          cancelUrl: (() => { try { const u = new URL(window.location.href); u.searchParams.set("stripe", "cancelado"); return u.toString(); } catch { return window.location.href; } })(),
           isRestrictedRetry: RESTRICTED_CURRENCY_COUNTRIES.has(country),
         },
       });
@@ -2225,6 +2245,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // evitar que aparezcan fugazmente todos los métodos legacy.
   const filteredByAdmin = methodsReady
     ? allMethods.filter((m) => {
+        if (m.id === "card" && cardRetriesLeft <= 0) return false; // ya se intentó la tarjeta 3 veces: solo quedan los otros métodos
         if (m.id === "card") {
           if (m.methodKey) return enabledStripeKeys.has(m.methodKey);
           return methodsConfig.regionCode && methodsConfig.enabledMethodKeys.length > 0
@@ -2569,6 +2590,51 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           {[0, 1, 2].map((i) => (
             <div key={i} className="h-[58px] animate-pulse rounded-xl border-2 border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900" />
           ))}
+        </div>
+      )}
+      {showStripeBack && !isFree && (
+        <div role="status" className="mb-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-100">
+          <p className="text-sm font-semibold">
+            {pick(language,
+              "No se completó el pago con tarjeta.",
+              "The card payment was not completed.",
+              "Le paiement par carte n'a pas abouti.",
+              "Il pagamento con carta non è andato a buon fine.",
+              "O pagamento com cartão não foi concluído.")}
+          </p>
+          <p className="mt-0.5 text-xs">
+            {cardRetriesLeft > 0
+              ? pick(language,
+                  `Puedes intentarlo otra vez con la tarjeta (${cardRetriesLeft} ${cardRetriesLeft === 1 ? "intento" : "intentos"} más) o elegir otro método:`,
+                  `You can try the card again (${cardRetriesLeft} more ${cardRetriesLeft === 1 ? "try" : "tries"}) or choose another method:`,
+                  `Tu peux réessayer avec la carte (${cardRetriesLeft} essai${cardRetriesLeft === 1 ? "" : "s"} de plus) ou choisir un autre moyen :`,
+                  `Puoi riprovare con la carta (${cardRetriesLeft} tentativ${cardRetriesLeft === 1 ? "o" : "i"} in più) o scegliere un altro metodo:`,
+                  `Você pode tentar o cartão de novo (mais ${cardRetriesLeft} tentativa${cardRetriesLeft === 1 ? "" : "s"}) ou escolher outro método:`)
+              : pick(language,
+                  "Para proteger tu compra, la tarjeta ya no está disponible. Elige otro método:",
+                  "To protect your purchase, the card is no longer available. Choose another method:",
+                  "Pour protéger ton achat, la carte n'est plus disponible. Choisis un autre moyen :",
+                  "Per proteggere il tuo acquisto, la carta non è più disponibile. Scegli un altro metodo:",
+                  "Para proteger sua compra, o cartão não está mais disponível. Escolha outro método:")}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {stripeAlternatives.filter((a) => a.id !== HOSTED_ALT_ID).map((a) => (
+              <button
+                key={a.id}
+                type="button"
+                onClick={() => {
+                  const alt = methods.find((x) => x.id === a.id);
+                  if (!alt) return;
+                  setSelectedCardRow(`${alt.id}-${alt.title}`);
+                  handleSelect(alt.id);
+                }}
+                className="rounded-md border border-emerald-600 bg-white px-3 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50 dark:bg-neutral-950 dark:text-emerald-200"
+              >
+                {a.title}
+              </button>
+            ))}
+          </div>
+          <SupportWhatsApp variant="error" language={language} country={(country || "").toUpperCase()} method="card" error="Stripe no completó el pago con tarjeta" />
         </div>
       )}
       {!isFree && !isInvalidZero && methods.map((m, idx) => {

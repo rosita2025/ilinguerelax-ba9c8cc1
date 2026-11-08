@@ -106,7 +106,7 @@ export default function OrderReconcilePanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function run(action: "inspect" | "sync" | "approve" | "reject" | "retry_delivery" | "set_amount", force = false) {
+  async function run(action: "inspect" | "sync" | "approve" | "reject" | "retry_delivery" | "set_amount" | "resend_capi", force = false) {
     const order = orderNumber.trim().toUpperCase();
     if (!order) { toast.error("Escribe el número de pedido"); return; }
     const amt = Number(amountText.replace(",", "."));
@@ -130,6 +130,7 @@ export default function OrderReconcilePanel() {
       }
       setSummary(data.summary ?? null);
       if (action === "inspect") toast.success("Estado consultado");
+      else if (action === "resend_capi") toast.success("Compra reenviada a Meta con su valor. Puede tardar unas horas en verse en Administrador de anuncios.");
       else if (action === "set_amount") toast.success(`Monto guardado: ${amt.toFixed(2)} ${currencyText.trim().toUpperCase() || "USD"}. Ya aparece en Pedidos y Analíticas.`);
       else if (action === "retry_delivery") toast.success("Material reenviado al cliente");
       else if (data.applied === "paid" || data.applied === "manual_approved") {
@@ -204,6 +205,10 @@ export default function OrderReconcilePanel() {
         <Button size="sm" variant="outline" className="w-full shrink-0 sm:w-auto" disabled={!!busy} onClick={() => run("set_amount")}>
           {busy === "set_amount" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ListChecks className="h-4 w-4 mr-1" />}
           Corregir monto
+        </Button>
+        <Button size="sm" variant="outline" className="w-full shrink-0 sm:w-auto" disabled={!!busy} onClick={() => run("resend_capi")}>
+          {busy === "resend_capi" ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-1" />}
+          Reenviar a Meta
         </Button>
       </div>
       <p className="-mt-1 text-[11px] text-muted-foreground">

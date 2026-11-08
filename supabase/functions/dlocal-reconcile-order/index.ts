@@ -45,7 +45,7 @@ const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
 
 const BodySchema = z.object({
-  action: z.enum(["inspect", "sync", "approve", "reject", "list_pending", "retry_delivery", "set_amount"]),
+  action: z.enum(["inspect", "sync", "approve", "reject", "list_pending", "retry_delivery", "set_amount", "resend_capi"]),
   orderNumber: z.string().trim().min(4).max(80).regex(/^[A-Za-z0-9\-_]+$/).optional(),
   // Opcional: el acceso ya está protegido por origen + CSRF + 2FA (assertAdminCsrf).
   // Si se envía, debe coincidir; si no se envía, no se pide.
@@ -358,6 +358,18 @@ Deno.serve(async (req) => {
     };
 
     if (action === "inspect") return json({ ok: true, summary });
+
+    // Reenviar la compra a Meta con su valor: para pedidos aceptados a mano sin monto (Meta descarta una compra sin valor y la campaña no la cuenta).
+    if (action === "resend_capi") {
+      if (!events.some((e) => e.event === "payment_paid")) return json({ error: "El pedido aún no está pagado: acéptalo primero", summary }, 409);
+      if (amount == null) return json({ error: "El pedido no tiene monto: escribe el monto total y pulsa «Reenviar a Meta»", summary }, 400);
+      if (!email) return json({ error: "El pedido no tiene correo del comprador", summary }, 400);
+      await sendPurchaseCapi({
+        eventId: `Purchase_${orderNumber}_v2`, email, country: country ?? null,
+        value: amount, currency, contentIds: skus, contentName: "Pedido iLingue Relax", orderId: orderNumber,
+      });
+      return json({ ok: true, applied: "capi_resent", summary });
+    }
 
     // Corregir el monto de un pedido (aunque ya esté pagado): actualiza las filas de «pedido creado» y «pago» para que se vea en Pedidos y Analíticas.
     if (action === "set_amount") {

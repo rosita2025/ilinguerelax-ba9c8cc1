@@ -50,6 +50,8 @@ function copy(text: string) {
 export default function OrderReconcilePanel() {
   const [orderNumber, setOrderNumber] = useState("");
   const [reason, setReason] = useState("");
+  const [amountText, setAmountText] = useState("");
+  const [currencyText, setCurrencyText] = useState("USD");
   const [busy, setBusy] = useState<string | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [pending, setPending] = useState<PendingOrder[] | null>(null);
@@ -104,14 +106,17 @@ export default function OrderReconcilePanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function run(action: "inspect" | "sync" | "approve" | "reject" | "retry_delivery", force = false) {
+  async function run(action: "inspect" | "sync" | "approve" | "reject" | "retry_delivery" | "set_amount", force = false) {
     const order = orderNumber.trim().toUpperCase();
     if (!order) { toast.error("Escribe el número de pedido"); return; }
+    const amt = Number(amountText.replace(",", "."));
+    const hasAmt = amountText.trim() !== "" && Number.isFinite(amt) && amt > 0;
+    if (action === "set_amount" && !hasAmt) { toast.error("Escribe el monto total (ej. 47.86)"); return; }
     if (action === "approve" && !force && !window.confirm(`¿Aceptar ${order} como PAGADO y enviar el material al cliente?`)) return;
     setBusy(action);
     try {
       const { data, error } = await adminInvoke<any>("dlocal-reconcile-order", {
-        body: { action, orderNumber: order, reason: reason.trim() || undefined, force: force || undefined },
+        body: { action, orderNumber: order, reason: reason.trim() || undefined, force: force || undefined, ...(hasAmt ? { amount: amt, currency: currencyText.trim().toUpperCase() || "USD" } : {}) },
       });
       if (action === "approve" && (data?.code === "still_pending" || data?.code === "possible_duplicate")) {
         setBusy(null);
@@ -125,6 +130,7 @@ export default function OrderReconcilePanel() {
       }
       setSummary(data.summary ?? null);
       if (action === "inspect") toast.success("Estado consultado");
+      else if (action === "set_amount") toast.success(`Monto guardado: ${amt.toFixed(2)} ${currencyText.trim().toUpperCase() || "USD"}. Ya aparece en Pedidos y Analíticas.`);
       else if (action === "retry_delivery") toast.success("Material reenviado al cliente");
       else if (data.applied === "paid" || data.applied === "manual_approved") {
         toast.success(data.delivery?.delivered ? "Pago aplicado y entrega enviada" : "Pago aplicado");
@@ -180,6 +186,29 @@ export default function OrderReconcilePanel() {
           <ScanLine className="h-4 w-4 mr-1" /> Detectar ID
         </Button>
       </div>
+
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Input
+          inputMode="decimal"
+          placeholder="Monto total (opcional, ej. 47.86)"
+          value={amountText}
+          onChange={(e) => setAmountText(e.target.value)}
+        />
+        <Input
+          className="sm:w-24"
+          placeholder="USD"
+          maxLength={3}
+          value={currencyText}
+          onChange={(e) => setCurrencyText(e.target.value.toUpperCase())}
+        />
+        <Button size="sm" variant="outline" className="w-full shrink-0 sm:w-auto" disabled={!!busy} onClick={() => run("set_amount")}>
+          {busy === "set_amount" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ListChecks className="h-4 w-4 mr-1" />}
+          Corregir monto
+        </Button>
+      </div>
+      <p className="-mt-1 text-[11px] text-muted-foreground">
+        Si un pedido aceptado no muestra precio en Pedidos / Analíticas, escribe su monto total y pulsa «Corregir monto». Al aceptar un pedido sin monto, también se usa este valor.
+      </p>
 
       <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
         <Button size="sm" variant="outline" className="w-full justify-center sm:w-auto" disabled={!!busy} onClick={() => run("inspect")}>

@@ -419,65 +419,101 @@ Deno.serve(async (req) => {
         })
         .sort((a, b) => b.count - a.count)
         .slice(0, 100);
-      // Quien dejó su correo en el checkout de CUALQUIER producto debe salir en la lista, aunque su visita no esté registrada
-      // (otro checkout, origen «directo» oculto por «Solo tráfico real», o IP del equipo): se completan desde los carritos del rango.
+      // Quien dejó su correo en el checkout de CUALQUIER producto debe salir en la lista, aunque su visita esté oculta o no registrada.
+      // Se completan tres fuentes: (A) visitas con correo que «Solo tráfico real» ocultó (origen «directo»), (B) carritos guardados
+      // y (C) contactos de «carrito abandonado» del rango. Las IPs del equipo siguen excluidas.
       try {
         const known = new Set(top.map((r) => (r.email || "").toLowerCase()).filter(Boolean));
+        type Extra = { email: string; ip: string; first: string; last: string; country: string | null; city: string | null; ua: string | null; slugs: Set<string>; sources: Set<string>; cart: typeof top[number]["cart"]; converted: boolean };
+        const extras = new Map<string, Extra>();
+        const touch = (email: string, ip: string, at: string, patch: Partial<Extra> = {}) => {
+          const em = email.trim().toLowerCase();
+          if (!em || known.has(em)) return;
+          const cur = extras.get(em) ?? { email: em, ip, first: at, last: at, country: null, city: null, ua: null, slugs: new Set<string>(), sources: new Set<string>(), cart: null, converted: false };
+          if (at > cur.last) cur.last = at;
+          if (at < cur.first) cur.first = at;
+          if (ip && !ip.startsWith("carrito:") && cur.ip.startsWith("carrito:")) cur.ip = ip;
+          cur.country = cur.country || patch.country || null;
+          cur.city = cur.city || patch.city || null;
+          cur.ua = cur.ua || patch.ua || null;
+          for (const sl of patch.slugs ?? []) cur.slugs.add(sl);
+          for (const so of patch.sources ?? []) cur.sources.add(so);
+          cur.cart = cur.cart ?? patch.cart ?? null;
+          cur.converted = cur.converted || !!patch.converted;
+          extras.set(em, cur);
+        };
+        // A) visitas con correo ocultas por el filtro de origen
+        for (const r of notTeam as { ip: string; slug: string | null; created_at: string; source: string | null; ua: string | null; country: string | null; city: string | null; email: string | null }[]) {
+          if (!r.email) continue;
+          touch(r.email, r.ip || `carrito:${r.email}`, r.created_at, { country: r.country, city: r.city, ua: r.ua, slugs: new Set(r.slug ? [r.slug] : []), sources: new Set(r.source ? [r.source] : []) });
+        }
+        // B) carritos guardados
         const { data: cartRows } = await admin
           .from("persistent_carts")
           .select("*")
           .or(`and(last_activity.gte.${since},last_activity.lt.${until}),and(created_at.gte.${since},created_at.lt.${until})`)
           .limit(500);
-        const extra = ((cartRows || []) as Record<string, unknown>[]).filter((c) => {
-          const em = String(c.email ?? "").trim().toLowerCase();
-          return em && !known.has(em);
-        });
-        if (extra.length) {
-          const extraEmails = [...new Set(extra.map((c) => String(c.email).trim().toLowerCase()))];
-          const boughtExtra = await getPurchasedEmails(admin, extraEmails);
-          for (const c of extra) {
-            const em = String(c.email).trim().toLowerCase();
-            if (known.has(em)) continue;
-            known.add(em);
-            const buyer = (c.buyer ?? {}) as { name?: string; phone?: string };
-            const items = Array.isArray(c.items) ? (c.items as Record<string, unknown>[]) : [];
-            const slugs = items.map((i) => String(i.slug ?? i.id ?? i.sku ?? "")).filter(Boolean).slice(0, 5);
-            const last = String(c.last_activity ?? c.created_at ?? new Date().toISOString());
-            const first = String(c.created_at ?? last);
+        for (const c of (cartRows || []) as Record<string, unknown>[]) {
+          const buyer = (c.buyer ?? {}) as { name?: string; phone?: string };
+          const items = Array.isArray(c.items) ? (c.items as Record<string, unknown>[]) : [];
+          const last = String(c.last_activity ?? c.created_at ?? new Date().toISOString());
+          touch(String(c.email ?? ""), `carrito:${String(c.email ?? "").toLowerCase()}`, last, {
+            slugs: new Set(items.map((i) => String(i.slug ?? i.id ?? i.sku ?? "")).filter(Boolean)),
+            converted: c.converted === true,
+            cart: {
+              name: String(buyer.name ?? "").slice(0, 120),
+              phone: String(buyer.phone ?? "").slice(0, 40),
+              started: (c.created_at as string | null) ?? null,
+              last_activity: (c.last_activity as string | null) ?? null,
+              recover_url: c.cart_token ? `https://ilinguerelax.com/recuperar-carrito?t=${encodeURIComponent(String(c.cart_token))}` : null,
+            },
+          });
+        }
+        // C) contactos de carrito abandonado
+        const { data: contactRows } = await admin
+          .from("email_contacts")
+          .select("email, metadata, updated_at")
+          .eq("source", "abandoned_cart")
+          .gte("updated_at", since)
+          .lt("updated_at", until)
+          .limit(500);
+        for (const c of (contactRows || []) as { email: string; metadata: { payment_method?: string } | null; updated_at: string }[]) {
+          touch(c.email, `carrito:${String(c.email).toLowerCase()}`, c.updated_at);
+          const m = String(c.metadata?.payment_method ?? "").trim().toLowerCase();
+          if (m && !methodByEmail.has(String(c.email).toLowerCase())) methodByEmail.set(String(c.email).toLowerCase(), m);
+        }
+        if (extras.size) {
+          const boughtExtra = await getPurchasedEmails(admin, [...extras.keys()]);
+          for (const x of extras.values()) {
+            const hasVisit = !x.ip.startsWith("carrito:");
             top.push({
-              ip: `carrito:${em}`,
-              count: 0,
-              raw_count: 0,
-              first,
-              last,
-              duration_sec: Math.max(0, Math.round((new Date(last).getTime() - new Date(first).getTime()) / 1000)),
-              cart: {
-                name: String(buyer.name ?? "").slice(0, 120),
-                phone: String(buyer.phone ?? "").slice(0, 40),
-                started: (c.created_at as string | null) ?? null,
-                last_activity: (c.last_activity as string | null) ?? null,
-                recover_url: c.cart_token ? `https://ilinguerelax.com/recuperar-carrito?t=${encodeURIComponent(String(c.cart_token))}` : null,
-              },
-              payment_method: methodByEmail.get(em) ?? null,
+              ip: x.ip,
+              count: hasVisit ? 1 : 0,
+              raw_count: hasVisit ? 1 : 0,
+              first: x.first,
+              last: x.last,
+              duration_sec: Math.max(0, Math.round((new Date(x.last).getTime() - new Date(x.first).getTime()) / 1000)),
+              cart: x.cart,
+              payment_method: methodByEmail.get(x.email) ?? null,
               actions: {},
               paid_by: null,
-              providers: [...(providersByEmail.get(em) ?? [])],
-              slugs,
-              sources: [],
+              providers: [...(providersByEmail.get(x.email) ?? [])],
+              slugs: [...x.slugs].slice(0, 5),
+              sources: [...x.sources],
               referers: [],
               campaigns: [],
-              ua: null,
-              country: null,
-              city: null,
-              email: em,
-              status: boughtExtra.has(em) || c.converted === true ? "purchased" : "abandoned",
+              ua: x.ua,
+              country: x.country,
+              city: x.city,
+              email: x.email,
+              status: boughtExtra.has(x.email) || x.converted ? "purchased" : "abandoned",
               client_purchase_event: false,
               reminders: 0,
             });
           }
         }
       } catch (e) {
-        console.error("checkout-abuse: no se pudieron completar visitantes desde carritos", e);
+        console.error("checkout-abuse: no se pudieron completar visitantes con correo", e);
       }
       const sources = [...bySource.entries()]
         .map(([source, count]) => ({ source, count }))

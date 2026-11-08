@@ -195,6 +195,7 @@ function BankBadge({ label, bg }: { label: string; bg: string; color?: string })
 type MethodSection = "cards" | "transfer" | "cash" | "wallet" | "other";
 
 const SECTION_ORDER: MethodSection[] = ["cards", "transfer", "cash", "wallet", "other"];
+const MX_SECTION_ORDER: MethodSection[] = ["transfer", "cash", "cards", "wallet", "other"];
 
 function methodSection(id: string): MethodSection {
   if (["card", "dlocal_card", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto", "stripe_klarna"].includes(id)) return "cards";
@@ -2295,9 +2296,16 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       : [];
   // Orden de secciones para que el checkout se lea de arriba a abajo sin saltos:
   // tarjetas → transferencias → efectivo → billeteras → otros (Hotmart al final).
+  // México: SPEI (transferencia) y OXXO (efectivo) van primero y la tarjeta después: las tarjetas mexicanas fallan o las bloquea Stripe
+  // con frecuencia (riesgo «máximo», banco que rechaza) y estos rails no pasan por Radar.
+  const sectionOrder = country === "MX" ? MX_SECTION_ORDER : SECTION_ORDER;
   const methods = [...visibleMethods].sort(
-    (a, b) => SECTION_ORDER.indexOf(methodSection(a.id)) - SECTION_ORDER.indexOf(methodSection(b.id)),
+    (a, b) => sectionOrder.indexOf(methodSection(a.id)) - sectionOrder.indexOf(methodSection(b.id)),
   );
+  // Método que queda elegido de entrada en México (el primero local disponible); si no hay, se elige la tarjeta como en el resto.
+  const mxFirstLocalId = country === "MX"
+    ? (methods.find((m) => !(m as any).isSeparator && ["dlocal_transfer", "clabe", "dlocal_cash"].includes(m.id))?.id as string | undefined)
+    : undefined;
   const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(m.id));
 
   // Si el banco rechaza la tarjeta se ofrecen otras opciones según el país:
@@ -2331,14 +2339,18 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       // método explícitamente (ej: PayPal, Binance). Antes forzaba "card"
       // en cada render y borraba la selección de PayPal al hacer click.
       if (!selected) {
-        setSelected("card");
-        setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`);
+        if (mxFirstLocalId) {
+          setSelected(mxFirstLocalId as Method);
+        } else {
+          setSelected("card");
+          setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`);
+        }
       }
       const isStripeSel = selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(selected);
       // En Perú el formulario lo abre el efecto de abajo (con el aviso de upsell).
       if (!isPeru && isStripeSel && valid && stripePromise && !showStripe) setShowStripe(true);
     }
-  }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
+  }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal, mxFirstLocalId]);
 
   // Perú: al elegir tarjeta, el formulario de Stripe se abre solo, sin tener que pulsar
   // ningún botón (fuera de Perú esto ya ocurre arriba). Se conserva el aviso

@@ -11,6 +11,7 @@ import { adminCorsHeaders, assertAdminCsrf } from "../_shared/adminCsrf.ts";
 import { sendEmail } from "../_shared/brevo.ts";
 import { getPurchasedSkus } from "../_shared/purchasedSkus.ts";
 import { getPurchasedEmails } from "../_shared/purchasedEmails.ts";
+import { matchCartsToPaidOrders } from "../_shared/cartPurchaseMatch.ts";
 
 const corsHeaders = adminCorsHeaders;
 // Steps are measured in MINUTES. 30 min, 1440 min (1 día), 10080 min (7 días).
@@ -275,6 +276,16 @@ Deno.serve(async (req) => {
           await admin.from("persistent_carts").update({ converted: true }).eq("email", email);
           stat.skipped++;
           continue;
+        }
+
+        // Compró con OTRO correo (mismo nombre + teléfono/país, pago confirmado): tampoco recibe correos de carrito abandonado.
+        {
+          const linked = await matchCartsToPaidOrders(admin, [{ id: email, email, buyer: cart.buyer, last_activity: cart.last_activity }]);
+          if (linked.size) {
+            await admin.from("persistent_carts").update({ converted: true }).eq("email", email);
+            stat.skipped++;
+            continue;
+          }
         }
 
         // Pago manual enviado (pendiente o aprobado) → no es abandono.

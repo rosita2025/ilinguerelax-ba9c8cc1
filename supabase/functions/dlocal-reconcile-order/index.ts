@@ -24,6 +24,7 @@ import { sendThankYouEmail } from "../_shared/thankYouEmail.ts";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { deliverLikeManual } from "../_shared/manualDelivery.ts";
 import { sendPurchaseCapi } from "../_shared/metaCapi.ts";
+import { markCartsConverted } from "../_shared/purchasedEmails.ts";
 
 import {
   dlocalApiBase,
@@ -489,6 +490,8 @@ Deno.serve(async (req) => {
         orderNumber, email, name, country, skus, amount, currency, provider,
         productName: "Pedido iLingue Relax", reference,
       });
+      // Ya pagó: su carrito deja de ser «abandono» y no recibe correos de recuperación.
+      void markCartsConverted(supabase, [email]);
       return json({ ok: true, applied: "paid", remoteStatus, delivery: res, summary });
     }
 
@@ -559,6 +562,8 @@ Deno.serve(async (req) => {
       orderNumber, email, name, country, skus, amount, currency, provider,
       productName: "Pedido iLingue Relax", reference,
     });
+    // Aceptado a mano: su carrito deja de ser «abandono» y no recibe correos de recuperación.
+    void markCartsConverted(supabase, [email]);
     return json({ ok: true, applied: "manual_approved", delivery: res, summary });
   } catch (e) {
     console.error("dlocal-reconcile-order error:", e);

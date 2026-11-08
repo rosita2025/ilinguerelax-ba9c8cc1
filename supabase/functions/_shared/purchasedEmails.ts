@@ -68,6 +68,22 @@ export async function getPurchasedEmails(admin: any, rawEmails: string[]): Promi
         .eq("status", "verified");
       for (const r of data ?? []) add(r?.buyer_email);
     })(),
+    (async () => {
+      // TERCERA fuente: compras de Stripe registradas por el WEBHOOK firmado de Stripe (no por el navegador): quedan en
+      // funnel_events con provider "stripe", el tipo de evento de Stripe y estado aprobado. Antes no se contaban y quien
+      // ya pagó con Stripe seguía figurando como «carrito abandonado» y recibía correos de recuperación.
+      if (!emails.length) return;
+      const orFilter = emails.map((e) => `email.ilike.${escapeIlike(e)}`).join(",");
+      const { data } = await admin
+        .from("funnel_events")
+        .select("email")
+        .eq("event_name", "Purchase")
+        .eq("provider", "stripe")
+        .ilike("referrer", '%"event_type":"%')
+        .ilike("referrer", '%"status":"approved"%')
+        .or(orFilter);
+      for (const r of data ?? []) add(r?.email);
+    })(),
   ];
 
   await Promise.allSettled(queries);

@@ -83,6 +83,29 @@ async function lookupVisit(email?: string | null): Promise<{ ip: string | null; 
 }
 
 /**
+ * Guarda en «Fallos de pago» (admin_payment_errors) por qué Meta no recibió una compra: sin token, rechazo de Meta o error de red.
+ * Antes solo quedaba en los registros de la función y nadie veía que la campaña no contaba la venta.
+ */
+async function logCapiFailure(input: CapiPurchaseInput, message: string, detail: Record<string, unknown> = {}): Promise<void> {
+  try {
+    const url = Deno.env.get("SUPABASE_URL");
+    const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!url || !key) return;
+    const { createClient } = await import("npm:@supabase/supabase-js@2");
+    const supabase = createClient(url, key);
+    await supabase.from("admin_payment_errors").insert({
+      provider: "meta_capi",
+      error_message: message.slice(0, 500),
+      error_kind: "meta_capi_error",
+      country: input.country ? String(input.country).toUpperCase().slice(0, 2) : null,
+      error_detail: { eventId: input.eventId, orderId: input.orderId ?? null, value: input.value ?? null, currency: input.currency ?? null, ...detail },
+    });
+  } catch (e) {
+    console.error("meta-capi: no se pudo guardar el fallo", e instanceof Error ? e.message : String(e));
+  }
+}
+
+/**
  * Fire-and-forget: never throws, never blocks the webhook's 200 response.
  * Envía la compra siempre que haya correo; usa fbc/fbp si existen para mejorar
  * la coincidencia con el anuncio.
@@ -92,6 +115,7 @@ export async function sendPurchaseCapi(input: CapiPurchaseInput): Promise<void> 
     const accessToken = Deno.env.get("FB_CONVERSIONS_API_TOKEN");
     if (!accessToken) {
       console.log("meta-capi: no FB_CONVERSIONS_API_TOKEN, skipped");
+      await logCapiFailure(input, "Falta el secreto FB_CONVERSIONS_API_TOKEN: la compra NO se envió a Meta");
       return;
     }
 
@@ -150,10 +174,13 @@ export async function sendPurchaseCapi(input: CapiPurchaseInput): Promise<void> 
     const json = await res.json().catch(() => ({}));
     if (!res.ok) {
       console.error("meta-capi error", JSON.stringify(json));
+      const err = (json as { error?: { message?: string; code?: number; error_subcode?: number } }).error;
+      await logCapiFailure(input, `Meta rechazó la compra (HTTP ${res.status}): ${err?.message ?? "sin detalle"}`, { status: res.status, code: err?.code ?? null, subcode: err?.error_subcode ?? null });
     } else {
       console.log("meta-capi sent", input.eventName || "Purchase", input.eventId, JSON.stringify(json));
     }
   } catch (e) {
     console.error("meta-capi exception", e instanceof Error ? e.message : String(e));
+    await logCapiFailure(input, `Error de red al enviar la compra a Meta: ${e instanceof Error ? e.message : String(e)}`);
   }
 }

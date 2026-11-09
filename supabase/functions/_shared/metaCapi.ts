@@ -25,6 +25,11 @@ export interface CapiPurchaseInput {
   orderId?: string | null;
   eventSourceUrl?: string | null;
   eventName?: string;
+  /** Datos del clic del anuncio guardados al CREAR el pago (más fiables que buscarlos por correo): cookie _fbc/_fbp, IP y navegador del comprador. */
+  fbc?: string | null;
+  fbp?: string | null;
+  clientIp?: string | null;
+  clientUa?: string | null;
 }
 
 /**
@@ -148,7 +153,8 @@ export async function sendPurchaseCapiResult(input: CapiPurchaseInput): Promise<
       return result;
     }
 
-    const attribution = await lookupAttribution(input.email);
+    // Prioridad: lo guardado al crear el pago (no depende de que el correo coincida); si no hay, lo guardado por correo.
+    const attribution = input.fbc || input.fbp ? { fbc: input.fbc ?? null, fbp: input.fbp ?? null } : await lookupAttribution(input.email);
     if (!attribution?.fbc && !attribution?.fbp) {
       if (!input.email) {
         console.log("meta-capi: sin correo ni atribución, evento omitido", input.eventId);
@@ -159,10 +165,11 @@ export async function sendPurchaseCapiResult(input: CapiPurchaseInput): Promise<
       console.log("meta-capi: sin fbc/fbp, se envía solo con correo cifrado", input.eventId);
     }
 
-    const visit = await lookupVisit(input.email);
+    const visit0 = input.clientIp && input.clientUa ? null : await lookupVisit(input.email);
+    const visit = { ip: input.clientIp || visit0?.ip || null, ua: input.clientUa || visit0?.ua || null };
     const user_data: Record<string, unknown> = {};
-    if (visit?.ip) user_data.client_ip_address = visit.ip;
-    if (visit?.ua) user_data.client_user_agent = visit.ua;
+    if (visit.ip) user_data.client_ip_address = visit.ip;
+    if (visit.ua) user_data.client_user_agent = visit.ua;
     if (attribution?.fbc) user_data.fbc = attribution.fbc;
     if (attribution?.fbp) user_data.fbp = attribution.fbp;
     if (input.email) user_data.em = [await sha256(String(input.email).toLowerCase().trim())];

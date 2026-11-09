@@ -11,6 +11,7 @@ import { getOrderRef } from "@/lib/support";
 import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
 import { trackPaymentError } from "@/hooks/useMetaPixel";
 import { savesCardForFutureUse } from "@/lib/cardSaving";
+import { metaRequestData } from "@/lib/metaAttribution";
 
 /**
  * Formulario de pago de Stripe estilo "Payment Element": pestañas de método
@@ -160,6 +161,7 @@ const Inner = ({
             currency: quote.currency,
             country,
             couponCode: s.coupon ?? undefined,
+            meta: metaRequestData(),
             contact: { email, name: name || undefined, phone: (s.buyer.phone ?? "").trim().slice(0, 30) || undefined },
           },
         },

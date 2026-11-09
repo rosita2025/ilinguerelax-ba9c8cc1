@@ -73,6 +73,13 @@ export const getMetaAttribution = (): MetaAttribution => {
   }
 };
 
+/** Datos del clic del anuncio para mandarlos al crear el pago (el servidor los guarda en el pago y los usa al enviar la compra a Meta). Solo si vino de un anuncio. */
+export const metaRequestData = (): { fbc?: string; fbp?: string } | undefined => {
+  const a = getMetaAttribution();
+  if (!a.attributed || (!a.fbc && !a.fbp)) return undefined;
+  return { ...(a.fbc ? { fbc: a.fbc } : {}), ...(a.fbp ? { fbp: a.fbp } : {}) };
+};
+
 /**
  * Guarda la atribución asociada al correo del comprador para que los webhooks
  * (Stripe, PayPal, Mercado Pago, Hotmart) sepan si la venta vino de un anuncio.

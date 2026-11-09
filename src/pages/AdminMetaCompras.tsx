@@ -100,7 +100,7 @@ const AdminMetaCompras = () => {
     if (stateOf(r) !== "sent" && !window.confirm(`¿Reenviar la compra ${r.ref} (${fmtMoney(r.amount, r.currency)}) a Meta?`)) return;
     setBusy(r.ref);
     try {
-      const { data, error } = await adminInvoke("manage-meta-purchases", { body: { adminKey, action: "resend", ref: r.ref } });
+      const { data, error } = await adminInvoke("manage-meta-purchases", { body: { adminKey, action: "resend", ref: r.ref, force: stateOf(r) === "sent" } });
       const d = data as { ok?: boolean; message?: string; error?: string } | null;
       if (error || d?.error) throw new Error(d?.error || error?.message || "No se pudo reenviar");
       toast.success("Enviada a Meta", { description: d?.message });

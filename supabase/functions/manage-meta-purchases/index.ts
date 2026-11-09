@@ -152,11 +152,34 @@ async function metaStates(admin: any, refs: string[], days: number): Promise<Map
   return map;
 }
 
-async function resendOne(p: Purchase): Promise<{ ok: boolean; message: string }> {
+/**
+ * Qué event_id usar al reenviar. Meta junta (deduplica) dos eventos con el MISMO nombre y event_id si llegan con menos de 48 h de diferencia.
+ *  - Sin envío anterior confirmado (o solo con errores): se usa el id original `Purchase_<pedido>`. Si en realidad el envío automático sí había llegado
+ *    (antes no quedaba registro), Meta lo junta y NO se cuenta dos veces.
+ *  - Ya confirmado con ese mismo valor: no hace falta reenviar; solo se reenvía si el admin fuerza (con id `_v2`, y Meta podría contarla dos veces).
+ *  - Confirmado sin valor o con otro valor: id `_v2`, porque Meta ignoraría el mismo id y la compra quedaría sin valor.
+ */
+async function pickEventId(admin: any, p: Purchase, force: boolean): Promise<{ eventId: string; alreadySent: boolean }> {
+  const base = `Purchase_${p.ref}`;
+  try {
+    const { data } = await admin.from("meta_capi_log").select("event_id, ok, value").eq("order_ref", p.ref).eq("ok", true).limit(20);
+    const rows = (data ?? []) as { event_id: string; ok: boolean; value: number | null }[];
+    if (!rows.length) return { eventId: base, alreadySent: false };
+    const same = rows.some((r) => Number(r.value) > 0 && Math.abs(Number(r.value) - Number(p.amount)) < 0.01);
+    if (same) return force ? { eventId: `${base}_v2`, alreadySent: true } : { eventId: base, alreadySent: true };
+    return { eventId: `${base}_v2`, alreadySent: false };
+  } catch (_) {
+    return { eventId: base, alreadySent: false };
+  }
+}
+
+async function resendOne(admin: any, p: Purchase, force = false): Promise<{ ok: boolean; message: string }> {
   if (!p.email) return { ok: false, message: "Sin correo del comprador: Meta no puede asociarla" };
   if (!(typeof p.amount === "number" && p.amount > 0)) return { ok: false, message: "La compra no tiene monto: corrígelo antes (Corregir monto en /admin/dlocal)" };
+  const pick = await pickEventId(admin, p, force);
+  if (pick.alreadySent && !force) return { ok: false, message: "Meta ya confirmó recibir esta compra con el mismo valor: no se reenvía para no duplicarla." };
   const r = await sendPurchaseCapiResult({
-    eventId: `Purchase_${p.ref}_v2`,
+    eventId: pick.eventId,
     email: p.email,
     country: p.country,
     value: p.amount,
@@ -165,7 +188,7 @@ async function resendOne(p: Purchase): Promise<{ ok: boolean; message: string }>
     orderId: p.ref,
   });
   return r.ok
-    ? { ok: true, message: `Meta confirmó recibirla (${r.eventsReceived ?? 1} evento)` }
+    ? { ok: true, message: `Meta confirmó recibirla (${r.eventsReceived ?? 1} evento)${pick.eventId.endsWith("_v2") ? "" : ". Si ya la tenía, Meta la junta con la anterior y no la cuenta dos veces"}` }
     : { ok: false, message: r.error || r.skipped || "No se pudo enviar" };
 }
 
@@ -227,7 +250,7 @@ Deno.serve(async (req) => {
       if (!p) return json({ error: "No encontré esa compra confirmada (últimos 60 días)" }, 404);
       const amount = Number(body.amount);
       if (Number.isFinite(amount) && amount > 0) { p.amount = amount; if (body.currency) p.currency = String(body.currency).toUpperCase().slice(0, 3); }
-      const r = await resendOne(p);
+      const r = await resendOne(admin, p, body.force === true);
       return json(r.ok ? { ok: true, message: r.message } : { error: r.message }, r.ok ? 200 : 422);
     }
 
@@ -238,7 +261,7 @@ Deno.serve(async (req) => {
       let sent = 0;
       const failed: { ref: string; message: string }[] = [];
       for (const p of todo) {
-        const r = await resendOne(p);
+        const r = await resendOne(admin, p);
         if (r.ok) sent++; else failed.push({ ref: p.ref, message: r.message });
       }
       return json({ ok: true, attempted: todo.length, sent, failed });

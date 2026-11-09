@@ -183,7 +183,33 @@ Deno.serve(async (req) => {
     if (action === "list") {
       const purchases = await collectPurchases(admin, days);
       const states = await metaStates(admin, purchases.map((p) => p.ref), days);
-      const rows = purchases.map((p) => ({ ...p, meta: states.get(p.ref) ?? { state: "none", at: null, eventsReceived: null, error: null, attempts: 0 } }));
+      // «Con quién»: de qué campaña/anuncio llegó cada comprador (según nuestro propio registro del checkout) y si hay clic de anuncio guardado.
+      const emails = [...new Set(purchases.map((p) => p.email).filter(Boolean) as string[])];
+      const camp = new Map<string, { campaign: string | null; ad: string | null }>();
+      const attrib = new Map<string, "fbc" | "fbp">();
+      try {
+        for (let i = 0; i < emails.length; i += 80) {
+          const chunk = emails.slice(i, i + 80);
+          const { data: hits } = await admin.from("checkout_rate_hits").select("email, campaign, ad, created_at").in("email", chunk).not("campaign", "is", null).order("created_at", { ascending: false }).limit(1000);
+          for (const h of (hits ?? []) as any[]) {
+            const k = String(h.email ?? "").toLowerCase();
+            if (k && !camp.has(k)) camp.set(k, { campaign: h.campaign ?? null, ad: h.ad ?? null });
+          }
+          const { data: at } = await admin.from("meta_attribution").select("email, fbc, fbp, expires_at").in("email", chunk);
+          for (const a of (at ?? []) as any[]) {
+            if (a.expires_at && new Date(a.expires_at).getTime() < Date.now()) continue;
+            const k = String(a.email ?? "").toLowerCase();
+            if (a.fbc) attrib.set(k, "fbc"); else if (a.fbp) attrib.set(k, "fbp");
+          }
+        }
+      } catch (_) { /* sin esos datos: la lista sigue funcionando */ }
+      const rows = purchases.map((p) => ({
+        ...p,
+        campaign: p.email ? camp.get(p.email)?.campaign ?? null : null,
+        ad: p.email ? camp.get(p.email)?.ad ?? null : null,
+        attribution: p.email ? attrib.get(p.email) ?? null : null,
+        meta: states.get(p.ref) ?? { state: "none", at: null, eventsReceived: null, error: null, attempts: 0 },
+      }));
       const summary = {
         total: rows.length,
         sent: rows.filter((r) => r.meta.state === "sent").length,

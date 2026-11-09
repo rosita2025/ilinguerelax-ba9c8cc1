@@ -124,8 +124,9 @@ async function collectPurchases(admin: any, days: number): Promise<Purchase[]> {
 
 type MetaState = { state: "sent" | "error" | "none"; at: string | null; eventsReceived: number | null; error: string | null; attempts: number };
 
-async function metaStates(admin: any, refs: string[], days: number): Promise<Map<string, MetaState>> {
-  const map = new Map<string, MetaState>();
+async function metaStates(admin: any, refs: string[], days: number): Promise<Map<string, MetaState> & { tableReady?: boolean }> {
+  const map: Map<string, MetaState> & { tableReady?: boolean } = new Map<string, MetaState>();
+  map.tableReady = true;
   if (!refs.length) return map;
   const since = new Date(Date.now() - (days + 2) * 86400000).toISOString();
   try {
@@ -137,7 +138,7 @@ async function metaStates(admin: any, refs: string[], days: number): Promise<Map
         .gte("created_at", since)
         .order("created_at", { ascending: false })
         .limit(2000);
-      if (error) return map; // tabla aún sin migrar: todo queda «sin registro»
+      if (error) { map.tableReady = false; return map; } // tabla aún sin migrar: todo queda «sin registro»
       for (const r of (data ?? []) as any[]) {
         const cur = map.get(r.order_ref) ?? { state: "none" as const, at: null, eventsReceived: null, error: null, attempts: 0 };
         cur.attempts += 1;
@@ -147,7 +148,7 @@ async function metaStates(admin: any, refs: string[], days: number): Promise<Map
         map.set(r.order_ref, cur);
       }
     }
-  } catch (_) { /* sin tabla */ }
+  } catch (_) { map.tableReady = false; }
   return map;
 }
 
@@ -216,7 +217,7 @@ Deno.serve(async (req) => {
         error: rows.filter((r) => r.meta.state === "error").length,
         none: rows.filter((r) => r.meta.state === "none").length,
       };
-      return json({ ok: true, rows, summary, pixelId: "24959578143733255" });
+      return json({ ok: true, rows, summary, pixelId: "24959578143733255", tableReady: states.tableReady !== false, tokenSet: !!Deno.env.get("FB_CONVERSIONS_API_TOKEN") });
     }
 
     if (action === "resend") {

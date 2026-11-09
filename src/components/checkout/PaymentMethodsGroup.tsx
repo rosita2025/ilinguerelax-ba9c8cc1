@@ -98,6 +98,7 @@ import { SupportWhatsApp } from "@/components/checkout/SupportWhatsApp";
 import { VisaBadge, MastercardBadge, AmexBadge, ApplePayBadge } from "@/components/checkout/CardBrandBadges";
 import visaLogoAsset from "@/assets/payment-logos/visa.png.asset.json";
 import mastercardLogoAsset from "@/assets/payment-logos/mastercard.png.asset.json";
+import { metaRequestData } from "@/lib/metaAttribution";
 const visaLogo = visaLogoAsset.url;
 const mastercardLogo = mastercardLogoAsset.url;
 const applePayLogo = "/__l5e/assets-v1/a38f0d22-72e4-4393-ace6-856f1b5379e6/apple-pay.svg";
@@ -1436,6 +1437,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           // Al volver de la página de Stripe sin pagar (rechazo o cancelación) se muestra el aviso con otras opciones.
           cancelUrl: (() => { try { const u = new URL(window.location.href); u.searchParams.set("stripe", "cancelado"); return u.toString(); } catch { return window.location.href; } })(),
           isRestrictedRetry: RESTRICTED_CURRENCY_COUNTRIES.has(country),
+          meta: metaRequestData(),
         },
       });
       if (data?.url) {

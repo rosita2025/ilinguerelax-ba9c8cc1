@@ -53,6 +53,8 @@ const BodySchema = z.object({
   returnUrl: z.string().url(),
   cancelUrl: z.string().url().optional(),
   isRestrictedRetry: z.boolean().optional(),
+  // Clic del anuncio de Meta (cookie _fbc/_fbp): se guarda en el pago para que la compra se ligue al anuncio.
+  meta: z.object({ fbc: z.string().max(255).optional(), fbp: z.string().max(255).optional() }).optional(),
 });
 
 Deno.serve(async (req) => {
@@ -212,6 +214,10 @@ Deno.serve(async (req) => {
       ship_zip: String((body.contact as any).zip ?? "").slice(0, 24),
       coupon_code: pricing.couponCode ?? "",
       coupon_percent: String(pricing.couponPercent),
+      fbc: body.meta?.fbc ?? "",
+      fbp: body.meta?.fbp ?? "",
+      cip: (req.headers.get("cf-connecting-ip") || req.headers.get("x-forwarded-for") || "").split(",")[0].trim().slice(0, 64),
+      cua: (req.headers.get("user-agent") || "").slice(0, 400),
       items_count: String(pricing.items.length),
       items_summary: productSummary,
       skus: deliverySkus,

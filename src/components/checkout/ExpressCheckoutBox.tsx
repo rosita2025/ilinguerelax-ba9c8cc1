@@ -12,6 +12,7 @@ import { getOrderRef } from "@/lib/support";
 import { mapStripeError, type Lang } from "@/lib/stripeErrorMap";
 import { savesCardForFutureUse } from "@/lib/cardSaving";
 import { trackPaymentError } from "@/hooks/useMetaPixel";
+import { metaRequestData } from "@/lib/metaAttribution";
 
 /**
  * EXPRESS CHECKOUT de Stripe: botones de Apple Pay, Google Pay y Link arriba del checkout.
@@ -100,6 +101,7 @@ const ExpressInner = ({ language, country, currency, onAvailable, available }: I
             currency,
             country,
             couponCode: s.coupon ?? undefined,
+            meta: metaRequestData(),
             contact: {
               email,
               name: (event.billingDetails?.name || s.buyer.fullName || "").trim() || undefined,

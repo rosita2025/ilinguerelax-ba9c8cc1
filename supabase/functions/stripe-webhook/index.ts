@@ -155,8 +155,10 @@ async function recordStripePurchase(params: {
   itemsSummary?: string;
   skus?: string;
   eventType: string;
+  /** Clic del anuncio de Meta guardado al crear el pago (metadata de Stripe). */
+  attribution?: { fbc?: string; fbp?: string; ip?: string; ua?: string };
 }): Promise<{ alreadyRecorded: boolean }> {
-  const { adminClient, eventKey, sourceId, paymentIntentId, customerEmail, customerName, customerCountry, purchase, itemsSummary, skus, eventType } = params;
+  const { adminClient, eventKey, sourceId, paymentIntentId, customerEmail, customerName, customerCountry, purchase, itemsSummary, skus, eventType, attribution } = params;
   const { data: existing } = await adminClient
     .from("funnel_events")
     .select("id")
@@ -219,6 +221,10 @@ async function recordStripePurchase(params: {
     contentIds: (skus ? splitSkuList(skus) : [purchase.product_id]).filter(Boolean),
     contentName: purchase.content_name,
     orderId,
+    fbc: attribution?.fbc || null,
+    fbp: attribution?.fbp || null,
+    clientIp: attribution?.ip || null,
+    clientUa: attribution?.ua || null,
   });
 
   return { alreadyRecorded: false };
@@ -381,6 +387,7 @@ async function handlePaidCheckoutSession(session: any, eventType: string) {
       itemsSummary: session.metadata?.items_summary,
       skus: session.metadata?.skus,
       eventType,
+      attribution: { fbc: session.metadata?.fbc, fbp: session.metadata?.fbp, ip: session.metadata?.cip, ua: session.metadata?.cua },
     });
     alreadyRecorded = rec.alreadyRecorded;
   } catch (trackingError) {
@@ -477,6 +484,7 @@ async function handleSucceededPaymentIntent(paymentIntent: any, eventType: strin
       itemsSummary: metadata.items_summary,
       skus: metadata.skus,
       eventType,
+      attribution: { fbc: metadata.fbc, fbp: metadata.fbp, ip: metadata.cip, ua: metadata.cua },
     });
     alreadyRecordedPi = rec.alreadyRecorded;
   } catch (trackingError) {

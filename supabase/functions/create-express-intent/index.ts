@@ -59,6 +59,8 @@ const BodySchema = z.object({
   couponCode: z.string().max(20).optional(),
   // Referencia corta del pedido (ej. PED-7K3QX2): queda en la descripción y los metadatos del pago en Stripe.
   orderRef: z.string().regex(/^PED-[A-Z0-9-]{3,12}$/).optional(),
+  // Clic del anuncio de Meta (cookie _fbc/_fbp): se guarda en el pago para que la compra se ligue al anuncio.
+  meta: z.object({ fbc: z.string().max(255).optional(), fbp: z.string().max(255).optional() }).optional(),
   contact: z.object({
     email: z.string().email().max(255),
     name: z.string().max(100).optional(),
@@ -162,6 +164,10 @@ Deno.serve(async (req) => {
       skus: deliverySkus,
       order_ref: body.orderRef ?? "",
       shipping_usd: "0",
+      fbc: body.meta?.fbc ?? "",
+      fbp: body.meta?.fbp ?? "",
+      cip: (req.headers.get("cf-connecting-ip") || req.headers.get("x-forwarded-for") || "").split(",")[0].trim().slice(0, 64),
+      cua: (req.headers.get("user-agent") || "").slice(0, 400),
     };
 
     // Customer reutilizable (permite el upsell post-compra con 1 clic).

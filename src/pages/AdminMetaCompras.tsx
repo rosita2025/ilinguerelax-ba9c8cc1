@@ -18,6 +18,9 @@ interface Row {
   currency: string | null;
   at: string;
   country: string | null;
+  campaign?: string | null;
+  ad?: string | null;
+  attribution?: "fbc" | "fbp" | null;
   meta: MetaState;
 }
 
@@ -36,7 +39,9 @@ const AdminMetaCompras = () => {
   const [rows, setRows] = useState<Row[]>([]);
   const [summary, setSummary] = useState({ total: 0, sent: 0, error: 0, none: 0 });
   const [pixelId, setPixelId] = useState("");
-  const [days, setDays] = useState(14);
+  // «today» = solo las compras de hoy (hora de tu navegador); se piden 2 días al servidor para cubrir el cambio de día.
+  const [range, setRange] = useState<"today" | 7 | 14 | 30 | 60>("today");
+  const days = range === "today" ? 2 : range;
   const [provider, setProvider] = useState("all");
   const [state, setState] = useState<"all" | "sent" | "error" | "none">("all");
   const [search, setSearch] = useState("");
@@ -72,7 +77,9 @@ const AdminMetaCompras = () => {
   useEffect(() => { void load(); }, [load]);
 
   const providers = useMemo(() => [...new Set(rows.map((r) => r.provider))], [rows]);
-  const visible = rows.filter((r) =>
+  const isToday = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
+  const inRange = range === "today" ? rows.filter((r) => isToday(r.at)) : rows;
+  const visible = inRange.filter((r) =>
     (provider === "all" || r.provider === provider) &&
     (state === "all" || r.meta.state === state) &&
     (!search.trim() || `${r.ref} ${r.email ?? ""} ${r.name ?? ""}`.toLowerCase().includes(search.trim().toLowerCase())),
@@ -156,16 +163,17 @@ const AdminMetaCompras = () => {
         )}
 
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-          {kpi("Compras confirmadas", summary.total, "bg-muted")}
-          {kpi("Enviadas a Meta", summary.sent, "bg-green-100 text-green-800")}
-          {kpi("Con error", summary.error, "bg-red-100 text-red-800")}
-          {kpi("Sin registro de envío", summary.none, "bg-yellow-100 text-yellow-800")}
+          {kpi("Compras confirmadas", inRange.length, "bg-muted")}
+          {kpi("Enviadas a Meta", inRange.filter((r) => r.meta.state === "sent").length, "bg-green-100 text-green-800")}
+          {kpi("Con error", inRange.filter((r) => r.meta.state === "error").length, "bg-red-100 text-red-800")}
+          {kpi("Sin registro de envío", inRange.filter((r) => r.meta.state === "none").length, "bg-yellow-100 text-yellow-800")}
         </div>
 
         <Card className="p-3 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            {[7, 14, 30, 60].map((d) => (
-              <Button key={d} size="sm" variant={days === d ? "default" : "outline"} onClick={() => setDays(d)}>{d} días</Button>
+            <Button size="sm" variant={range === "today" ? "default" : "outline"} onClick={() => setRange("today")}>Hoy</Button>
+            {([7, 14, 30, 60] as const).map((d) => (
+              <Button key={d} size="sm" variant={range === d ? "default" : "outline"} onClick={() => setRange(d)}>{d} días</Button>
             ))}
             <div className="relative ml-auto w-full sm:w-64">
               <Search className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -202,6 +210,8 @@ const AdminMetaCompras = () => {
                 </Button>
               </div>
               <div className="mt-1 text-xs text-muted-foreground break-all">
+                {r.campaign ? <span className="mr-2 font-medium text-primary">📣 {r.campaign}{r.ad ? ` · ${r.ad}` : ""}</span> : null}
+                {r.attribution ? <span className="mr-2 rounded bg-green-100 px-1.5 py-0.5 text-[11px] text-green-800" title="Tenemos guardado el clic del anuncio de este comprador: Meta puede atribuirle la compra a la campaña.">🔗 clic de anuncio guardado</span> : <span className="mr-2 rounded bg-muted px-1.5 py-0.5 text-[11px]" title="No hay clic de anuncio guardado: Meta solo podrá atribuirla si reconoce el correo.">sin clic de anuncio guardado</span>}
                 {r.name ? `${r.name} · ` : ""}{r.email ?? "sin correo"}
                 {r.meta.state === "sent" && r.meta.at ? ` · Meta confirmó (${r.meta.eventsReceived ?? 1} evento) el ${fmtDate(r.meta.at)}` : ""}
                 {r.meta.state === "error" && r.meta.error ? ` · ${r.meta.error}` : ""}

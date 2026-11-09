@@ -69,7 +69,13 @@ export const BrevoStatusCard = () => {
 
   const emailsLeft = status?.account?.emailsLeft;
   const isLowCredits = emailsLeft !== null && emailsLeft < 50;
-  const hasError = status?.account?.error || status?.stats?.error;
+  // Brevo responde «access_denied» al pedir el plan/créditos cuando la clave (o el conector) no tiene permiso para esa consulta.
+  // Los envíos y las estadísticas siguen funcionando: se muestra un aviso claro en lugar del error crudo.
+  const denied = (e?: string | null) => !!e && /access_denied|access denied/i.test(e);
+  const accountDenied = denied(status?.account?.error);
+  const accountError = !accountDenied ? status?.account?.error : null;
+  const statsDenied = denied(status?.stats?.error);
+  const hasError = accountError || (!statsDenied ? status?.stats?.error : null);
 
   return (
     <Card className={isLowCredits ? "border-amber-500/50" : ""}>
@@ -89,7 +95,7 @@ export const BrevoStatusCard = () => {
           </div>
           
           <p className="text-xs text-muted-foreground">
-            Créditos restantes para envíos transaccionales.
+            {accountDenied ? "No se puede leer el plan ni los créditos con esta clave de Brevo." : "Créditos restantes para envíos transaccionales."}
           </p>
 
           <div className="grid grid-cols-2 gap-2 pt-2 border-t">
@@ -105,14 +111,23 @@ export const BrevoStatusCard = () => {
             </div>
           </div>
 
-          {hasError && (
-            <div className="flex items-center gap-2 p-2 mt-2 text-xs text-rose-500 bg-rose-50 rounded border border-rose-100">
-              <AlertCircle className="h-3 w-3 shrink-0" />
-              <span>{hasError}</span>
+          {(accountDenied || statsDenied) && (
+            <div className="flex items-start gap-2 p-2 mt-2 text-xs text-amber-800 bg-amber-50 rounded border border-amber-200">
+              <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
+              <span className="break-words">
+                Brevo negó el permiso de lectura ({accountDenied ? "plan y créditos" : "estadísticas"}). Los correos se siguen enviando con normalidad. Mira tus créditos en app.brevo.com → Planes, o crea una clave API nueva en Brevo (SMTP y API → Claves API) y guárdala como <b>BREVO_API_KEY</b>.
+              </span>
             </div>
           )}
 
-          {!hasError && !isLowCredits && emailsLeft !== null && (
+          {hasError && (
+            <div className="flex items-start gap-2 p-2 mt-2 text-xs text-rose-500 bg-rose-50 rounded border border-rose-100">
+              <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
+              <span className="break-words min-w-0">{String(hasError).slice(0, 200)}</span>
+            </div>
+          )}
+
+          {!hasError && !accountDenied && !isLowCredits && emailsLeft !== null && (
             <div className="flex items-center gap-2 p-2 mt-2 text-xs text-emerald-600 bg-emerald-50 rounded border border-emerald-100">
               <CheckCircle2 className="h-3 w-3 shrink-0" />
               <span>Conexión activa y créditos disponibles</span>

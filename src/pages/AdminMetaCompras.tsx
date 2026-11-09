@@ -42,10 +42,12 @@ const AdminMetaCompras = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!adminKey) return;
     setLoading(true);
+    setLoadError(null);
     try {
       const { data, error } = await adminInvoke("manage-meta-purchases", { body: { adminKey, action: "list", days } });
       if (error) throw error;
@@ -55,7 +57,13 @@ const AdminMetaCompras = () => {
       setSummary(d.summary ?? { total: 0, sent: 0, error: 0, none: 0 });
       setPixelId(d.pixelId ?? "");
     } catch (e) {
-      toast.error("No se pudo cargar", { description: (e as Error).message });
+      const m = (e as Error).message || "";
+      // «Failed to send a request to the Edge Function» = la función no está desplegada (o no responde): no es un problema de tus datos.
+      const notDeployed = /failed to send a request|failed to fetch|networkerror/i.test(m);
+      setLoadError(notDeployed
+        ? "La función del servidor «manage-meta-purchases» todavía no está desplegada (o no responde). En Lovable pulsa Publish → Update para desplegarla; si sigue igual, revisa Cloud → Edge Functions → manage-meta-purchases → Logs."
+        : m);
+      toast.error("No se pudo cargar", { description: notDeployed ? "La función del servidor aún no está desplegada." : m });
     } finally {
       setLoading(false);
     }
@@ -142,6 +150,10 @@ const AdminMetaCompras = () => {
             )}
           </div>
         </div>
+
+        {loadError && (
+          <p className="rounded-md border border-amber-400 bg-amber-50 p-3 text-sm text-amber-900">{loadError}</p>
+        )}
 
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
           {kpi("Compras confirmadas", summary.total, "bg-muted")}

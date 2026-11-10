@@ -8,10 +8,26 @@ afterEach(() => { cleanup(); vi.useRealTimers(); });
 const show = (path = "/products/x") => { render(<MemoryRouter initialEntries={[path]}><CookieConsent /></MemoryRouter>); act(() => { vi.advanceTimersByTime(2500); }); };
 
 describe("cookie consent version 2", () => {
-  it("does not show the banner on checkout pages", () => {
+  it("shows a slim top bar on checkout pages for European visitors who have not decided", () => {
     localStorage.setItem("ilr_country", "ES");
     show("/checkouts/patrones-ingles");
+    const bar = screen.getByRole("dialog");
+    expect(bar.className).toContain("top-0");
+    fireEvent.click(screen.getByRole("button", { name: "Aceptar" }));
+    expect(getCookieConsent()).toBe("accepted");
+  });
+  it("does not show anything on checkout pages outside Europe", () => {
+    localStorage.setItem("ilr_country", "MX");
+    show("/checkouts/patrones-ingles");
     expect(screen.queryByRole("dialog")).toBeNull();
+  });
+  it("asks for permission when the country is unknown but the time zone is European", () => {
+    vi.stubGlobal("fetch", vi.fn(() => new Promise(() => {})));
+    const spy = vi.spyOn(Intl.DateTimeFormat.prototype, "resolvedOptions").mockReturnValue({ timeZone: "Europe/Madrid" } as Intl.ResolvedDateTimeFormatOptions);
+    show("/products/patrones");
+    expect(screen.queryByRole("dialog")).not.toBeNull();
+    spy.mockRestore();
+    vi.unstubAllGlobals();
   });
   it("shows the banner on product pages for European visitors", () => {
     localStorage.setItem("ilr_country", "ES");

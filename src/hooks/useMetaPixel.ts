@@ -1,3 +1,4 @@
+import { isEuUser } from "@/lib/euConsent";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getClientId } from "@/lib/clientId";
@@ -57,18 +58,7 @@ const getSessionId = (): string => {
 const FUNNEL_EVENTS = new Set(["PageView", "ViewContent", "AddToCart", "InitiateCheckout", "BeginCheckout", "Purchase", "PaymentError", "Lead", "CheckoutAction"]);
 const CAPI_EVENTS = new Set(["ViewContent", "AddToCart", "InitiateCheckout", "Lead", "Purchase"]);
 
-// EU consent gating: in EU countries we must wait for explicit "accepted" before firing browser Pixel.
-const EU_COUNTRIES = new Set([
-  "AT","BE","BG","HR","CY","CZ","DK","EE","FI","FR","DE","GR","HU","IE","IT",
-  "LV","LT","LU","MT","NL","PL","PT","RO","SK","SI","ES","SE","IS","LI","NO","GB","CH"
-]);
-const isEuUser = (): boolean => {
-  if (typeof window === "undefined") return false;
-  try {
-    const c = (localStorage.getItem("ilr_country") || "").toUpperCase();
-    return EU_COUNTRIES.has(c);
-  } catch { return false; }
-};
+// EU consent gating: en Europa hay que esperar un «accepted» explícito antes de usar el Pixel (ver src/lib/euConsent.ts).
 // ---------------------------------------------------------------------------
 // Tráfico interno (admin / pruebas propias): NO debe llegar al Pixel ni a CAPI.
 // Se marca de forma permanente en el navegador para que, aunque el admin luego

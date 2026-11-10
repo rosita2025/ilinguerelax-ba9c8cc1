@@ -4,6 +4,7 @@
 // desde el servidor cuando la compra se confirma en un webhook.
 
 import { supabase } from "@/integrations/supabase/client";
+import { getCookieConsent, isEuUser } from "@/lib/euConsent";
 
 const META_ATTR_KEY = "ilr_meta_paid_until";
 const FBCLID_KEY = "ilr_meta_fbc";
@@ -75,6 +76,8 @@ export const getMetaAttribution = (): MetaAttribution => {
 
 /** Datos del clic del anuncio para mandarlos al crear el pago (el servidor los guarda en el pago y los usa al enviar la compra a Meta). Solo si vino de un anuncio. */
 export const metaRequestData = (): { fbc?: string; fbp?: string } | undefined => {
+  // Europa: sin «Aceptar» de cookies no se guarda ni se envía el clic del anuncio.
+  if (isEuUser() && getCookieConsent() !== "accepted") return undefined;
   const a = getMetaAttribution();
   if (!a.attributed || (!a.fbc && !a.fbp)) return undefined;
   return { ...(a.fbc ? { fbc: a.fbc } : {}), ...(a.fbp ? { fbp: a.fbp } : {}) };

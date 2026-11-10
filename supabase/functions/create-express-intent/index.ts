@@ -166,8 +166,8 @@ Deno.serve(async (req) => {
       shipping_usd: "0",
       fbc: body.meta?.fbc ?? "",
       fbp: body.meta?.fbp ?? "",
-      cip: (req.headers.get("cf-connecting-ip") || req.headers.get("x-forwarded-for") || "").split(",")[0].trim().slice(0, 64),
-      cua: (req.headers.get("user-agent") || "").slice(0, 400),
+      cip: !body.meta ? "" : (req.headers.get("cf-connecting-ip") || req.headers.get("x-forwarded-for") || "").split(",")[0].trim().slice(0, 64),
+      cua: !body.meta ? "" : (req.headers.get("user-agent") || "").slice(0, 400),
     };
 
     // Customer reutilizable (permite el upsell post-compra con 1 clic).

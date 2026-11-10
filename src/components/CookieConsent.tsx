@@ -3,31 +3,19 @@ import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Cookie } from "lucide-react";
 
-const EU_COUNTRIES = new Set([
-  "AT","BE","BG","HR","CY","CZ","DK","EE","FI","FR","DE","GR","HU","IE","IT",
-  "LV","LT","LU","MT","NL","PL","PT","RO","SK","SI","ES","SE","IS","LI","NO","GB","CH"
-]);
+import { CONSENT_KEY, ensureVisitorCountry, getCookieConsent as readConsent, isEuUser as euUser } from "@/lib/euConsent";
 
-const CONSENT_KEY = "ilr_cookie_consent"; // "accepted" | "rejected"
+export const getCookieConsent = readConsent;
+export const isEuUser = euUser;
+
 // Versión del banner: Europa debe volver a elegir al actualizarla.
 const CONSENT_VERSION = "2";
 const VERSION_KEY = "ilr_cookie_consent_v";
 
-export const getCookieConsent = (): "accepted" | "rejected" | null => {
-  try { return localStorage.getItem(CONSENT_KEY) as any; } catch { return null; }
-};
-
-export const isEuUser = (): boolean => {
-  try {
-    const c = (localStorage.getItem("ilr_country") || "").toUpperCase();
-    return EU_COUNTRIES.has(c);
-  } catch { return false; }
-};
-
 /** Europa: si la respuesta es del banner anterior, se borra para volver a preguntar. */
 const resetOutdatedConsent = (): void => {
   try {
-    if (isEuUser() && localStorage.getItem(VERSION_KEY) !== CONSENT_VERSION) {
+    if (euUser() && localStorage.getItem(VERSION_KEY) !== CONSENT_VERSION) {
       localStorage.removeItem(CONSENT_KEY);
     }
   } catch { /* noop */ }
@@ -51,38 +39,60 @@ export const CookieConsent = () => {
   const [lang, setLang] = useState<string>("es");
 
   useEffect(() => {
-    resetOutdatedConsent();
-    // Wait briefly for ipapi to populate ilr_country
+    // El país se detecta al entrar al sitio (no solo en el formulario del pago) para poder pedir permiso a tiempo.
+    ensureVisitorCountry();
     const check = () => {
       resetOutdatedConsent();
       const already = getCookieConsent();
       if (already) return;
-      if (!isEuUser()) return;
+      if (!euUser()) return;
       try {
         const l = (localStorage.getItem("ilr_lang") || "es").toLowerCase();
         setLang(COPY[l] ? l : "en");
       } catch { setLang("en"); }
       setVisible(true);
     };
+    check();
     const t1 = setTimeout(check, 800);
     const t2 = setTimeout(check, 2500);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    // Llegó el país (consulta por IP): se vuelve a revisar.
+    window.addEventListener("ilr-country", check);
+    return () => { clearTimeout(t1); clearTimeout(t2); window.removeEventListener("ilr-country", check); };
   }, []);
 
   const decide = (v: "accepted" | "rejected") => {
     try {
       localStorage.setItem(CONSENT_KEY, v);
       localStorage.setItem(VERSION_KEY, CONSENT_VERSION);
-    } catch {}
+    } catch { /* sin almacenamiento */ }
     setVisible(false);
     // Notify listeners (Pixel init) immediately
     window.dispatchEvent(new CustomEvent("ilr-cookie-consent", { detail: v }));
   };
 
-  // En el checkout no se muestra el banner (tapaba el formulario de pago): la decisión se toma en la
-  // página del producto y el checkout la respeta (se guarda en el navegador).
-  if (!visible || pathname.startsWith("/checkout")) return null;
+  if (!visible) return null;
   const t = COPY[lang] || COPY.en;
+  const inCheckout = pathname.startsWith("/checkout");
+
+  // En el pago: barra fina arriba (no tapa el formulario ni los botones de pago). Antes aquí no se mostraba y, como el país se
+  // detectaba justo en el pago, quien venía de Europa nunca podía aceptar y el píxel no veía ni el checkout ni la compra.
+  if (inCheckout) {
+    return (
+      <div role="dialog" aria-label="Cookies" className="fixed inset-x-0 top-0 z-[70] border-b border-border bg-card/98 px-3 py-2 shadow-md backdrop-blur-md">
+        <div className="mx-auto flex max-w-3xl items-center gap-3">
+          <Cookie className="hidden h-4 w-4 shrink-0 text-primary sm:block" />
+          <p className="min-w-0 flex-1 text-xs leading-snug text-muted-foreground">
+            {t.body} <a href="/privacidad" className="underline underline-offset-2 text-foreground/80">{t.more}</a>
+          </p>
+          {/* Mismo tamaño y mismo nivel de visibilidad para Aceptar y Rechazar. */}
+          <div className="flex shrink-0 gap-2">
+            <Button variant="outline" size="sm" className="h-9 px-3 text-xs" onClick={() => decide("rejected")}>{t.reject}</Button>
+            <Button variant="outline" size="sm" className="h-9 px-3 text-xs" onClick={() => decide("accepted")}>{t.accept}</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -100,8 +110,8 @@ export const CookieConsent = () => {
         </div>
         {/* Mismo tamaño y mismo nivel de visibilidad para Aceptar y Rechazar. */}
         <div className="grid grid-cols-2 gap-2 mt-2.5">
-          <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => decide("rejected")}>{t.reject}</Button>
-          <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => decide("accepted")}>{t.accept}</Button>
+          <Button variant="outline" size="sm" className="h-9 text-xs" onClick={() => decide("rejected")}>{t.reject}</Button>
+          <Button variant="outline" size="sm" className="h-9 text-xs" onClick={() => decide("accepted")}>{t.accept}</Button>
         </div>
       </div>
     </div>

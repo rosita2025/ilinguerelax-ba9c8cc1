@@ -1,3 +1,4 @@
+import { ensureVisitorCountry } from "@/lib/euConsent";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -204,7 +205,7 @@ const getAttributionReferrer = () => {
 
 const RouteTracker = () => {
   const location = useLocation();
-  useEffect(() => { initClientIdSync(); }, []);
+  useEffect(() => { initClientIdSync(); ensureVisitorCountry(); }, []);
   // Captura el fbclid del anuncio en cualquier página (home, blog, productos).
   useEffect(() => { captureMetaClickId(); captureAdCampaign(); }, [location.search]);
   useEffect(() => {

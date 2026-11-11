@@ -115,19 +115,39 @@ const AdminMonedas = () => {
     setSaving(true);
     try {
       const toMap = (m: Record<string, string>) => Object.fromEntries(Object.entries(m).map(([k, v]) => [k, numOrNull(v)]).filter(([, v]) => v !== null));
-      const { data, error } = await adminInvoke<{ success?: boolean; error?: string; updated_at?: string | null }>("manage-products", {
-        body: {
-          action: "set_prices",
-          adminKey,
-          sku: product.sku,
-          price_usd: usaN,
-          price_usd_latam: latamN,
-          price_usd_tienda: asiaN,
-          local_prices: toMap(fixed),
-          local_compare_at_prices: toMap(compare),
-          local_usd_prices: usdMap,
-        },
-      });
+      type SaveRes = { success?: boolean; error?: string; updated_at?: string | null };
+      const prices = {
+        price_usd: usaN,
+        price_usd_latam: latamN,
+        price_usd_tienda: asiaN,
+        local_prices: toMap(fixed),
+        local_compare_at_prices: toMap(compare),
+        local_usd_prices: usdMap,
+      };
+      let { data, error } = await adminInvoke<SaveRes>("manage-products", { body: { action: "set_prices", adminKey, sku: product.sku, ...prices } });
+      // La función de Supabase aún no tiene la acción nueva (se despliega al publicar): se guarda por la acción de siempre («upsert»)
+      // reenviando el producto tal cual con los precios nuevos. Los enlaces de entrega no cambian (no pide confirmación) y los upsells no se tocan.
+      const oldFunction = /invalid action/i.test(error?.message ?? "") || /invalid action/i.test(data?.error ?? "");
+      if (oldFunction) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { bonus_titles: _b, id: _i, created_at: _c, updated_at: _u, ...clean } = product as any;
+        ({ data, error } = await adminInvoke<SaveRes>("manage-products", {
+          body: {
+            action: "upsert",
+            adminKey,
+            confirmDriveChange: false,
+            product: {
+              ...clean,
+              ...prices,
+              gallery_images: Array.isArray(clean.gallery_images) ? clean.gallery_images : [],
+              gallery_metadata: clean.gallery_metadata || {},
+              is_physical: !!clean.is_physical,
+              active: !!clean.active,
+              store_enabled: !!clean.store_enabled,
+            },
+          },
+        }));
+      }
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
       publishCatalogUpdate(product.sku, data?.updated_at ? new Date(data.updated_at).getTime() : Date.now());

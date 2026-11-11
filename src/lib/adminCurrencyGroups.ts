@@ -3,9 +3,9 @@ export type CurrencyGroup = "LATAM" | "EUROPA" | "USA_CANADA" | "ASIA" | "RESTO"
 export const GROUP_TITLE: Record<CurrencyGroup, string> = { LATAM: "🌎 LATAM", EUROPA: "🇪🇺 Europa", USA_CANADA: "🇺🇸 USA y Canadá", ASIA: "🌏 Asia", RESTO: "🌍 Resto del mundo" };
 export const GROUP_HINT: Record<CurrencyGroup, string> = {
   LATAM: "Usa el precio de LATAM (US$)",
-  EUROPA: "Países con euro (España, Francia, Alemania, Italia, Portugal…): precio de Europa (€). Reino Unido, Suiza, Suecia, Noruega, Dinamarca, Polonia y Chequia ven su propia moneda, calculada desde el precio de USA y Canadá",
+  EUROPA: "TODA Europa ve y paga en euros (España, Francia, Alemania, Italia, Reino Unido, Suiza, Suecia, Noruega, Dinamarca, Polonia, Chequia…): usa el precio de Europa (€). Las otras monedas europeas solo se ven si el visitante las elige a mano en el selector",
   USA_CANADA: "Usa el precio de USA y Canadá (US$)",
-  ASIA: "Usa el precio de Asia y resto del mundo (US$)",
+  ASIA: "Asia y Medio Oriente: usa el precio de Asia y resto del mundo (US$)",
   RESTO: "Usa el precio de Asia y resto del mundo (US$); Australia y Nueva Zelanda, por ahora, el de USA y Canadá",
 };
 /** Monedas locales del admin, agrupadas en las 5 regiones. `region` decide qué precio base USD se usa (igual que el servidor y la página). */
@@ -26,6 +26,7 @@ export const LOCAL_CURRENCY_CARDS: { code: string; flag: string; label: string; 
   { code: "HNL", flag: "🇭🇳", label: "Honduras", region: "LATAM", group: "LATAM" },
   { code: "NIO", flag: "🇳🇮", label: "Nicaragua", region: "LATAM", group: "LATAM" },
   { code: "VES", flag: "🇻🇪", label: "Venezuela", region: "LATAM", group: "LATAM" },
+  { code: "CUP", flag: "🇨🇺", label: "Cuba", region: "LATAM", group: "LATAM" },
   // Europa
   { code: "EUR", flag: "🇪🇺", label: "Europa (euro)", region: "Anglosphere/Europe", group: "EUROPA" },
   { code: "GBP", flag: "🇬🇧", label: "Reino Unido", region: "Anglosphere/Europe", group: "EUROPA" },
@@ -35,9 +36,19 @@ export const LOCAL_CURRENCY_CARDS: { code: string; flag: string; label: string; 
   { code: "DKK", flag: "🇩🇰", label: "Dinamarca", region: "Anglosphere/Europe", group: "EUROPA" },
   { code: "PLN", flag: "🇵🇱", label: "Polonia", region: "Anglosphere/Europe", group: "EUROPA" },
   { code: "CZK", flag: "🇨🇿", label: "Rep. Checa", region: "Anglosphere/Europe", group: "EUROPA" },
-  // USA y Canadá: Estados Unidos ve US$ con el precio de USA y Canadá (no hay tarjeta USD: un precio fijo en USD pisaría los precios de todas las regiones que ven dólares)
+  { code: "RON", flag: "🇷🇴", label: "Leu rumano", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "HUF", flag: "🇭🇺", label: "Forinto húngaro", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "ISK", flag: "🇮🇸", label: "Corona islandesa", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "RSD", flag: "🇷🇸", label: "Dinar serbio", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "ALL", flag: "🇦🇱", label: "Lek albanés", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "BAM", flag: "🇧🇦", label: "Marco convertible bosnio", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "MKD", flag: "🇲🇰", label: "Denar macedonio", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "MDL", flag: "🇲🇩", label: "Leu moldavo", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "UAH", flag: "🇺🇦", label: "Grivna ucraniana", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "TRY", flag: "🇹🇷", label: "Lira turca", region: "Anglosphere/Europe", group: "EUROPA" },
+  // USA y Canadá (no hay tarjeta USD: un precio fijo en USD pisaría los precios de todas las regiones que ven dólares)
   { code: "CAD", flag: "🇨🇦", label: "Canadá", region: "Anglosphere/Europe", group: "USA_CANADA" },
-  // Asia
+  // Asia y Medio Oriente
   { code: "JPY", flag: "🇯🇵", label: "Japón", region: "Asia", group: "ASIA" },
   { code: "KRW", flag: "🇰🇷", label: "Corea del Sur", region: "Asia", group: "ASIA" },
   { code: "CNY", flag: "🇨🇳", label: "China", region: "Asia", group: "ASIA" },
@@ -47,7 +58,24 @@ export const LOCAL_CURRENCY_CARDS: { code: string; flag: string; label: string; 
   { code: "TWD", flag: "🇹🇼", label: "Taiwán", region: "Asia", group: "ASIA" },
   { code: "IDR", flag: "🇮🇩", label: "Indonesia", region: "Asia", group: "ASIA" },
   { code: "MYR", flag: "🇲🇾", label: "Malasia", region: "Asia", group: "ASIA" },
-  // Resto del mundo
+  { code: "THB", flag: "🇹🇭", label: "Baht tailandés", region: "Asia", group: "ASIA" },
+  { code: "PHP", flag: "🇵🇭", label: "Peso filipino", region: "Asia", group: "ASIA" },
+  { code: "VND", flag: "🇻🇳", label: "Dong vietnamita", region: "Asia", group: "ASIA" },
+  { code: "PKR", flag: "🇵🇰", label: "Rupia pakistaní", region: "Asia", group: "ASIA" },
+  { code: "BDT", flag: "🇧🇩", label: "Taka de Bangladés", region: "Asia", group: "ASIA" },
+  { code: "LKR", flag: "🇱🇰", label: "Rupia de Sri Lanka", region: "Asia", group: "ASIA" },
+  { code: "NPR", flag: "🇳🇵", label: "Rupia nepalí", region: "Asia", group: "ASIA" },
+  { code: "KZT", flag: "🇰🇿", label: "Tenge kazajo", region: "Asia", group: "ASIA" },
+  { code: "UZS", flag: "🇺🇿", label: "Som uzbeko", region: "Asia", group: "ASIA" },
+  { code: "AED", flag: "🇦🇪", label: "Dírham de los Emiratos", region: "Asia", group: "ASIA" },
+  { code: "SAR", flag: "🇸🇦", label: "Riyal saudí", region: "Asia", group: "ASIA" },
+  { code: "QAR", flag: "🇶🇦", label: "Riyal catarí", region: "Asia", group: "ASIA" },
+  { code: "KWD", flag: "🇰🇼", label: "Dinar kuwaití", region: "Asia", group: "ASIA" },
+  { code: "BHD", flag: "🇧🇭", label: "Dinar bahreiní", region: "Asia", group: "ASIA" },
+  { code: "OMR", flag: "🇴🇲", label: "Rial omaní", region: "Asia", group: "ASIA" },
+  { code: "ILS", flag: "🇮🇱", label: "Nuevo shéquel israelí", region: "Asia", group: "ASIA" },
+  { code: "JOD", flag: "🇯🇴", label: "Dinar jordano", region: "Asia", group: "ASIA" },
+  // Resto del mundo (África, Oceanía y otros)
   { code: "AUD", flag: "🇦🇺", label: "Australia", region: "Anglosphere/Europe", group: "RESTO" },
   { code: "NZD", flag: "🇳🇿", label: "Nueva Zelanda", region: "Anglosphere/Europe", group: "RESTO" },
   { code: "ZAR", flag: "🇿🇦", label: "Sudáfrica", region: "Africa", group: "RESTO" },
@@ -55,4 +83,20 @@ export const LOCAL_CURRENCY_CARDS: { code: string; flag: string; label: string; 
   { code: "EGP", flag: "🇪🇬", label: "Egipto", region: "Africa", group: "RESTO" },
   { code: "KES", flag: "🇰🇪", label: "Kenia", region: "Africa", group: "RESTO" },
   { code: "MAD", flag: "🇲🇦", label: "Marruecos", region: "Africa", group: "RESTO" },
+  { code: "JMD", flag: "🇯🇲", label: "Dólar jamaiquino", region: "Africa", group: "RESTO" },
+  { code: "TTD", flag: "🇹🇹", label: "Dólar de Trinidad y Tobago", region: "Africa", group: "RESTO" },
+  { code: "GHS", flag: "🇬🇭", label: "Cedi ghanés", region: "Africa", group: "RESTO" },
+  { code: "TND", flag: "🇹🇳", label: "Dinar tunecino", region: "Africa", group: "RESTO" },
+  { code: "DZD", flag: "🇩🇿", label: "Dinar argelino", region: "Africa", group: "RESTO" },
+  { code: "XOF", flag: "🇸🇳", label: "Franco CFA (África Occidental)", region: "Africa", group: "RESTO" },
+  { code: "XAF", flag: "🇨🇲", label: "Franco CFA (África Central)", region: "Africa", group: "RESTO" },
+  { code: "TZS", flag: "🇹🇿", label: "Chelín tanzano", region: "Africa", group: "RESTO" },
+  { code: "UGX", flag: "🇺🇬", label: "Chelín ugandés", region: "Africa", group: "RESTO" },
+  { code: "ETB", flag: "🇪🇹", label: "Birr etíope", region: "Africa", group: "RESTO" },
+  { code: "FJD", flag: "🇫🇯", label: "Dólar fiyiano", region: "Africa", group: "RESTO" },
+  { code: "PGK", flag: "🇵🇬", label: "Kina de Papúa Nueva Guinea", region: "Africa", group: "RESTO" },
+  { code: "HTG", flag: "🇭🇹", label: "Haití", region: "Africa", group: "RESTO" },
 ];
+
+/** Cuántas monedas hay en el catálogo del admin (más USD, que usa el precio de USA y Canadá). */
+export const CURRENCY_COUNT = LOCAL_CURRENCY_CARDS.length + 1;

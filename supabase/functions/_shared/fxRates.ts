@@ -87,11 +87,58 @@ export const FX_USD_TO_LOCAL: Record<string, number> = {
   MYR: 4.5,
   NGN: 1550,
   KES: 130,
+  // Mismas tasas que `exchangeRates` del navegador (src/i18n/index.ts). Antes faltaban en el servidor: si la base no tenía su tasa en vivo,
+  // el servidor no podía calcular el total en esa moneda y cobraba en US$ aunque la página mostrara rand, libra egipcia, cedi, etc.
+  ZAR: 18.5,
+  EGP: 48,
+  GHS: 15,
+  TZS: 2700,
+  UGX: 3700,
+  MAD: 10,
+  // Resto del catálogo de 79 monedas (mismas tasas que el navegador).
+  JMD: 157,
+  TTD: 6.8,
+  RON: 4.6,
+  HUF: 360,
+  ISK: 138,
+  RSD: 108,
+  ALL: 94,
+  BAM: 1.8,
+  MKD: 56,
+  MDL: 17.5,
+  UAH: 41,
+  TRY: 41,
+  THB: 35,
+  PHP: 57,
+  VND: 25400,
+  PKR: 280,
+  BDT: 120,
+  LKR: 300,
+  NPR: 135,
+  KZT: 520,
+  UZS: 12800,
+  AED: 3.67,
+  SAR: 3.75,
+  QAR: 3.64,
+  KWD: 0.31,
+  BHD: 0.377,
+  OMR: 0.385,
+  ILS: 3.7,
+  JOD: 0.71,
+  TND: 3.1,
+  DZD: 134,
+  XOF: 600,
+  XAF: 600,
+  ETB: 120,
+  FJD: 2.25,
+  PGK: 4,
 };
 
 /** Monedas que dLocal rechaza con decimales. */
 export const ZERO_DECIMAL_CURRENCIES = new Set([
   "CLP", "PYG", "COP", "ARS", "CRC", "GTQ", "JPY", "IDR",
+  // Monedas sin centavos que se muestran enteras: el total se redondea igual que lo que ve el comprador.
+  "VND", "UZS", "XOF", "XAF", "KZT", "PKR", "BDT", "LKR", "NPR", "DZD", "ETB", "HUF", "ISK", "RSD", "ALL", "MKD",
 ]);
 
 /**

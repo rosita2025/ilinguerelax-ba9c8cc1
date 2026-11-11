@@ -137,8 +137,8 @@ const RATES: Record<CampaignCurrency, { symbol: string; rate: number; decimals: 
 
 const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
   US: "USD",
-  GB: "GBP",
-  UK: "GBP",
+  GB: "EUR", // Europa: euros
+  UK: "EUR",
   CA: "CAD",
   CO: "COP",
   AR: "ARS",
@@ -161,10 +161,10 @@ const COUNTRY_TO_CURRENCY: Record<string, CampaignCurrency> = {
   SV: "USD", // El Salvador usa USD
   AU: "AUD",
   NZ: "NZD",
-  SE: "SEK",
-  NO: "NOK",
-  DK: "DKK",
-  CH: "CHF",
+  SE: "EUR",
+  NO: "EUR",
+  DK: "EUR",
+  CH: "EUR",
   JP: "JPY",
   KR: "KRW",
   SG: "SGD",

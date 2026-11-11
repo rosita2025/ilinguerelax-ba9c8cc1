@@ -1015,7 +1015,7 @@ const AdminProductEdit = () => {
                   }}
                   placeholder={product.price_usd ? `auto ≈ ${(Number(product.price_usd) * (exchangeRates.EUR ?? 0.92)).toFixed(2)}` : "27.00"}
                 />
-                <p className="text-[10px] text-muted-foreground">Países con euro (España, Francia, Alemania, Italia…). Vacío = convierte el precio de USA y Canadá.</p>
+                <p className="text-[10px] text-muted-foreground">Toda Europa ve y paga en euros (incl. Reino Unido, Suiza, Suecia, Noruega, Dinamarca…). Vacío = convierte el precio de USA y Canadá.</p>
               </div>
               <div className="rounded-lg border bg-muted/20 p-3 space-y-1">
                 <Label className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">🇺🇸🇨🇦 USA y Canadá (US$)</Label>

@@ -197,13 +197,6 @@ type MethodSection = "cards" | "transfer" | "cash" | "wallet" | "other";
 
 const SECTION_ORDER: MethodSection[] = ["cards", "transfer", "cash", "wallet", "other"];
 const MX_SECTION_ORDER: MethodSection[] = ["transfer", "cash", "cards", "wallet", "other"];
-// Países donde la billetera digital (Nequi, Daviplata, DeUna, MACH, Tigo Money, SINPE Móvil, Yappy, Prex…) es de lo más usado: va primero.
-const WALLET_FIRST_COUNTRIES = new Set(["CO", "EC", "BO", "CL", "CR", "GT", "PA", "PY", "UY"]);
-const WALLET_FIRST_ORDER: MethodSection[] = ["wallet", "transfer", "cash", "cards", "other"];
-
-function methods0HasWallet(list: { id: string }[]): boolean {
-  return list.some((m) => m.id === "dlocal_wallet");
-}
 
 function methodSection(id: string): MethodSection {
   if (["card", "dlocal_card", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto", "stripe_klarna"].includes(id)) return "cards";
@@ -2342,7 +2335,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // tarjetas → transferencias → efectivo → billeteras → otros (Hotmart al final).
   // México: SPEI (transferencia) y OXXO (efectivo) van primero y la tarjeta después: las tarjetas mexicanas fallan o las bloquea Stripe
   // con frecuencia (riesgo «máximo», banco que rechaza) y estos rails no pasan por Radar.
-  const sectionOrder = country === "MX" ? MX_SECTION_ORDER : WALLET_FIRST_COUNTRIES.has(country) && methods0HasWallet(visibleMethods) ? WALLET_FIRST_ORDER : SECTION_ORDER;
+  const sectionOrder = country === "MX" ? MX_SECTION_ORDER : SECTION_ORDER;
   const methods = [...visibleMethods].sort(
     (a, b) => sectionOrder.indexOf(methodSection(a.id)) - sectionOrder.indexOf(methodSection(b.id)),
   );

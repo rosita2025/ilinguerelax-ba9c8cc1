@@ -119,8 +119,9 @@ const countryToCurrency: Record<string, Currency> = {
   BE: "EUR", AT: "EUR", IE: "EUR", FI: "EUR", GR: "EUR", LU: "EUR",
   SK: "EUR", SI: "EUR", EE: "EUR", LV: "EUR", LT: "EUR", MT: "EUR", CY: "EUR", HR: "EUR",
 
-  // GBP
-  GB: "GBP", UK: "GBP",
+  // Europa fuera de la Eurozona: también ven y pagan en EUROS (un solo precio de Europa en euros).
+  GB: "EUR", UK: "EUR", CH: "EUR", SE: "EUR", NO: "EUR", DK: "EUR",
+  PL: "EUR", CZ: "EUR", RO: "EUR", HU: "EUR", BG: "EUR",
 
   // Otras principales
   BR: "BRL", MX: "MXN", CO: "COP", AR: "ARS", CA: "CAD", VE: "VES",
@@ -129,10 +130,6 @@ const countryToCurrency: Record<string, Currency> = {
   // LATAM Hotmart (moneda local)
   CL: "CLP", BO: "BOB", CR: "CRC", DO: "DOP",
   GT: "GTQ", HN: "HNL", NI: "NIO", CU: "CUP", PY: "PYG", UY: "UYU", HT: "HTG",
-
-  // Europa fuera Eurozona
-  CH: "CHF", SE: "SEK", NO: "NOK", DK: "DKK",
-  PL: "PLN", CZ: "CZK",
 
   // Asia principal
   JP: "JPY", KR: "KRW", CN: "CNY", IN: "INR", SG: "SGD", HK: "HKD", TW: "TWD", ID: "IDR", MY: "MYR",

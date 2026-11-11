@@ -3,7 +3,7 @@ export type CurrencyGroup = "LATAM" | "EUROPA" | "USA_CANADA" | "ASIA" | "RESTO"
 export const GROUP_TITLE: Record<CurrencyGroup, string> = { LATAM: "🌎 LATAM", EUROPA: "🇪🇺 Europa", USA_CANADA: "🇺🇸 USA y Canadá", ASIA: "🌏 Asia", RESTO: "🌍 Resto del mundo" };
 export const GROUP_HINT: Record<CurrencyGroup, string> = {
   LATAM: "Usa el precio de LATAM (US$)",
-  EUROPA: "Países con euro (España, Francia, Alemania, Italia, Portugal…): precio de Europa (€). Reino Unido, Suiza, Suecia, Noruega, Dinamarca, Polonia y Chequia ven su propia moneda, calculada desde el precio de USA y Canadá",
+  EUROPA: "TODA Europa ve y paga en euros (España, Francia, Alemania, Italia, Reino Unido, Suiza, Suecia, Noruega, Dinamarca, Polonia, Chequia…): usa el precio de Europa (€). Las otras monedas europeas solo se ven si el visitante las elige a mano en el selector",
   USA_CANADA: "Usa el precio de USA y Canadá (US$)",
   ASIA: "Usa el precio de Asia y resto del mundo (US$)",
   RESTO: "Usa el precio de Asia y resto del mundo (US$); Australia y Nueva Zelanda, por ahora, el de USA y Canadá",

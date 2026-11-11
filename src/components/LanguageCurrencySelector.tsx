@@ -48,7 +48,7 @@ const COUNTRIES: CountryOption[] = [
   { code: "SV", flag: "🇸🇻", label: "El Salvador", currency: "USD", region: "Americas" },
   { code: "PR", flag: "🇵🇷", label: "Puerto Rico", currency: "USD", region: "Americas" },
   // Europe
-  { code: "GB", flag: "🇬🇧", label: "United Kingdom", currency: "GBP", region: "Europe" },
+  { code: "GB", flag: "🇬🇧", label: "United Kingdom", currency: "EUR", region: "Europe" },
   { code: "IE", flag: "🇮🇪", label: "Ireland", currency: "EUR", region: "Europe" },
   { code: "ES", flag: "🇪🇸", label: "España", currency: "EUR", region: "Europe" },
   { code: "FR", flag: "🇫🇷", label: "France", currency: "EUR", region: "Europe" },
@@ -60,10 +60,10 @@ const COUNTRIES: CountryOption[] = [
   { code: "AT", flag: "🇦🇹", label: "Österreich", currency: "EUR", region: "Europe" },
   { code: "FI", flag: "🇫🇮", label: "Suomi", currency: "EUR", region: "Europe" },
   { code: "GR", flag: "🇬🇷", label: "Ελλάδα", currency: "EUR", region: "Europe" },
-  { code: "CH", flag: "🇨🇭", label: "Schweiz", currency: "CHF", region: "Europe" },
-  { code: "SE", flag: "🇸🇪", label: "Sverige", currency: "SEK", region: "Europe" },
-  { code: "NO", flag: "🇳🇴", label: "Norge", currency: "NOK", region: "Europe" },
-  { code: "DK", flag: "🇩🇰", label: "Danmark", currency: "DKK", region: "Europe" },
+  { code: "CH", flag: "🇨🇭", label: "Schweiz", currency: "EUR", region: "Europe" },
+  { code: "SE", flag: "🇸🇪", label: "Sverige", currency: "EUR", region: "Europe" },
+  { code: "NO", flag: "🇳🇴", label: "Norge", currency: "EUR", region: "Europe" },
+  { code: "DK", flag: "🇩🇰", label: "Danmark", currency: "EUR", region: "Europe" },
   // Asia-Pacific
   { code: "AU", flag: "🇦🇺", label: "Australia", currency: "AUD", region: "Asia-Pacific" },
   { code: "NZ", flag: "🇳🇿", label: "New Zealand", currency: "NZD", region: "Asia-Pacific" },

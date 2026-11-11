@@ -197,13 +197,6 @@ type MethodSection = "cards" | "transfer" | "cash" | "wallet" | "other";
 
 const SECTION_ORDER: MethodSection[] = ["cards", "transfer", "cash", "wallet", "other"];
 const MX_SECTION_ORDER: MethodSection[] = ["transfer", "cash", "cards", "wallet", "other"];
-// Países donde la billetera digital (Nequi, Daviplata, DeUna, MACH, Tigo Money, SINPE Móvil, Yappy, Prex…) es de lo más usado: va primero.
-const WALLET_FIRST_COUNTRIES = new Set(["CO", "EC", "BO", "CL", "CR", "GT", "PA", "PY", "UY"]);
-const WALLET_FIRST_ORDER: MethodSection[] = ["wallet", "transfer", "cash", "cards", "other"];
-
-function methods0HasWallet(list: { id: string }[]): boolean {
-  return list.some((m) => m.id === "dlocal_wallet");
-}
 
 function methodSection(id: string): MethodSection {
   if (["card", "dlocal_card", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto", "stripe_klarna"].includes(id)) return "cards";
@@ -568,8 +561,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
   const { trackPurchase } = usePurchaseTracking();
   const [selected, setSelected] = useState<Method | null>(null);
-  // Método que el comprador tocó ANTES de llenar sus datos: se queda marcado y se confirma solo cuando los datos están completos (antes lo rebotaba al formulario sin marcar nada).
-  const [earlyMethod, setEarlyMethod] = useState<Method | null>(null);
   const [selectedCardRow, setSelectedCardRow] = useState<string | null>(null);
   const [dlocalDocument, setDlocalDocument] = useState("");
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
@@ -1293,7 +1284,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     // estado más reciente directo del store evita esa carrera.
     const freshBuyer = useCheckoutPruebaStore.getState().buyer;
     const freshValid = isBuyerValid(freshBuyer, hasPhysicalItems);
-    if (!freshValid) { setEarlyMethod(m); requestBuyerInfo(); return; }
+    if (!freshValid) { requestBuyerInfo(); return; }
     if (isDlocalMethodId(m)) {
       const v = validateDlocalMethod(country, m);
       if (!v.ok) {
@@ -1321,16 +1312,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       }, 60);
     }
   };
-
-  // Los datos ya están completos y había un método tocado de antemano: se confirma ese método.
-  useEffect(() => {
-    if (valid && earlyMethod) {
-      const m = earlyMethod;
-      setEarlyMethod(null);
-      handleSelect(m);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [valid, earlyMethod]);
 
 
   const handleBuyNow = async () => {
@@ -2175,8 +2156,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       // Donde Mercado Pago está disponible (México, Argentina, Brasil, Perú…) la fila se llama Mercado Pago y usa su logo
       // (el cobro lo gestiona dLocal Go por detrás).
       title: dlocalRails(country, "wallet").includes("Mercado Pago") ? "Mercado Pago"
-        // Con las marcas que la gente reconoce (Nequi · Daviplata, Yape, Zinli…) en vez de «Billetera digital» genérico.
-        : dlocalRails(country, "wallet").length ? dlocalRails(country, "wallet").slice(0, 2).join(" · ")
         : (getDlocalCountry(country)?.walletLabel
         ? `${getDlocalCountry(country)!.walletLabel}`
         : language === "en" ? "Digital wallet"
@@ -2342,7 +2321,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // tarjetas → transferencias → efectivo → billeteras → otros (Hotmart al final).
   // México: SPEI (transferencia) y OXXO (efectivo) van primero y la tarjeta después: las tarjetas mexicanas fallan o las bloquea Stripe
   // con frecuencia (riesgo «máximo», banco que rechaza) y estos rails no pasan por Radar.
-  const sectionOrder = country === "MX" ? MX_SECTION_ORDER : WALLET_FIRST_COUNTRIES.has(country) && methods0HasWallet(visibleMethods) ? WALLET_FIRST_ORDER : SECTION_ORDER;
+  const sectionOrder = country === "MX" ? MX_SECTION_ORDER : SECTION_ORDER;
   const methods = [...visibleMethods].sort(
     (a, b) => sectionOrder.indexOf(methodSection(a.id)) - sectionOrder.indexOf(methodSection(b.id)),
   );
@@ -2592,20 +2571,21 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       )}
 
       {!isFree && !isInvalidZero && !valid && (
-        <div className="mb-3 px-3 py-2.5 rounded-lg border border-primary/30 bg-primary/5">
-          <p className="text-xs font-semibold text-neutral-800 dark:text-neutral-100 text-center">
-            {earlyMethod
-              ? (language === "en" ? "✅ Great choice. Complete your name and email above and we continue with it."
-                : language === "pt" ? "✅ Ótima escolha. Complete seu nome e e-mail acima e continuamos com ela."
-                : language === "fr" ? "✅ Bon choix. Complétez votre nom et e-mail ci-dessus et on continue avec celui-ci."
-                : "✅ Buena elección. Completa tu nombre y correo arriba y seguimos con ese método.")
-              : (language === "en" ? "👇 Choose how to pay. We only need your name and email to continue."
-                : language === "pt" ? "👇 Escolha como pagar. Só precisamos do seu nome e e-mail para continuar."
-                : language === "fr" ? "👇 Choisissez comment payer. Il nous faut seulement votre nom et e-mail pour continuer."
-                : "👇 Elige cómo pagar. Solo necesitamos tu nombre y correo para continuar.")}
+        <div className="mb-3 px-3 py-2.5 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800">
+          <p className="text-xs font-semibold text-amber-900 dark:text-amber-100 text-center">
+            {language === "en"
+              ? "👆 Complete your name and email above to choose a payment method."
+              : language === "pt"
+              ? "👆 Complete seu nome e e-mail acima para escolher uma forma de pagamento."
+              : language === "fr"
+              ? "👆 Complétez votre nom et e-mail ci-dessus pour choisir un moyen de paiement."
+              : "👆 Completa tu nombre y correo arriba para elegir un método de pago."}
           </p>
         </div>
       )}
+
+
+
 
       {!isFree && !isInvalidZero && !methodsReady && (
         <div className="space-y-2" aria-hidden="true">
@@ -2665,7 +2645,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         const isPrimaryCard = m.id === "card" && m.title === primaryCardTitle;
         // For USA extra rows (Cash App, US Bank) — highlight only the clicked one.
         const rowKey = `${m.id}-${m.title}`;
-        const isSelected = (valid && selected === m.id && (!isStripeRow || selectedCardRow === rowKey)) || (!valid && earlyMethod === m.id);
+        const isSelected = valid && selected === m.id && (!isStripeRow || selectedCardRow === rowKey);
         const isLoading = mpLoading === m.id;
         const Icon = m.icon;
         // Logo oficial en lugar del ícono genérico (PayPal, Yape, y OXXO / SPEI en México).
@@ -2695,6 +2675,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             data-method-row={m.id}
             className={cn(
               "rounded-xl border-2 overflow-hidden transition-all scroll-mt-24",
+              !valid && "opacity-60",
               isSelected
                 ? "border-primary bg-primary/5 shadow-sm"
                 : "border-neutral-200 bg-background hover:border-primary/40 dark:border-neutral-700",

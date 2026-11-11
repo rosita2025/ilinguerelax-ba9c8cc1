@@ -110,65 +110,6 @@ const EMPTY: Product = {
   review_count: 120,
 };
 
-type CurrencyGroup = "LATAM" | "EUROPA" | "USA_CANADA" | "ASIA" | "RESTO";
-const GROUP_TITLE: Record<CurrencyGroup, string> = { LATAM: "🌎 LATAM", EUROPA: "🇪🇺 Europa", USA_CANADA: "🇺🇸 USA y Canadá", ASIA: "🌏 Asia", RESTO: "🌍 Resto del mundo" };
-const GROUP_HINT: Record<CurrencyGroup, string> = {
-  LATAM: "Usa el precio BASE USD - LATAM",
-  EUROPA: "Usa el precio global (BASE USD - ANGLOSPHERE / EU)",
-  USA_CANADA: "Usa el precio global (BASE USD - ANGLOSPHERE / EU)",
-  ASIA: "Usa el precio BASE USD - ASIA Y RESTO DEL MUNDO",
-  RESTO: "Usa BASE USD - ASIA Y RESTO DEL MUNDO (Australia y Nueva Zelanda, por ahora, el precio global)",
-};
-/** Monedas locales del admin, agrupadas en las 5 regiones. `region` decide qué precio base USD se usa (igual que el servidor y la página). */
-const LOCAL_CURRENCY_CARDS: { code: string; flag: string; label: string; region: "LATAM" | "Anglosphere/Europe" | "Asia" | "Africa"; group: CurrencyGroup }[] = [
-  // LATAM
-  { code: "MXN", flag: "🇲🇽", label: "México", region: "LATAM", group: "LATAM" },
-  { code: "COP", flag: "🇨🇴", label: "Colombia", region: "LATAM", group: "LATAM" },
-  { code: "ARS", flag: "🇦🇷", label: "Argentina", region: "LATAM", group: "LATAM" },
-  { code: "CLP", flag: "🇨🇱", label: "Chile", region: "LATAM", group: "LATAM" },
-  { code: "BRL", flag: "🇧🇷", label: "Brasil", region: "LATAM", group: "LATAM" },
-  { code: "PEN", flag: "🇵🇪", label: "Perú", region: "LATAM", group: "LATAM" },
-  { code: "UYU", flag: "🇺🇾", label: "Uruguay", region: "LATAM", group: "LATAM" },
-  { code: "PYG", flag: "🇵🇾", label: "Paraguay", region: "LATAM", group: "LATAM" },
-  { code: "BOB", flag: "🇧🇴", label: "Bolivia", region: "LATAM", group: "LATAM" },
-  { code: "CRC", flag: "🇨🇷", label: "Costa Rica", region: "LATAM", group: "LATAM" },
-  { code: "DOP", flag: "🇩🇴", label: "Rep. Dominicana", region: "LATAM", group: "LATAM" },
-  { code: "GTQ", flag: "🇬🇹", label: "Guatemala", region: "LATAM", group: "LATAM" },
-  { code: "HNL", flag: "🇭🇳", label: "Honduras", region: "LATAM", group: "LATAM" },
-  { code: "NIO", flag: "🇳🇮", label: "Nicaragua", region: "LATAM", group: "LATAM" },
-  { code: "VES", flag: "🇻🇪", label: "Venezuela", region: "LATAM", group: "LATAM" },
-  // Europa
-  { code: "EUR", flag: "🇪🇺", label: "Europa (euro)", region: "Anglosphere/Europe", group: "EUROPA" },
-  { code: "GBP", flag: "🇬🇧", label: "Reino Unido", region: "Anglosphere/Europe", group: "EUROPA" },
-  { code: "CHF", flag: "🇨🇭", label: "Suiza", region: "Anglosphere/Europe", group: "EUROPA" },
-  { code: "SEK", flag: "🇸🇪", label: "Suecia", region: "Anglosphere/Europe", group: "EUROPA" },
-  { code: "NOK", flag: "🇳🇴", label: "Noruega", region: "Anglosphere/Europe", group: "EUROPA" },
-  { code: "DKK", flag: "🇩🇰", label: "Dinamarca", region: "Anglosphere/Europe", group: "EUROPA" },
-  { code: "PLN", flag: "🇵🇱", label: "Polonia", region: "Anglosphere/Europe", group: "EUROPA" },
-  { code: "CZK", flag: "🇨🇿", label: "Rep. Checa", region: "Anglosphere/Europe", group: "EUROPA" },
-  // USA y Canadá (la moneda de Estados Unidos es USD; antes esta tarjeta se llamaba «US» y nunca se aplicaba)
-  { code: "USD", flag: "🇺🇸", label: "Estados Unidos", region: "Anglosphere/Europe", group: "USA_CANADA" },
-  { code: "CAD", flag: "🇨🇦", label: "Canadá", region: "Anglosphere/Europe", group: "USA_CANADA" },
-  // Asia
-  { code: "JPY", flag: "🇯🇵", label: "Japón", region: "Asia", group: "ASIA" },
-  { code: "KRW", flag: "🇰🇷", label: "Corea del Sur", region: "Asia", group: "ASIA" },
-  { code: "CNY", flag: "🇨🇳", label: "China", region: "Asia", group: "ASIA" },
-  { code: "INR", flag: "🇮🇳", label: "India", region: "Asia", group: "ASIA" },
-  { code: "SGD", flag: "🇸🇬", label: "Singapur", region: "Asia", group: "ASIA" },
-  { code: "HKD", flag: "🇭🇰", label: "Hong Kong", region: "Asia", group: "ASIA" },
-  { code: "TWD", flag: "🇹🇼", label: "Taiwán", region: "Asia", group: "ASIA" },
-  { code: "IDR", flag: "🇮🇩", label: "Indonesia", region: "Asia", group: "ASIA" },
-  { code: "MYR", flag: "🇲🇾", label: "Malasia", region: "Asia", group: "ASIA" },
-  // Resto del mundo
-  { code: "AUD", flag: "🇦🇺", label: "Australia", region: "Anglosphere/Europe", group: "RESTO" },
-  { code: "NZD", flag: "🇳🇿", label: "Nueva Zelanda", region: "Anglosphere/Europe", group: "RESTO" },
-  { code: "ZAR", flag: "🇿🇦", label: "Sudáfrica", region: "Africa", group: "RESTO" },
-  { code: "NGN", flag: "🇳🇬", label: "Nigeria", region: "Africa", group: "RESTO" },
-  { code: "EGP", flag: "🇪🇬", label: "Egipto", region: "Africa", group: "RESTO" },
-  { code: "KES", flag: "🇰🇪", label: "Kenia", region: "Africa", group: "RESTO" },
-  { code: "MAD", flag: "🇲🇦", label: "Marruecos", region: "Africa", group: "RESTO" },
-];
-
 const AdminProductEdit = () => {
   const { sku } = useParams();
   const isNew = !sku || sku === "nuevo";
@@ -1041,93 +982,66 @@ const AdminProductEdit = () => {
           </Card>
 
           <Card className="p-6 space-y-4">
-            <div className="flex items-center justify-between border-b pb-2">
-              <h2 className="font-semibold text-lg flex items-center gap-2">💰 Configuración de Precios Regionales</h2>
-              <div className="flex flex-wrap items-center gap-6">
-                <div className="text-right">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">BASE USD - LATAM</Label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-primary">$</span>
-                    <Input
-                      type="number" step="0.01"
-                      className="w-24 h-8 text-sm font-bold border-primary/30"
-                      value={product.price_usd_latam ?? ""}
-                      onChange={(e) => {
-                        const val = e.target.value === "" ? null : Number(e.target.value);
-                        update("price_usd_latam", val);
-                      }}
-                      placeholder="45.00"
-                    />
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">BASE USD - ANGLOSPHERE / EU</Label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-primary">$</span>
-                    <Input
-                        type="number" step="0.01"
-                        className="w-24 h-8 text-sm font-bold border-primary/30"
-                        value={product.price_usd}
-                        onChange={(e) => {
-                          const val = e.target.value === "" ? 0 : Number(e.target.value);
-                          update("price_usd", val);
-                        }}
-                        placeholder="72.99"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">BASE ANTES - GLOBAL</Label>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-muted-foreground">$</span>
-                      <Input
-                        type="number" step="0.01"
-                        className="w-24 h-8 text-sm font-bold border-muted-foreground/30"
-                        value={product.compare_at_price_usd ?? ""}
-                        onChange={(e) => {
-                          const val = e.target.value === "" ? null : Number(e.target.value);
-                          update("compare_at_price_usd", val);
-                        }}
-                        placeholder="97.00"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">BASE USD - ASIA Y RESTO DEL MUNDO</Label>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-primary">$</span>
-                      <Input
-                        type="number" step="0.01"
-                        className="w-24 h-8 text-sm font-bold border-primary/30"
-                        value={product.price_usd_tienda ?? ""}
-                        onChange={(e) => {
-                          const val = e.target.value === "" ? null : Number(e.target.value);
-                          update("price_usd_tienda", val);
-                        }}
-                        placeholder="68.00"
-                      />
-                    </div>
-                  </div>
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-2">
+              <h2 className="font-semibold text-lg flex items-center gap-2">💰 Precios por región (4 precios distintos)</h2>
+              {!isNew && (
+                <Link to={`/admin/monedas?sku=${encodeURIComponent(product.sku)}`} className="text-xs font-semibold text-primary underline">
+                  Monedas locales de este producto →
+                </Link>
+              )}
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="rounded-lg border bg-muted/20 p-3 space-y-1">
+                <Label className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">🌎 LATAM (US$)</Label>
+                <Input
+                  type="number" step="0.01" className="h-9 font-bold"
+                  value={product.price_usd_latam ?? ""}
+                  onChange={(e) => update("price_usd_latam", e.target.value === "" ? null : Number(e.target.value))}
+                  placeholder="45.00"
+                />
+                <p className="text-[10px] text-muted-foreground">México, Colombia, Perú, Chile, Argentina, Brasil…</p>
+              </div>
+              <div className="rounded-lg border bg-muted/20 p-3 space-y-1">
+                <Label className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">🇪🇺 Europa (€ euros)</Label>
+                <Input
+                  type="text" inputMode="decimal" className="h-9 font-bold"
+                  value={product.local_prices?.EUR ?? ""}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/,/g, ".");
+                    const next = { ...(product.local_prices || {}) };
+                    if (raw === "" || isNaN(Number(raw)) || Number(raw) <= 0) delete next.EUR;
+                    else next.EUR = Math.round(Number(raw) * 100) / 100;
+                    update("local_prices", next);
+                  }}
+                  placeholder={product.price_usd ? `auto ≈ ${(Number(product.price_usd) * (exchangeRates.EUR ?? 0.92)).toFixed(2)}` : "27.00"}
+                />
+                <p className="text-[10px] text-muted-foreground">Países con euro (España, Francia, Alemania, Italia…). Vacío = convierte el precio de USA y Canadá.</p>
+              </div>
+              <div className="rounded-lg border bg-muted/20 p-3 space-y-1">
+                <Label className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">🇺🇸🇨🇦 USA y Canadá (US$)</Label>
+                <Input
+                  type="number" step="0.01" className="h-9 font-bold"
+                  value={product.price_usd}
+                  onChange={(e) => update("price_usd", e.target.value === "" ? 0 : Number(e.target.value))}
+                  placeholder="72.99"
+                />
+                <p className="text-[10px] text-muted-foreground">Es también el precio de Australia y Nueva Zelanda, y la base de reserva.</p>
+              </div>
+              <div className="rounded-lg border bg-muted/20 p-3 space-y-1">
+                <Label className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">🌏 Asia y resto del mundo (US$)</Label>
+                <Input
+                  type="number" step="0.01" className="h-9 font-bold"
+                  value={product.price_usd_tienda ?? ""}
+                  onChange={(e) => update("price_usd_tienda", e.target.value === "" ? null : Number(e.target.value))}
+                  placeholder="68.00"
+                />
+                <p className="text-[10px] text-muted-foreground">Asia, África, Medio Oriente y el resto.</p>
               </div>
             </div>
-
-            <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg flex items-start gap-3">
-              <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-              <div className="text-xs text-amber-800 space-y-1">
-                <p className="font-bold">Estructura de 3 Tiers:</p>
-                <ul className="list-disc ml-4 space-y-0.5">
-                  <li><b>LATAM:</b> Basado en BASE USD - LATAM ($ {product.price_usd_latam || product.price_usd}).</li>
-                  <li><b>ANGLO / EU:</b> Basado en BASE USD - ANGLOSPHERE / EU ($ {product.price_usd}).</li>
-                  <li><b>ASIA / RESTO:</b> Basado en BASE USD - ASIA Y RESTO DEL MUNDO ($ {product.price_usd_tienda || product.price_usd}).</li>
-
-                  <li>Los precios tachados se controlan ahora de forma manual por moneda en las tarjetas de abajo para mayor precisión.</li>
-                </ul>
-              </div>
-            </div>
-
+            <p className="text-[11px] text-muted-foreground bg-primary/5 p-2 rounded border border-primary/10">
+              Si un precio de región queda vacío se usa el de USA y Canadá. El precio tachado es automático; para fijar precios exactos o tachados por moneda
+              (pesos, soles, yen…) usa la página <b>Monedas</b>{!isNew ? <> (<Link to={`/admin/monedas?sku=${encodeURIComponent(product.sku)}`} className="underline text-primary">abrir para este producto</Link>)</> : " (guarda primero el producto)"}.
+            </p>
 
             <div className="grid md:grid-cols-2 gap-4 bg-muted/20 p-3 rounded-lg border border-dashed">
               <div className="space-y-1">
@@ -1157,212 +1071,6 @@ const AdminProductEdit = () => {
                 />
               </div>
             </div>
-
-            <div className="space-y-3">
-              <div>
-                <p className="text-[11px] text-muted-foreground bg-primary/5 p-2 rounded border border-primary/10">
-                  💡 Fija el monto <b>exacto</b> por moneda. El sistema detecta el país por IP y usa este valor manual. Si se deja vacío, se usa la conversión automática desde el <b>Precio Base Oferta USD</b> (Ref: Tasa actual). El <b>Precio Normal</b> se usa para mostrar el monto tachado (antes).
-                </p>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                {LOCAL_CURRENCY_CARDS.map(({ code, flag, label, region, group }, cardIdx) => {
-                  const isLatam = REGIONS.latam.codes.includes(code) || region === "LATAM";
-                  const isAnglosphereOrEurope = REGIONS.english_speaking.codes.includes(code) || REGIONS.europe.codes.includes(code) || region === "Anglosphere/Europe";
-                  
-                  const baseUsdRef = isLatam 
-                    ? (product.price_usd_latam ?? product.price_usd)
-                    : isAnglosphereOrEurope 
-                      ? product.price_usd 
-                      : (product.price_usd_tienda ?? product.price_usd);
-                  
-                  const isAsiaOrRest = !isLatam && !isAnglosphereOrEurope;
-                  const regionLabel = GROUP_TITLE[group].replace(/^\S+\s/, "");
-                  const showGroupHeader = cardIdx === 0 || LOCAL_CURRENCY_CARDS[cardIdx - 1].group !== group;
-                  
-                  const regionalUsdOverride = product.local_usd_prices?.[code];
-                  const currentUsdValue = regionalUsdOverride != null ? Number(regionalUsdOverride) : Number(baseUsdRef);
-                  
-                  const regionPrice = (() => {
-                    if (currentUsdValue <= 0) return null;
-                    
-                    const rate = exchangeRates[code as Currency];
-                    if (!rate) return null;
-
-                    const raw = currentUsdValue * rate;
-                    // Rounding logic for specific currencies
-                    if (code === "COP" || code === "TZS" || code === "UGX") return Math.round(raw / 100) * 100;
-                    if (code === "CLP" || code === "PYG" || code === "NGN" || code === "KRW") return Math.round(raw / 10) * 10;
-                    if (code === "MXN" || code === "ARS" || code === "UYU" || code === "JPY" || code === "INR") return Math.round(raw);
-                    
-                    return Math.round(raw * 100) / 100;
-                  })();
-
-
-                  return (
-                    <Fragment key={code}>
-                    {showGroupHeader && (
-                      <div className="col-span-full mt-2 flex flex-wrap items-baseline gap-2 border-b border-primary/20 pb-1">
-                        <span className="text-xs font-bold uppercase tracking-wider text-primary">{GROUP_TITLE[group]}</span>
-                        <span className="text-[10px] text-muted-foreground">{GROUP_HINT[group]}</span>
-                      </div>
-                    )}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex flex-col">
-                          <Label className="text-xs">{flag} {code}</Label>
-                          <span className="text-[9px] text-muted-foreground leading-tight">{regionLabel} · {label}</span>
-                        </div>
-                        {regionPrice && !product.local_prices?.[code] && (
-                          <button 
-                            type="button"
-                            onClick={() => {
-                              const next = { ...(product.local_prices || {}), [code]: regionPrice };
-                              update("local_prices", next);
-                            }}
-                            className="text-[9px] text-primary hover:underline bg-primary/5 px-1 rounded border border-primary/20"
-                          >
-                            Sug: {regionPrice}
-                          </button>
-                        )}
-                      </div>
-                      <div className="space-y-1.5">
-                        <div className="relative">
-                          <Label className="text-[8px] absolute -top-2 left-1 bg-background px-0.5 text-primary font-bold z-10">Precio Oferta Local (Monto Exacto)</Label>
-                          <Input
-                            type="text" 
-                            inputMode="decimal"
-                            className={cn(
-                              "h-9 text-xs pr-8",
-                              product.local_prices?.[code] ? "border-primary bg-primary/5 font-semibold" : "border-dashed opacity-70"
-                            )}
-                            value={product.local_prices?.[code] ?? ""}
-                            onChange={(e) => {
-                              const config = currencyConfig[code as Currency];
-                              const decimals = config?.decimals ?? 2;
-                              // Monedas sin decimales (CLP, COP, ARS, PYG, CRC,
-                              // JPY, KRW...): cualquier punto o coma que
-                              // escriban es casi seguro un separador de miles
-                              // (así se escribe en Latinoamérica: "16.460" =
-                              // dieciséis mil cuatrocientos sesenta), NUNCA un
-                              // decimal — se quitan por completo. Antes se
-                              // trataba el punto como decimal y "16.460" se
-                              // guardaba como 16.46: mil veces menos de lo que
-                              // el admin quiso escribir, sin ningún aviso.
-                              const rawValue = decimals === 0
-                                ? e.target.value.replace(/[.,]/g, "")
-                                : e.target.value.replace(/,/g, ".");
-                              const next = { ...(product.local_prices || {}) };
-                              
-                              if (rawValue === "" || isNaN(Number(rawValue)) || Number(rawValue) < 0) {
-                                delete next[code];
-                              } else {
-                                const amount = Number(rawValue);
-                                next[code] = Math.round(amount * Math.pow(10, decimals)) / Math.pow(10, decimals);
-                              }
-                              update("local_prices", next);
-                            }}
-                            placeholder={regionPrice ? `ej: ${regionPrice}` : "auto"}
-                          />
-                          {product.local_prices?.[code] && (
-                            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p className="text-[10px]">Precio fijo manual (Muestra: {formatCurrencyAmount(product.local_prices[code], code as Currency)})</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="relative">
-                          <Label className="text-[8px] absolute -top-2 left-1 bg-background px-0.5 text-muted-foreground font-bold z-10">Precio Normal Tachado</Label>
-                          <Input
-                            type="text" 
-                            inputMode="decimal"
-                            className={cn(
-                              "h-7 text-[10px] pr-2 border-dashed",
-                              product.local_compare_at_prices?.[code] ? "border-muted-foreground/50 bg-muted/20 line-through" : "opacity-50"
-                            )}
-                            value={product.local_compare_at_prices?.[code] ?? ""}
-                            onChange={(e) => {
-                              const config = currencyConfig[code as Currency];
-                              const decimals = config?.decimals ?? 2;
-                              // Mismo criterio que el precio de oferta: en
-                              // monedas sin decimales, punto o coma es un
-                              // separador de miles, no un decimal.
-                              const rawValue = decimals === 0
-                                ? e.target.value.replace(/[.,]/g, "")
-                                : e.target.value.replace(/,/g, ".");
-                              const next = { ...(product.local_compare_at_prices || {}) };
-                              
-                              if (rawValue === "" || isNaN(Number(rawValue)) || Number(rawValue) < 0) {
-                                delete next[code];
-                              } else {
-                                const amount = Number(rawValue);
-                                next[code] = Math.round(amount * Math.pow(10, decimals)) / Math.pow(10, decimals);
-                              }
-                              update("local_compare_at_prices", next);
-                            }}
-                            placeholder="---"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-0.5 mt-1 px-0.5">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1">
-                            <p className="text-[9px] text-muted-foreground font-medium">
-                              {product.local_prices?.[code] ? "✓ Manual" : "Auto"}
-                            </p>
-                            {product.local_compare_at_prices?.[code] && (
-                              <span className="text-[8px] bg-amber-100 text-amber-700 px-1 rounded font-bold">OFERTA</span>
-                            )}
-                          </div>
-                          <p className="text-[9px] text-muted-foreground/70 italic">
-                            Ref: USD {currentUsdValue.toFixed(2)}
-                          </p>
-                        </div>
-                        
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="text-[8px] uppercase font-bold text-muted-foreground/60 shrink-0">USD REF:</span>
-                          <Input
-                            type="text"
-                            inputMode="decimal"
-                            className={cn(
-                              "h-5 text-[9px] px-1 py-0 w-16",
-                              product.local_usd_prices?.[code] ? "border-primary/40 bg-primary/5" : "border-muted/50"
-                            )}
-                            value={product.local_usd_prices?.[code] ?? ""}
-                            onChange={(e) => {
-                              const rawValue = e.target.value.replace(/,/g, ".");
-                              const next = { ...(product.local_usd_prices || {}) };
-                              if (rawValue === "" || isNaN(Number(rawValue)) || Number(rawValue) < 0) {
-                                delete next[code];
-                              } else {
-                                next[code] = Math.round(Number(rawValue) * 100) / 100;
-                              }
-                              update("local_usd_prices", next);
-                            }}
-                            placeholder={baseUsdRef.toFixed(2)}
-                          />
-                        </div>
-                        {exchangeRates[code as Currency] && (
-                          <p className="text-[8px] text-muted-foreground/50 border-t border-muted-foreground/10 pt-0.5">
-                            Tasa: 1 USD = {exchangeRates[code as Currency]} {code}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    </Fragment>
-                  );
-                })}
-                </div>
-              </div>
 
               <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border mt-4">
                 <div className="space-y-0.5">

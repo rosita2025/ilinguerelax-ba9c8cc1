@@ -77,6 +77,7 @@ const groups: Group[] = [
     label: "Productos",
     items: [
       { to: "/admin/productos", label: "Productos digitales", icon: Package },
+      { to: "/admin/monedas", label: "Monedas por producto", icon: Globe },
     ],
   },
   {

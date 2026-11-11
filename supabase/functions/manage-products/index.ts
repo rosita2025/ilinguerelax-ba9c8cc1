@@ -422,6 +422,54 @@ Deno.serve(async (req) => {
 
     }
 
+    // Solo precios (4 precios por región + monedas locales): no toca nada más del producto (enlaces de entrega, bonos, etc.).
+    // Lo usa la página /admin/monedas, para no reenviar todo el producto por cambiar un precio.
+    if (action === "set_prices") {
+      const sku = String((body as { sku?: unknown }).sku ?? "").trim().toLowerCase();
+      if (!SKU_RE.test(sku)) return json({ error: "SKU inválido" }, 400);
+      const num = (v: unknown): number | null => {
+        if (v === null || v === undefined || v === "") return null;
+        const n = Number(v);
+        return Number.isFinite(n) && n > 0 && n < 1e9 ? n : null;
+      };
+      const zeroDecimals = ["COP", "ARS", "CLP", "PYG", "CRC", "JPY", "KRW", "INR", "UGX"];
+      const cleanMap = (raw: unknown, byDecimals: boolean): Record<string, number> => {
+        const out: Record<string, number> = {};
+        if (!raw || typeof raw !== "object") return out;
+        for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+          const cur = k.toUpperCase();
+          if (!/^[A-Z]{3}$/.test(cur)) continue;
+          const n = num(v);
+          if (n === null) continue;
+          const decimals = byDecimals && zeroDecimals.includes(cur) ? 0 : 2;
+          out[cur] = Math.round(n * Math.pow(10, decimals)) / Math.pow(10, decimals);
+        }
+        return out;
+      };
+      const b = body as Record<string, unknown>;
+      const patch: Record<string, unknown> = {};
+      if ("price_usd" in b) {
+        const n = num(b.price_usd);
+        if (n === null) return json({ error: "El precio de USA y Canadá es obligatorio" }, 400);
+        patch.price_usd = Math.round(n * 100) / 100;
+      }
+      if ("price_usd_latam" in b) { const n = num(b.price_usd_latam); patch.price_usd_latam = n === null ? null : Math.round(n * 100) / 100; }
+      if ("price_usd_tienda" in b) { const n = num(b.price_usd_tienda); patch.price_usd_tienda = n === null ? null : Math.round(n * 100) / 100; }
+      if ("local_prices" in b) patch.local_prices = cleanMap(b.local_prices, true);
+      if ("local_compare_at_prices" in b) patch.local_compare_at_prices = cleanMap(b.local_compare_at_prices, true);
+      if ("local_usd_prices" in b) patch.local_usd_prices = cleanMap(b.local_usd_prices, false);
+      if (!Object.keys(patch).length) return json({ error: "Nada que guardar" }, 400);
+      const { data: updated, error: updErr } = await admin
+        .from("digital_products")
+        .update(patch)
+        .eq("sku", sku)
+        .select("sku, updated_at")
+        .maybeSingle();
+      if (updErr) throw updErr;
+      if (!updated) return json({ error: "Producto no encontrado" }, 404);
+      return json({ success: true, sku, updated_at: updated.updated_at ?? null });
+    }
+
     if (action === "rename") {
       // El SKU es inmutable: es la clave que usan Stripe, PayPal, Mercado Pago,
       // dLocal Go, Binance Pay, Yape/Plin, transferencias, los tokens de descarga

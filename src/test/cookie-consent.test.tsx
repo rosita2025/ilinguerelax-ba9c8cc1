@@ -3,7 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { CookieConsent, getCookieConsent } from "@/components/CookieConsent";
 
-beforeEach(() => { localStorage.clear(); vi.useFakeTimers(); });
+// No se falsea `Intl` ni `Date`: los fake timers nuevos reemplazan Intl.DateTimeFormat y el espía de la zona horaria no llegaría al código.
+beforeEach(() => { localStorage.clear(); vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "setInterval", "clearInterval"] }); });
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 const show = (path = "/products/x") => { render(<MemoryRouter initialEntries={[path]}><CookieConsent /></MemoryRouter>); act(() => { vi.advanceTimersByTime(2500); }); };
 

@@ -256,6 +256,21 @@ export async function resolveServerPricing(opts: {
     // Precio mínimo autoritativo del catálogo para este país.
     let unit = pickTierPrice(row, tier, currencyHint);
 
+    // Europa en euros: si el producto tiene su precio exacto en € (`local_prices.EUR`), ese es EL precio de quien paga en euros.
+    // Su equivalente en US$ se calcula desde ese importe para que el cobro de respaldo en US$, las analíticas y Meta cuadren con lo que
+    // ve el comprador (si no, quedaba el precio de USA y Canadá).
+    let europeEur = false;
+    if (String(currencyHint || "").toUpperCase() === "EUR") {
+      const eur = Number((row.local_prices as Record<string, number> | null)?.EUR);
+      if (Number.isFinite(eur) && eur > 0) {
+        const eurPerUsd = await localAmountFromUsd(1, "EUR");
+        if (eurPerUsd && eurPerUsd > 0) {
+          unit = Math.round((eur / eurPerUsd) * 100) / 100;
+          europeEur = true;
+        }
+      }
+    }
+
     if (isUpsell) {
       const pct = maxDiscount.get(sku) ?? DEFAULT_UPSELL_DISCOUNT_PCT;
       const staticPrice = STATIC_UPSELL_USD[item.id.toLowerCase()];
@@ -270,7 +285,7 @@ export async function resolveServerPricing(opts: {
     // Si el navegador mandó un precio IGUAL O MAYOR (el que vio el cliente en
     // la web), lo respetamos; nunca aceptamos uno menor al del catálogo, que
     // es lo que impide manipular el carrito desde el navegador.
-    if (item.clientPrice != null && item.clientPrice > unit && item.clientPrice <= 10000) {
+    if (!europeEur && item.clientPrice != null && item.clientPrice > unit && item.clientPrice <= 10000) {
       unit = item.clientPrice;
     }
 

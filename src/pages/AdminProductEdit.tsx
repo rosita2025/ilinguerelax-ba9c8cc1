@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { ArrowLeft, Save, Plus, Trash2, Loader2, Lock as LockIcon, Info, Sparkles, Star, Eye } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -109,6 +109,65 @@ const EMPTY: Product = {
   rating: 4.8,
   review_count: 120,
 };
+
+type CurrencyGroup = "LATAM" | "EUROPA" | "USA_CANADA" | "ASIA" | "RESTO";
+const GROUP_TITLE: Record<CurrencyGroup, string> = { LATAM: "🌎 LATAM", EUROPA: "🇪🇺 Europa", USA_CANADA: "🇺🇸 USA y Canadá", ASIA: "🌏 Asia", RESTO: "🌍 Resto del mundo" };
+const GROUP_HINT: Record<CurrencyGroup, string> = {
+  LATAM: "Usa el precio BASE USD - LATAM",
+  EUROPA: "Usa el precio global (BASE USD - ANGLOSPHERE / EU)",
+  USA_CANADA: "Usa el precio global (BASE USD - ANGLOSPHERE / EU)",
+  ASIA: "Usa el precio BASE USD - ASIA Y RESTO DEL MUNDO",
+  RESTO: "Usa BASE USD - ASIA Y RESTO DEL MUNDO (Australia y Nueva Zelanda, por ahora, el precio global)",
+};
+/** Monedas locales del admin, agrupadas en las 5 regiones. `region` decide qué precio base USD se usa (igual que el servidor y la página). */
+const LOCAL_CURRENCY_CARDS: { code: string; flag: string; label: string; region: "LATAM" | "Anglosphere/Europe" | "Asia" | "Africa"; group: CurrencyGroup }[] = [
+  // LATAM
+  { code: "MXN", flag: "🇲🇽", label: "México", region: "LATAM", group: "LATAM" },
+  { code: "COP", flag: "🇨🇴", label: "Colombia", region: "LATAM", group: "LATAM" },
+  { code: "ARS", flag: "🇦🇷", label: "Argentina", region: "LATAM", group: "LATAM" },
+  { code: "CLP", flag: "🇨🇱", label: "Chile", region: "LATAM", group: "LATAM" },
+  { code: "BRL", flag: "🇧🇷", label: "Brasil", region: "LATAM", group: "LATAM" },
+  { code: "PEN", flag: "🇵🇪", label: "Perú", region: "LATAM", group: "LATAM" },
+  { code: "UYU", flag: "🇺🇾", label: "Uruguay", region: "LATAM", group: "LATAM" },
+  { code: "PYG", flag: "🇵🇾", label: "Paraguay", region: "LATAM", group: "LATAM" },
+  { code: "BOB", flag: "🇧🇴", label: "Bolivia", region: "LATAM", group: "LATAM" },
+  { code: "CRC", flag: "🇨🇷", label: "Costa Rica", region: "LATAM", group: "LATAM" },
+  { code: "DOP", flag: "🇩🇴", label: "Rep. Dominicana", region: "LATAM", group: "LATAM" },
+  { code: "GTQ", flag: "🇬🇹", label: "Guatemala", region: "LATAM", group: "LATAM" },
+  { code: "HNL", flag: "🇭🇳", label: "Honduras", region: "LATAM", group: "LATAM" },
+  { code: "NIO", flag: "🇳🇮", label: "Nicaragua", region: "LATAM", group: "LATAM" },
+  { code: "VES", flag: "🇻🇪", label: "Venezuela", region: "LATAM", group: "LATAM" },
+  // Europa
+  { code: "EUR", flag: "🇪🇺", label: "Europa (euro)", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "GBP", flag: "🇬🇧", label: "Reino Unido", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "CHF", flag: "🇨🇭", label: "Suiza", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "SEK", flag: "🇸🇪", label: "Suecia", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "NOK", flag: "🇳🇴", label: "Noruega", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "DKK", flag: "🇩🇰", label: "Dinamarca", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "PLN", flag: "🇵🇱", label: "Polonia", region: "Anglosphere/Europe", group: "EUROPA" },
+  { code: "CZK", flag: "🇨🇿", label: "Rep. Checa", region: "Anglosphere/Europe", group: "EUROPA" },
+  // USA y Canadá (la moneda de Estados Unidos es USD; antes esta tarjeta se llamaba «US» y nunca se aplicaba)
+  { code: "USD", flag: "🇺🇸", label: "Estados Unidos", region: "Anglosphere/Europe", group: "USA_CANADA" },
+  { code: "CAD", flag: "🇨🇦", label: "Canadá", region: "Anglosphere/Europe", group: "USA_CANADA" },
+  // Asia
+  { code: "JPY", flag: "🇯🇵", label: "Japón", region: "Asia", group: "ASIA" },
+  { code: "KRW", flag: "🇰🇷", label: "Corea del Sur", region: "Asia", group: "ASIA" },
+  { code: "CNY", flag: "🇨🇳", label: "China", region: "Asia", group: "ASIA" },
+  { code: "INR", flag: "🇮🇳", label: "India", region: "Asia", group: "ASIA" },
+  { code: "SGD", flag: "🇸🇬", label: "Singapur", region: "Asia", group: "ASIA" },
+  { code: "HKD", flag: "🇭🇰", label: "Hong Kong", region: "Asia", group: "ASIA" },
+  { code: "TWD", flag: "🇹🇼", label: "Taiwán", region: "Asia", group: "ASIA" },
+  { code: "IDR", flag: "🇮🇩", label: "Indonesia", region: "Asia", group: "ASIA" },
+  { code: "MYR", flag: "🇲🇾", label: "Malasia", region: "Asia", group: "ASIA" },
+  // Resto del mundo
+  { code: "AUD", flag: "🇦🇺", label: "Australia", region: "Anglosphere/Europe", group: "RESTO" },
+  { code: "NZD", flag: "🇳🇿", label: "Nueva Zelanda", region: "Anglosphere/Europe", group: "RESTO" },
+  { code: "ZAR", flag: "🇿🇦", label: "Sudáfrica", region: "Africa", group: "RESTO" },
+  { code: "NGN", flag: "🇳🇬", label: "Nigeria", region: "Africa", group: "RESTO" },
+  { code: "EGP", flag: "🇪🇬", label: "Egipto", region: "Africa", group: "RESTO" },
+  { code: "KES", flag: "🇰🇪", label: "Kenia", region: "Africa", group: "RESTO" },
+  { code: "MAD", flag: "🇲🇦", label: "Marruecos", region: "Africa", group: "RESTO" },
+];
 
 const AdminProductEdit = () => {
   const { sku } = useParams();
@@ -1106,42 +1165,7 @@ const AdminProductEdit = () => {
                 </p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                {[
-                  // LATAM
-                  { code: "MXN", flag: "🇲🇽", label: "México", region: "LATAM" },
-                  { code: "COP", flag: "🇨🇴", label: "Colombia", region: "LATAM" },
-                  { code: "ARS", flag: "🇦🇷", label: "Argentina", region: "LATAM" },
-                  { code: "CLP", flag: "🇨🇱", label: "Chile", region: "LATAM" },
-                  { code: "BRL", flag: "🇧🇷", label: "Brasil", region: "LATAM" },
-                  { code: "PEN", flag: "🇵🇪", label: "Perú", region: "LATAM" },
-                  { code: "UYU", flag: "🇺🇾", label: "Uruguay", region: "LATAM" },
-                  { code: "PYG", flag: "🇵🇾", label: "Paraguay", region: "LATAM" },
-                  { code: "BOB", flag: "🇧🇴", label: "Bolivia", region: "LATAM" },
-                  { code: "CRC", flag: "🇨🇷", label: "Costa Rica", region: "LATAM" },
-                  { code: "DOP", flag: "🇩🇴", label: "Rep. Dominicana", region: "LATAM" },
-                  { code: "GTQ", flag: "🇬🇹", label: "Guatemala", region: "LATAM" },
-                  { code: "HNL", flag: "🇭🇳", label: "Honduras", region: "LATAM" },
-                  { code: "NIO", flag: "🇳🇮", label: "Nicaragua", region: "LATAM" },
-                  { code: "VES", flag: "🇻🇪", label: "Venezuela", region: "LATAM" },
-                  // Global / Anglosphere / Europe
-                  { code: "US", flag: "🇺🇸", label: "Estados Unidos", region: "Anglosphere/Europe" },
-                  { code: "EUR", flag: "🇪🇺", label: "Europa", region: "Anglosphere/Europe" },
-                  { code: "GBP", flag: "🇬🇧", label: "Reino Unido", region: "Anglosphere/Europe" },
-                  { code: "CAD", flag: "🇨🇦", label: "Canadá", region: "Anglosphere/Europe" },
-                  { code: "AUD", flag: "🇦🇺", label: "Australia", region: "Anglosphere/Europe" },
-                  { code: "NZD", flag: "🇳🇿", label: "Nueva Zelanda", region: "Anglosphere/Europe" },
-                  // Asia
-                  { code: "JPY", flag: "🇯🇵", label: "Japón", region: "Asia" },
-                  { code: "KRW", flag: "🇰🇷", label: "Corea del Sur", region: "Asia" },
-                  { code: "CNY", flag: "🇨🇳", label: "China", region: "Asia" },
-                  { code: "INR", flag: "🇮🇳", label: "India", region: "Asia" },
-                  // Africa
-                  { code: "ZAR", flag: "🇿🇦", label: "Sudáfrica", region: "Africa" },
-                  { code: "NGN", flag: "🇳🇬", label: "Nigeria", region: "Africa" },
-                  { code: "EGP", flag: "🇪🇬", label: "Egipto", region: "Africa" },
-                  { code: "KES", flag: "🇰🇪", label: "Kenia", region: "Africa" },
-                  { code: "MAD", flag: "🇲🇦", label: "Marruecos", region: "Africa" },
-                ].map(({ code, flag, label, region }) => {
+                {LOCAL_CURRENCY_CARDS.map(({ code, flag, label, region, group }, cardIdx) => {
                   const isLatam = REGIONS.latam.codes.includes(code) || region === "LATAM";
                   const isAnglosphereOrEurope = REGIONS.english_speaking.codes.includes(code) || REGIONS.europe.codes.includes(code) || region === "Anglosphere/Europe";
                   
@@ -1152,7 +1176,8 @@ const AdminProductEdit = () => {
                       : (product.price_usd_tienda ?? product.price_usd);
                   
                   const isAsiaOrRest = !isLatam && !isAnglosphereOrEurope;
-                  const regionLabel = isLatam ? "LATAM" : isAnglosphereOrEurope ? "ANGLO / EU" : "ASIA / RESTO";
+                  const regionLabel = GROUP_TITLE[group].replace(/^\S+\s/, "");
+                  const showGroupHeader = cardIdx === 0 || LOCAL_CURRENCY_CARDS[cardIdx - 1].group !== group;
                   
                   const regionalUsdOverride = product.local_usd_prices?.[code];
                   const currentUsdValue = regionalUsdOverride != null ? Number(regionalUsdOverride) : Number(baseUsdRef);
@@ -1174,7 +1199,14 @@ const AdminProductEdit = () => {
 
 
                   return (
-                    <div key={code}>
+                    <Fragment key={code}>
+                    {showGroupHeader && (
+                      <div className="col-span-full mt-2 flex flex-wrap items-baseline gap-2 border-b border-primary/20 pb-1">
+                        <span className="text-xs font-bold uppercase tracking-wider text-primary">{GROUP_TITLE[group]}</span>
+                        <span className="text-[10px] text-muted-foreground">{GROUP_HINT[group]}</span>
+                      </div>
+                    )}
+                    <div>
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex flex-col">
                           <Label className="text-xs">{flag} {code}</Label>
@@ -1326,6 +1358,7 @@ const AdminProductEdit = () => {
                         )}
                       </div>
                     </div>
+                    </Fragment>
                   );
                 })}
                 </div>

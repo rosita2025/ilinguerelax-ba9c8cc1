@@ -9,13 +9,9 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { normalizeSku } from "./digitalSku.ts";
 import { localAmountFromUsd, FX_USD_TO_LOCAL, ZERO_DECIMAL_CURRENCIES } from "./fxRates.ts";
 
-export type RegionTier = "latam" | "global" | "tienda";
+import { priceTierOf, type PriceTier } from "./priceRegions.ts";
 
-const LATAM = new Set([
-  "AR", "BO", "BR", "CL", "CO", "CR", "DO", "EC", "SV",
-  "GT", "HN", "MX", "PA", "PY", "PE", "PR", "UY",
-]);
-const TIENDA = new Set(["VE", "CU", "NI"]);
+export type RegionTier = PriceTier;
 
 /** Países con restricciones cambiarias, inestabilidad o alta tasa de rechazo en moneda local. */
 export const RESTRICTED_CURRENCY_COUNTRIES = new Set(["HN", "AR", "VE", "NI", "CU", "BO", "PY", "SV", "GT"]);
@@ -26,10 +22,12 @@ export function isRestrictedCurrency(country: string | null | undefined): boolea
 }
 
 
+/**
+ * Tier de precio de un país. MISMA regla que el navegador (src/lib/priceRegions.ts): antes el servidor usaba otra lista
+ * (Asia/África iban al precio global y VE/CU/NI al «tienda») y el cobro no coincidía con el precio que veía el comprador.
+ */
 export function tierForCountry(country: string | null | undefined): RegionTier {
-  const c = String(country || "").toUpperCase().slice(0, 2);
-  if (TIENDA.has(c)) return "tienda";
-  return LATAM.has(c) ? "latam" : "global";
+  return priceTierOf(country);
 }
 
 /** Cupones válidos (espejo servidor de src/stores/checkoutStore.ts). */
@@ -129,9 +127,10 @@ function pickTierPrice(row: Record<string, unknown>, tier: RegionTier, currency?
 
   }
 
+  // Regla única (igual que el navegador): sin precio propio de la región, se usa el global.
   const global = Number(row.price_usd) || 0;
-  const latam = row.price_usd_latam != null ? Number(row.price_usd_latam) : global;
-  const tienda = row.price_usd_tienda != null ? Number(row.price_usd_tienda) : latam;
+  const latam = Number(row.price_usd_latam) > 0 ? Number(row.price_usd_latam) : global;
+  const tienda = Number(row.price_usd_tienda) > 0 ? Number(row.price_usd_tienda) : global;
   
   // Rule: strictly 3-tier USD model
   const value = tier === "tienda" ? tienda : tier === "latam" ? latam : global;

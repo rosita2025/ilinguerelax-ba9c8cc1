@@ -9,7 +9,7 @@ export type RegionTier = "latam" | "global" | "tienda";
 const STORAGE_KEY = "region_tier_v2";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
-import { REGIONS } from "@/lib/countryRegions";
+import { priceTierOf } from "@/lib/priceRegions";
 
 // Clasificación UNIFICADA de 3 tiers (misma lista `REGIONS` que usan las
 // tarjetas de homepage/all-products y las páginas estáticas):
@@ -20,11 +20,6 @@ import { REGIONS } from "@/lib/countryRegions";
 // "tienda"), así que un visitante de Asia/África veía el precio GLOBAL en la
 // página de producto mientras las tarjetas y el admin prometían el precio
 // TIENDA — precios distintos para el mismo producto en el mismo momento.
-const LATAM = new Set(REGIONS.latam.codes);
-const ANGLO_EU = new Set([
-  ...REGIONS.english_speaking.codes,
-  ...REGIONS.europe.codes,
-]);
 
 interface Cached {
   tier: RegionTier;
@@ -32,11 +27,9 @@ interface Cached {
   timestamp: number;
 }
 
+// Regla ÚNICA compartida con el servidor (src/lib/priceRegions.ts ⇄ supabase/functions/_shared/priceRegions.ts).
 function classify(country: string): RegionTier {
-  const c = country.toUpperCase();
-  if (LATAM.has(c)) return "latam";
-  if (ANGLO_EU.has(c)) return "global";
-  return "tienda";
+  return priceTierOf(country);
 }
 
 function readCache(): Cached | null {

@@ -123,7 +123,7 @@ export async function loadCheckoutProduct(adminSku: string): Promise<CheckoutPro
         const regionPrices = {
           latam: latamRaw ?? original,
           global: original,
-          tienda: tiendaRaw ?? latamRaw ?? original,
+          tienda: tiendaRaw ?? original,
         };
         return {
           id: p.sku,
@@ -172,7 +172,7 @@ export async function loadCheckoutProduct(adminSku: string): Promise<CheckoutPro
     regionPrices: {
       latam: priceLatam ?? priceGlobal,
       global: priceGlobal,
-      tienda: priceTienda ?? priceLatam ?? priceGlobal,
+      tienda: priceTienda ?? priceGlobal,
     },
     localPrices: data.local_prices,
     localUsdPrices: data.local_usd_prices,

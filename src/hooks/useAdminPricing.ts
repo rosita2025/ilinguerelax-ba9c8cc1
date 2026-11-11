@@ -161,13 +161,13 @@ export function useAdminPricing(sku: string): AdminPricing {
       const latam = data.price_usd_latam != null ? Number(data.price_usd_latam) : global;
       const tienda = (data as any).price_usd_tienda != null && Number((data as any).price_usd_tienda) > 0
         ? Number((data as any).price_usd_tienda)
-        : latam;
+        : global;
       const manualPen = data.local_prices?.PEN;
       const pen = manualPen != null && Number(manualPen) > 0 ? Number(manualPen) : null;
 
       const compareGlobal = data.compare_at_price_usd != null ? Number(data.compare_at_price_usd) : null;
       const compareLatam = data.compare_at_price_usd_latam != null ? Number(data.compare_at_price_usd_latam) : compareGlobal;
-      const compareTienda = data.compare_at_price_usd_tienda != null ? Number(data.compare_at_price_usd_tienda) : compareLatam;
+      const compareTienda = data.compare_at_price_usd_tienda != null ? Number(data.compare_at_price_usd_tienda) : compareGlobal;
       const comparePen = data.compare_at_price_pen != null ? Number(data.compare_at_price_pen) : null;
 
       const next: AdminPricing = {

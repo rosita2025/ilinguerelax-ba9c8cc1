@@ -29,17 +29,9 @@ export interface PruebaItem {
 
 /** Returns the effective USD unit price for an item, given the visitor's IP region tier. */
 export function itemPrice(item: PruebaItem, tier: RegionTier): number {
-  const country = (() => {
-    if (typeof window === "undefined") return "";
-    try { return (localStorage.getItem("ilr_country") || "").toUpperCase(); } catch { return ""; }
-  })();
-  
-  // TIER TIENDA (VE, CU, NI)
-  if (["VE", "CU", "NI"].includes(country) && item.regionPrices?.tienda) {
-    return item.regionPrices.tienda;
-  }
-  
-  // TIER LATAM vs GLOBAL
+  // El tier ya viene de la regla única de regiones (src/lib/priceRegions.ts, igual que el servidor): LATAM (incl. VE/CU/NI) → latam,
+  // Europa/USA/Canadá/AU/NZ/ZA → global, Asia y resto → tienda. Antes aquí había un caso aparte «VE/CU/NI → tienda» que cobraba un
+  // precio distinto al que veía el comprador y al que cobra el servidor.
   return item.regionPrices?.[tier] ?? item.price;
 }
 

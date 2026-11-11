@@ -78,6 +78,8 @@ Deno.serve(async (req) => {
         items: body.items.map((i) => ({ id: i.id, quantity: i.quantity, price: i.price })),
         country: body.country ?? "US",
         couponCode: body.couponCode,
+        // Igual que Stripe y dLocal: con la moneda, el precio de Europa en euros y los precios por moneda se resuelven igual en todas las pasarelas.
+        currency: body.currency,
       });
     } catch (e) {
       if (e instanceof PricingError) return json({ error: e.message }, 400);

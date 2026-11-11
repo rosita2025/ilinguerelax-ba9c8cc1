@@ -87,6 +87,14 @@ export const FX_USD_TO_LOCAL: Record<string, number> = {
   MYR: 4.5,
   NGN: 1550,
   KES: 130,
+  // Mismas tasas que `exchangeRates` del navegador (src/i18n/index.ts). Antes faltaban en el servidor: si la base no tenía su tasa en vivo,
+  // el servidor no podía calcular el total en esa moneda y cobraba en US$ aunque la página mostrara rand, libra egipcia, cedi, etc.
+  ZAR: 18.5,
+  EGP: 48,
+  GHS: 15,
+  TZS: 2700,
+  UGX: 3700,
+  MAD: 10,
 };
 
 /** Monedas que dLocal rechaza con decimales. */

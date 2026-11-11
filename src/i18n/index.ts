@@ -11,7 +11,9 @@ export type Currency =
   | "CLP" | "BOB" | "CRC" | "DOP" | "GTQ" | "HNL" | "NIO" | "CUP" | "PYG" | "UYU" | "HTG" | "VES"
   | "CHF" | "SEK" | "NOK" | "DKK" | "PLN" | "CZK"
   | "JPY" | "KRW" | "CNY" | "INR" | "NZD" | "SGD" | "HKD" | "TWD" | "IDR" | "MYR"
-  | "ZAR" | "NGN" | "EGP" | "KES" | "GHS" | "TZS" | "UGX" | "MAD";
+  | "ZAR" | "NGN" | "EGP" | "KES" | "GHS" | "TZS" | "UGX" | "MAD"
+  // Resto de las 79 monedas del catálogo (admin /admin/monedas)
+  | "JMD" | "TTD" | "RON" | "HUF" | "ISK" | "RSD" | "ALL" | "BAM" | "MKD" | "MDL" | "UAH" | "TRY" | "THB" | "PHP" | "VND" | "PKR" | "BDT" | "LKR" | "NPR" | "KZT" | "UZS" | "AED" | "SAR" | "QAR" | "KWD" | "BHD" | "OMR" | "ILS" | "JOD" | "TND" | "DZD" | "XOF" | "XAF" | "ETB" | "FJD" | "PGK";
 
 export const translations = {
   es,
@@ -136,6 +138,11 @@ const countryToCurrency: Record<string, Currency> = {
   
   // Africa
   ZA: "ZAR", NG: "NGN", EG: "EGP", KE: "KES", GH: "GHS", TZ: "TZS", UG: "UGX", MA: "MAD",
+
+  // Resto del mundo con moneda local (catálogo de 79 monedas). KW, BH, OM, JO y TN (3 decimales) no las cobra Stripe: ven US$.
+  JM: "JMD", TT: "TTD", TH: "THB", PH: "PHP", VN: "VND", PK: "PKR", BD: "BDT", LK: "LKR", NP: "NPR", KZ: "KZT", UZ: "UZS", AE: "AED", SA: "SAR", QA: "QAR", IL: "ILS", DZ: "DZD", ET: "ETB", FJ: "FJD", PG: "PGK", SN: "XOF", CI: "XOF", BF: "XOF", ML: "XOF", NE: "XOF", TG: "XOF", BJ: "XOF", GW: "XOF", CM: "XAF", GA: "XAF", CG: "XAF", TD: "XAF", CF: "XAF", GQ: "XAF",
+  // Europa: otros países europeos también en euros.
+  IS: "EUR", RS: "EUR", AL: "EUR", BA: "EUR", MK: "EUR", MD: "EUR", UA: "EUR", TR: "EUR", ME: "EUR", AD: "EUR", MC: "EUR", SM: "EUR", VA: "EUR", LI: "EUR",
 };
 
 // Currency symbols and formatting
@@ -186,6 +193,42 @@ export const currencyConfig: Record<Currency, { symbol: string; position: "befor
   TZS: { symbol: "TSh ", position: "before", decimals: 2 },
   UGX: { symbol: "USh ", position: "before", decimals: 0 },
   MAD: { symbol: "MAD ", position: "before", decimals: 2 },
+  JMD: { symbol: "J$", position: "before", decimals: 2 },
+  TTD: { symbol: "TT$", position: "before", decimals: 2 },
+  RON: { symbol: " lei", position: "after", decimals: 2 },
+  HUF: { symbol: " Ft", position: "after", decimals: 0 },
+  ISK: { symbol: " kr", position: "after", decimals: 0 },
+  RSD: { symbol: " din", position: "after", decimals: 0 },
+  ALL: { symbol: " L", position: "after", decimals: 0 },
+  BAM: { symbol: " KM", position: "after", decimals: 2 },
+  MKD: { symbol: " ден", position: "after", decimals: 0 },
+  MDL: { symbol: " L", position: "after", decimals: 2 },
+  UAH: { symbol: "₴", position: "before", decimals: 2 },
+  TRY: { symbol: "₺", position: "before", decimals: 2 },
+  THB: { symbol: "฿", position: "before", decimals: 2 },
+  PHP: { symbol: "₱", position: "before", decimals: 2 },
+  VND: { symbol: " ₫", position: "after", decimals: 0 },
+  PKR: { symbol: "Rs ", position: "before", decimals: 0 },
+  BDT: { symbol: "৳", position: "before", decimals: 0 },
+  LKR: { symbol: "Rs ", position: "before", decimals: 0 },
+  NPR: { symbol: "Rs ", position: "before", decimals: 0 },
+  KZT: { symbol: "₸", position: "before", decimals: 0 },
+  UZS: { symbol: " so'm", position: "after", decimals: 0 },
+  AED: { symbol: "AED ", position: "before", decimals: 2 },
+  SAR: { symbol: "SAR ", position: "before", decimals: 2 },
+  QAR: { symbol: "QAR ", position: "before", decimals: 2 },
+  KWD: { symbol: "KWD ", position: "before", decimals: 3 },
+  BHD: { symbol: "BHD ", position: "before", decimals: 3 },
+  OMR: { symbol: "OMR ", position: "before", decimals: 3 },
+  ILS: { symbol: "₪", position: "before", decimals: 2 },
+  JOD: { symbol: "JOD ", position: "before", decimals: 3 },
+  TND: { symbol: "TND ", position: "before", decimals: 3 },
+  DZD: { symbol: "DA ", position: "before", decimals: 0 },
+  XOF: { symbol: " CFA", position: "after", decimals: 0 },
+  XAF: { symbol: " FCFA", position: "after", decimals: 0 },
+  ETB: { symbol: "Br ", position: "before", decimals: 0 },
+  FJD: { symbol: "FJ$", position: "before", decimals: 2 },
+  PGK: { symbol: "K ", position: "before", decimals: 2 },
 };
 
 // Exchange rates from USD (updated August 2026 — exact)
@@ -237,6 +280,42 @@ export let exchangeRates: Record<Currency, number> = {
   TZS: 2700,
   UGX: 3700,
   MAD: 10,
+  JMD: 157,
+  TTD: 6.8,
+  RON: 4.6,
+  HUF: 360,
+  ISK: 138,
+  RSD: 108,
+  ALL: 94,
+  BAM: 1.8,
+  MKD: 56,
+  MDL: 17.5,
+  UAH: 41,
+  TRY: 41,
+  THB: 35,
+  PHP: 57,
+  VND: 25400,
+  PKR: 280,
+  BDT: 120,
+  LKR: 300,
+  NPR: 135,
+  KZT: 520,
+  UZS: 12800,
+  AED: 3.67,
+  SAR: 3.75,
+  QAR: 3.64,
+  KWD: 0.31,
+  BHD: 0.377,
+  OMR: 0.385,
+  ILS: 3.7,
+  JOD: 0.71,
+  TND: 3.1,
+  DZD: 134,
+  XOF: 600,
+  XAF: 600,
+  ETB: 120,
+  FJD: 2.25,
+  PGK: 4,
 };
 
 /**

@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { publishCatalogUpdate } from "@/lib/catalogSync";
 import { exchangeRates, currencyConfig, formatCurrencyAmount, type Currency } from "@/i18n";
-import { GROUP_HINT, GROUP_TITLE, LOCAL_CURRENCY_CARDS, type CurrencyGroup } from "@/lib/adminCurrencyGroups";
+import { CURRENCY_COUNT, GROUP_HINT, GROUP_TITLE, LOCAL_CURRENCY_CARDS, type CurrencyGroup } from "@/lib/adminCurrencyGroups";
 
 /**
  * /admin/monedas — monedas locales por producto (SKU), en una página aparte para que el editor del producto no sea larguísimo.
@@ -222,7 +222,7 @@ const AdminMonedas = () => {
               </Card>
 
               <div className="space-y-2">
-                <h2 className="font-semibold">Monedas locales (precio fijo y tachado, opcional)</h2>
+                <h2 className="font-semibold">Monedas locales de todo el mundo: {CURRENCY_COUNT} monedas (precio fijo y tachado, opcional)</h2>
                 <p className="text-xs text-muted-foreground">Cada región se abre y se cierra. Si dejas una moneda vacía, su precio se calcula solo con la tasa del día.</p>
                 {GROUP_ORDER.map((g) => {
                   const rows = LOCAL_CURRENCY_CARDS.filter((c) => c.group === g);

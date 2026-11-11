@@ -158,6 +158,55 @@ export function dlocalNeedsDocument(country: string | null | undefined): boolean
   return !getDlocalCountry(country)?.noDocument;
 }
 
+export type DlocalDocumentInfo = {
+  /** Nombre del documento tal como lo conoce el comprador de ese país. */
+  label: string;
+  placeholder: string;
+  /** Texto de ayuda corto bajo el campo. */
+  hint: string;
+  /** Solo letras y números (dLocal rechaza puntos, guiones y espacios). */
+  normalize: (raw: string) => string;
+  /** Validación tolerante: solo descarta lo que dLocal seguro rechazaría. */
+  isValid: (normalized: string) => boolean;
+};
+
+const clean = (raw: string) => raw.replace(/[^0-9a-zA-Z]/g, "").toUpperCase();
+const digitsLen = (min: number, max: number) => (v: string) => /^\d+$/.test(v) && v.length >= min && v.length <= max;
+
+const DOC_BY_COUNTRY: Record<string, Omit<DlocalDocumentInfo, "normalize">> = {
+  CO: { label: "Cédula (CC), CE o NIT", placeholder: "Ej. 1023456789", hint: "Solo números, sin puntos ni guiones.", isValid: digitsLen(5, 12) },
+  MX: { label: "CURP o RFC", placeholder: "Ej. GOMC800101HDFRRL09", hint: "CURP (18 caracteres) o RFC (12-13). Sin espacios.", isValid: (v) => /^[A-Z0-9]{12,13}$/.test(v) || /^[A-Z0-9]{18}$/.test(v) },
+  PE: { label: "DNI o CE", placeholder: "Ej. 45678912", hint: "DNI de 8 dígitos (o carné de extranjería).", isValid: (v) => /^[A-Z0-9]{8,12}$/.test(v) },
+  AR: { label: "DNI o CUIT/CUIL", placeholder: "Ej. 30123456", hint: "Solo números, sin puntos.", isValid: digitsLen(7, 11) },
+  CL: { label: "RUT", placeholder: "Ej. 12345678K", hint: "Sin puntos ni guion; la letra K si la tiene.", isValid: (v) => /^\d{7,8}[0-9K]$/.test(v) },
+  BR: { label: "CPF o CNPJ", placeholder: "Ej. 12345678909", hint: "Solo números: CPF (11) o CNPJ (14).", isValid: (v) => /^\d{11}$/.test(v) || /^\d{14}$/.test(v) },
+  EC: { label: "Cédula o RUC", placeholder: "Ej. 1712345678", hint: "Cédula de 10 dígitos o RUC de 13.", isValid: (v) => /^\d{10}$/.test(v) || /^\d{13}$/.test(v) },
+  UY: { label: "Cédula de identidad (CI)", placeholder: "Ej. 12345678", hint: "Solo números, sin puntos ni guion.", isValid: digitsLen(6, 9) },
+  PY: { label: "Cédula de identidad (CI)", placeholder: "Ej. 1234567", hint: "Solo números, sin puntos.", isValid: digitsLen(5, 9) },
+  BO: { label: "Cédula de identidad (CI)", placeholder: "Ej. 1234567", hint: "Solo números.", isValid: (v) => /^[A-Z0-9]{5,12}$/.test(v) },
+  CR: { label: "Cédula de identidad", placeholder: "Ej. 123456789", hint: "Solo números, sin guiones.", isValid: digitsLen(9, 12) },
+  GT: { label: "DPI o NIT", placeholder: "Ej. 1234567890101", hint: "DPI de 13 dígitos o NIT.", isValid: digitsLen(5, 13) },
+  PA: { label: "Cédula", placeholder: "Ej. 81234567", hint: "Sin guiones.", isValid: (v) => /^[A-Z0-9]{5,12}$/.test(v) },
+  DO: { label: "Cédula", placeholder: "Ej. 00112345678", hint: "11 dígitos, sin guiones.", isValid: digitsLen(9, 11) },
+  SV: { label: "DUI", placeholder: "Ej. 012345678", hint: "Solo números, sin guion.", isValid: digitsLen(8, 10) },
+  HN: { label: "Documento de identidad", placeholder: "Ej. 0801199912345", hint: "Solo números, sin guiones.", isValid: digitsLen(8, 14) },
+  NI: { label: "Cédula", placeholder: "Ej. 0012345678901A", hint: "Sin guiones.", isValid: (v) => /^[A-Z0-9]{8,16}$/.test(v) },
+  VE: { label: "Cédula", placeholder: "Ej. 12345678", hint: "Solo números.", isValid: digitsLen(5, 10) },
+};
+
+/** Etiqueta, formato y validación del documento de identidad que pide dLocal Go según el país del comprador. */
+export function dlocalDocumentInfo(country: string | null | undefined): DlocalDocumentInfo {
+  const c = DOC_BY_COUNTRY[(country || "").toUpperCase()];
+  if (c) return { ...c, normalize: clean };
+  return {
+    label: "Documento de identidad",
+    placeholder: "Número de documento",
+    hint: "Solo letras y números, sin espacios ni guiones.",
+    normalize: clean,
+    isValid: (v) => /^[A-Z0-9]{5,20}$/.test(v),
+  };
+}
+
 /** ¿dLocal Go soporta este tipo de cobro en este país? */
 export function dlocalSupports(country: string | null | undefined, kind: DlocalKind): boolean {
   const c = getDlocalCountry(country);

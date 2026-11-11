@@ -117,7 +117,8 @@ Deno.serve(async (req) => {
       payer: {
         name: body.payerName,
         email: body.payerEmail,
-        document: opts.minimal ? undefined : body.payerDocument,
+        // dLocal rechaza puntos, guiones y espacios en el documento (p. ej. «1.023.456.789»).
+        document: opts.minimal || !body.payerDocument ? undefined : body.payerDocument.replace(/[^0-9a-zA-Z]/g, "").toUpperCase() || undefined,
         // Dirección de envío: dLocal la acepta como parte del pagador y nos
         // sirve para despachar libros físicos desde /admin/orders-physical.
         address: opts.minimal || !body.payerAddress ? undefined : {
@@ -172,10 +173,10 @@ Deno.serve(async (req) => {
 
     const buildAttempts = async () => {
       const rest = [];
-      if (body.payerDocument) {
+      if (body.payerDocument && localAmount && localAmount > 0) {
       rest.push({ label: `checkout ${localCurrency} mínimo`, payload: payloadFor(localAmount!, localCurrency, { minimal: true }) });
     }
-    const rail = await resolveRail();
+    const rail = localAmount && localAmount > 0 ? await resolveRail() : null;
     if (rail) rest.push({ label: `rail ${rail}`, payload: { ...payloadFor(localAmount!, localCurrency), payment_method_id: rail, payment_method_flow: "REDIRECT" } });
     if (localCurrency !== "USD") {
       rest.push({ label: "checkout USD", payload: payloadFor(calculatedUsd, "USD") });

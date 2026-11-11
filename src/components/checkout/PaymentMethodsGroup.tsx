@@ -55,7 +55,7 @@ const isCardHostedOnly = (): boolean => {
   try { return new URLSearchParams(window.location.search).get("form") !== "1"; } catch { return true; }
 };
 const StripePaymentElementBox = React.lazy(() => import("@/components/checkout/StripePaymentElementBox"));
-import { DLOCAL_COUNTRY_CODES, dlocalNeedsDocument, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";
+import { DLOCAL_COUNTRY_CODES, dlocalNeedsDocument, dlocalDocumentInfo, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";
 import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
 import { mapDlocalStatus } from "@/lib/dlocalErrorMap";
 import { saveDlocalPending, clearDlocalPending } from "@/lib/dlocalPending";
@@ -1031,15 +1031,21 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     // solicitud con error 400 en TODOS los intentos. Esto NO aplica a
     // Stripe, ni a los métodos manuales aparte (CLABE propia, Yape/Plin,
     // Binance) — esos no lo necesitan.
-    if ((kind === "cash" || kind === "transfer") && dlocalNeedsDocument(region.country) && !dlocalDocument.trim()) {
+    const needsDoc = (kind === "cash" || kind === "transfer") && dlocalNeedsDocument(region.country);
+    const docInfo = dlocalDocumentInfo(region.country);
+    const docClean = docInfo.normalize(dlocalDocument);
+    if (needsDoc && (!docClean || !docInfo.isValid(docClean))) {
+      logCheckoutAction(docClean ? "dlocal_documento_invalido" : "dlocal_falta_documento", `${region.country}:${kind}`);
       setMethodError({
         method: dlMethod,
         message: language === "en"
-          ? "Please enter your ID document above to continue."
-          : language === "it" ? "Inserisci qui sopra il tuo documento d'identità per continuare." : "Ingresa tu documento de identidad arriba para continuar.",
+          ? (docClean ? "That ID number doesn't look right. Check it and try again." : "Please enter your ID document above to continue.")
+          : language === "it" ? "Inserisci qui sopra il tuo documento d'identità per continuare."
+          : docClean ? `Revisa tu ${docInfo.label}: ${docInfo.hint}` : `Ingresa tu ${docInfo.label} arriba para continuar.`,
       });
       return;
     }
+    logCheckoutAction("dlocal_pago_iniciado", `${region.country}:${kind}`);
     const s = useCheckoutPruebaStore.getState();
     const totals = calcTotals(s.items, s.couponPercent, region.tier);
     const ctry = (region.country || localStorage.getItem("ilr_country") || "PE").toUpperCase().slice(0, 2);
@@ -1093,7 +1099,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           payerEmail: s.buyer.email.trim(),
           payerName: s.buyer.fullName.trim(),
           payerPhone: (s.buyer.phone ?? "").trim() || undefined,
-          payerDocument: (kind === "cash" || kind === "transfer") && dlocalNeedsDocument(region.country) ? dlocalDocument.trim() : undefined,
+          payerDocument: needsDoc ? docClean : undefined,
           // Mismos datos que enviamos a Stripe: necesarios para despachar libros físicos.
           payerAddress: (s.buyer.address ?? "").trim().slice(0, 160) || undefined,
           payerCity: (s.buyer.city ?? "").trim().slice(0, 80) || undefined,
@@ -1117,11 +1123,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         const detail = await extractEdgeErrorMessage(error);
         throw new Error(detail || t.errorPayment);
       }
+      logCheckoutAction("dlocal_redirigido", `${ctry}:${kind}`);
       window.location.assign(data.redirect_url);
     } catch (err) {
       redirectingRef.current = false;
       setMpLoading(null);
       clearDlocalPending();
+      logCheckoutAction("dlocal_error_creando", `${ctry}:${kind}`);
       const rawReason = err instanceof Error ? err.message : String(err);
       try {
         trackPaymentError({
@@ -3197,22 +3205,33 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 p-3">
                   <p className="text-xs text-amber-800 dark:text-amber-300">
                     {language === "en"
-                      ? "This local payment provider requires an ID document by law. Please enter it to continue."
-                      : "Este método de pago local requiere un documento de identidad por regulación. Ingrésalo para continuar."}
+                      ? "Your bank needs your ID number to issue the payment. Only once, then you pay."
+                      : "El banco pide tu número de documento para generar el pago. Solo una vez; después pagas. (Con billetera digital no se pide)."}
                   </p>
                 </div>
-                <div>
-                  <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1 block">
-                    {(language === "es" ? "Documento de identidad (ej. RFC, CURP, DNI, CI)" : "ID document (e.g. RFC, CURP, DNI, CI)")}
-                  </label>
-                  <input
-                    type="text"
-                    value={dlocalDocument}
-                    onChange={(e) => setDlocalDocument(e.target.value.trim())}
-                    placeholder={(language === "es" ? "Ingresa tu número de documento" : "Enter your document number")}
-                    className="w-full px-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                  />
-                </div>
+                {(() => {
+                  const di = dlocalDocumentInfo(country);
+                  const es = language === "es" || !["en", "it", "pt", "fr"].includes(language as string);
+                  return (
+                    <div>
+                      <label htmlFor="dlocal-document" className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1 block">
+                        {es ? di.label : (language === "en" ? "ID document" : "Documento")}
+                      </label>
+                      <input
+                        id="dlocal-document"
+                        type="text"
+                        inputMode="text"
+                        autoComplete="off"
+                        autoCapitalize="characters"
+                        value={dlocalDocument}
+                        onChange={(e) => setDlocalDocument(di.normalize(e.target.value))}
+                        placeholder={di.placeholder}
+                        className="w-full px-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      />
+                      {es && <p className="mt-1 text-[11px] text-neutral-500">{di.hint}</p>}
+                    </div>
+                  );
+                })()}
               </div>
             )}
 

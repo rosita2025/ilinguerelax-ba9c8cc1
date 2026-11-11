@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "@/i18n/I18nContext";
-import { Language, Currency } from "@/i18n";
+import { Language, Currency, currencyConfig, detectCurrency } from "@/i18n";
 import {
   Select,
   SelectContent,
@@ -77,6 +77,19 @@ const COUNTRIES: CountryOption[] = [
 const CAMPAIGN_STORAGE = "campaign_currency_v5";
 const COUNTRY_STORAGE = "manual_country_v1";
 
+const regionNames = typeof Intl !== "undefined" && "DisplayNames" in Intl ? new Intl.DisplayNames(["es"], { type: "region" }) : null;
+const flagOf = (code: string) => String.fromCodePoint(...[...code].map((c) => 127397 + c.charCodeAt(0)));
+
+/** País del selector: de la lista o, si no está (Tailandia, Emiratos, Vietnam…), uno armado con su moneda real (así no se muestra «Estados Unidos / USD» a quien no lo es). */
+function optionFor(code: string): CountryOption {
+  const known = COUNTRIES.find((c) => c.code === code);
+  if (known) return known;
+  let label = code;
+  try { label = regionNames?.of(code) ?? code; } catch { /* sin nombre */ }
+  return { code, flag: flagOf(code), label, currency: detectCurrency(code) as unknown as CampaignCurrency, region: "Middle East & Africa" };
+}
+const isIsoCountry = (c: unknown): c is string => typeof c === "string" && /^[A-Z]{2}$/.test(c);
+
 function readInitialCountry(): string {
   if (typeof window === "undefined") return "US";
   try {
@@ -85,20 +98,16 @@ function readInitialCountry(): string {
     const cached = localStorage.getItem(CAMPAIGN_STORAGE);
     if (cached) {
       const parsed = JSON.parse(cached);
-      const match = COUNTRIES.find((c) => c.code === parsed.countryCode);
-      if (match) return match.code;
+      if (isIsoCountry(parsed.countryCode)) return parsed.countryCode;
     }
     const saved = localStorage.getItem(COUNTRY_STORAGE);
-    if (saved && COUNTRIES.some((c) => c.code === saved)) return saved;
+    if (isIsoCountry(saved)) return saved;
   } catch { /* ignore */ }
   return "US";
 }
 
-const I18N_SUPPORTED: Currency[] = [
-  "USD", "EUR", "GBP", "CAD", "AUD", "NZD", "BRL", "MXN", "COP", "ARS", "PEN",
-  "CLP", "BOB", "CRC", "DOP", "GTQ", "HNL", "NIO", "CUP", "PYG", "UYU", "HTG", "VES",
-  "CHF", "SEK", "NOK", "DKK", "PLN", "CZK", "JPY", "KRW", "CNY", "INR", "SGD", "HKD", "TWD",
-];
+// Todas las monedas que el sitio sabe mostrar y cobrar (las 82 del catálogo).
+const I18N_SUPPORTED = Object.keys(currencyConfig) as Currency[];
 
 // Detect country via IP so the header selector reflects the visitor's real
 // location even on pages that don't call useCampaignPrice (e.g. /admin, /blog).
@@ -108,7 +117,7 @@ async function detectCountryByIp(): Promise<string | null> {
   inflightIpDetection = (async () => {
     const detected = await detectGeoCountry({ fallbackCountry: "US" });
     const country = detected?.countryCode;
-    return country && COUNTRIES.some((c) => c.code === country) ? country : "US";
+    return isIsoCountry(country) ? country : "US";
   })();
   return inflightIpDetection;
 }
@@ -124,8 +133,7 @@ export const LanguageCurrencySelector = () => {
         const cached = localStorage.getItem(CAMPAIGN_STORAGE);
         if (!cached) return;
         const parsed = JSON.parse(cached);
-        const match = COUNTRIES.find((c) => c.code === parsed.countryCode);
-        if (match && match.code !== countryCode) setCountryCode(match.code);
+        if (isIsoCountry(parsed.countryCode) && parsed.countryCode !== countryCode) setCountryCode(parsed.countryCode);
       } catch { /* ignore */ }
     };
     window.addEventListener("campaign-currency-change", sync);
@@ -137,8 +145,7 @@ export const LanguageCurrencySelector = () => {
     let cancelled = false;
     detectCountryByIp().then((detected) => {
       if (cancelled || !detected) return;
-      const match = COUNTRIES.find((c) => c.code === detected);
-      if (!match) return;
+      const match = optionFor(detected);
       try {
         const payload = { currency: match.currency, countryCode: detected, timestamp: Date.now() };
         localStorage.setItem(CAMPAIGN_STORAGE, JSON.stringify(payload));
@@ -162,7 +169,7 @@ export const LanguageCurrencySelector = () => {
   }, [countryCode, setCurrency]);
 
 
-  const current = COUNTRIES.find((c) => c.code === countryCode) ?? COUNTRIES[0];
+  const current = optionFor(countryCode);
 
   // Nota: cambio manual de país deshabilitado a propósito para evitar arbitraje
   // (visitante de USA cambiando a MX/PE para comprar al precio local reducido).

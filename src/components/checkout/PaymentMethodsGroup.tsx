@@ -3229,6 +3229,31 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                         className="w-full px-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                       />
                       {es && <p className="mt-1 text-[11px] text-neutral-500">{di.hint}</p>}
+                      {es && <p className="mt-1 text-[11px] text-neutral-500">Solo sirve para generar tu ficha de pago en el banco; no lo guardamos.</p>}
+                    </div>
+                  );
+                })()}
+                {(() => {
+                  // Salida para quien no quiere dar su documento: métodos que no lo piden.
+                  const alts = methods.filter((x) => !(x as any).isSeparator && (x.id === "dlocal_wallet" || x.id === "paypal"));
+                  if (!alts.length) return null;
+                  return (
+                    <div className="border-t border-neutral-200 dark:border-neutral-700 pt-3">
+                      <p className="mb-2 text-[11px] text-neutral-500">
+                        {language === "en" ? "Prefer not to share it? Pay without ID with:" : "¿Prefieres no ponerlo? Paga sin documento con:"}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {alts.map((x) => (
+                          <button
+                            key={x.id}
+                            type="button"
+                            onClick={() => { logCheckoutAction("dlocal_cambia_sin_documento", `${country}:${x.id}`); handleSelect(x.id as Method); }}
+                            className="rounded-full border border-primary/40 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/5"
+                          >
+                            {x.title}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   );
                 })()}

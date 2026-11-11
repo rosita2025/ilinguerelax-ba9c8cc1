@@ -3,7 +3,7 @@ import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { detectCurrency, formatCurrencyAmount, exchangeRates, type Currency } from "@/i18n";
 import { useLocalOverrides } from "@/lib/livePrices";
-import { REGIONS } from "@/lib/countryRegions";
+import { priceTierOf } from "@/lib/priceRegions";
 
 /**
  * Países que compran vía Hotmart LATAM (USD). El resto del mundo (incl. Perú y
@@ -80,8 +80,9 @@ export function useCountryTierRouting(adminSku: string, opts: Options = {}): Cou
   const rate = exchangeRates[currency] || 1;
 
   // 1. Determinar el Tier de Región
-  const isLatam = REGIONS.latam.codes.includes(countryCode);
-  const isAnglosphereOrEurope = REGIONS.english_speaking.codes.includes(countryCode) || REGIONS.europe.codes.includes(countryCode);
+  const priceTier = priceTierOf(countryCode);
+  const isLatam = priceTier === "latam";
+  const isAnglosphereOrEurope = priceTier === "global";
   const isAsiaOrRest = !isLatam && !isAnglosphereOrEurope;
   const isTiendaUsd = TIENDA_USD_COUNTRIES.has(countryCode);
 

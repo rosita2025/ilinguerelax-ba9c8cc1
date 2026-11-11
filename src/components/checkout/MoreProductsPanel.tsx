@@ -49,7 +49,7 @@ export function MoreProductsPanel({ parentSku }: Props) {
   const { language } = useI18n();
   const t = T[(language as keyof typeof T)] ?? T.es;
   const isPeru = (region.country || "").toUpperCase() === "PE";
-  const isTiendaUsd = ["VE", "CU", "NI"].includes((region.country || "").toUpperCase());
+  const isTiendaUsd = region.tier === "tienda";
 
   useEffect(() => {
     if (!parentSku) { setUpsells([]); return; }
@@ -84,7 +84,7 @@ export function MoreProductsPanel({ parentSku }: Props) {
     if (upsells.length === 0 || items.length === 0) return;
     const country = (region.country || "").toUpperCase();
     const isPE = country === "PE";
-    const isTienda = ["VE", "CU", "NI"].includes(country);
+    const isTienda = region.tier === "tienda";
     upsells.forEach((r) => {
       const factor = 1 - Math.max(0, Math.min(95, r.discount_pct)) / 100;
       if (factor >= 1) return;

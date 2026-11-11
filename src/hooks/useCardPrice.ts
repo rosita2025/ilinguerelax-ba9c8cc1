@@ -9,7 +9,7 @@ import {
   exchangeRates,
   type Currency,
 } from "@/i18n";
-import { REGIONS } from "@/lib/countryRegions";
+import { priceTierOf } from "@/lib/priceRegions";
 import { CHECKOUT_CATALOG } from "@/config/checkoutCatalog";
 import { resolveAdminSku } from "./useLocalCurrency";
 
@@ -199,10 +199,9 @@ export function useCardPrice(): CardPriceFormatter {
   // así que un visitante de Asia veía en la tarjeta el precio GLOBAL mientras
   // la página de producto mostraba el precio TIENDA — precios distintos para
   // el mismo producto en el mismo momento.
-  const isLatamTier = REGIONS.latam.codes.includes(cc);
-  const isAngloEuTier =
-    REGIONS.english_speaking.codes.includes(cc) || REGIONS.europe.codes.includes(cc);
-  const isTiendaUsd = !isLatamTier && !isAngloEuTier;
+  const priceTier = priceTierOf(cc);
+  const isLatamTier = priceTier === "latam";
+  const isTiendaUsd = priceTier === "tienda";
 
   const displayCurrency: Currency = isPeru ? "PEN" : (detectCurrency(cc || "US") as Currency);
 

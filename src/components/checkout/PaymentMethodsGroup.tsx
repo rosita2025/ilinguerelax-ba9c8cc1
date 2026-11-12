@@ -1483,6 +1483,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // carrito, precios por región y moneda que el checkout embebido.
   const payWithHostedFallback = async (method: unknown = "card") => {
     const isOxxo = method === "oxxo";
+    // OXXO: el botón y una pantalla de espera muestran de inmediato que se está generando la ficha (la respuesta de Stripe tarda 1-3 s).
+    if (isOxxo) setMpLoading("stripe_oxxo");
     const toAbsUrl = (u?: string) => {
       if (!u) return undefined;
       if (/^https?:\/\//i.test(u)) return u;
@@ -1524,9 +1526,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         },
       });
       if (data?.url) {
-        window.location.href = data.url;
+        window.location.href = data.url; // la espera sigue visible hasta que el navegador cambie de página
         return;
       }
+      if (isOxxo) setMpLoading(null);
       console.error("Hosted fallback failed:", error);
       // El mensaje genérico de Supabase («non-2xx») no dice nada: se lee el motivo real que devolvió la función.
       const detail = (await extractEdgeErrorMessage(error)) || (error as any)?.message || "";
@@ -1537,6 +1540,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         variant: "destructive",
       });
     } catch (err) {
+      if (isOxxo) setMpLoading(null);
       console.error("Hosted fallback failed:", err);
       try { trackPaymentError({ provider: isOxxo ? "stripe_oxxo" : "stripe_hosted", skus: s.items.map((i) => i.id), reason: String(err instanceof Error ? err.message : err).slice(0, 300), value: 0, currency: isOxxo ? "MXN" : "USD" }); } catch { /* noop */ }
       toast({ title: t.errorPayment, description: err instanceof Error ? err.message : "No se pudo abrir la página de pago.", variant: "destructive" });
@@ -2152,6 +2156,19 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     })();
     return () => { alive = false; };
   }, [country]);
+
+  // México con OXXO elegido: abre ya la conexión con la página de Stripe para que el salto sea más rápido.
+  useEffect(() => {
+    if (selected !== "stripe_oxxo" || typeof document === "undefined") return;
+    for (const origin of ["https://checkout.stripe.com", "https://payments.stripe.com"]) {
+      if (document.head.querySelector(`link[rel="preconnect"][href="${origin}"]`)) continue;
+      const l = document.createElement("link");
+      l.rel = "preconnect";
+      l.href = origin;
+      l.crossOrigin = "";
+      document.head.appendChild(l);
+    }
+  }, [selected]);
   const enabledStripeKeys = new Set(methodsConfig.enabledMethodKeys.filter((k) => k.startsWith("stripe_")));
   const primaryCardBadges: MethodBadge[] = [
     { label: "Visa", bg: "#ffffff", color: "#1F2937" },
@@ -3491,6 +3508,18 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             <><Lock className="w-4 h-4" /> {selected === "hotmart" ? ((language === "es" ? "Pagar con Hotmart" : "Checkout with Hotmart")) : t.buyNow}</>
           )}
         </button>
+      )}
+
+      {mpLoading === "stripe_oxxo" && (
+        <div className="fixed inset-0 z-[80] flex flex-col items-center justify-center gap-3 bg-white/90 px-6 text-center backdrop-blur-sm dark:bg-neutral-950/90" role="status" aria-live="polite">
+          <Loader2 className="h-9 w-9 animate-spin text-emerald-600" />
+          <p className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
+            {language === "en" ? "Creating your OXXO voucher…" : "Generando tu ficha de OXXO…"}
+          </p>
+          <p className="text-sm text-neutral-600 dark:text-neutral-300">
+            {language === "en" ? "We are taking you to Stripe's secure page." : "Te llevamos a la página segura de Stripe. No cierres esta ventana."}
+          </p>
+        </div>
       )}
 
       <UpsellPopup

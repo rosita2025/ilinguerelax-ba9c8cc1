@@ -2261,7 +2261,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         : "Paga desde tu billetera digital en moneda local. Confirmación inmediata."),
       badge: finalPriceLabel,
 
-      badges: dlocalBadges(country, "wallet", 6),
+      // Con Whop solo se muestra la marca que ese pago acepta (Nequi), no las otras billeteras de dLocal.
+      badges: whopEnabled ? [{ label: "Nequi", bg: "#200020", color: "#DA0081" }] : dlocalBadges(country, "wallet", 6),
     },
     {
       id: "dlocal_card",

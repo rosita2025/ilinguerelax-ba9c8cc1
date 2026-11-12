@@ -63,11 +63,16 @@ const previews = [
 ];
 
 // Capturas REALES de WhatsApp de atención posventa (datos privados tapados a mano por el dueño; sin editar ni IA). Más en public/soporte-patrones.
+const shot = (name: string, h: number, flag: string, country: string, caption: string, alt: string): SupportShot => ({
+  src: `/soporte-patrones/${name}.webp`, full: `/soporte-patrones/${name}-full.webp`, width: 480, height: h, flag, country, caption, alt,
+});
 const supportShots: SupportShot[] = [
-  { src: "/soporte-patrones/peru-yape.webp", width: 640, height: 1210, flag: "🇵🇪", country: "Perú", caption: "Pago manual con Yape: revisado y material enviado al correo.", alt: "Captura real de WhatsApp: cliente de Perú confirma su pago por Yape y recibe el material" },
-  { src: "/soporte-patrones/mexico-material.webp", width: 640, height: 1181, flag: "🇲🇽", country: "México", caption: "Ebook + 3 bonos enviados por WhatsApp.", alt: "Captura real de WhatsApp: cliente de México recibe el ebook y los 3 bonos y agradece" },
-  { src: "/soporte-patrones/espana-spotify.webp", width: 640, height: 1313, flag: "🇪🇸", country: "España", caption: "Bono de 1,000 palabras con su audio en Spotify.", alt: "Captura real de WhatsApp: cliente de España recibe el enlace del audio de 1,000 palabras" },
-  { src: "/soporte-patrones/espana-actualizacion.webp", width: 640, height: 1195, flag: "🇪🇸", country: "España", caption: "Material actualizado (versión 1.5) enviado a quien ya compró.", alt: "Captura real de WhatsApp: cliente de España recibe la actualización de su pedido" },
+  shot("mexico-dlocal", 896, "🇲🇽", "México", "Pago con dLocal confirmado: material enviado a su correo.", "Captura real de WhatsApp: cliente de México pagó con dLocal y recibe el material en su correo"),
+  shot("usa-icloud", 886, "🇺🇸", "EE. UU.", "Correo de iCloud en spam: se reenvía a su Gmail.", "Captura real de WhatsApp: cliente de EE. UU. recibe el material en otro correo porque iCloud lo manda a spam"),
+  shot("peru-yape", 907, "🇵🇪", "Perú", "Pago manual con Yape: revisado y enviado al correo.", "Captura real de WhatsApp: cliente de Perú confirma su pago por Yape y recibe el material"),
+  shot("mexico-material", 886, "🇲🇽", "México", "Ebook + 3 bonos enviados por WhatsApp.", "Captura real de WhatsApp: cliente de México recibe el ebook y los 3 bonos y agradece"),
+  shot("espana-spotify", 985, "🇪🇸", "España", "Bono de 1,000 palabras con su audio en Spotify.", "Captura real de WhatsApp: cliente de España recibe el enlace del audio de 1,000 palabras"),
+  shot("espana-actualizacion", 896, "🇪🇸", "España", "Material actualizado (versión 1.5) para quien ya compró.", "Captura real de WhatsApp: cliente de España recibe la actualización de su pedido"),
 ];
 
 const bonusPreviews = [
@@ -893,24 +898,24 @@ const PatronesContent = () => {
       </section>
 
       {/* Atención posventa (no son reseñas): capturas reales, agradecidos por su confianza */}
-      <section className="py-10 md:py-14">
+      <section className="py-8 md:py-10">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-6">
+            <div className="text-center mb-4">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold mb-2">
-                🇲🇽 🇵🇪 🇪🇸 Atención real después de la compra
+                🇲🇽 🇺🇸 🇵🇪 🇪🇸 Atención real después de la compra
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground">
                 Gracias por <span className="text-gradient">su confianza</span>
               </h2>
-              <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
-                Si compras, no te dejamos solo: te acompañamos con actualizaciones del material, pagos manuales (Yape, transferencia, OXXO) y si tu correo falla o cae en spam.
+              <p className="text-muted-foreground mt-2 max-w-xl mx-auto text-sm md:text-base">
+                Te acompañamos después de comprar: pagos manuales, correos en spam y actualizaciones del material.
               </p>
             </div>
-            <LazyMount minHeight={520} rootMargin={mediaMargin}>
+            <LazyMount minHeight={400} rootMargin={mediaMargin}>
               <SupportProofSlider shots={supportShots} />
             </LazyMount>
-            <p className="text-center text-xs text-muted-foreground mt-4">Capturas reales de WhatsApp. Datos privados tapados; sin editar.</p>
+            <p className="text-center text-xs text-muted-foreground mt-4">Capturas reales de WhatsApp, sin editar. Toca una para ampliarla.</p>
           </div>
         </div>
       </section>

@@ -230,6 +230,7 @@ const CHECKOUT_METHODS: CheckoutMethodDef[] = [
   { key: "dlocal_cash", label: "dLocal Go — Pago en efectivo", note: "Pago en efectivo/agentes vía dLocal Go (OXXO MX, Efecty CO, Boleto BR, Rapipago AR, PagoEfectivo PE…)", icon: "Banknote", regions: ["PE", "GLOBAL"], countryCodes: ["AR", "BR", "CO", "EC", "MX", "PE", "UY", "BO", "CL", "CR", "GT", "PA", "PY", "DO", "SV", "HN", "NI", "ID"] },
   { key: "dlocal_wallet", label: "dLocal Go — Billetera digital", note: "Billeteras digitales locales vía dLocal Go (Mercado Pago PE/BR, Nequi CO, MACH CL, PicPay BR…)", icon: "Smartphone", countryCodes: ["BO", "BR", "CL", "CO", "CR", "EC", "GT", "PA", "PE", "PY", "UY", "DO", "SV", "HN", "NI", "ID", "MY", "KE"] },
   { key: "dlocal_mercadopago", label: "dLocal Go — Billetera (Mercado Pago)", note: "Mercado Pago y billeteras locales vía dLocal Go (Mercado Pago, Ualá y MODO en Argentina; Mercado Pago y Spin by OXXO en México). dLocal gestiona Mercado Pago.", icon: "Wallet", countryCodes: ["AR", "MX"] },
+  { key: "whop_wallet", label: "Whop — Nequi (Colombia)", note: "Nequi por Whop (checkout incrustado, pesos colombianos, un producto sin cupón). Si el producto no tiene plan en Whop, se usa la billetera de dLocal Go. Requiere WHOP_WEBHOOK_SECRET y WHOP_PLAN_MAP.", icon: "Smartphone", countryCodes: ["CO"] },
   { key: "hotmart_1click", label: "Hotmart (1 clic)", note: "Redirige al enlace de Hotmart del producto según el país. Precio y moneda gestionados por Hotmart.", icon: "CreditCard", regions: ["PE", "US", "GLOBAL"] },
 ];
 

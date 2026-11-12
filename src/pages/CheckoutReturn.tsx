@@ -25,6 +25,7 @@ export default function CheckoutReturn() {
   const t = getCheckoutStrings(language);
   const isDlocal = (sp.get("provider") || "").toLowerCase() === "dlocal";
   const isPaypal = (sp.get("provider") || "").toLowerCase() === "paypal";
+  const isWhop = (sp.get("provider") || "").toLowerCase() === "whop";
   const [slow, setSlow] = useState(false);
 
   useEffect(() => {
@@ -126,9 +127,31 @@ export default function CheckoutReturn() {
     return () => { cancelled = true; };
   }, [isPaypal, sp, navigate]);
 
+  // ---- Whop (Nequi) -------------------------------------------------------
+  // Vuelve con ?provider=whop&order=ILR-WH-xxx&status=succeeded|failed|canceled (&payment=pay_xxx). La URL se puede fabricar a mano:
+  // nunca se muestra «aprobado» desde aquí. El producto lo entrega el aviso de Whop (whop-webhook) y le llega por correo.
+  useEffect(() => {
+    if (!isWhop) return;
+    const params = new URLSearchParams();
+    params.set("provider", "whop");
+    const order = sp.get("order");
+    if (order) params.set("order", order);
+    const status = (sp.get("status") || "").toLowerCase();
+    if (status === "failed" || status === "canceled") {
+      params.set("status", "rejected");
+      params.set("reason", "whop_" + status);
+      navigate(`/checkouts/failure?${params.toString()}`, { replace: true });
+      return;
+    }
+    params.set("status", "pending");
+    params.set("reason", "whop_confirming");
+    if (order) params.set("external_reference", order);
+    navigate(`/checkouts/pending?${params.toString()}`, { replace: true });
+  }, [isWhop, sp, navigate]);
+
   // ---- Stripe ------------------------------------------------------------
   useEffect(() => {
-    if (isDlocal || isPaypal) return;
+    if (isDlocal || isPaypal || isWhop) return;
     const params = new URLSearchParams();
     if (sessionId) params.set("session_id", sessionId);
     // Stripe appends `redirect_status` after 3DS/off-session redirects:
@@ -160,7 +183,7 @@ export default function CheckoutReturn() {
     }
     params.set("status", "approved");
     navigate(`/checkouts/success?${params.toString()}`, { replace: true });
-  }, [sessionId, navigate, sp, isDlocal, isPaypal]);
+  }, [sessionId, navigate, sp, isDlocal, isPaypal, isWhop]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">

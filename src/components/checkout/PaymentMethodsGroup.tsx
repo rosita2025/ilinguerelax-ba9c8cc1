@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
+import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreditCard, Building2, Banknote, Loader2, Lock, Smartphone, Copy, Check, MessageCircle, Wallet } from "lucide-react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
@@ -55,6 +55,7 @@ const isCardHostedOnly = (): boolean => {
   try { return new URLSearchParams(window.location.search).get("form") !== "1"; } catch { return true; }
 };
 const StripePaymentElementBox = React.lazy(() => import("@/components/checkout/StripePaymentElementBox"));
+const WhopCheckoutPanel = lazy(() => import("@/components/checkout/WhopCheckoutPanel"));
 import { DLOCAL_COUNTRY_CODES, dlocalNeedsDocument, dlocalDocumentInfo, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";
 import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
 import { mapDlocalStatus } from "@/lib/dlocalErrorMap";
@@ -573,6 +574,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const [selectedCardRow, setSelectedCardRow] = useState<string | null>(null);
   const [dlocalDocument, setDlocalDocument] = useState("");
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
+  // Whop (billetera / Nequi en Colombia): pedido creado por el servidor + plan que se abre en su checkout incrustado.
+  const [whopSession, setWhopSession] = useState<{ planId: string; orderId: string; email: string; phone?: string } | null>(null);
+  const [whopBroken, setWhopBroken] = useState(false);
   const [showStripe, setShowStripe] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
   const [stripeError, setStripeError] = useState<MappedStripeError | null>(null);
@@ -1021,6 +1025,38 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     }
   };
 
+  /** Abre el checkout de Whop para la billetera. Devuelve false si no está disponible (sin plan, cupón, varios productos…): se usa dLocal. */
+  const payWhop = async (): Promise<boolean> => {
+    const s = useCheckoutPruebaStore.getState();
+    setMpLoading("dlocal_wallet");
+    try {
+      const { data, error } = await supabase.functions.invoke("whop-create-order", {
+        body: {
+          items: s.items.map((i) => ({ id: i.id, quantity: i.quantity })),
+          couponCode: s.coupon ?? undefined,
+          payerEmail: s.buyer.email.trim(),
+          payerName: s.buyer.fullName.trim(),
+          payerPhone: (s.buyer.phone ?? "").trim() || undefined,
+          country: (region.country || country || "CO").toUpperCase().slice(0, 2),
+        },
+      });
+      const d = data as { planId?: string; orderId?: string } | null;
+      if (error || !d?.planId || !d?.orderId) {
+        logCheckoutAction("whop_no_disponible", country);
+        return false;
+      }
+      void captureAbandonedCheckout("dlocal_wallet", true);
+      logCheckoutAction("whop_iniciado", d.orderId);
+      setWhopSession({ planId: d.planId, orderId: d.orderId, email: s.buyer.email.trim(), phone: (s.buyer.phone ?? "").trim() || undefined });
+      window.setTimeout(() => document.querySelector<HTMLElement>('[data-method-row="dlocal_wallet"]')?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      setMpLoading(null);
+    }
+  };
+
   const payDlocal = async (kind: "transfer" | "cash" | "wallet") => {
     const dlMethod: Method = kind === "cash" ? "dlocal_cash" : kind === "wallet" ? "dlocal_wallet" : "dlocal_transfer";
     if (!valid) { requestBuyerInfo(); return; }
@@ -1398,7 +1434,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       if (selected === "stripe_oxxo") { logCheckoutAction("stripe_oxxo_iniciado", country); await payWithHostedFallback("oxxo"); return; }
       if (selected === "dlocal_transfer") { await payDlocal("transfer"); return; }
       if (selected === "dlocal_cash") { await payDlocal("cash"); return; }
-      if (selected === "dlocal_wallet") { await payDlocal("wallet"); return; }
+      if (selected === "dlocal_wallet") {
+        // Colombia con Whop encendido en /admin/checkout-methods: Nequi por Whop; si no está disponible, dLocal Go como siempre.
+        if (whopEnabled && (await payWhop())) return;
+        await payDlocal("wallet");
+        return;
+      }
       if (selected === "transfer") { await payMercado("transfer"); return; }
       if (selected === "cash") { await payMercado("cash"); return; }
       
@@ -2075,6 +2116,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
 
+  const whopEnabled = country === "CO" && !whopBroken && methodsConfig.enabledMethodKeys.includes("whop_wallet");
   const enabledStripeKeys = new Set(methodsConfig.enabledMethodKeys.filter((k) => k.startsWith("stripe_")));
   const primaryCardBadges: MethodBadge[] = [
     { label: "Visa", bg: "#ffffff", color: "#1F2937" },
@@ -2197,7 +2239,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       icon: Wallet,
       // Donde Mercado Pago está disponible (México, Argentina, Brasil, Perú…) la fila se llama Mercado Pago y usa su logo
       // (el cobro lo gestiona dLocal Go por detrás).
-      title: dlocalRails(country, "wallet").includes("Mercado Pago") ? "Mercado Pago"
+      title: whopEnabled ? "Nequi"
+        : dlocalRails(country, "wallet").includes("Mercado Pago") ? "Mercado Pago"
         // Con las marcas que la gente reconoce (Nequi · Daviplata, Yape, Zinli…) en vez de «Billetera digital» genérico.
         : dlocalRails(country, "wallet").length ? dlocalRails(country, "wallet").slice(0, 2).join(" · ")
         : (getDlocalCountry(country)?.walletLabel
@@ -2207,7 +2250,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         : language === "fr" ? "Portefeuille numérique"
         : language === "it" ? "Portafoglio digitale"
         : "Billetera digital"),
-      sub: (dlocalRails(country, "wallet").length
+      sub: whopEnabled
+        ? (language === "en" ? "Pay from your Nequi app. Instant confirmation." : "Paga desde tu app de Nequi. Confirmación inmediata.")
+        : (dlocalRails(country, "wallet").length
         ? `${dlocalRails(country, "wallet").join(" · ")} — `
         : "") + (language === "en" ? "Pay from your wallet app in local currency. Instant confirmation."
         : language === "pt" ? "Pague pela sua carteira digital em moeda local. Confirmação imediata."
@@ -3250,6 +3295,18 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   );
                 })()}
               </div>
+            )}
+
+            {m.id === "dlocal_wallet" && isSelected && whopEnabled && whopSession && (
+              <Suspense fallback={<div className="p-4 text-center text-xs text-neutral-500">Abriendo el pago seguro…</div>}>
+                <WhopCheckoutPanel
+                  planId={whopSession.planId}
+                  orderId={whopSession.orderId}
+                  email={whopSession.email}
+                  phone={whopSession.phone}
+                  onFail={() => { setWhopSession(null); setWhopBroken(true); redirectingRef.current = false; window.setTimeout(() => { void payDlocal("wallet"); }, 600); }}
+                />
+              </Suspense>
             )}
 
             {m.id === "clabe" && isSelected && (

@@ -263,6 +263,8 @@ const methodHint = (id: string, language: string): { text: string; cls: string }
     return { text: L("Billetera", "Wallet", "Portefeuille", "Portafoglio", "Carteira"), cls: "bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-200" };
   if (id === "binance" || id === "stripe_crypto")
     return { text: L("Cripto", "Crypto", "Crypto", "Cripto", "Cripto"), cls: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200" };
+  if (id === "stripe_oxxo")
+    return { text: L("Pago en efectivo", "Cash payment", "Paiement en espèces", "Pagamento in contanti", "Pagamento em dinheiro"), cls: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200" };
   if (id === "cash" || id === "dlocal_cash")
     return { text: L("Sin tarjeta", "No card", "Sans carte", "Senza carta", "Sem cartão"), cls: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200" };
   if (id === "stripe_klarna" || id === "whop_addi")
@@ -1522,9 +1524,17 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         return;
       }
       console.error("Hosted fallback failed:", error);
-      toast({ title: t.errorPayment, description: (error as any)?.message || "No se pudo abrir la página de pago.", variant: "destructive" });
+      // El mensaje genérico de Supabase («non-2xx») no dice nada: se lee el motivo real que devolvió la función.
+      const detail = (await extractEdgeErrorMessage(error)) || (error as any)?.message || "";
+      try { trackPaymentError({ provider: isOxxo ? "stripe_oxxo" : "stripe_hosted", skus: s.items.map((i) => i.id), reason: String(detail).slice(0, 300), value: 0, currency: isOxxo ? "MXN" : "USD" }); } catch { /* noop */ }
+      toast({
+        title: isOxxo ? (language === "en" ? "We could not create your OXXO voucher" : "No pudimos generar tu ficha de OXXO") : t.errorPayment,
+        description: (isOxxo ? (language === "en" ? "Choose card, SPEI or PayPal. " : "Elige tarjeta, SPEI o PayPal. ") : "") + (detail ? `(${String(detail).slice(0, 140)})` : "No se pudo abrir la página de pago."),
+        variant: "destructive",
+      });
     } catch (err) {
       console.error("Hosted fallback failed:", err);
+      try { trackPaymentError({ provider: isOxxo ? "stripe_oxxo" : "stripe_hosted", skus: s.items.map((i) => i.id), reason: String(err instanceof Error ? err.message : err).slice(0, 300), value: 0, currency: isOxxo ? "MXN" : "USD" }); } catch { /* noop */ }
       toast({ title: t.errorPayment, description: err instanceof Error ? err.message : "No se pudo abrir la página de pago.", variant: "destructive" });
     } finally {
       setHostedLoading(false);

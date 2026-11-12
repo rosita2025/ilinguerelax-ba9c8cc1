@@ -101,7 +101,8 @@ export function buildWhopCheckoutConfig(input: {
       release_method: "buy_now",
       visibility: "hidden",
       title: input.title.slice(0, 80),
-      payment_method_configuration: { enabled: input.methods, include_platform_defaults: false },
+      // Whop exige los dos arreglos (`enabled` y `disabled`), aunque `disabled` vaya vacío.
+      payment_method_configuration: { enabled: input.methods, disabled: [], include_platform_defaults: false },
     },
   };
 }

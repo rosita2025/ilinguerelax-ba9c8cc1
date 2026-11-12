@@ -34,6 +34,8 @@ describe("whop webhook", () => {
     expect(body.variant.initial_price).toBe(59900);
     expect(body.variant.billing_type).toBe("one_time");
     expect(body.variant.visibility).toBe("hidden");
+    expect(buildWhopCheckoutConfig({ orderId: "x", title: "Un título larguísimo de un producto de iLingue Relax", amount: 1000, currency: "COP", methods: ["nequi"] }) as any).toHaveProperty("variant.title");
+    expect(((buildWhopCheckoutConfig({ orderId: "x", title: "Un título larguísimo de un producto de iLingue Relax", amount: 1000, currency: "COP", methods: ["nequi"] }) as any).variant.title as string).length).toBeLessThanOrEqual(30);
     expect(body.variant.payment_method_configuration).toEqual({ enabled: ["nequi", "addi"], disabled: [], include_platform_defaults: false });
     expect((buildWhopCheckoutConfig({ productId: "prod_1", orderId: "x", title: "t", amount: 1000, currency: "COP", methods: ["nequi"] }) as any).account_id).toBeUndefined();
     expect((buildWhopCheckoutConfig({ orderId: "x", title: "t", amount: 1000, currency: "CLP", methods: ["mercado_pago"] }) as any).variant.product_id).toBeUndefined();

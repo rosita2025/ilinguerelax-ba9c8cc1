@@ -77,15 +77,15 @@ Deno.serve(async (req) => {
     const { data: prior } = await supabase.from("order_events").select("event").eq("order_number", orderNumber).in("event", ["delivery_sent"]);
     if ((prior ?? []).length > 0) return ok({ received: true, ignored: "already delivered" });
 
-    // El plan pagado debe ser el que le asignamos a ese pedido.
-    const paidPlan = String(payment.variant_id || "");
-    if (meta.planId && paidPlan && paidPlan !== meta.planId) {
+    // El pago debe haberse hecho por la configuración de checkout que creamos para ESE pedido.
+    const paidConfig = String(payment.checkout_configuration_id || "");
+    if (meta.checkoutConfigId && paidConfig !== meta.checkoutConfigId) {
       await logOrderEvent({
-        orderNumber, event: "payment_mismatch", provider: "whop", status: "PLAN_MISMATCH", reference: paymentId,
-        detail: `Whop cobró el plan ${paidPlan} y el pedido esperaba ${meta.planId}`, customerEmail: email,
-        metadata: { skus, paidPlan, expectedPlan: meta.planId },
+        orderNumber, event: "payment_mismatch", provider: "whop", status: "CHECKOUT_MISMATCH", reference: paymentId,
+        detail: `Whop cobró por ${paidConfig || "otro checkout"} y el pedido esperaba ${meta.checkoutConfigId}`, customerEmail: email,
+        metadata: { skus, paidConfig, expected: meta.checkoutConfigId },
       });
-      return ok({ received: true, held: "plan_mismatch" });
+      return ok({ received: true, held: "checkout_mismatch" });
     }
 
     // Importe: lo cobrado (en la moneda que vio el comprador) debe cubrir lo que calculó nuestro servidor.

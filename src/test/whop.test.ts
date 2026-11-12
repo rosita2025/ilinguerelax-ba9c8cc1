@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { signWhopPayload, verifyWhopWebhook, parseWhopPlanMap, whopMoney } from "../../supabase/functions/_shared/whop";
+import { signWhopPayload, verifyWhopWebhook, buildWhopCheckoutConfig, whopMoney } from "../../supabase/functions/_shared/whop";
 
 const SECRET = "ws_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
 const BODY = JSON.stringify({ id: "msg_1", type: "payment.succeeded", data: { id: "pay_1" } });
@@ -25,10 +25,16 @@ describe("whop webhook", () => {
     expect(await verifyWhopWebhook(BODY, h, SECRET, { nowMs: Date.now() + 10 * 60 * 1000 })).toBe(false);
     expect(await verifyWhopWebhook(BODY, { "webhook-id": "msg_1" }, SECRET)).toBe(false);
   });
-  it("lee el mapa de planes y descarta valores inválidos", () => {
-    expect(parseWhopPlanMap('{"Patrones-Ingles":"plan_AbC123","x":"nope"}')).toEqual({ "patrones-ingles": "plan_AbC123" });
-    expect(parseWhopPlanMap("no es json")).toEqual({});
-    expect(parseWhopPlanMap(undefined)).toEqual({});
+  it("arma la configuración de checkout en pesos con el importe del servidor", () => {
+    const body = buildWhopCheckoutConfig({ accountId: "biz_1", productId: "prod_1", orderId: "ILR-WH-ABC123DEF4", title: "iLingue Relax · 1x Patrones", amountCop: 59900.4 }) as any;
+    expect(body.metadata).toEqual({ order_id: "ILR-WH-ABC123DEF4" });
+    expect(body.account_id).toBe("biz_1");
+    expect(body.variant.currency).toBe("cop");
+    expect(body.variant.initial_price).toBe(59900);
+    expect(body.variant.billing_type).toBe("one_time");
+    expect(body.variant.visibility).toBe("hidden");
+    expect(body.variant.payment_method_configuration).toEqual({ enabled: ["nequi", "bre_b"], include_platform_defaults: false });
+    expect((buildWhopCheckoutConfig({ productId: "prod_1", orderId: "x", title: "t", amountCop: 1000 }) as any).account_id).toBeUndefined();
   });
   it("lee importes Money", () => {
     expect(whopMoney({ amount: "59900.00", currency: "cop" })).toEqual({ amount: 59900, currency: "COP" });

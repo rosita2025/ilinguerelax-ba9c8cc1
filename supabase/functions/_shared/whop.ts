@@ -57,22 +57,40 @@ export async function verifyWhopWebhook(
   return sigHeader.split(" ").some((s) => timingSafeEqual(s.trim(), expected));
 }
 
+export const WHOP_API_BASE = "https://api.whop.com/api/v1";
+/** Versión de la API de Whop contra la que se escribió esta integración. */
+export const WHOP_API_VERSION_DATE = "2026-11-10-1";
+
+/** Métodos de pago que Whop ofrece en este checkout: solo billeteras de Colombia (en pesos). */
+export const WHOP_COLOMBIA_WALLETS = ["nequi", "bre_b"];
+
 /**
- * Plan de Whop de cada producto: secreto `WHOP_PLAN_MAP` = JSON {"<sku>": "plan_xxxxxxxx"}.
- * El precio del plan (en pesos colombianos) lo fija el vendedor en Whop y debe ser el que se ve en la página de Colombia.
+ * Cuerpo para `POST /checkout_configurations`: una variante («plan») en línea, de pago único, oculta, con el importe exacto en pesos
+ * que calculó nuestro servidor. Whop reutiliza la variante si ya existe una igual. `metadata` se copia a cada pago y a cada aviso.
  */
-export function parseWhopPlanMap(raw: string | undefined | null): Record<string, string> {
-  if (!raw) return {};
-  try {
-    const obj = JSON.parse(raw);
-    const out: Record<string, string> = {};
-    for (const [sku, plan] of Object.entries(obj ?? {})) {
-      if (typeof plan === "string" && /^plan_[A-Za-z0-9]+$/.test(plan.trim())) out[sku.trim().toLowerCase()] = plan.trim();
-    }
-    return out;
-  } catch {
-    return {};
-  }
+export function buildWhopCheckoutConfig(input: {
+  accountId?: string;
+  productId: string;
+  orderId: string;
+  title: string;
+  amountCop: number;
+}): Record<string, unknown> {
+  const amount = Math.round(input.amountCop);
+  return {
+    ...(input.accountId ? { account_id: input.accountId } : {}),
+    mode: "payment",
+    metadata: { order_id: input.orderId },
+    variant: {
+      product_id: input.productId,
+      currency: "cop",
+      initial_price: amount,
+      billing_type: "one_time",
+      release_method: "buy_now",
+      visibility: "hidden",
+      title: input.title.slice(0, 80),
+      payment_method_configuration: { enabled: WHOP_COLOMBIA_WALLETS, include_platform_defaults: false },
+    },
+  };
 }
 
 /** Importe de un campo «Money» de Whop ({ amount: "59900.00", currency: "cop" }). */

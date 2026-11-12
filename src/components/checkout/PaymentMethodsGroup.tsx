@@ -575,7 +575,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const [dlocalDocument, setDlocalDocument] = useState("");
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
   // Whop (billetera / Nequi en Colombia): pedido creado por el servidor + plan que se abre en su checkout incrustado.
-  const [whopSession, setWhopSession] = useState<{ planId: string; orderId: string; email: string; phone?: string } | null>(null);
+  const [whopSession, setWhopSession] = useState<{ checkoutConfiguration: string; orderId: string; email: string; phone?: string } | null>(null);
   const [whopBroken, setWhopBroken] = useState(false);
   const [showStripe, setShowStripe] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
@@ -1025,7 +1025,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     }
   };
 
-  /** Abre el checkout de Whop para la billetera. Devuelve false si no está disponible (sin plan, cupón, varios productos…): se usa dLocal. */
+  /** Abre el checkout de Whop para la billetera. Devuelve false si no está disponible (sin configurar, Whop no responde…): se usa dLocal. */
   const payWhop = async (): Promise<boolean> => {
     const s = useCheckoutPruebaStore.getState();
     setMpLoading("dlocal_wallet");
@@ -1040,14 +1040,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           country: (region.country || country || "CO").toUpperCase().slice(0, 2),
         },
       });
-      const d = data as { planId?: string; orderId?: string } | null;
-      if (error || !d?.planId || !d?.orderId) {
+      const d = data as { checkoutConfiguration?: string; orderId?: string } | null;
+      if (error || !d?.checkoutConfiguration || !d?.orderId) {
         logCheckoutAction("whop_no_disponible", country);
         return false;
       }
       void captureAbandonedCheckout("dlocal_wallet", true);
       logCheckoutAction("whop_iniciado", d.orderId);
-      setWhopSession({ planId: d.planId, orderId: d.orderId, email: s.buyer.email.trim(), phone: (s.buyer.phone ?? "").trim() || undefined });
+      setWhopSession({ checkoutConfiguration: d.checkoutConfiguration, orderId: d.orderId, email: s.buyer.email.trim(), phone: (s.buyer.phone ?? "").trim() || undefined });
       window.setTimeout(() => document.querySelector<HTMLElement>('[data-method-row="dlocal_wallet"]')?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
       return true;
     } catch {
@@ -3300,7 +3300,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             {m.id === "dlocal_wallet" && isSelected && whopEnabled && whopSession && (
               <Suspense fallback={<div className="p-4 text-center text-xs text-neutral-500">Abriendo el pago seguro…</div>}>
                 <WhopCheckoutPanel
-                  planId={whopSession.planId}
+                  checkoutConfiguration={whopSession.checkoutConfiguration}
                   orderId={whopSession.orderId}
                   email={whopSession.email}
                   phone={whopSession.phone}

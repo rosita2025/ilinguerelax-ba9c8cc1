@@ -8,5 +8,5 @@ export type WhopKind = "wallet" | "installments";
 export const WHOP_COUNTRIES: Record<string, { currency: string; wallet: string[]; installments?: string[] }> = {
   CO: { currency: "COP", wallet: ["nequi"], installments: ["addi"] },
   CL: { currency: "CLP", wallet: ["mercado_pago"] },
-  AR: { currency: "ARS", wallet: ["mercado_pago_ar"] },
+  AR: { currency: "ARS", wallet: ["mercado_pago_ar", "modo"] },
 };

@@ -69,7 +69,7 @@ export const WHOP_API_VERSION_DATE = "2026-11-10-1";
 export const WHOP_COUNTRIES: Record<string, { currency: string; wallet: string[]; installments?: string[] }> = {
   CO: { currency: "COP", wallet: ["nequi"], installments: ["addi"] },
   CL: { currency: "CLP", wallet: ["mercado_pago"] },
-  AR: { currency: "ARS", wallet: ["mercado_pago_ar"] },
+  AR: { currency: "ARS", wallet: ["mercado_pago_ar", "modo"] },
 };
 
 /**

@@ -2244,7 +2244,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       // Donde Mercado Pago está disponible (México, Argentina, Brasil, Perú…) la fila se llama Mercado Pago y usa su logo
       // (el cobro lo gestiona dLocal Go por detrás).
       // Con Whop (Colombia, Chile, Argentina) la fila es la de Whop: Nequi y Addi en Colombia, Mercado Pago en Chile y Argentina.
-      title: whopEnabled ? (country === "CO" ? "Nequi" : "Mercado Pago")
+      title: whopEnabled ? (country === "CO" ? "Nequi" : country === "AR" ? "Mercado Pago · MODO" : "Mercado Pago")
         : dlocalRails(country, "wallet").includes("Mercado Pago") ? "Mercado Pago"
         // Con las marcas que la gente reconoce (Nequi · Daviplata, Yape, Zinli…) en vez de «Billetera digital» genérico.
         : dlocalRails(country, "wallet").length ? dlocalRails(country, "wallet").slice(0, 2).join(" · ")
@@ -2258,7 +2258,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       sub: whopEnabled
         ? (country === "CO"
           ? (language === "en" ? "Pay from your Nequi app. Instant confirmation." : "Paga desde tu app de Nequi. Confirmación inmediata.")
-          : (language === "en" ? "Pay with your Mercado Pago account. Instant confirmation." : "Paga con tu cuenta de Mercado Pago. Confirmación inmediata."))
+          : country === "AR"
+            ? (language === "en" ? "Pay with Mercado Pago or MODO. Instant confirmation." : "Paga con Mercado Pago o MODO. Confirmación inmediata.")
+            : (language === "en" ? "Pay with your Mercado Pago account. Instant confirmation." : "Paga con tu cuenta de Mercado Pago. Confirmación inmediata."))
         : (dlocalRails(country, "wallet").length
         ? `${dlocalRails(country, "wallet").join(" · ")} — `
         : "") + (language === "en" ? "Pay from your wallet app in local currency. Instant confirmation."
@@ -2269,7 +2271,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       badge: finalPriceLabel,
 
       badges: whopEnabled
-        ? (country === "CO" ? [{ label: "Nequi", bg: "#200020", color: "#DA0081" }] : [])
+        ? (country === "CO" ? [{ label: "Nequi", bg: "#200020", color: "#DA0081" }] : country === "AR" ? [{ label: "MODO", bg: "#00A859", color: "#ffffff" }] : [])
         : dlocalBadges(country, "wallet", 6),
     },
     {

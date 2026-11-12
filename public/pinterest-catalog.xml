@@ -230,10 +230,10 @@
       <g:title>5,000 Palabras con Pronunciación Español y Fonética UK/USA</g:title>
       <g:description>Incluye estructura gramatical completa desde Nivel Cero hasta Avanzado C1. Perfecto para principiantes y estudiantes avanzados.</g:description>
       <g:link>https://ilinguerelax.com/products/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</g:link>
-      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1784955103139-pdgsy.webp</g:image_link>
+      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa/1793593103036-qgu08.webp</g:image_link>
       <g:condition>new</g:condition>
       <g:availability>in stock</g:availability>
-      <g:price>30.00 USD</g:price>
+      <g:price>25.00 USD</g:price>
       <g:brand>iLingue Relax</g:brand>
       <g:mpn>5-000-palabras-en-ingles-con-pronunciacion-espanol-y-fonetica-uk-usa</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
@@ -390,7 +390,7 @@
       <g:title>Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés</g:title>
       <g:description>Método visual para dominar la pronunciación del inglés desde cero.</g:description>
       <g:link>https://ilinguerelax.com/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles</g:link>
-      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/patrones-especiales-alfabeto-combinaciones-secretas-ingles/1789945794300-1sxv9.webp</g:image_link>
+      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/patrones-especiales-alfabeto-combinaciones-secretas-ingles/1793595175843-w94mq.webp</g:image_link>
       <g:condition>new</g:condition>
       <g:availability>in stock</g:availability>
       <g:price>27.00 USD</g:price>
@@ -463,6 +463,26 @@
       <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
       <g:product_type>Libros Digitales &gt; Idiomas &gt; Español</g:product_type>
       <g:custom_label_0>Español</g:custom_label_0>
+      <g:custom_label_1>Digital</g:custom_label_1>
+    </item>
+    <item>
+      <g:id>dominaelvocabularioeningles</g:id>
+      <g:title>Domina el Vocabulario en Ingles con pronunciacion hispanohablantes</g:title>
+      <g:description>Inglés Relax® – Domina el Vocabulario en Inglés Aprende 8,000 palabras en inglés con pronunciación simplificada y fonética USA/UK. Incluye niveles A1–C1, frases de uso cotidiano y vocabulario organizado por temas. ¡Mejora tu inglés a tu ritmo con un libro digital en PDF!</g:description>
+      <g:link>https://ilinguerelax.com/products/dominaelvocabularioeningles</g:link>
+      <g:image_link>https://opyitzdvvurdyyyzkwwv.supabase.co/storage/v1/object/public/product-images/dominaelvocabularioeningles/1793591751884-p4eoo.webp</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in stock</g:availability>
+      <g:price>30.00 USD</g:price>
+      <g:brand>iLingue Relax</g:brand>
+      <g:mpn>dominaelvocabularioeningles</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:adult>no</g:adult>
+      <g:content_language>es</g:content_language>
+      <g:target_country>US</g:target_country>
+      <g:google_product_category>Media &gt; Books &gt; E-books</g:google_product_category>
+      <g:product_type>Libros Digitales &gt; Idiomas &gt; Inglés</g:product_type>
+      <g:custom_label_0>Inglés</g:custom_label_0>
       <g:custom_label_1>Digital</g:custom_label_1>
     </item>
     <item>

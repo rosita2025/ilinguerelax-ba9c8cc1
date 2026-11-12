@@ -64,7 +64,7 @@ const previews = [
 
 // Capturas REALES de WhatsApp de atención posventa (datos privados tapados a mano por el dueño; sin editar ni IA). Más en public/soporte-patrones.
 const supportShots: SupportShot[] = [
-  { src: "/soporte-patrones/peru-yape.webp", width: 640, height: 767, flag: "🇵🇪", country: "Perú", caption: "Pago manual con Yape: revisado y material enviado al correo.", alt: "Captura real de WhatsApp: cliente de Perú confirma su pago por Yape y recibe el material" },
+  { src: "/soporte-patrones/peru-yape.webp", width: 640, height: 1210, flag: "🇵🇪", country: "Perú", caption: "Pago manual con Yape: revisado y material enviado al correo.", alt: "Captura real de WhatsApp: cliente de Perú confirma su pago por Yape y recibe el material" },
   { src: "/soporte-patrones/mexico-material.webp", width: 640, height: 1181, flag: "🇲🇽", country: "México", caption: "Ebook + 3 bonos enviados por WhatsApp.", alt: "Captura real de WhatsApp: cliente de México recibe el ebook y los 3 bonos y agradece" },
   { src: "/soporte-patrones/espana-spotify.webp", width: 640, height: 1313, flag: "🇪🇸", country: "España", caption: "Bono de 1,000 palabras con su audio en Spotify.", alt: "Captura real de WhatsApp: cliente de España recibe el enlace del audio de 1,000 palabras" },
   { src: "/soporte-patrones/espana-actualizacion.webp", width: 640, height: 1195, flag: "🇪🇸", country: "España", caption: "Material actualizado (versión 1.5) enviado a quien ya compró.", alt: "Captura real de WhatsApp: cliente de España recibe la actualización de su pedido" },

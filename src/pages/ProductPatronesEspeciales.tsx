@@ -4,7 +4,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
-import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BlackFridayStrip } from "@/components/BlackFridayStrip";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
@@ -466,7 +465,6 @@ const PatronesContent = () => {
         ]}
       />
 
-      <Navbar />
       <BlackFridayStrip />
 
       {/* Hero */}

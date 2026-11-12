@@ -2383,14 +2383,16 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         if (m.id === "paypal") return methodsConfig.paypal; // PayPal directo: se activa por región en /admin/checkout-methods
 
         // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.
-        if (m.id === "dlocal_transfer") return methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer") && !getDlocalCountry(country)?.transferComingSoon;
+        // México: la transferencia de dLocal Go no se muestra (queda SPEI manual, OXXO y tarjeta).
+        if (m.id === "dlocal_transfer") return country !== "MX" && methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer") && !getDlocalCountry(country)?.transferComingSoon;
         // OXXO de Stripe (sin documento): si está encendido en México, reemplaza al OXXO de dLocal, que sí pide documento.
         if (m.id === "stripe_oxxo") return country === "MX" && methodsConfig.enabledMethodKeys.includes("stripe_oxxo");
         if (m.id === "dlocal_cash") return methodsConfig.dlocalCash && dlocalSupports(country, "cash") && !getDlocalCountry(country)?.cashComingSoon && !(country === "MX" && methodsConfig.enabledMethodKeys.includes("stripe_oxxo"));
         // Tarjeta dLocal DESACTIVADA. Billetera digital sigue activa.
         if (m.id === "dlocal_card") return false;
         // Con Whop encendido, la billetera es la de Whop (reemplaza a la de dLocal Go en Colombia, Chile y Argentina).
-        if (m.id === "dlocal_wallet") return whopEnabled || (methodsConfig.dlocalWallet && dlocalSupports(country, "wallet") && !getDlocalCountry(country)?.walletComingSoon);
+        // México: sin Mercado Pago ni otra billetera de dLocal Go.
+        if (m.id === "dlocal_wallet") return country !== "MX" && (whopEnabled || methodsConfig.dlocalWallet && dlocalSupports(country, "wallet") && !getDlocalCountry(country)?.walletComingSoon);
 
 
 
@@ -2439,6 +2441,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const methods = [...visibleMethods].sort(
     (a, b) => sectionOrder.indexOf(methodSection(a.id)) - sectionOrder.indexOf(methodSection(b.id)),
   );
+  // Colombia: tarjeta, Nequi, Addi, transferencia, efectivo y PayPal (orden pedido por el dueño; lo demás va después).
+  if (country === "CO") {
+    const CO_ORDER = ["card", "dlocal_wallet", "whop_addi", "dlocal_transfer", "dlocal_cash", "paypal"];
+    const coRank = (id: string) => { const i = CO_ORDER.indexOf(id); return i === -1 ? CO_ORDER.length : i; };
+    methods.sort((x, y) => coRank(x.id) - coRank(y.id));
+  }
   // Método que queda elegido de entrada en México (el primero local disponible); si no hay, se elige la tarjeta como en el resto.
   const mxFirstLocalId = country === "MX"
     ? (methods.find((m) => !(m as any).isSeparator && ["dlocal_transfer", "clabe", "dlocal_cash"].includes(m.id))?.id as string | undefined)

@@ -4,19 +4,16 @@ import { useNavigate, Link } from "react-router-dom";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
-import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BlackFridayStrip } from "@/components/BlackFridayStrip";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2, Download, Lock, FileText, X, ZoomIn } from "lucide-react";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { motion } from "framer-motion";
-import { ScrollToTop } from "@/components/ScrollToTop";
 import { useAdminPricing } from "@/hooks/useAdminPricing";
 import { useCountryTierRouting } from "@/hooks/useCountryTierRouting";
 import { useRegionTier } from "@/hooks/useRegionTier";
@@ -466,10 +463,10 @@ const PatronesContent = () => {
         ]}
       />
 
-      <Navbar />
       <BlackFridayStrip />
 
       {/* Hero */}
+
       <section className="pt-4 pb-6 md:pt-8 md:pb-10">
         {!pricingAdmin.active && (
           <div className="container px-4 md:px-6 mb-6">
@@ -544,13 +541,6 @@ const PatronesContent = () => {
             </div>
 
             <div>
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20">
-                  🆕 Nuevo Lanzamiento
-                </span>
-              </div>
-
-
               <p className="text-lg md:text-xl font-bold text-foreground mb-2">
                 Deja de pronunciar el inglés como se escribe.
               </p>
@@ -575,16 +565,17 @@ const PatronesContent = () => {
                 </span>
               </div>
 
-              <div className="mb-5 rounded-2xl border-2 border-yellow-400 bg-gradient-to-r from-yellow-400/15 to-amber-400/15 p-4 text-center shadow-lg">
-                <p className="text-foreground font-extrabold text-base md:text-lg">
+              <div className="mb-5 rounded-2xl border-2 border-yellow-400 bg-gradient-to-r from-yellow-400/15 to-amber-400/15 p-4 shadow-lg">
+                <p className="text-foreground font-extrabold text-base md:text-lg text-center mb-2">
                   🎁 Hoy recibes el PDF + 3 BONOS GRATIS
                 </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Pago único · Sin suscripciones · Descarga inmediata
-                </p>
+                <ul className="space-y-1 text-sm text-foreground">
+                  {["Ebook PDF «Patrones Especiales»", "Bono 1: 1,000 palabras con pronunciación y audios", "Bono 2: Estructuras gramaticales desde cero", "Bono 3: Examen de 98 preguntas con respuestas"].map((x) => (
+                    <li key={x} className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />{x}</li>
+                  ))}
+                </ul>
+                <p className="text-xs text-muted-foreground mt-2 text-center">Pago único · Sin suscripciones · Descarga inmediata</p>
               </div>
-
-
 
               <div className="mb-6 flex items-center justify-between bg-muted/30 p-3 rounded-xl border border-border/50">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Pagos Seguros:</span>
@@ -611,6 +602,10 @@ const PatronesContent = () => {
                 </Button>
               </motion.div>
 
+              <a href="#vista-previa" className="mb-3 flex items-center justify-center gap-2 rounded-xl border-2 border-primary/30 bg-primary/5 px-4 py-3 text-sm font-bold text-primary hover:bg-primary/10 transition-colors">
+                <Eye className="w-4 h-4" /> Ver vista previa del PDF
+              </a>
+
               <p className="text-center text-xs text-muted-foreground mb-6">
                 🔒 Pago seguro • ⬇️ Descarga inmediata • 🛡️ Garantía 7 días
               </p>
@@ -619,38 +614,6 @@ const PatronesContent = () => {
 
 
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Qué es y para qué sirve (resumen corto, justo debajo del hero) */}
-      <section className="py-6 md:py-8 bg-primary/5 border-y border-primary/10">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <p className="text-base md:text-lg text-foreground text-center mb-5">
-              <strong>Patrones Especiales</strong> te ayuda a aprender a leer y pronunciar palabras en inglés reconociendo patrones de letras y combinaciones que se repiten en muchas palabras.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-              <div className="rounded-xl border border-border bg-card p-4 shadow-card">
-                <h2 className="text-base md:text-lg font-extrabold text-foreground mb-2">📘 ¿Para qué sirven los patrones?</h2>
-                <ul className="space-y-1.5 text-sm text-foreground">
-                  <li>✅ Para reconocer combinaciones de letras y entender cómo suenan en inglés.</li>
-                  <li>✅ Para aprender a pronunciar palabras nuevas con mayor facilidad.</li>
-                  <li>✅ Para mejorar tu lectura en inglés sin depender de memorizar cada palabra por separado.</li>
-                </ul>
-              </div>
-              <div className="rounded-xl border border-border bg-card p-4 shadow-card">
-                <h2 className="text-base md:text-lg font-extrabold text-foreground mb-2">Además, recibirás 3 bonos gratis:</h2>
-                <ul className="space-y-1.5 text-sm text-foreground">
-                  <li>🎁 1.000 palabras en inglés con pronunciación para hispanohablantes y audios.</li>
-                  <li>🎁 Estructuras gramaticales desde cero.</li>
-                  <li>🎁 Examen de vocabulario y pronunciación para practicar.</li>
-                </ul>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground text-center mt-4">
-              La idea es que tengas un material práctico para estudiar a tu propio ritmo. 😊
-            </p>
           </div>
         </div>
       </section>
@@ -704,23 +667,6 @@ const PatronesContent = () => {
         </div>
       </section>
 
-      {/* Testimonios 1: reseñas reales por WhatsApp */}
-      <section className="py-6 md:py-8">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-bold mb-2">
-                <Check className="w-3.5 h-3.5" /> Compras verificadas · WhatsApp 🇲🇽 🇵🇪
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-                Reseñas <span className="text-gradient">reales</span> de clientes
-              </h2>
-            </div>
-            <ReviewSlider />
-          </div>
-        </div>
-      </section>
-
       {/* Presentación del producto */}
       <section className="py-8 md:py-10 bg-muted/30">
         <div className="container px-4 md:px-6">
@@ -751,14 +697,6 @@ const PatronesContent = () => {
             </div>
             <LazyMount minHeight={400} rootMargin={mediaMargin}><Suspense fallback={<div className="min-h-[400px]" />}><TikTokVideos /></Suspense></LazyMount>
             </LazyMount>
-            <div className="text-center mt-6">
-              <Button variant="hero" size="xl" onClick={handleBuy} onPointerEnter={prefetchCheckout} onFocus={prefetchCheckout} onTouchStart={prefetchCheckout} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
-                <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-                {pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
-                <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
-              </Button>
-              <p className="text-xs text-muted-foreground mt-2">🔒 Pago seguro • ⬇️ Descarga inmediata • 🛡️ Garantía 7 días</p>
-            </div>
           </div>
         </div>
       </section>
@@ -770,7 +708,9 @@ const PatronesContent = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-2">
               Lo que vas a <span className="text-gradient">lograr</span>
             </h2>
-            <p className="text-center text-muted-foreground mb-6">Con los patrones correctos, pronunciar bien deja de ser suerte.</p>
+            <p className="text-center text-muted-foreground mb-6">
+              <strong className="text-foreground">Patrones Especiales</strong> te ayuda a leer y pronunciar palabras nuevas reconociendo combinaciones de letras que se repiten en muchas palabras. Con los patrones correctos, pronunciar bien deja de ser suerte.
+            </p>
             <div className="bg-card rounded-3xl border border-border shadow-card p-6 md:p-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {features.map((feature) => (
@@ -782,6 +722,51 @@ const PatronesContent = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Qué incluye */}
+      <section id="incluye" className="py-8 md:py-10">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
+                <Sparkles className="w-4 h-4" /> Todo lo que incluye
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                1 ebook + <span className="text-gradient">3 bonos gratis</span>
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              {[
+                { icon: BookOpen, tag: "Ebook principal", title: "Patrones Especiales, Alfabeto y Combinaciones Secretas", text: "Alfabeto, letras mudas, combinaciones, contracciones y mini retos con respuestas." },
+                { icon: Music2, tag: "Bono 1 · Gratis", title: "1,000 palabras con pronunciación", text: "Vocabulario por temas (A1 a B2) con fonética para hispanohablantes y audios en Spotify." },
+                { icon: Lightbulb, tag: "Bono 2 · Gratis", title: "Estructuras gramaticales desde cero", text: "De cero hasta A2, con ejemplos y pronunciación en español." },
+                { icon: FileText, tag: "Bono 3 · Gratis", title: "Examen de 98 preguntas", text: "Comprueba lo aprendido, con hoja de respuestas incluida." },
+              ].map(({ icon: Icon, tag, title, text }) => (
+                <div key={title} className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4 shadow-card">
+                  <div className="w-10 h-10 rounded-full gradient-hero flex items-center justify-center shrink-0">
+                    <Icon className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-primary">{tag}</p>
+                    <h3 className="text-base font-extrabold text-foreground leading-snug">{title}</h3>
+                    <p className="text-sm text-muted-foreground mt-0.5">{text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Button variant="hero" size="xl" onClick={handleBuy} onPointerEnter={prefetchCheckout} onFocus={prefetchCheckout} onTouchStart={prefetchCheckout} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
+                <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
+                {pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
+                <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
+              </Button>
+              <a href="#vista-previa" className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary/30 px-5 py-3 text-sm font-bold text-primary hover:bg-primary/5 transition-colors w-full sm:w-auto">
+                <Eye className="w-4 h-4" /> Ver vista previa
+              </a>
             </div>
           </div>
         </div>
@@ -893,28 +878,43 @@ const PatronesContent = () => {
         </div>
       </section>
 
-      {/* Testimonios 2 */}
-      <section className="py-10 md:py-14">
+      {/* Reseñas (una sola sección: WhatsApp reales + opiniones escritas) */}
+      <section className="py-10 md:py-14 bg-muted/30">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 text-amber-600 text-sm font-bold mb-3">
-                <Star className="w-4 h-4 fill-amber-500 text-amber-500" /> Opiniones verificadas
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-bold mb-2">
+                <Check className="w-3.5 h-3.5" /> Compras verificadas · WhatsApp 🇲🇽 🇵🇪
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-                Lo que dicen <span className="text-gradient">nuestros lectores</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                Reseñas <span className="text-gradient">reales</span> de clientes
               </h2>
-              <p className="text-muted-foreground">
-                Lo que dicen quienes ya aprendieron los patrones
-              </p>
             </div>
-
-            <TestimonialSlider priceLabel={priceLabel} />
-
-
+            <ReviewSlider />
+            <div className="mt-8">
+              <TestimonialSlider priceLabel={priceLabel} />
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Cierre: ¿listo? */}
+      <section className="py-10 md:py-14">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-2xl mx-auto text-center rounded-3xl border-2 border-primary/20 bg-primary/5 p-6 md:p-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+              ¿Listo para <span className="text-gradient">pronunciar con seguridad</span>?
+            </h2>
+            <p className="text-muted-foreground mb-5">Ebook + 3 bonos gratis · Pago único · Descarga inmediata · Garantía 7 días</p>
+            <Button variant="hero" size="xl" onClick={handleBuy} onPointerEnter={prefetchCheckout} onFocus={prefetchCheckout} onTouchStart={prefetchCheckout} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-8 py-5 shadow-2xl">
+              <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
+              {pricingReady ? `LISTO, LO QUIERO • ${priceLabel}` : "LISTO, LO QUIERO"}
+              <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
 
       <FAQ
         items={[
@@ -951,8 +951,6 @@ const PatronesContent = () => {
       <div className="h-20 md:h-16" />
 
       <SalesNotification productKey="patrones" productImage={heroLight ?? heroImage ?? undefined} />
-<WhatsAppButton url="https://wa.link/5ta2ea" label="¿Dudas?" />
-      <ScrollToTop showAfter={500} />
     </main>
   );
 };

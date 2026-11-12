@@ -36,7 +36,17 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
   try {
-    const parsed = BodySchema.safeParse(await req.json());
+    const raw = await req.json();
+
+    // «Sondeo» del checkout: ¿está Whop listo en este servidor? (secretos guardados y país con Whop). No llama a Whop ni crea pedidos.
+    if (raw && typeof raw === "object" && (raw as { probe?: unknown }).probe === true) {
+      const c = String((raw as { country?: unknown }).country || "").toUpperCase();
+      if (!WHOP_COUNTRIES[c]) return unavailable("country_not_supported");
+      if (!Deno.env.get("WHOP_WEBHOOK_SECRET") || !Deno.env.get("WHOP_API_KEY")) return unavailable("not_configured");
+      return json({ available: true });
+    }
+
+    const parsed = BodySchema.safeParse(raw);
     if (!parsed.success) return json({ error: "Invalid input", details: parsed.error.flatten().fieldErrors }, 400);
     const body = parsed.data;
     const country = body.country.toUpperCase();
@@ -122,7 +132,8 @@ Deno.serve(async (req) => {
         customerEmail: body.payerEmail,
         metadata: { country, skus },
       });
-      return unavailable("whop_api_error");
+      // Se devuelve el motivo que dio Whop (sin secretos) para poder diagnosticar: permisos de la clave, producto, campos rechazados…
+      return json({ error: "whop_not_available", reason: "whop_api_error", detail: whopError.slice(0, 300) }, 409);
     }
 
     await logOrderEvent({

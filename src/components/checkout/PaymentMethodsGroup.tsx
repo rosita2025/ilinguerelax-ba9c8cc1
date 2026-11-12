@@ -575,6 +575,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // Whop (billetera / Nequi en Colombia): pedido creado por el servidor + plan que se abre en su checkout incrustado.
   const [whopSession, setWhopSession] = useState<{ kind: WhopKind; checkoutConfiguration: string; orderId: string; email: string; phone?: string } | null>(null);
   const [whopBroken, setWhopBroken] = useState(false);
+  // ¿Whop está listo en el servidor? Optimista; un «no» se recuerda 10 min para no parpadear en cada carga.
+  const [whopReady, setWhopReady] = useState<boolean>(() => {
+    try { const t = Number(sessionStorage.getItem("ilr_whop_unavailable") || 0); return !(t && Date.now() - t < 10 * 60 * 1000); } catch { return true; }
+  });
   const [showStripe, setShowStripe] = useState(false);
   const [stripeLoading, setStripeLoading] = useState(false);
   const [stripeError, setStripeError] = useState<MappedStripeError | null>(null);
@@ -2131,7 +2135,23 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
 
-  const whopEnabled = !!WHOP_COUNTRIES[country] && !whopBroken && methodsConfig.enabledMethodKeys.includes("whop_wallet");
+  // Whop se usa SIEMPRE en Colombia, Chile y Argentina (sin interruptor del admin). Se asume listo hasta que el sondeo diga lo contrario;
+  // si el servidor no lo tiene configurado, el checkout vuelve solo a dLocal Go (ver el efecto del sondeo).
+  const whopEnabled = !!WHOP_COUNTRIES[country] && whopReady && !whopBroken;
+  useEffect(() => {
+    if (!WHOP_COUNTRIES[country]) return;
+    let alive = true;
+    void (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("whop-create-order", { body: { probe: true, country } });
+        const ok = !error && (data as { available?: boolean } | null)?.available === true;
+        if (!alive) return;
+        setWhopReady(ok);
+        try { if (ok) sessionStorage.removeItem("ilr_whop_unavailable"); else sessionStorage.setItem("ilr_whop_unavailable", String(Date.now())); } catch { /* sin sessionStorage */ }
+      } catch { /* sin respuesta: se queda como está */ }
+    })();
+    return () => { alive = false; };
+  }, [country]);
   const enabledStripeKeys = new Set(methodsConfig.enabledMethodKeys.filter((k) => k.startsWith("stripe_")));
   const primaryCardBadges: MethodBadge[] = [
     { label: "Visa", bg: "#ffffff", color: "#1F2937" },

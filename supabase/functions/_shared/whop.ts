@@ -61,12 +61,20 @@ export const WHOP_API_BASE = "https://api.whop.com/api/v1";
 /** Versión de la API de Whop contra la que se escribió esta integración. */
 export const WHOP_API_VERSION_DATE = "2026-11-10-1";
 
-/** Métodos de pago que Whop ofrece en este checkout: solo billeteras de Colombia (en pesos). */
-export const WHOP_COLOMBIA_WALLETS = ["nequi", "bre_b"];
+/**
+ * Países donde el checkout cobra por Whop, con su moneda y los únicos métodos que se ofrecen (billeteras y cuotas):
+ * Colombia (Nequi y Addi en cuotas), Chile (Mercado Pago) y Argentina (Mercado Pago billetera). Espejo en el navegador:
+ * `src/lib/whopCountries.ts` (`src/test/whop.test.ts` comprueba que coinciden).
+ */
+export const WHOP_COUNTRIES: Record<string, { currency: string; methods: string[] }> = {
+  CO: { currency: "COP", methods: ["nequi", "addi"] },
+  CL: { currency: "CLP", methods: ["mercado_pago"] },
+  AR: { currency: "ARS", methods: ["mercado_pago_ar"] },
+};
 
 /**
- * Cuerpo para `POST /checkout_configurations`: una variante («plan») en línea, de pago único, oculta, con el importe exacto en pesos
- * que calculó nuestro servidor. Whop reutiliza la variante si ya existe una igual. `metadata` se copia a cada pago y a cada aviso.
+ * Cuerpo para `POST /checkout_configurations`: una variante («plan») en línea, de pago único, oculta, con el importe exacto en la
+ * moneda local que calculó nuestro servidor. Whop reutiliza la variante si ya existe una igual. `metadata` se copia a cada pago y a cada aviso.
  */
 export function buildWhopCheckoutConfig(input: {
   accountId?: string;
@@ -74,22 +82,26 @@ export function buildWhopCheckoutConfig(input: {
   productId?: string;
   orderId: string;
   title: string;
-  amountCop: number;
+  /** Importe en moneda local (pesos). */
+  amount: number;
+  currency: string;
+  /** Tipos de método de pago de Whop que se ofrecen (`nequi`, `addi`, `mercado_pago`…). */
+  methods: string[];
 }): Record<string, unknown> {
-  const amount = Math.round(input.amountCop);
+  const amount = Math.round(input.amount);
   return {
     ...(input.accountId ? { account_id: input.accountId } : {}),
     mode: "payment",
     metadata: { order_id: input.orderId },
     variant: {
       ...(input.productId ? { product_id: input.productId } : {}),
-      currency: "cop",
+      currency: input.currency.toLowerCase(),
       initial_price: amount,
       billing_type: "one_time",
       release_method: "buy_now",
       visibility: "hidden",
       title: input.title.slice(0, 80),
-      payment_method_configuration: { enabled: WHOP_COLOMBIA_WALLETS, include_platform_defaults: false },
+      payment_method_configuration: { enabled: input.methods, include_platform_defaults: false },
     },
   };
 }

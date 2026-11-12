@@ -1,14 +1,14 @@
-// Whop — crea el pedido de iLingue para pagar con billetera (Nequi, Bre-B) en Colombia.
+// Whop — crea el pedido de iLingue para pagar con billetera en Colombia (Nequi, Addi), Chile (Mercado Pago) y Argentina (Mercado Pago).
 // El navegador solo manda id, cantidad y cupón; aquí se resuelven producto y precio autoritativos (mismos que dLocal y Stripe),
-// se guarda el pedido (`order_created`) y se le pide a Whop una «configuración de checkout» con ese importe exacto en pesos
-// colombianos. El navegador la abre en el checkout incrustado de Whop (`<Checkout checkoutConfiguration="ch_…">`).
-// Si algo falla (sin secretos, Whop no responde, país distinto de Colombia…), responde `whop_not_available`
+// se guarda el pedido (`order_created`) y se le pide a Whop una «configuración de checkout» con ese importe exacto en la moneda
+// local del país. El navegador la abre en el checkout incrustado de Whop (`<Checkout checkoutConfiguration="ch_…">`).
+// Si algo falla (sin secretos, Whop no responde, país sin Whop…), responde `whop_not_available`
 // y el checkout cobra con la billetera de dLocal Go como siempre.
 import { z } from "npm:zod@3.25.76";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { logOrderEvent } from "../_shared/orderEvents.ts";
 import { resolveServerPricing, PricingError, localTotalFromPricing } from "../_shared/catalogPricing.ts";
-import { buildWhopCheckoutConfig, WHOP_API_BASE, WHOP_API_VERSION_DATE } from "../_shared/whop.ts";
+import { buildWhopCheckoutConfig, WHOP_API_BASE, WHOP_API_VERSION_DATE, WHOP_COUNTRIES } from "../_shared/whop.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -39,8 +39,9 @@ Deno.serve(async (req) => {
     const body = parsed.data;
     const country = body.country.toUpperCase();
 
-    // Whop cobra en pesos colombianos: solo Colombia (Nequi, Bre-B) y solo productos digitales.
-    if (country !== "CO") return unavailable("only_colombia");
+    // Whop solo en los países de WHOP_COUNTRIES, en su moneda local y solo con productos digitales.
+    const cfg = WHOP_COUNTRIES[country];
+    if (!cfg) return unavailable("country_not_supported");
     const apiKey = Deno.env.get("WHOP_API_KEY");
     const productId = Deno.env.get("WHOP_PRODUCT_ID") || undefined; // opcional
     if (!Deno.env.get("WHOP_WEBHOOK_SECRET") || !apiKey) return unavailable("not_configured");
@@ -51,7 +52,7 @@ Deno.serve(async (req) => {
         items: body.items.map((i) => ({ id: i.id, quantity: i.quantity })),
         country,
         couponCode: body.couponCode,
-        currency: "COP",
+        currency: cfg.currency,
       });
     } catch (e) {
       if (e instanceof PricingError) return json({ error: e.message }, 400);
@@ -59,8 +60,8 @@ Deno.serve(async (req) => {
     }
     if (pricing.items.some((i) => i.isPhysical)) return unavailable("physical_product");
 
-    const localAmount = await localTotalFromPricing(pricing, "COP");
-    if (!localAmount || localAmount <= 0) return unavailable("no_cop_price");
+    const localAmount = await localTotalFromPricing(pricing, cfg.currency);
+    if (!localAmount || localAmount <= 0) return unavailable("no_local_price");
 
     const orderId = `ILR-WH-${crypto.randomUUID().replace(/-/g, "").slice(0, 10).toUpperCase()}`;
     const skus = normalizeSkus(pricing.items.map((i) => i.sku));
@@ -72,7 +73,9 @@ Deno.serve(async (req) => {
       productId,
       orderId,
       title: description,
-      amountCop: localAmount,
+      amount: localAmount,
+      currency: cfg.currency,
+      methods: cfg.methods,
     });
     let checkoutConfigId = "";
     let whopError = "";
@@ -134,13 +137,13 @@ Deno.serve(async (req) => {
         checkoutConfigId,
         productName: description,
         localAmount,
-        localCurrency: "COP",
+        localCurrency: cfg.currency,
         customerName: body.payerName,
         customerPhone: body.payerPhone ?? null,
       },
     });
 
-    return json({ orderId, checkoutConfiguration: checkoutConfigId, amount: localAmount, currency: "COP" });
+    return json({ orderId, checkoutConfiguration: checkoutConfigId, amount: localAmount, currency: cfg.currency });
   } catch (err) {
     console.error("whop-create-order error:", err);
     return json({ error: "No pudimos iniciar el pago. Intenta de nuevo." }, 500);

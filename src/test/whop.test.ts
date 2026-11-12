@@ -41,9 +41,11 @@ describe("whop webhook", () => {
   it("los países de Whop del navegador y del servidor coinciden (Colombia, Chile, Argentina)", () => {
     expect(WHOP_COUNTRIES).toEqual(SERVER_COUNTRIES);
     expect(Object.keys(WHOP_COUNTRIES).sort()).toEqual(["AR", "CL", "CO"]);
-    expect(WHOP_COUNTRIES.CO.methods).toEqual(["nequi", "addi"]);
-    expect(WHOP_COUNTRIES.CL.methods).toEqual(["mercado_pago"]);
-    expect(WHOP_COUNTRIES.AR.methods).toEqual(["mercado_pago_ar"]);
+    // Colombia: Nequi y Addi van en filas separadas; Chile y Argentina solo billetera.
+    expect(WHOP_COUNTRIES.CO.wallet).toEqual(["nequi"]);
+    expect(WHOP_COUNTRIES.CO.installments).toEqual(["addi"]);
+    expect(WHOP_COUNTRIES.CL).toEqual({ currency: "CLP", wallet: ["mercado_pago"] });
+    expect(WHOP_COUNTRIES.AR).toEqual({ currency: "ARS", wallet: ["mercado_pago_ar"] });
   });
   it("lee importes Money", () => {
     expect(whopMoney({ amount: "59900.00", currency: "cop" })).toEqual({ amount: 59900, currency: "COP" });

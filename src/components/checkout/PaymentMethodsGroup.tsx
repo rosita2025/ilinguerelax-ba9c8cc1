@@ -2771,7 +2771,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           : m.id === "yape" ? { src: yapeLogo, alt: "Yape" }
           : m.id === "clabe" ? { src: speiLogo, alt: "SPEI" }
           : (m.id === "dlocal_cash" || m.id === "stripe_oxxo") && country === "MX" ? { src: oxxoLogo, alt: "OXXO" }
-          : m.id === "dlocal_wallet" && whopEnabled && country === "CO" ? { src: nequiLogo, alt: "Nequi" }
+          : m.id === "dlocal_wallet" && country === "CO" ? { src: nequiLogo, alt: "Nequi" } // Colombia: el logo de Nequi sale con o sin Whop
           : m.id === "whop_addi" ? { src: addiLogo, alt: "Addi" }
           : m.id === "dlocal_wallet" && (dlocalRails(country, "wallet").includes("Mercado Pago") || (whopEnabled && country !== "CO")) ? { src: mercadopagoLogo, alt: "Mercado Pago" }
           : null;

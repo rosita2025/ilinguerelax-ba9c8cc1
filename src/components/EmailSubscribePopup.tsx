@@ -38,6 +38,23 @@ function isBlockedPath(pathname: string): boolean {
 const STORAGE_KEY = "ilr_newsletter_popup_v2";
 const COOKIE_KEY = "ilr_newsletter_popup";
 const DELAY_MS = 15000;
+// En Patrones el popup no interrumpe la compra: sale entre 2 y 55 min después de entrar (al azar, fijo por sesión).
+const PATRONES_PATH = "/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles";
+const PATRONES_DELAY_KEY = "ilr_popup_patrones_at";
+const PATRONES_MIN_MS = 2 * 60_000;
+const PATRONES_MAX_MS = 55 * 60_000;
+
+export function popupDelayFor(pathname: string, now = Date.now(), rnd = Math.random()): number {
+  if (!(pathname || "").toLowerCase().startsWith(PATRONES_PATH)) return DELAY_MS;
+  const fresh = PATRONES_MIN_MS + rnd * (PATRONES_MAX_MS - PATRONES_MIN_MS);
+  try {
+    let at = Number(sessionStorage.getItem(PATRONES_DELAY_KEY));
+    if (!at) { at = now + fresh; sessionStorage.setItem(PATRONES_DELAY_KEY, String(at)); }
+    return Math.max(0, at - now);
+  } catch {
+    return fresh;
+  }
+}
 const DISMISS_TTL_DAYS = 7;
 const SUBSCRIBED_TTL_DAYS = 365;
 
@@ -296,9 +313,9 @@ export const EmailSubscribePopup = () => {
     const t = setTimeout(() => {
       if (isBlockedPath(window.location.pathname)) return;
       setOpen(true);
-    }, DELAY_MS);
+    }, popupDelayFor(location.pathname));
     return () => clearTimeout(t);
-  }, [blocked]);
+  }, [blocked, location.pathname]);
 
 
   const dismiss = () => {

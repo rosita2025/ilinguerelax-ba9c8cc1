@@ -151,6 +151,13 @@ export default function CheckoutReturn() {
       navigate(`/checkouts/failure?${params.toString()}`, { replace: true });
       return;
     }
+    // OXXO (Stripe): al volver el cliente solo generó la ficha; el pago llega cuando paga en la tienda. Nunca se muestra como aprobado.
+    if (sp.get("method") === "oxxo") {
+      params.set("status", "pending");
+      params.set("reason", "oxxo_pending");
+      navigate(`/checkouts/pending?${params.toString()}`, { replace: true });
+      return;
+    }
     params.set("status", "approved");
     navigate(`/checkouts/success?${params.toString()}`, { replace: true });
   }, [sessionId, navigate, sp, isDlocal, isPaypal]);

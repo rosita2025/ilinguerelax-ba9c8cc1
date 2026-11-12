@@ -68,7 +68,7 @@ import { loadCheckoutProduct } from "@/lib/checkoutProductCache";
 import type { UpsellItem } from "@/config/checkoutCatalog";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "stripe_bizum" | "stripe_satispay" | "stripe_ideal" | "stripe_mbway" | "stripe_crypto" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "paypal" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "hotmart_separator";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "stripe_bizum" | "stripe_satispay" | "stripe_ideal" | "stripe_mbway" | "stripe_crypto" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "paypal" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "stripe_oxxo" | "hotmart_separator";
 
 const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
@@ -208,7 +208,7 @@ function methods0HasWallet(list: { id: string }[]): boolean {
 function methodSection(id: string): MethodSection {
   if (["card", "dlocal_card", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto", "stripe_klarna"].includes(id)) return "cards";
   if (["transfer", "stripe_ach", "dlocal_transfer", "clabe"].includes(id)) return "transfer";
-  if (["cash", "dlocal_cash"].includes(id)) return "cash";
+  if (["cash", "dlocal_cash", "stripe_oxxo"].includes(id)) return "cash";
   if (["yape", "binance", "paypal", "dlocal_wallet", "stripe_cashapp", "stripe_crypto"].includes(id)) return "wallet";
   return "other";
 }
@@ -1375,7 +1375,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       // Aviso "¿Te gustaría agregar…?" ANTES de abrir Stripe o crear el pago en
       // dLocal / Mercado Pago. Si algo falla al mostrarlo, el pago sigue normal.
       if (
-        ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto", "dlocal_transfer", "dlocal_cash", "dlocal_wallet", "transfer", "cash"].includes(selected) &&
+        ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto", "dlocal_transfer", "dlocal_cash", "dlocal_wallet", "stripe_oxxo", "transfer", "cash"].includes(selected) &&
         (await offerUpsellThen(() => { void handleBuyNow(); }))
       ) return;
 
@@ -1395,6 +1395,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         return; 
       }
       if (selected === "paypal") { await payPaypal(); return; }
+      if (selected === "stripe_oxxo") { logCheckoutAction("stripe_oxxo_iniciado", country); await payWithHostedFallback("oxxo"); return; }
       if (selected === "dlocal_transfer") { await payDlocal("transfer"); return; }
       if (selected === "dlocal_cash") { await payDlocal("cash"); return; }
       if (selected === "dlocal_wallet") { await payDlocal("wallet"); return; }
@@ -1428,7 +1429,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // Fallback anti-AdBlock: crea una sesión HOSPEDADA de Stripe (página
   // completa en checkout.stripe.com, no un iframe) con exactamente el mismo
   // carrito, precios por región y moneda que el checkout embebido.
-  const payWithHostedFallback = async () => {
+  const payWithHostedFallback = async (method: unknown = "card") => {
+    const isOxxo = method === "oxxo";
     const toAbsUrl = (u?: string) => {
       if (!u) return undefined;
       if (/^https?:\/\//i.test(u)) return u;
@@ -1447,7 +1449,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             id: i.id, name: i.name, price: itemPrice(i, region.tier),
             quantity: i.quantity, image: toAbsUrl(i.image), description: i.description,
           })),
-          currency: (currency || "USD").toLowerCase(),
+          currency: isOxxo ? "mxn" : (currency || "USD").toLowerCase(),
+          stripePaymentMethod: isOxxo ? "oxxo" : undefined,
           couponPercent: s.couponPercent,
           couponCode: s.coupon ?? undefined,
           contact: {
@@ -1460,7 +1463,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             state: (s.buyer.state ?? "").slice(0, 80) || undefined,
             zip: (s.buyer.zip ?? "").slice(0, 24) || undefined,
           },
-          returnUrl: `${window.location.origin}/checkouts/return?session_id={CHECKOUT_SESSION_ID}`,
+          // OXXO: al volver NO está pagado todavía (el cliente paga en la tienda), así que va a «pago pendiente».
+          returnUrl: `${window.location.origin}/checkouts/return?${isOxxo ? "method=oxxo&" : ""}session_id={CHECKOUT_SESSION_ID}`,
           // Al volver de la página de Stripe sin pagar (rechazo o cancelación) se muestra el aviso con otras opciones.
           cancelUrl: (() => { try { const u = new URL(window.location.href); u.searchParams.set("stripe", "cancelado"); return u.toString(); } catch { return window.location.href; } })(),
           isRestrictedRetry: RESTRICTED_CURRENCY_COUNTRIES.has(country),
@@ -2084,7 +2088,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const dynamicStripeRows: PaymentMethodRow[] = methodsConfig.enabledMethodKeys
     // Apple Pay / Google Pay / Link salen como botones rápidos DENTRO del formulario de tarjeta de
     // Stripe; una fila aparte hacía dos botones para lo mismo.
-    .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link" && key !== "stripe_apple_pay" && key !== "stripe_google_pay" && key !== "stripe_sepa_debit" /* SEPA tarda días en cobrar */ && key !== "stripe_ideal" && key !== "stripe_mb_way" && key !== "stripe_satispay" && key !== "stripe_crypto" /* ahora son filas propias */)
+    .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link" && key !== "stripe_apple_pay" && key !== "stripe_google_pay" && key !== "stripe_oxxo" /* OXXO tiene su propia fila (página de Stripe, sin documento) */ && key !== "stripe_sepa_debit" /* SEPA tarda días en cobrar */ && key !== "stripe_ideal" && key !== "stripe_mb_way" && key !== "stripe_satispay" && key !== "stripe_crypto" /* ahora son filas propias */)
     .map((key) => ({ id: "card", methodKey: key, badge: finalPriceLabel, ...STRIPE_VISIBLE_METHODS[key] }));
   const allMethods: PaymentMethodRow[] = [
     { 
@@ -2176,6 +2180,17 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       badges: dlocalBadges(country, "cash", 6).length
         ? dlocalBadges(country, "cash", 6)
         : [{ label: "Cash", bg: "#F5A623", color: "#1F2937" }],
+    },
+    {
+      // OXXO de Stripe (solo México, en pesos): nombre y correo, sin documento de identidad. Se enciende en /admin/checkout-methods.
+      id: "stripe_oxxo",
+      icon: Banknote,
+      title: "OXXO",
+      sub: language === "en" ? "Get a voucher and pay cash at any OXXO. No ID needed."
+        : language === "pt" ? "Gere um voucher e pague em dinheiro em qualquer OXXO."
+        : "Genera tu ficha y paga en efectivo en cualquier OXXO. Sin pedir identificación.",
+      badge: finalPriceLabel,
+      badges: [{ label: "OXXO", bg: "#E31E24", color: "#ffffff" }],
     },
     {
       id: "dlocal_wallet",
@@ -2304,7 +2319,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
         // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.
         if (m.id === "dlocal_transfer") return methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer") && !getDlocalCountry(country)?.transferComingSoon;
-        if (m.id === "dlocal_cash") return methodsConfig.dlocalCash && dlocalSupports(country, "cash") && !getDlocalCountry(country)?.cashComingSoon;
+        // OXXO de Stripe (sin documento): si está encendido en México, reemplaza al OXXO de dLocal, que sí pide documento.
+        if (m.id === "stripe_oxxo") return country === "MX" && methodsConfig.enabledMethodKeys.includes("stripe_oxxo");
+        if (m.id === "dlocal_cash") return methodsConfig.dlocalCash && dlocalSupports(country, "cash") && !getDlocalCountry(country)?.cashComingSoon && !(country === "MX" && methodsConfig.enabledMethodKeys.includes("stripe_oxxo"));
         // Tarjeta dLocal DESACTIVADA. Billetera digital sigue activa.
         if (m.id === "dlocal_card") return false;
         if (m.id === "dlocal_wallet") return methodsConfig.dlocalWallet && dlocalSupports(country, "wallet") && !getDlocalCountry(country)?.walletComingSoon;
@@ -2681,7 +2698,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           m.id === "paypal" ? { src: paypalLogo, alt: "PayPal" }
           : m.id === "yape" ? { src: yapeLogo, alt: "Yape" }
           : m.id === "clabe" ? { src: speiLogo, alt: "SPEI" }
-          : m.id === "dlocal_cash" && country === "MX" ? { src: oxxoLogo, alt: "OXXO" }
+          : (m.id === "dlocal_cash" || m.id === "stripe_oxxo") && country === "MX" ? { src: oxxoLogo, alt: "OXXO" }
           : m.id === "dlocal_wallet" && dlocalRails(country, "wallet").includes("Mercado Pago") ? { src: mercadopagoLogo, alt: "Mercado Pago" }
           : null;
         const section = methodSection(m.id);
@@ -2807,7 +2824,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 ) : m.id === "hotmart" ? (
                   <p className="mt-1 text-[11px] sm:text-xs leading-snug text-neutral-600 dark:text-neutral-300">{hotmartCustomNote || m.sub}</p>
 
-                ) : (m.id === "dlocal_cash" || m.id === "dlocal_wallet") && rowLogo ? null : m.badges?.length ? (
+                ) : (m.id === "dlocal_cash" || m.id === "dlocal_wallet" || m.id === "stripe_oxxo") && rowLogo ? null : m.badges?.length ? (
                   <div className="mt-1 flex items-center gap-1 flex-wrap">
                     {m.badges.map(renderMethodBadge)}
 

@@ -23,7 +23,6 @@ import { useRegionTier } from "@/hooks/useRegionTier";
 import { detectCurrency, formatPrice, formatCurrencyAmount, exchangeRates, type Currency } from "@/i18n";
 import { useLocalOverrides } from "@/lib/livePrices";
 import { CheckoutLanguageProvider, useI18n } from "@/i18n/I18nContext";
-import { UrgencyTimerBar } from "@/components/UrgencyTimerBar";
 import introVideo from "@/assets/introduccion-patrones-16x9.mp4.asset.json";
 import introPoster from "@/assets/intro-patrones-poster.jpg.asset.json";
 import { PATRONES_COVER_SOURCE as FAST_COVER_SOURCE, PATRONES_FAST_COVER_URL, PATRONES_MOBILE_COVER_URL, PATRONES_COVER_SRCSET, PATRONES_COVER_SIZES } from "@/lib/patronesCover";
@@ -446,7 +445,6 @@ const PatronesContent = () => {
 
   return (
     <main className="min-h-screen bg-background">
-      <UrgencyTimerBar productSlug={ADMIN_SKU} language="es" />
       <SEO
         title={pricingAdmin.name ?? "Patrones y Pronunciación en Inglés PDF · A1 a C1"}
         description={pricingAdmin.description ?? "Domina la pronunciación en inglés: patrones secretos, letras mudas, combinaciones especiales y ejercicios prácticos. Ebook PDF para hispanohablantes."}

@@ -2386,8 +2386,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         // México: la transferencia de dLocal Go no se muestra (queda SPEI manual, OXXO y tarjeta).
         if (m.id === "dlocal_transfer") return country !== "MX" && methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer") && !getDlocalCountry(country)?.transferComingSoon;
         // OXXO de Stripe (sin documento): si está encendido en México, reemplaza al OXXO de dLocal, que sí pide documento.
-        if (m.id === "stripe_oxxo") return country === "MX" && methodsConfig.enabledMethodKeys.includes("stripe_oxxo");
-        if (m.id === "dlocal_cash") return methodsConfig.dlocalCash && dlocalSupports(country, "cash") && !getDlocalCountry(country)?.cashComingSoon && !(country === "MX" && methodsConfig.enabledMethodKeys.includes("stripe_oxxo"));
+        // México: el OXXO es SIEMPRE el de Stripe (sin documento de identidad); no depende de un interruptor del admin.
+        if (m.id === "stripe_oxxo") return country === "MX";
+        // México: el OXXO de dLocal Go (que pide CURP o RFC) no se muestra nunca.
+        if (m.id === "dlocal_cash") return country !== "MX" && methodsConfig.dlocalCash && dlocalSupports(country, "cash") && !getDlocalCountry(country)?.cashComingSoon;
         // Tarjeta dLocal DESACTIVADA. Billetera digital sigue activa.
         if (m.id === "dlocal_card") return false;
         // Con Whop encendido, la billetera es la de Whop (reemplaza a la de dLocal Go en Colombia, Chile y Argentina).

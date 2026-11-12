@@ -5,10 +5,10 @@ import { logCheckoutAction } from "@/hooks/useMetaPixel";
 
 /**
  * Checkout incrustado de Whop (billetera digital en Colombia: Nequi). Se carga bajo demanda desde PaymentMethodsGroup.
- * El precio lo fija el plan de Whop; el pedido (`order_id`) lo creó nuestro servidor, y la entrega la hace el aviso
+ * El precio lo fija la configuración de checkout que creó nuestro servidor para este pedido (`order_id` va en su metadata), y la entrega la hace el aviso
  * `payment.succeeded` (`whop-webhook`), nunca esta pantalla.
  */
-type PanelProps = { planId: string; orderId: string; email: string; phone?: string; onFail?: () => void };
+type PanelProps = { checkoutConfiguration: string; orderId: string; email: string; phone?: string; onFail?: () => void };
 
 /** Si el script de Whop no carga (sin conexión a su CDN, bloqueador de anuncios…) el pago NO debe romper el resto del checkout: se avisa y se usa la billetera de dLocal. */
 class WhopBoundary extends Component<{ onFail?: () => void; children: ReactNode }, { failed: boolean }> {
@@ -35,15 +35,14 @@ export default function WhopCheckoutPanel(props: PanelProps) {
   );
 }
 
-function WhopCheckoutInner({ planId, orderId, email, phone }: PanelProps) {
+function WhopCheckoutInner({ checkoutConfiguration, orderId, email, phone }: PanelProps) {
   const base = typeof window !== "undefined" ? window.location.origin : "";
   const whopReturn = `${base}/checkouts/return?provider=whop&order=${encodeURIComponent(orderId)}`;
   return (
     <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-3 sm:p-4">
       <WhopElements elements={loadWhop()}>
         <Checkout
-          plan={planId}
-          metadata={{ order_id: orderId }}
+          checkoutConfiguration={checkoutConfiguration}
           returnUrl={whopReturn}
           onComplete={(c) => {
             if (c.result === "payment") {

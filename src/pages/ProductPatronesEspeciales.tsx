@@ -6,6 +6,7 @@ import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { BlackFridayStrip } from "@/components/BlackFridayStrip";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
@@ -468,6 +469,7 @@ const PatronesContent = () => {
       />
 
       <Navbar />
+      <BlackFridayStrip />
 
       {/* Hero */}
       <section className="pt-4 pb-6 md:pt-8 md:pb-10">

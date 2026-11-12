@@ -8,7 +8,7 @@ import { logCheckoutAction } from "@/hooks/useMetaPixel";
  * El precio lo fija la configuración de checkout que creó nuestro servidor para este pedido (`order_id` va en su metadata), y la entrega la hace el aviso
  * `payment.succeeded` (`whop-webhook`), nunca esta pantalla.
  */
-type PanelProps = { checkoutConfiguration: string; orderId: string; email: string; phone?: string; onFail?: () => void };
+type PanelProps = { checkoutConfiguration: string; orderId: string; email: string; phone?: string; name?: string; country?: string; language?: string; onFail?: () => void };
 
 /** Si el script de Whop no carga (sin conexión a su CDN, bloqueador de anuncios…) el pago NO debe romper el resto del checkout: se avisa y se usa la billetera de dLocal. */
 class WhopBoundary extends Component<{ onFail?: () => void; children: ReactNode }, { failed: boolean }> {
@@ -35,7 +35,7 @@ export default function WhopCheckoutPanel(props: PanelProps) {
   );
 }
 
-function WhopCheckoutInner({ checkoutConfiguration, orderId, email, phone }: PanelProps) {
+function WhopCheckoutInner({ checkoutConfiguration, orderId, email, phone, name, country, language }: PanelProps) {
   const base = typeof window !== "undefined" ? window.location.origin : "";
   const whopReturn = `${base}/checkouts/return?provider=whop&order=${encodeURIComponent(orderId)}`;
   return (
@@ -43,6 +43,7 @@ function WhopCheckoutInner({ checkoutConfiguration, orderId, email, phone }: Pan
       <WhopElements elements={loadWhop()}>
         <Checkout
           checkoutConfiguration={checkoutConfiguration}
+          locale={(["es", "en", "pt", "fr", "it"] as const).find((l) => l === language) ?? "es"}
           returnUrl={whopReturn}
           onComplete={(c) => {
             if (c.result === "payment") {
@@ -52,7 +53,12 @@ function WhopCheckoutInner({ checkoutConfiguration, orderId, email, phone }: Pan
             }
           }}
         >
-          <CheckoutElement buyerEmail={email} lockBuyerEmail defaultValues={phone ? { phone } : undefined} />
+          <CheckoutElement
+            buyerEmail={email}
+            lockBuyerEmail
+            // El país y el nombre ya los sabemos: Whop los usa donde pueda (el país por defecto de su formulario no siempre es el del comprador).
+            defaultValues={{ ...(phone ? { phone } : {}), shippingAddress: { ...(name ? { name } : {}), ...(country ? { country } : {}) } }}
+          />
         </Checkout>
       </WhopElements>
     </div>

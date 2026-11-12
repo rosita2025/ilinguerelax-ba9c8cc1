@@ -57,6 +57,9 @@ const isCardHostedOnly = (): boolean => {
   try { return new URLSearchParams(window.location.search).get("form") !== "1"; } catch { return true; }
 };
 const StripePaymentElementBox = React.lazy(() => import("@/components/checkout/StripePaymentElementBox"));
+/** Firma del carrito (productos, cantidades y cupón): si cambia con el pago de Whop abierto, se vuelve a crear con el precio nuevo. */
+const whopCartSig = (list: { id: string; quantity: number }[], coupon?: string | null) =>
+  list.map((i) => `${i.id}x${i.quantity}`).join(",") + "|" + (coupon ?? "");
 const WhopCheckoutPanel = lazy(() => import("@/components/checkout/WhopCheckoutPanel"));
 import { WHOP_COUNTRIES, type WhopKind } from "@/lib/whopCountries";
 import { DLOCAL_COUNTRY_CODES, dlocalNeedsDocument, dlocalDocumentInfo, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";
@@ -573,7 +576,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const [dlocalDocument, setDlocalDocument] = useState("");
   const [mpLoading, setMpLoading] = useState<Method | null>(null);
   // Whop (billetera / Nequi en Colombia): pedido creado por el servidor + plan que se abre en su checkout incrustado.
-  const [whopSession, setWhopSession] = useState<{ kind: WhopKind; checkoutConfiguration: string; orderId: string; email: string; phone?: string } | null>(null);
+  const [whopSession, setWhopSession] = useState<{ kind: WhopKind; sig: string; checkoutConfiguration: string; orderId: string; email: string; phone?: string; name?: string; country?: string } | null>(null);
   const [whopBroken, setWhopBroken] = useState(false);
   // ¿Whop está listo en el servidor? Optimista; un «no» se recuerda 10 min para no parpadear en cada carga.
   const [whopReady, setWhopReady] = useState<boolean>(() => {
@@ -1051,7 +1054,16 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       }
       void captureAbandonedCheckout(rowId, true);
       logCheckoutAction("whop_iniciado", `${kind}:${d.orderId}`);
-      setWhopSession({ kind, checkoutConfiguration: d.checkoutConfiguration, orderId: d.orderId, email: s.buyer.email.trim(), phone: (s.buyer.phone ?? "").trim() || undefined });
+      setWhopSession({
+        kind,
+        sig: whopCartSig(s.items, s.coupon),
+        checkoutConfiguration: d.checkoutConfiguration,
+        orderId: d.orderId,
+        email: s.buyer.email.trim(),
+        phone: (s.buyer.phone ?? "").trim() || undefined,
+        name: s.buyer.fullName.trim() || undefined,
+        country: (region.country || country || "").toUpperCase().slice(0, 2) || undefined,
+      });
       window.setTimeout(() => document.querySelector<HTMLElement>(`[data-method-row="${rowId}"]`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
       return true;
     } catch {
@@ -2142,6 +2154,17 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // Whop se usa SIEMPRE en Colombia, Chile y Argentina (sin interruptor del admin). Se asume listo hasta que el sondeo diga lo contrario;
   // si el servidor no lo tiene configurado, el checkout vuelve solo a dLocal Go (ver el efecto del sondeo).
   const whopEnabled = !!WHOP_COUNTRIES[country] && whopReady && !whopBroken;
+  // Si el comprador agrega una oferta (upsell) o cambia el cupón con el pago de Whop ya abierto, el precio de Whop quedaría viejo:
+  // se cierra y se vuelve a crear con el carrito nuevo.
+  const whopSigNow = whopCartSig(items, coupon);
+  useEffect(() => {
+    if (!whopSession || whopSession.sig === whopSigNow) return;
+    const kind = whopSession.kind;
+    setWhopSession(null);
+    const stillOnRow = selected === (kind === "installments" ? "whop_addi" : "dlocal_wallet");
+    if (stillOnRow) void payWhop(kind);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [whopSigNow]);
   useEffect(() => {
     if (!WHOP_COUNTRIES[country]) return;
     let alive = true;
@@ -3372,6 +3395,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                   orderId={whopSession.orderId}
                   email={whopSession.email}
                   phone={whopSession.phone}
+                  name={whopSession.name}
+                  country={whopSession.country}
+                  language={language}
                   onFail={() => {
                     const kind = whopSession.kind;
                     setWhopSession(null);

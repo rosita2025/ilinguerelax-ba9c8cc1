@@ -1038,7 +1038,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     try {
       const { data, error } = await supabase.functions.invoke("whop-create-order", {
         body: {
-          items: s.items.map((i) => ({ id: i.id, quantity: i.quantity })),
+          // `price` es solo una pista (como en dLocal y Stripe): el servidor valida contra el catálogo; sirve para ofertas fuera del catálogo.
+          items: s.items.map((i) => ({ id: i.id, quantity: i.quantity, price: itemPrice(i, region.tier) })),
           couponCode: s.coupon ?? undefined,
           payerEmail: s.buyer.email.trim(),
           payerName: s.buyer.fullName.trim(),
@@ -2157,6 +2158,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   // Si el comprador agrega una oferta (upsell) o cambia el cupón con el pago de Whop ya abierto, el precio de Whop quedaría viejo:
   // se cierra y se vuelve a crear con el carrito nuevo.
   const whopSigNow = whopCartSig(items, coupon);
+  const whopPanelOpen = !!whopSession && whopEnabled && (whopSession.kind === "wallet" ? selected === "dlocal_wallet" : selected === "whop_addi");
   useEffect(() => {
     if (!whopSession || whopSession.sig === whopSigNow) return;
     const kind = whopSession.kind;
@@ -3516,7 +3518,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
       {/* Con tarjeta no hay botón aparte (el de pagar es el de Stripe) y sin método elegido tampoco.
           Para transferencia, efectivo, dLocal Go y Hotmart se mantiene, sin monto en USD. */}
-      {!!selected && selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "dlocal_card" && !["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(selected) && (
+      {/* Con el pago de Whop abierto el botón es el de Whop: se oculta este para no tener dos botones. */}
+      {!whopPanelOpen && !!selected && selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "dlocal_card" && !["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(selected) && (
         <button
           type="button"
           onClick={handleBuyNow}

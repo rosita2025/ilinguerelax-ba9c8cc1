@@ -19,7 +19,7 @@ const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
 const BodySchema = z.object({
-  items: z.array(z.object({ id: z.string().min(1).max(200), quantity: z.number().int().min(1).max(50) })).min(1).max(20),
+  items: z.array(z.object({ id: z.string().min(1).max(200), quantity: z.number().int().min(1).max(50), price: z.number().optional() })).min(1).max(20),
   couponCode: z.string().max(30).optional(),
   payerEmail: z.string().email(),
   payerName: z.string().min(1).max(120),
@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
     let pricing;
     try {
       pricing = await resolveServerPricing({
-        items: body.items.map((i) => ({ id: i.id, quantity: i.quantity })),
+        items: body.items.map((i) => ({ id: i.id, quantity: i.quantity, price: i.price })),
         country,
         couponCode: body.couponCode,
         currency: cfg.currency,

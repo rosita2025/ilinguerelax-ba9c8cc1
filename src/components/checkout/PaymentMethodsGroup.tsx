@@ -34,6 +34,8 @@ import yapeLogo from "@/assets/yape-logo.webp";
 import oxxoLogo from "@/assets/oxxo-logo.webp";
 import speiLogo from "@/assets/spei-logo.webp";
 import mercadopagoLogo from "@/assets/mercadopago-logo.webp";
+import nequiLogo from "@/assets/nequi-logo.webp";
+import addiLogo from "@/assets/addi-logo.webp";
 import cardBrandsStrip from "@/assets/card-brands-strip.webp";
 import stripeLogo from "@/assets/stripe-logo.webp";
 
@@ -2763,6 +2765,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           : m.id === "yape" ? { src: yapeLogo, alt: "Yape" }
           : m.id === "clabe" ? { src: speiLogo, alt: "SPEI" }
           : (m.id === "dlocal_cash" || m.id === "stripe_oxxo") && country === "MX" ? { src: oxxoLogo, alt: "OXXO" }
+          : m.id === "dlocal_wallet" && whopEnabled && country === "CO" ? { src: nequiLogo, alt: "Nequi" }
+          : m.id === "whop_addi" ? { src: addiLogo, alt: "Addi" }
           : m.id === "dlocal_wallet" && (dlocalRails(country, "wallet").includes("Mercado Pago") || (whopEnabled && country !== "CO")) ? { src: mercadopagoLogo, alt: "Mercado Pago" }
           : null;
         const section = methodSection(m.id);
@@ -2888,7 +2892,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 ) : m.id === "hotmart" ? (
                   <p className="mt-1 text-[11px] sm:text-xs leading-snug text-neutral-600 dark:text-neutral-300">{hotmartCustomNote || m.sub}</p>
 
-                ) : (m.id === "dlocal_cash" || m.id === "dlocal_wallet" || m.id === "stripe_oxxo") && rowLogo ? null : m.badges?.length ? (
+                ) : (m.id === "dlocal_cash" || m.id === "dlocal_wallet" || m.id === "stripe_oxxo" || m.id === "whop_addi") && rowLogo ? null : m.badges?.length ? (
                   <div className="mt-1 flex items-center gap-1 flex-wrap">
                     {m.badges.map(renderMethodBadge)}
 
@@ -2949,16 +2953,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     "Ti portiamo alla pagina di pagamento sicura di Stripe per inserire la carta di credito o debito. Poi torni qui.",
                     "Levamos você à página de pagamento segura da Stripe para inserir seu cartão. Depois você volta aqui.")}
                 </p>
-                {(dlocalSupports(country, "transfer") || dlocalSupports(country, "cash") || dlocalSupports(country, "wallet")) && (
-                  <p className="rounded-md bg-neutral-100 px-3 py-2 text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
-                    {pick(language,
-                      "¿No tienes tarjeta o prefieres tu cuenta bancaria, billetera o efectivo? Elige arriba «Transferencia», «Billetera» o «Efectivo» y paga en tu moneda local.",
-                      "No card, or prefer your bank account, wallet or cash? Choose “Transfer”, “Wallet” or “Cash” above and pay in your local currency.",
-                      "Pas de carte, ou vous préférez votre compte bancaire, portefeuille ou espèces ? Choisissez « Virement », « Portefeuille » ou « Espèces » ci-dessus.",
-                      "Niente carta, o preferisci conto bancario, portafoglio o contanti? Scegli sopra «Bonifico», «Portafoglio» o «Contanti».",
-                      "Sem cartão, ou prefere conta bancária, carteira ou dinheiro? Escolha acima «Transferência», «Carteira» ou «Dinheiro».")}
-                  </p>
-                )}
                 <button
                   type="button"
                   disabled={hostedLoading}

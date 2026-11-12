@@ -36,7 +36,7 @@ const BodySchema = z.object({
   environment: z.enum(["sandbox", "live"]).default("sandbox"),
   items: z.array(ItemSchema).min(1).max(20),
   currency: z.string().length(3).default("usd"),
-  stripePaymentMethod: z.enum(["card", "us_bank_account", "cashapp", "klarna", "afterpay_clearpay", "affirm"]).default("card"),
+  stripePaymentMethod: z.enum(["card", "us_bank_account", "cashapp", "klarna", "afterpay_clearpay", "affirm", "oxxo"]).default("card"),
   couponPercent: z.number().min(0).max(100).optional(),
   couponCode: z.string().max(20).optional(),
   contact: z.object({
@@ -113,12 +113,20 @@ Deno.serve(async (req) => {
     }
 
     const discountMultiplier = 1 - pricing.couponPercent / 100;
-    const initialForceUsd = body.isRestrictedRetry || isRestrictedCurrency(country);
+    // OXXO (efectivo en tiendas): solo México y solo en pesos; Stripe no lo cobra en otra moneda.
+    const isOxxo = body.stripePaymentMethod === "oxxo";
+    if (isOxxo && country !== "MX") {
+      return new Response(JSON.stringify({ error: "OXXO solo está disponible en México.", reason: "oxxo_only_mexico" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const initialForceUsd = !isOxxo && (body.isRestrictedRetry || isRestrictedCurrency(country));
 
     // Crea la sesión en la moneda local del comprador o, con forceUsd, en dólares.
     // Si Stripe no acepta la moneda local (ej. cuenta sin esa moneda), se reintenta solo en USD: el comprador nunca ve un error por la moneda.
     const createSession = async (forceUsd: boolean): Promise<{ session: { url?: string | null } } | { tooSmall: true }> => {
-    const targetCurrency = forceUsd ? "usd" : currency;
+    const targetCurrency = isOxxo ? "mxn" : forceUsd ? "usd" : currency;
 
     // --- LÓGICA DE ENVÍO (idéntica a create-checkout-prueba) ---
     const isPhysical = pricing.items.some(i => i.isPhysical);
@@ -205,6 +213,7 @@ Deno.serve(async (req) => {
       // CAMBIO: marca el origen para distinguir en reportes los pagos que
       // llegaron por el botón de emergencia anti-AdBlock.
       source: "checkout-hosted-fallback",
+      pay_method: isOxxo ? "oxxo" : "card",
       customer_email: body.contact.email,
       customer_name: fullName,
       customer_country: body.contact.country,
@@ -231,12 +240,14 @@ Deno.serve(async (req) => {
       mode: "payment",
       // Solo tarjeta de crédito/débito (Apple Pay y Google Pay van dentro de "card"). Sin "link" en la lista Stripe no muestra
       // Link ("Confirma que eres tú" con teléfono) ni otros métodos, que confundían al comprador.
-      payment_method_types: ["card"],
+      payment_method_types: isOxxo ? ["oxxo"] : ["card"],
+      // La ficha de OXXO vale 3 días; después el pedido se cancela solo.
+      ...(isOxxo ? { payment_method_options: { oxxo: { expires_after_days: 3 } } } : {}),
       // CAMBIO 1: sin ui_mode → Stripe usa "hosted" (página completa, no iframe).
       // CAMBIO 2: success_url / cancel_url en vez de return_url.
       success_url: body.returnUrl,
       cancel_url: body.cancelUrl ?? body.returnUrl,
-      adaptive_pricing: { enabled: !forceUsd },
+      adaptive_pricing: { enabled: !forceUsd && !isOxxo },
       currency: targetCurrency,
       customer_email: body.contact.email,
       payment_intent_data: {
@@ -255,7 +266,7 @@ Deno.serve(async (req) => {
     } catch (firstErr) {
       const fe = firstErr as any;
       const currencyRejected = fe?.code === "currency_not_supported" || /currency|adaptive pricing|not supported/i.test(String(fe?.message ?? ""));
-      if (initialForceUsd || !currencyRejected) throw firstErr;
+      if (initialForceUsd || isOxxo || !currencyRejected) throw firstErr;
       console.warn(`[Stripe Hosted] Moneda ${currency.toUpperCase()} rechazada (${fe?.code ?? fe?.message}); reintentando en USD`);
       created = await createSession(true);
     }
@@ -278,11 +289,14 @@ Deno.serve(async (req) => {
     const stripeCode = e?.code || e?.type || "unknown_error";
     const stripeParam = e?.param || "";
     const stripeType = e?.type || "";
-    const isCurrencyError = stripeCode === "currency_not_supported" ||
+    const oxxoUnavailable = /oxxo/i.test(String(e?.message ?? "")) && /invalid|not.*(enabled|activated|supported)|payment method/i.test(String(e?.message ?? ""));
+    const isCurrencyError = !oxxoUnavailable && stripeCode === "currency_not_supported" ||
                            (e?.message && e.message.toLowerCase().includes("not supported"));
-    const reason = isCurrencyError ? "currency_restricted" :
+    const reason = oxxoUnavailable ? "oxxo_not_available" : isCurrencyError ? "currency_restricted" :
                    ([stripeType, stripeCode, stripeParam].filter(Boolean).join(":").slice(0, 80) || "gateway_error");
-    const message = isCurrencyError
+    const message = oxxoUnavailable
+      ? "OXXO no está disponible por ahora. Elige tarjeta, PayPal o transferencia."
+      : isCurrencyError
       ? "Tu banco o región no admite pagos en moneda local. Intenta pagar en USD."
       : (e?.message && e.message.length < 200 && !e.message.includes("api.stripe.com")
           ? e.message

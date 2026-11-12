@@ -61,7 +61,7 @@ export const DLOCAL_COVERAGE: DlocalCountry[] = [
     walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
   { code: "CL", name: "Chile", flag: "🇨🇱", currency: "CLP",
     transfer: ["Banco de Chile", "BancoEstado", "Santander", "BCI"],
-    cash: ["Prepago Los Héroes", "Dale Coopeuch", "ServiPag", "Multicaja"],
+    cash: ["Prepago Los Héroes", "Dale Coopeuch", "ServiPag"],
     wallet: ["MACH", "Tenpo", "Chek", "Fpay"], walletLabel: "Billetera digital", walletKey: "dlocal_wallet" },
   { code: "CO", name: "Colombia", flag: "🇨🇴", currency: "COP",
     transfer: ["PSE", "Bancolombia", "Davivienda", "Banco de Bogotá"],

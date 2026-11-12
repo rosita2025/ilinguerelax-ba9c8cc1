@@ -102,7 +102,7 @@ Deno.serve(async (req) => {
       });
     }
     await logOrderEvent({
-      orderNumber, event: "payment_paid", provider: "whop", status: "PAID", method: "Billetera digital (Whop)", reference: paymentId,
+      orderNumber, event: "payment_paid", provider: "whop", status: "PAID", method: meta.whopMethod === "installments" ? "Cuotas con Addi (Whop)" : "Billetera digital (Whop)", reference: paymentId,
       detail: check.mismatch ? `Pago confirmado por Whop con discrepancia: ${describeAmountCheck(check)}` : "Pago confirmado por Whop",
       customerEmail: email, amount: paid?.amount ?? null, currency: paid?.currency ?? null, metadata: { skus, country },
     });

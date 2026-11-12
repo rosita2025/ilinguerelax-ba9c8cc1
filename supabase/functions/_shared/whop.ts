@@ -62,14 +62,14 @@ export const WHOP_API_BASE = "https://api.whop.com/api/v1";
 export const WHOP_API_VERSION_DATE = "2026-11-10-1";
 
 /**
- * Países donde el checkout cobra por Whop, con su moneda y los únicos métodos que se ofrecen (billeteras y cuotas):
- * Colombia (Nequi y Addi en cuotas), Chile (Mercado Pago) y Argentina (Mercado Pago billetera). Espejo en el navegador:
+ * Países donde el checkout cobra por Whop, con su moneda y los únicos métodos que se ofrecen, en filas separadas:
+ * `wallet` (billetera) y `installments` (cuotas). Colombia: Nequi y, aparte, Addi; Chile y Argentina: Mercado Pago. Espejo en el navegador:
  * `src/lib/whopCountries.ts` (`src/test/whop.test.ts` comprueba que coinciden).
  */
-export const WHOP_COUNTRIES: Record<string, { currency: string; methods: string[] }> = {
-  CO: { currency: "COP", methods: ["nequi", "addi"] },
-  CL: { currency: "CLP", methods: ["mercado_pago"] },
-  AR: { currency: "ARS", methods: ["mercado_pago_ar"] },
+export const WHOP_COUNTRIES: Record<string, { currency: string; wallet: string[]; installments?: string[] }> = {
+  CO: { currency: "COP", wallet: ["nequi"], installments: ["addi"] },
+  CL: { currency: "CLP", wallet: ["mercado_pago"] },
+  AR: { currency: "ARS", wallet: ["mercado_pago_ar"] },
 };
 
 /**

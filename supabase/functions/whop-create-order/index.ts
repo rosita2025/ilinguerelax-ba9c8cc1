@@ -25,6 +25,8 @@ const BodySchema = z.object({
   payerName: z.string().min(1).max(120),
   payerPhone: z.string().max(30).optional(),
   country: z.string().length(2),
+  /** Fila elegida: billetera (Nequi, Mercado Pago) o cuotas (Addi). */
+  method: z.enum(["wallet", "installments"]).default("wallet"),
 });
 
 const unavailable = (reason: string) => json({ error: "whop_not_available", reason }, 409);
@@ -42,6 +44,8 @@ Deno.serve(async (req) => {
     // Whop solo en los países de WHOP_COUNTRIES, en su moneda local y solo con productos digitales.
     const cfg = WHOP_COUNTRIES[country];
     if (!cfg) return unavailable("country_not_supported");
+    const methods = cfg[body.method];
+    if (!methods?.length) return unavailable("method_not_supported");
     const apiKey = Deno.env.get("WHOP_API_KEY");
     const productId = Deno.env.get("WHOP_PRODUCT_ID") || undefined; // opcional
     if (!Deno.env.get("WHOP_WEBHOOK_SECRET") || !apiKey) return unavailable("not_configured");
@@ -75,7 +79,7 @@ Deno.serve(async (req) => {
       title: description,
       amount: localAmount,
       currency: cfg.currency,
-      methods: cfg.methods,
+      methods,
     });
     let checkoutConfigId = "";
     let whopError = "";
@@ -126,7 +130,7 @@ Deno.serve(async (req) => {
       event: "order_created",
       provider: "whop",
       status: "CREATED",
-      method: "Billetera digital (Whop)",
+      method: body.method === "installments" ? "Cuotas con Addi (Whop)" : "Billetera digital (Whop)",
       detail: description,
       customerEmail: body.payerEmail,
       amount: Number(pricing.totalUsd.toFixed(2)),
@@ -138,6 +142,7 @@ Deno.serve(async (req) => {
         productName: description,
         localAmount,
         localCurrency: cfg.currency,
+        whopMethod: body.method,
         customerName: body.payerName,
         customerPhone: body.payerPhone ?? null,
       },

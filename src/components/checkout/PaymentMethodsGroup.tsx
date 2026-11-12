@@ -56,6 +56,7 @@ const isCardHostedOnly = (): boolean => {
 };
 const StripePaymentElementBox = React.lazy(() => import("@/components/checkout/StripePaymentElementBox"));
 const WhopCheckoutPanel = lazy(() => import("@/components/checkout/WhopCheckoutPanel"));
+import { WHOP_COUNTRIES } from "@/lib/whopCountries";
 import { DLOCAL_COUNTRY_CODES, dlocalNeedsDocument, dlocalDocumentInfo, dlocalSupports, dlocalRails, dlocalBadges, getDlocalCountry, validateDlocalMethod, isDlocalMethodId, auditDlocalCheckout, RESTRICTED_CURRENCY_COUNTRIES } from "@/lib/dlocalCoverage";
 import { DlocalSmartFields } from "@/components/checkout/DlocalSmartFields";
 import { mapDlocalStatus } from "@/lib/dlocalErrorMap";
@@ -2116,7 +2117,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
 
 
-  const whopEnabled = country === "CO" && !whopBroken && methodsConfig.enabledMethodKeys.includes("whop_wallet");
+  const whopEnabled = !!WHOP_COUNTRIES[country] && !whopBroken && methodsConfig.enabledMethodKeys.includes("whop_wallet");
   const enabledStripeKeys = new Set(methodsConfig.enabledMethodKeys.filter((k) => k.startsWith("stripe_")));
   const primaryCardBadges: MethodBadge[] = [
     { label: "Visa", bg: "#ffffff", color: "#1F2937" },
@@ -2239,7 +2240,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       icon: Wallet,
       // Donde Mercado Pago está disponible (México, Argentina, Brasil, Perú…) la fila se llama Mercado Pago y usa su logo
       // (el cobro lo gestiona dLocal Go por detrás).
-      title: whopEnabled ? "Nequi"
+      // Con Whop (Colombia, Chile, Argentina) la fila es la de Whop: Nequi y Addi en Colombia, Mercado Pago en Chile y Argentina.
+      title: whopEnabled ? (country === "CO" ? "Nequi · Addi" : "Mercado Pago")
         : dlocalRails(country, "wallet").includes("Mercado Pago") ? "Mercado Pago"
         // Con las marcas que la gente reconoce (Nequi · Daviplata, Yape, Zinli…) en vez de «Billetera digital» genérico.
         : dlocalRails(country, "wallet").length ? dlocalRails(country, "wallet").slice(0, 2).join(" · ")
@@ -2251,7 +2253,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         : language === "it" ? "Portafoglio digitale"
         : "Billetera digital"),
       sub: whopEnabled
-        ? (language === "en" ? "Pay from your Nequi app. Instant confirmation." : "Paga desde tu app de Nequi. Confirmación inmediata.")
+        ? (country === "CO"
+          ? (language === "en" ? "Pay with Nequi, or split it into installments with Addi." : "Paga con Nequi o en cuotas con Addi. Confirmación inmediata.")
+          : (language === "en" ? "Pay with your Mercado Pago account. Instant confirmation." : "Paga con tu cuenta de Mercado Pago. Confirmación inmediata."))
         : (dlocalRails(country, "wallet").length
         ? `${dlocalRails(country, "wallet").join(" · ")} — `
         : "") + (language === "en" ? "Pay from your wallet app in local currency. Instant confirmation."
@@ -2261,7 +2265,9 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         : "Paga desde tu billetera digital en moneda local. Confirmación inmediata."),
       badge: finalPriceLabel,
 
-      badges: dlocalBadges(country, "wallet", 6),
+      badges: whopEnabled
+        ? (country === "CO" ? [{ label: "Nequi", bg: "#200020", color: "#DA0081" }, { label: "Addi", bg: "#00E5A8", color: "#04250F" }] : [])
+        : dlocalBadges(country, "wallet", 6),
     },
     {
       id: "dlocal_card",
@@ -2369,11 +2375,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         if (m.id === "dlocal_cash") return methodsConfig.dlocalCash && dlocalSupports(country, "cash") && !getDlocalCountry(country)?.cashComingSoon && !(country === "MX" && methodsConfig.enabledMethodKeys.includes("stripe_oxxo"));
         // Tarjeta dLocal DESACTIVADA. Billetera digital sigue activa.
         if (m.id === "dlocal_card") return false;
-        if (m.id === "dlocal_wallet") return methodsConfig.dlocalWallet && dlocalSupports(country, "wallet") && !getDlocalCountry(country)?.walletComingSoon;
+        // Con Whop encendido, la billetera es la de Whop (reemplaza a la de dLocal Go en Colombia, Chile y Argentina).
+        if (m.id === "dlocal_wallet") return whopEnabled || (methodsConfig.dlocalWallet && dlocalSupports(country, "wallet") && !getDlocalCountry(country)?.walletComingSoon);
 
 
 
-        if (m.id === "hotmart") return methodsConfig.hotmart && !!hotmartResolvedUrl && !EUROPE_COUNTRIES.has(country);
+        // Hotmart ya no se usa: la fila no se muestra. El código queda por si se vuelve a usar.
+        if (m.id === "hotmart") return false;
 
 
         return true;
@@ -2744,7 +2752,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           : m.id === "yape" ? { src: yapeLogo, alt: "Yape" }
           : m.id === "clabe" ? { src: speiLogo, alt: "SPEI" }
           : (m.id === "dlocal_cash" || m.id === "stripe_oxxo") && country === "MX" ? { src: oxxoLogo, alt: "OXXO" }
-          : m.id === "dlocal_wallet" && dlocalRails(country, "wallet").includes("Mercado Pago") ? { src: mercadopagoLogo, alt: "Mercado Pago" }
+          : m.id === "dlocal_wallet" && (dlocalRails(country, "wallet").includes("Mercado Pago") || (whopEnabled && country !== "CO")) ? { src: mercadopagoLogo, alt: "Mercado Pago" }
           : null;
         const section = methodSection(m.id);
         const prev = idx > 0 ? methods[idx - 1] : null;

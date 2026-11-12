@@ -70,7 +70,8 @@ export const WHOP_COLOMBIA_WALLETS = ["nequi", "bre_b"];
  */
 export function buildWhopCheckoutConfig(input: {
   accountId?: string;
-  productId: string;
+  /** Producto de Whop al que pertenece la variante en línea. Opcional: sin él Whop usa el que corresponda a la cuenta. */
+  productId?: string;
   orderId: string;
   title: string;
   amountCop: number;
@@ -81,7 +82,7 @@ export function buildWhopCheckoutConfig(input: {
     mode: "payment",
     metadata: { order_id: input.orderId },
     variant: {
-      product_id: input.productId,
+      ...(input.productId ? { product_id: input.productId } : {}),
       currency: "cop",
       initial_price: amount,
       billing_type: "one_time",

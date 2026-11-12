@@ -6,6 +6,7 @@ import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
 import { BlackFridayStrip } from "@/components/BlackFridayStrip";
+import { ProductGallerySlider } from "@/components/ProductGallerySlider";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
@@ -344,8 +345,13 @@ const PatronesContent = () => {
     () => (pricingAdmin.galleryImages ?? []).filter((u): u is string => typeof u === "string" && u.trim().length > 0 && u !== pricingAdmin.coverImageUrl),
     [pricingAdmin.galleryImages, pricingAdmin.coverImageUrl],
   );
-  const [heroView, setHeroView] = useState(0);
-  const activeExtraView = heroView > 0 ? extraViews[heroView - 1] : undefined;
+  // Galería manual: portada + vistas del admin; si el admin no cargó ninguna, las páginas reales del PDF.
+  const galleryExtras = useMemo(
+    () => (extraViews.length > 0
+      ? extraViews.map((src, i) => ({ src, alt: `Patrones Especiales - vista adicional ${i + 1}` }))
+      : previews.map((p) => ({ src: p.src, alt: p.alt }))),
+    [extraViews],
+  );
   
   const pixelParams = useMemo(() => ({
     content_name: "Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés",
@@ -483,16 +489,11 @@ const PatronesContent = () => {
             <div className="relative">
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative">
-                {activeExtraView ? (
-                  <img
-                    src={activeExtraView}
-                    alt={`Patrones Especiales - vista adicional ${heroView}`}
-                    className="w-full h-auto rounded-2xl shadow-hero"
-                    width={1254}
-                    height={1254}
-                    decoding="async"
-                  />
-                ) : heroImage ? (
+                <ProductGallerySlider
+                  coverThumb={heroLight ?? heroImage ?? undefined}
+                  extras={galleryExtras}
+                  cover={
+                    heroImage ? (
                   <img
                     src={heroLight ?? heroImage}
                     srcSet={snapshotCover && !constrainedNetwork ? PATRONES_COVER_SRCSET : undefined}
@@ -502,7 +503,7 @@ const PatronesContent = () => {
                       if (heroLight && heroLight !== heroImage) { disableImageTransform(); setHeroFailed(true); }
                     }}
                     alt="Patrones Especiales, Alfabeto y Combinaciones Secretas en Inglés"
-                    className="w-full h-auto rounded-2xl shadow-hero"
+                    className="w-full h-auto"
                     width={1000}
                     height={1250}
                     loading="eager"
@@ -510,27 +511,11 @@ const PatronesContent = () => {
                     fetchPriority="high"
                     onLoad={() => setHeroLoaded(true)}
                   />
-                ) : (
-                  <div className="w-full aspect-[4/5] rounded-2xl bg-muted animate-pulse" />
-                )}
-                {extraViews.length > 0 && heroImage && (
-                  <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-                    {[heroLight ?? heroImage, ...extraViews].map((src, i) => (
-                      <button
-                        key={`${i}-${src}`}
-                        type="button"
-                        onClick={() => setHeroView(i)}
-                        aria-label={i === 0 ? "Ver portada" : `Ver vista adicional ${i}`}
-                        aria-pressed={i === heroView}
-                        className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                          i === heroView ? "border-primary" : "border-border opacity-70 hover:opacity-100"
-                        }`}
-                      >
-                        <img src={src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
-                      </button>
-                    ))}
-                  </div>
-                )}
+                    ) : (
+                      <div className="w-full aspect-[4/5] bg-muted animate-pulse" />
+                    )
+                  }
+                />
                 <PinterestSave 
                   overlay 
                   media={heroImageAbsolute}

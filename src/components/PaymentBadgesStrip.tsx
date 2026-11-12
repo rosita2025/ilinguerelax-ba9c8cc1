@@ -22,8 +22,8 @@ const WALLETS: Id[] = ["applepay", "googlepay"];
 const BY_COUNTRY: Record<string, Id[]> = {
   PE: [...CARDS, ...WALLETS, "yape", "paypal"],
   ES: [...CARDS, "applepay", "googlepay", "bizum", "paypal"],
-  MX: [...CARDS, "oxxo", "mercadopago", "spei", "paypal"],
-  CO: [...CARDS, "nequi", "pse", "paypal"],
+  MX: [...CARDS, "oxxo", "spei", "paypal"], // México: sin Mercado Pago
+  CO: [...CARDS, "nequi", "paypal"],
   AR: [...CARDS, "mercadopago", "rapipago", "paypal"],
   BR: [...CARDS, "pix", "boleto", "paypal"],
   CL: [...CARDS, ...WALLETS, "paypal"],
@@ -42,7 +42,7 @@ function available(id: Id, c: CheckoutMethodsConfig, country: string): boolean {
   switch (id) {
     case "paypal": return c.paypal;
     case "yape": return c.yape;
-    case "oxxo": return c.dlocalCash || keys.includes("stripe_oxxo");
+    case "oxxo": return country === "MX" || c.dlocalCash || keys.includes("stripe_oxxo"); // México: OXXO de Stripe siempre
     case "mercadopago": return c.dlocalWallet || (country === "PE" && (c.transfer || c.cash));
     case "spei": return c.clabe || c.dlocalTransfer;
     case "nequi": return c.dlocalWallet;

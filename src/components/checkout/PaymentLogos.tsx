@@ -74,7 +74,6 @@ export function PaymentLogos({ className = "" }: { className?: string }) {
       )}
       {country === "CO" && (
         <>
-          <TextBadge label="PSE" bg="#0B5AA6" />
           <TextBadge label="Nequi" bg="#200020" color="#DA0081" />
         </>
       )}

@@ -8,9 +8,12 @@ type Extra = { src: string; alt: string };
  * prioritaria), el resto se carga al acercarse. Se desliza con el dedo (scroll-snap), con flechas, con los puntos
  * o con las miniaturas. Sin autoplay.
  */
-export const ProductGallerySlider = ({ cover, extras, coverThumb }: { cover: ReactNode; extras: Extra[]; coverThumb?: string }) => {
+export const ProductGallerySlider = ({ cover, extras, coverThumb, warm = false }: { cover: ReactNode; extras: Extra[]; coverThumb?: string; warm?: boolean }) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const [idx, setIdx] = useState(0);
+  // Las imágenes extra pesan ~200 KB c/u: no se piden hasta que la portada ya cargó (`warm`) o el visitante toca la galería.
+  const [touched, setTouched] = useState(false);
+  const active = warm || touched;
   const total = 1 + extras.length;
 
   const goTo = useCallback((i: number) => {
@@ -40,7 +43,7 @@ export const ProductGallerySlider = ({ cover, extras, coverThumb }: { cover: Rea
   const arrow = "absolute top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-foreground shadow-md ring-1 ring-black/10 transition hover:bg-white disabled:opacity-0 disabled:pointer-events-none";
 
   return (
-    <div role="group" aria-roledescription="carrusel" aria-label="Imágenes del producto" onKeyDown={onKeyDown}>
+    <div role="group" aria-roledescription="carrusel" aria-label="Imágenes del producto" onKeyDown={onKeyDown} onPointerDown={() => setTouched(true)} onTouchStart={() => setTouched(true)} onFocus={() => setTouched(true)}>
       <div className="relative">
         <div
           ref={trackRef}
@@ -50,7 +53,7 @@ export const ProductGallerySlider = ({ cover, extras, coverThumb }: { cover: Rea
           <div className="w-full shrink-0 snap-center" aria-label={`Imagen 1 de ${total}`}>{cover}</div>
           {extras.map((x, i) => (
             <div key={x.src} className="w-full shrink-0 snap-center aspect-[4/5] bg-card" aria-label={`Imagen ${i + 2} de ${total}`}>
-              <img src={x.src} alt={x.alt} loading="lazy" decoding="async" draggable={false} className="h-full w-full object-contain" />
+              {active ? <img src={x.src} alt={x.alt} loading="lazy" decoding="async" draggable={false} className="h-full w-full object-contain" /> : null}
             </div>
           ))}
         </div>
@@ -70,9 +73,9 @@ export const ProductGallerySlider = ({ cover, extras, coverThumb }: { cover: Rea
       </div>
       {total > 1 && (
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-          {[coverThumb, ...extras.map((x) => x.src)].map((src, i) => (
+          {[coverThumb, ...extras.map((x) => (active ? x.src : undefined))].map((src, i) => (
             <button
-              key={`${i}-${src ?? "cover"}`}
+              key={i}
               type="button"
               onClick={() => goTo(i)}
               aria-label={i === 0 ? "Ver portada" : `Ver imagen ${i + 1}`}

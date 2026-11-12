@@ -302,6 +302,8 @@ const PatronesContent = () => {
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   
   const [heroLoaded, setHeroLoaded] = useState(false);
+  // Galería: las imágenes extra se piden 2,5 s después de que cargó la portada (nunca en conexiones lentas) o al tocarla.
+  const [galleryWarm, setGalleryWarm] = useState(false);
   const constrainedNetwork = isPatronesConstrainedConnection(getPatronesConnection());
   const mediaMargin = constrainedNetwork ? "0px" : "300px";
   const checkoutPrefetched = useRef(false);
@@ -312,6 +314,12 @@ const PatronesContent = () => {
     void import("@/pages/Checkout");
     void prefetchCheckoutProduct("patrones-especiales-alfabeto-combinaciones-secretas-ingles");
   };
+
+  useEffect(() => {
+    if (!heroLoaded || isPatronesConstrainedConnection(getPatronesConnection())) return;
+    const id = window.setTimeout(() => setGalleryWarm(true), 2500);
+    return () => window.clearTimeout(id);
+  }, [heroLoaded]);
 
   // Do not download payment code while the first image is still loading.
   useEffect(() => {
@@ -501,6 +509,7 @@ const PatronesContent = () => {
               <div className="absolute -inset-4 gradient-hero opacity-20 blur-3xl rounded-3xl" />
               <div className="relative">
                 <ProductGallerySlider
+                  warm={galleryWarm}
                   coverThumb={heroLight ?? heroImage ?? undefined}
                   extras={galleryExtras}
                   cover={

@@ -35,6 +35,7 @@ describe("whop webhook", () => {
     expect(body.variant.visibility).toBe("hidden");
     expect(body.variant.payment_method_configuration).toEqual({ enabled: ["nequi", "bre_b"], include_platform_defaults: false });
     expect((buildWhopCheckoutConfig({ productId: "prod_1", orderId: "x", title: "t", amountCop: 1000 }) as any).account_id).toBeUndefined();
+    expect((buildWhopCheckoutConfig({ orderId: "x", title: "t", amountCop: 1000 }) as any).variant.product_id).toBeUndefined();
   });
   it("lee importes Money", () => {
     expect(whopMoney({ amount: "59900.00", currency: "cop" })).toEqual({ amount: 59900, currency: "COP" });

@@ -42,8 +42,8 @@ Deno.serve(async (req) => {
     // Whop cobra en pesos colombianos: solo Colombia (Nequi, Bre-B) y solo productos digitales.
     if (country !== "CO") return unavailable("only_colombia");
     const apiKey = Deno.env.get("WHOP_API_KEY");
-    const productId = Deno.env.get("WHOP_PRODUCT_ID");
-    if (!Deno.env.get("WHOP_WEBHOOK_SECRET") || !apiKey || !productId) return unavailable("not_configured");
+    const productId = Deno.env.get("WHOP_PRODUCT_ID") || undefined; // opcional
+    if (!Deno.env.get("WHOP_WEBHOOK_SECRET") || !apiKey) return unavailable("not_configured");
 
     let pricing;
     try {

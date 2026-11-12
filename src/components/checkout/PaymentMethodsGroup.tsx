@@ -2166,6 +2166,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     // Apple Pay / Google Pay / Link salen como botones rápidos DENTRO del formulario de tarjeta de
     // Stripe; una fila aparte hacía dos botones para lo mismo.
     .filter((key) => !!STRIPE_VISIBLE_METHODS[key] && key !== "stripe_link" && key !== "stripe_apple_pay" && key !== "stripe_google_pay" && key !== "stripe_oxxo" /* OXXO tiene su propia fila (página de Stripe, sin documento) */ && key !== "stripe_sepa_debit" /* SEPA tarda días en cobrar */ && key !== "stripe_ideal" && key !== "stripe_mb_way" && key !== "stripe_satispay" && key !== "stripe_crypto" /* ahora son filas propias */)
+    // México: de Stripe solo se ofrecen tarjeta y OXXO; ningún otro método de Stripe aunque el admin lo tenga encendido para esa región.
+    .filter(() => country !== "MX")
     .map((key) => ({ id: "card", methodKey: key, badge: finalPriceLabel, ...STRIPE_VISIBLE_METHODS[key] }));
   const allMethods: PaymentMethodRow[] = [
     { 

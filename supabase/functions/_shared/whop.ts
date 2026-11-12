@@ -100,7 +100,8 @@ export function buildWhopCheckoutConfig(input: {
       billing_type: "one_time",
       release_method: "buy_now",
       visibility: "hidden",
-      title: input.title.slice(0, 80),
+      // Whop limita el título del plan a 30 caracteres.
+      title: input.title.slice(0, 30),
       // Whop exige los dos arreglos (`enabled` y `disabled`), aunque `disabled` vaya vacío.
       payment_method_configuration: { enabled: input.methods, disabled: [], include_platform_defaults: false },
     },

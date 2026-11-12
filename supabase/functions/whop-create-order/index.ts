@@ -86,7 +86,8 @@ Deno.serve(async (req) => {
       accountId: Deno.env.get("WHOP_ACCOUNT_ID") || undefined,
       productId,
       orderId,
-      title: description,
+      // Título corto del plan (Whop: máximo 30 caracteres): el producto, y «+N» si hay más.
+      title: (pricing.items.length > 1 ? `${pricing.items[0].name} +${pricing.items.length - 1}` : pricing.items[0].name).slice(0, 30),
       amount: localAmount,
       currency: cfg.currency,
       methods,

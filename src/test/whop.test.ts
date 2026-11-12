@@ -45,7 +45,7 @@ describe("whop webhook", () => {
     expect(WHOP_COUNTRIES.CO.wallet).toEqual(["nequi"]);
     expect(WHOP_COUNTRIES.CO.installments).toEqual(["addi"]);
     expect(WHOP_COUNTRIES.CL).toEqual({ currency: "CLP", wallet: ["mercado_pago"] });
-    expect(WHOP_COUNTRIES.AR).toEqual({ currency: "ARS", wallet: ["mercado_pago_ar"] });
+    expect(WHOP_COUNTRIES.AR).toEqual({ currency: "ARS", wallet: ["mercado_pago_ar", "modo"] });
   });
   it("lee importes Money", () => {
     expect(whopMoney({ amount: "59900.00", currency: "cop" })).toEqual({ amount: 59900, currency: "COP" });

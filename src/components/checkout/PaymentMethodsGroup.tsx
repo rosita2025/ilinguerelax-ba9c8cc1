@@ -200,7 +200,8 @@ function BankBadge({ label, bg }: { label: string; bg: string; color?: string })
 type MethodSection = "cards" | "transfer" | "cash" | "wallet" | "other";
 
 const SECTION_ORDER: MethodSection[] = ["cards", "transfer", "cash", "wallet", "other"];
-const MX_SECTION_ORDER: MethodSection[] = ["transfer", "cash", "cards", "wallet", "other"];
+// México: tarjeta arriba como en el resto de países, luego efectivo (OXXO) y transferencia (SPEI).
+const MX_SECTION_ORDER: MethodSection[] = ["cards", "cash", "transfer", "wallet", "other"];
 function methodSection(id: string): MethodSection {
   if (["card", "dlocal_card", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto", "stripe_klarna", "whop_addi"].includes(id)) return "cards";
   if (["transfer", "stripe_ach", "dlocal_transfer", "clabe"].includes(id)) return "transfer";
@@ -2449,10 +2450,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     const coRank = (id: string) => { const i = CO_ORDER.indexOf(id); return i === -1 ? CO_ORDER.length : i; };
     methods.sort((x, y) => coRank(x.id) - coRank(y.id));
   }
-  // Método que queda elegido de entrada en México (el primero local disponible); si no hay, se elige la tarjeta como en el resto.
-  const mxFirstLocalId = country === "MX"
-    ? (methods.find((m) => !(m as any).isSeparator && ["dlocal_transfer", "clabe", "dlocal_cash"].includes(m.id))?.id as string | undefined)
-    : undefined;
   const stripeMethodAvailable = methods.some((m) => ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(m.id));
 
   // Si el banco rechaza la tarjeta se ofrecen otras opciones según el país:
@@ -2486,18 +2483,15 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       // método explícitamente (ej: PayPal, Binance). Antes forzaba "card"
       // en cada render y borraba la selección de PayPal al hacer click.
       if (!selected) {
-        if (mxFirstLocalId) {
-          setSelected(mxFirstLocalId as Method);
-        } else {
-          setSelected("card");
-          setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`);
-        }
+        // La tarjeta es la opción recomendada y queda elegida de entrada en todos los países (México incluido).
+        setSelected("card");
+        setSelectedCardRow(`card-${isPeru ? t.cardTitlePeru : t.cardTitleGlobal}`);
       }
       const isStripeSel = selected && ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(selected);
       // En Perú el formulario lo abre el efecto de abajo (con el aviso de upsell).
       if (!isPeru && isStripeSel && valid && stripePromise && !showStripe) setShowStripe(true);
     }
-  }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal, mxFirstLocalId]);
+  }, [isPeru, stripeMethodAvailable, selected, valid, stripePromise, showStripe, total, items.length, t.cardTitlePeru, t.cardTitleGlobal]);
 
   // Perú: al elegir tarjeta, el formulario de Stripe se abre solo, sin tener que pulsar
   // ningún botón (fuera de Perú esto ya ocurre arriba). Se conserva el aviso

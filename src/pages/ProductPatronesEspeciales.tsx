@@ -7,6 +7,7 @@ import { SEO } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
 import { BlackFridayStrip } from "@/components/BlackFridayStrip";
 import { ProductGallerySlider } from "@/components/ProductGallerySlider";
+import { SupportProofSlider, type SupportShot } from "@/components/SupportProofSlider";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
@@ -59,6 +60,14 @@ const previews = [
   { src: patronesPreview2.url, alt: "Letras mudas en inglés con reglas y ejemplos", caption: "Letras mudas" },
   { src: patronesPreview3.url, alt: "Sufijos y prefijos en inglés con pronunciación adaptada", caption: "Sufijos y prefijos" },
   { src: patronesPreview4.url, alt: "Contracciones y habla rápida en inglés", caption: "Contracciones y habla rápida" },
+];
+
+// Capturas REALES de WhatsApp de atención posventa (datos privados tapados a mano por el dueño; sin editar ni IA). Más en public/soporte-patrones.
+const supportShots: SupportShot[] = [
+  { src: "/soporte-patrones/peru-yape.webp", width: 640, height: 767, flag: "🇵🇪", country: "Perú", caption: "Pago manual con Yape: revisado y material enviado al correo.", alt: "Captura real de WhatsApp: cliente de Perú confirma su pago por Yape y recibe el material" },
+  { src: "/soporte-patrones/mexico-material.webp", width: 640, height: 1181, flag: "🇲🇽", country: "México", caption: "Ebook + 3 bonos enviados por WhatsApp.", alt: "Captura real de WhatsApp: cliente de México recibe el ebook y los 3 bonos y agradece" },
+  { src: "/soporte-patrones/espana-spotify.webp", width: 640, height: 1313, flag: "🇪🇸", country: "España", caption: "Bono de 1,000 palabras con su audio en Spotify.", alt: "Captura real de WhatsApp: cliente de España recibe el enlace del audio de 1,000 palabras" },
+  { src: "/soporte-patrones/espana-actualizacion.webp", width: 640, height: 1195, flag: "🇪🇸", country: "España", caption: "Material actualizado (versión 1.5) enviado a quien ya compró.", alt: "Captura real de WhatsApp: cliente de España recibe la actualización de su pedido" },
 ];
 
 const bonusPreviews = [
@@ -879,6 +888,29 @@ const PatronesContent = () => {
             <div className="mt-8">
               <TestimonialSlider priceLabel={priceLabel} />
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Atención posventa (no son reseñas): capturas reales, agradecidos por su confianza */}
+      <section className="py-10 md:py-14">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold mb-2">
+                🇲🇽 🇵🇪 🇪🇸 Atención real después de la compra
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                Gracias por <span className="text-gradient">su confianza</span>
+              </h2>
+              <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
+                Si compras, no te dejamos solo: te acompañamos con actualizaciones del material, pagos manuales (Yape, transferencia, OXXO) y si tu correo falla o cae en spam.
+              </p>
+            </div>
+            <LazyMount minHeight={520} rootMargin={mediaMargin}>
+              <SupportProofSlider shots={supportShots} />
+            </LazyMount>
+            <p className="text-center text-xs text-muted-foreground mt-4">Capturas reales de WhatsApp. Datos privados tapados; sin editar.</p>
           </div>
         </div>
       </section>

@@ -22,15 +22,12 @@ import { useRegionTier } from "@/hooks/useRegionTier";
 import { detectCurrency, formatPrice, formatCurrencyAmount, exchangeRates, type Currency } from "@/i18n";
 import { useLocalOverrides } from "@/lib/livePrices";
 import { CheckoutLanguageProvider, useI18n } from "@/i18n/I18nContext";
-import introVideo from "@/assets/introduccion-patrones-16x9.mp4.asset.json";
-import introPoster from "@/assets/intro-patrones-poster.jpg.asset.json";
 import { PATRONES_COVER_SOURCE as FAST_COVER_SOURCE, PATRONES_FAST_COVER_URL, PATRONES_MOBILE_COVER_URL, PATRONES_COVER_SRCSET, PATRONES_COVER_SIZES } from "@/lib/patronesCover";
 import { getPatronesConnection, isPatronesConstrainedConnection } from "@/lib/patronesNetwork";
 
 // Below-the-fold modules download only when their sections approach the viewport.
 const SegundoBonoGramatica = lazy(() => import("@/components/SegundoBonoGramatica").then(m => ({ default: m.SegundoBonoGramatica })));
 const TercerBonoExamen = lazy(() => import("@/components/TercerBonoExamen").then(m => ({ default: m.TercerBonoExamen })));
-const TikTokVideos = lazy(() => import("@/components/TikTokVideos").then(m => ({ default: m.TikTokVideos })));
 
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
 // ÚNICA regla final para Patrones:
@@ -259,7 +256,7 @@ const TestimonialSlider = ({ priceLabel }: { priceLabel: string }) => {
                 </div>
                 <p className="text-foreground/90 text-sm leading-relaxed mb-4 flex-grow">"{r.text}"</p>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground text-xs font-bold">
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">
                     {r.name.charAt(0)}
                   </div>
                   <div>
@@ -666,40 +663,6 @@ const PatronesContent = () => {
         </div>
       </section>
 
-      {/* Presentación del producto */}
-      <section className="py-8 md:py-10 bg-muted/30">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-5">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
-                <Music2 className="w-4 h-4" /> Presentación del producto
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-                Mira cómo <span className="text-gradient">funciona por dentro</span>
-              </h2>
-            </div>
-            <LazyMount minHeight={520} rootMargin={mediaMargin}>
-            <div className="mb-6">
-                <div className="relative rounded-2xl overflow-hidden border border-border/50 bg-black">
-                  <video
-                    src={introVideo.url}
-                    poster={introPoster.url}
-                    className="w-full aspect-video object-cover"
-                    controls
-                    playsInline
-                    preload="none"
-                    controlsList="nodownload noplaybackrate noremoteplayback"
-                    disablePictureInPicture
-                    onContextMenu={(e) => e.preventDefault()}
-                  />
-                </div>
-            </div>
-            <LazyMount minHeight={400} rootMargin={mediaMargin}><Suspense fallback={<div className="min-h-[400px]" />}><TikTokVideos /></Suspense></LazyMount>
-            </LazyMount>
-          </div>
-        </div>
-      </section>
-
       {/* Beneficios */}
       <section className="py-8 md:py-10 bg-muted/30">
         <div className="container px-4 md:px-6">
@@ -882,11 +845,11 @@ const PatronesContent = () => {
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-bold mb-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold mb-2">
                 <Check className="w-3.5 h-3.5" /> Compras verificadas · WhatsApp 🇲🇽 🇵🇪
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-                Reseñas <span className="text-gradient">reales</span> de clientes
+                Reseñas <span className="text-primary">reales</span> de clientes
               </h2>
             </div>
             <ReviewSlider />
@@ -906,7 +869,7 @@ const PatronesContent = () => {
                 🇲🇽 🇺🇸 🇵🇪 🇪🇸 Atención real después de la compra
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-                Gracias por <span className="text-gradient">su confianza</span>
+                Gracias por <span className="text-primary">su confianza</span>
               </h2>
               <p className="text-muted-foreground mt-2 max-w-xl mx-auto text-sm md:text-base">
                 Te acompañamos después de comprar: pagos manuales, correos en spam y actualizaciones del material.
@@ -940,10 +903,15 @@ const PatronesContent = () => {
 
       <FAQ
         items={[
-          { question: "¿Qué recibo exactamente al comprar?", answer: "El ebook Patrones Especiales + 3 bonos GRATIS: 1,000 palabras con pronunciación, Estructuras Gramaticales de cero a A2 y un Examen de 98 preguntas con respuestas. Todo en PDF.", icon: Sparkles },
+          { question: "¿Qué son los Patrones Especiales?", answer: "Es un ebook en PDF que te enseña a leer y pronunciar en inglés reconociendo los patrones de letras y combinaciones que se repiten en muchas palabras: letras mudas, combinaciones secretas, contracciones y habla rápida. Está hecho para hispanohablantes.", icon: BookOpen },
+          { question: "¿Es una clase o es digital?", answer: "No es una clase en vivo ni un curso con horarios: es un material 100% digital (PDF) que estudias a tu ritmo, cuando quieras, en móvil, tablet o computadora.", icon: Smartphone },
+          { question: "¿Qué recibo exactamente al comprar?", answer: "El ebook Patrones Especiales + 3 bonos GRATIS: 1,000 palabras con pronunciación y audios, Estructuras Gramaticales de cero a A2 y un Examen de 98 preguntas con respuestas. Todo en PDF.", icon: Sparkles },
+          { question: "¿Es un material de calidad?", answer: "Sí. Es un material de iLingue Relax, con explicaciones paso a paso y sin errores ortográficos. Puedes comprobarlo antes de comprar en la vista previa real de 4 páginas, y tienes garantía de 7 días.", icon: Check },
+          { question: "¿Quién es iLingue Relax?", answer: "iLingue Relax es nuestra marca de materiales para aprender idiomas sin estrés, con pronunciación pensada para hispanohablantes. Atendemos a nuestros clientes por WhatsApp, también después de la compra.", icon: Lightbulb },
           { question: "¿Cómo recibo el material?", answer: "Inmediatamente después de pagar recibes un correo con tu enlace de descarga. Si no lo ves, revisa Spam o Promociones o escríbenos por WhatsApp y te ayudamos al momento.", icon: Download },
+          { question: "¿Qué pasa si pago por Yape, transferencia u OXXO?", answer: "Los pagos manuales o en efectivo pueden tardar un poco en confirmarse; apenas se confirman te enviamos el material. Si ya pagaste y no llega, escríbenos por WhatsApp con tu comprobante.", icon: CreditCard },
+          { question: "¿Recibiré actualizaciones del material?", answer: "Cuando actualizamos el material, enviamos la nueva versión a quienes ya compraron.", icon: Eye },
           { question: "¿Es seguro pagar aquí?", answer: "Sí. El pago se procesa en un checkout seguro y tienes garantía de 7 días.", icon: Shield },
-          { question: "¿Es digital o físico?", answer: "Es 100% digital (PDF). Puedes leerlo en móvil, tablet o computadora, o imprimirlo.", icon: Smartphone },
           { question: "¿Sirve si soy principiante?", answer: "Sí. Está explicado paso a paso para hispanohablantes, con ejemplos claros y mini retos con respuestas.", icon: BookOpen },
         ]}
         title="Preguntas Frecuentes"

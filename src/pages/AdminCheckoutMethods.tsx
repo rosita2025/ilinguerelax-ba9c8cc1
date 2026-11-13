@@ -11,6 +11,8 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import AdminNav from "@/components/admin/AdminNav";
+import { WhopStatusCard } from "@/components/admin/WhopStatusCard";
+import { PAYPAL_UNAVAILABLE } from "@/lib/paymentAvailability";
 import AdminCheckoutPreview from "@/components/admin/AdminCheckoutPreview";
 import { adminInvoke } from "@/lib/adminInvoke";
 import { invalidateCheckoutMethodsCache } from "@/hooks/useCheckoutMethodsConfig";
@@ -175,7 +177,7 @@ type CheckoutMethodDef = {
   baseStripe?: boolean;
 };
 
-const CHECKOUT_METHODS: CheckoutMethodDef[] = [
+const ALL_CHECKOUT_METHODS: CheckoutMethodDef[] = [
   { key: "stripe_card", label: "Stripe — tarjeta / wallets", note: "Tarjeta, Apple Pay, Google Pay y Link dentro de Stripe", icon: "CreditCard", regions: ["PE", "US", "GLOBAL"] },
   { key: "stripe_link", label: "Link (Stripe)", note: "Autocompletado con 1 clic de Stripe · ya sale en Pago rápido arriba (no se duplica)", icon: "Wallet", baseStripe: true },
   { key: "stripe_apple_pay", label: "Apple Pay", note: "iPhone / Safari · ya sale en Pago rápido arriba (no se duplica)", icon: "Smartphone", baseStripe: true },
@@ -232,6 +234,10 @@ const CHECKOUT_METHODS: CheckoutMethodDef[] = [
   { key: "dlocal_mercadopago", label: "dLocal Go — Billetera (Mercado Pago)", note: "Mercado Pago y billeteras locales vía dLocal Go (Mercado Pago, Ualá y MODO en Argentina; Mercado Pago y Spin by OXXO en México). dLocal gestiona Mercado Pago.", icon: "Wallet", countryCodes: ["AR", "MX"] },
   { key: "hotmart_1click", label: "Hotmart (1 clic)", note: "Redirige al enlace de Hotmart del producto según el país. Precio y moneda gestionados por Hotmart.", icon: "CreditCard", regions: ["PE", "US", "GLOBAL"] },
 ];
+
+// PayPal (cuenta restringida) y Hotmart (ya no se usa) no se ofrecen más en el admin; ver `src/lib/paymentAvailability.ts`.
+const HIDDEN_METHOD_KEYS = new Set<string>([...(PAYPAL_UNAVAILABLE ? ["paypal"] : []), "hotmart_1click"]);
+const CHECKOUT_METHODS: CheckoutMethodDef[] = ALL_CHECKOUT_METHODS.filter((m) => !HIDDEN_METHOD_KEYS.has(m.key));
 
 
 const CHECKOUT_METHOD_KEYS = new Set(CHECKOUT_METHODS.map(m => m.key));
@@ -702,6 +708,8 @@ export default function AdminCheckoutMethods() {
               </Button>
             </div>
           </Card>
+
+          <WhopStatusCard />
 
           <AdminCheckoutPreview regions={regions} methods={methods} />
 

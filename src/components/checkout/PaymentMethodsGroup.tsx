@@ -3564,58 +3564,85 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             )}
 
             {m.id === "ach_us" && isSelected && (
-              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-3 space-y-3">
-                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-3 space-y-2">
-                  <p className="font-bold text-sm text-amber-800 dark:text-amber-400">{(language === "es" ? "Transfiere desde tu banco de EE. UU." : "Transfer from your US bank")}</p>
-
-                  <div className="rounded-lg bg-white/60 dark:bg-black/20 border border-amber-100 dark:border-amber-900/20 divide-y divide-amber-100 dark:divide-amber-900/10 text-sm">
-                    <div className="flex justify-between gap-2 px-3 py-1.5">
-                      <span className="text-neutral-500">{(language === "es" ? "Titular" : "Holder")}</span>
-                      <span className="font-bold text-neutral-900 dark:text-neutral-100">{ACH_HOLDER} · {ACH_ACCOUNT_TYPE}</span>
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
+                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 sm:p-5 space-y-4">
+                  <div className="flex items-center gap-3 text-amber-800 dark:text-amber-400">
+                    <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
+                      <Building2 className="w-5 h-5" />
                     </div>
-                    <div className="flex items-center justify-between gap-2 px-3 py-1.5">
-                      <span className="text-neutral-500">{(language === "es" ? "Ruta" : "Routing")}</span>
-                      <span className="flex items-center gap-1">
-                        <span className="font-mono font-bold tracking-wide text-neutral-900 dark:text-neutral-100">{ACH_ROUTING}</span>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-amber-600 hover:bg-amber-100" onClick={() => copyAch("routing")} aria-label={(language === "es" ? "Copiar número de ruta" : "Copy routing number")}>
-                          {copiedAch === "routing" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                        </Button>
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between gap-2 px-3 py-1.5">
-                      <span className="text-neutral-500">{(language === "es" ? "Cuenta" : "Account")}</span>
-                      <span className="flex items-center gap-1">
-                        <span className="font-mono font-bold tracking-wide text-neutral-900 dark:text-neutral-100">{ACH_ACCOUNT}</span>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-amber-600 hover:bg-amber-100" onClick={() => copyAch("account")} aria-label={(language === "es" ? "Copiar número de cuenta" : "Copy account number")}>
-                          {copiedAch === "account" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                        </Button>
-                      </span>
-                    </div>
-                    <div className="flex justify-between gap-2 px-3 py-1.5">
-                      <span className="text-neutral-500">{(language === "es" ? "Banco" : "Bank")}</span>
-                      <span className="font-bold text-neutral-900 dark:text-neutral-100">{ACH_BANK}</span>
-                    </div>
-                    <div className="flex justify-between gap-2 px-3 py-1.5 bg-amber-100/50 dark:bg-amber-900/10">
-                      <span className="text-neutral-600 dark:text-neutral-300 font-semibold">{t.amountToPay}</span>
-                      <span className="font-bold text-neutral-900 dark:text-neutral-100">USD ${totalUsd}</span>
+                    <div>
+                      <p className="font-bold text-base leading-tight">{(language === "es" ? "Instrucciones de pago ACH / Wire" : "ACH / Wire payment instructions")}</p>
+                      <p className="text-xs opacity-80">{(language === "es" ? "Transfiere desde tu cuenta bancaria de Estados Unidos" : "Transfer from your US bank account")}</p>
                     </div>
                   </div>
 
-                  <p className="text-xs leading-snug text-amber-900/80 dark:text-amber-300/80">
-                    <strong>{(language === "es" ? "Solo desde EE. UU." : "US only")}</strong> {(language === "es" ? "(ACH o Wire nacional). Envía tu comprobante a " : "(domestic ACH or Wire). Send your proof to ")}<span className="font-bold">hola@ilinguerelax.com</span>{(language === "es" ? " o por WhatsApp." : " or via WhatsApp.")}
-                  </p>
+                  <div className="space-y-3 bg-white/50 dark:bg-black/20 p-4 rounded-lg border border-amber-100 dark:border-amber-900/20">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{(language === "es" ? "Titular de la cuenta" : "Account holder")}</p>
+                      <p className="font-bold text-sm text-neutral-900 dark:text-neutral-100">{ACH_HOLDER}</p>
+                    </div>
+
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50 pt-2 border-t border-amber-100 dark:border-amber-900/10">{(language === "es" ? "Tipo de cuenta" : "Account type")}</p>
+                      <p className="font-bold text-sm text-neutral-900 dark:text-neutral-100">{ACH_ACCOUNT_TYPE}</p>
+                    </div>
+
+                    <div className="flex justify-between items-start gap-2 pt-2 border-t border-amber-100 dark:border-amber-900/10">
+                      <div>
+                        <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{(language === "es" ? "Número de ruta (ACH y Wire)" : "Routing number (ACH & Wire)")}</p>
+                        <p className="font-mono font-bold text-base tracking-wider text-neutral-900 dark:text-neutral-100">{ACH_ROUTING}</p>
+                      </div>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:text-amber-700 hover:bg-amber-100 shrink-0" onClick={() => copyAch("routing")} aria-label={(language === "es" ? "Copiar número de ruta" : "Copy routing number")}>
+                        {copiedAch === "routing" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      </Button>
+                    </div>
+
+                    <div className="flex justify-between items-start gap-2 pt-2 border-t border-amber-100 dark:border-amber-900/10">
+                      <div>
+                        <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{(language === "es" ? "Número de cuenta" : "Account number")}</p>
+                        <p className="font-mono font-bold text-base tracking-wider text-neutral-900 dark:text-neutral-100">{ACH_ACCOUNT}</p>
+                      </div>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:text-amber-700 hover:bg-amber-100 shrink-0" onClick={() => copyAch("account")} aria-label={(language === "es" ? "Copiar número de cuenta" : "Copy account number")}>
+                        {copiedAch === "account" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      </Button>
+                    </div>
+
+                    <div className="pt-2 border-t border-amber-100 dark:border-amber-900/10">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{(language === "es" ? "Banco receptor" : "Receiving bank")}</p>
+                      <p className="font-bold text-sm text-neutral-900 dark:text-neutral-100">{ACH_BANK}</p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg bg-white/50 dark:bg-black/20 p-3 text-center border border-amber-100 dark:border-amber-900/10">
+                    <p className="text-xs text-amber-700/70 dark:text-amber-500/50 uppercase tracking-wider font-bold">{t.amountToPay}</p>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">USD ${totalUsd}</p>
+                  </div>
+
+                  <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-amber-900/80 dark:text-amber-300/80">
+                    <MessageCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                    <p>
+                      <strong>{(language === "es" ? "Solo desde EE. UU.:" : "US only:")}</strong> {(language === "es" ? "esta cuenta recibe transferencias nacionales de Estados Unidos (ACH o Wire nacional). No sirve para transferencias internacionales." : "this account only receives domestic US transfers (ACH or domestic Wire). It does not work for international transfers.")}
+                    </p>
+                  </div>
+
+                  <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-amber-900/80 dark:text-amber-300/80 italic">
+                    <MessageCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                    <p>
+                      <strong>{(language === "es" ? "Importante:" : "Important:")}</strong> {(language === "es" ? "Envía tu comprobante de transferencia a " : "Send your transfer proof to ")}<span className="font-bold">hola@ilinguerelax.com</span> {(language === "es" ? "o por WhatsApp para validar tu pedido." : "or via WhatsApp to validate your order.")}
+                    </p>
+                  </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleAchPaid}
                   disabled={mpLoading === "ach_us"}
-                  className="w-full bg-[#0A2540] hover:bg-[#081e33] text-white font-bold py-3 rounded-xl transition-colors shadow-lg disabled:opacity-60"
+                  className="w-full bg-[#0A2540] hover:bg-[#081e33] text-white font-bold py-4 rounded-xl transition-colors shadow-lg disabled:opacity-60"
                 >
                   {t.alreadyPaid}
                 </button>
 
-                <p className="text-[11px] text-center text-neutral-500 leading-snug">{(language === "es" ? "Verificamos tu pago en 1–24 h y te enviamos el producto por correo." : "We verify your payment within 1–24 h and email your product.")}</p>
+                <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
               </div>
             )}
 

@@ -1,3 +1,4 @@
+import { PAYPAL_UNAVAILABLE } from "@/lib/paymentAvailability";
 import { useMemo } from "react";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { useCheckoutMethodsConfig, type CheckoutMethodsConfig } from "@/hooks/useCheckoutMethodsConfig";
@@ -40,7 +41,7 @@ const DEFAULT: Id[] = [...CARDS, ...WALLETS, "paypal"];
 function available(id: Id, c: CheckoutMethodsConfig, country: string): boolean {
   const keys = c.enabledMethodKeys;
   switch (id) {
-    case "paypal": return c.paypal;
+    case "paypal": return !PAYPAL_UNAVAILABLE && c.paypal;
     case "yape": return c.yape;
     case "oxxo": return country === "MX" || c.dlocalCash || keys.includes("stripe_oxxo"); // México: OXXO de Stripe siempre
     case "mercadopago": return c.dlocalWallet || (country === "PE" && (c.transfer || c.cash));

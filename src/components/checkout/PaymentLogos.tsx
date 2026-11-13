@@ -1,3 +1,4 @@
+import { PAYPAL_UNAVAILABLE } from "@/lib/paymentAvailability";
 import React from "react";
 import { VisaBadge, MastercardBadge, AmexBadge, ApplePayBadge, PayPalBadge } from "@/components/checkout/CardBrandBadges";
 import { useRegionTier } from "@/hooks/useRegionTier";
@@ -55,7 +56,7 @@ export function PaymentLogos({ className = "" }: { className?: string }) {
         </span>
       </span>
 
-      {country !== "ES" && (country === "US" || !["PE", "MX", "CO", "AR", "CL", "BR", "PA", "GT", "HN", "SV", "NI", "PY", "UY", "DO", "BO", "CR", "EC"].includes(country)) && (
+      {!PAYPAL_UNAVAILABLE && country !== "ES" && (country === "US" || !["PE", "MX", "CO", "AR", "CL", "BR", "PA", "GT", "HN", "SV", "NI", "PY", "UY", "DO", "BO", "CR", "EC"].includes(country)) && (
         <PayPalBadge />
       )}
       

@@ -29,7 +29,7 @@ const BY_KEY: Record<string, MethodTag> = {
   yape_plin: T.fast, dlocal_wallet: T.wallet, dlocal_mercadopago: T.wallet,
   stripe_us_bank_account: T.bank, stripe_ideal: T.bank, stripe_bancontact: T.bank, stripe_sofort: T.bank,
   stripe_giropay: T.bank, stripe_eps: T.bank, stripe_p24: T.bank, stripe_acss_debit: T.bank,
-  mercadopago_transfer: T.bank, dlocal_transfer: T.bank, clabe_mx: T.bank,
+  mercadopago_transfer: T.bank, dlocal_transfer: T.bank, clabe_mx: T.bank, ach_us: T.bank,
   stripe_sepa_debit: T.debit, stripe_bacs_debit: T.debit,
   stripe_klarna: T.installments, stripe_affirm: T.installments, stripe_afterpay_clearpay: T.installments,
   stripe_oxxo: T.noCard, stripe_boleto: T.noCard, stripe_multibanco: T.noCard, stripe_konbini: T.noCard,

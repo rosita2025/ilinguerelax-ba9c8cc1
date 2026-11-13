@@ -240,6 +240,7 @@ const METHOD_TAGS: Array<[RegExp, MethodTag]> = [
   [/dlocal/, { label: "dLocal Go", className: "bg-teal-500/10 text-teal-700 border-teal-500/30" }],
   [/mercadopago|^cash$|^transfer$/, { label: "Mercado Pago", className: "bg-blue-500/10 text-blue-700 border-blue-500/30" }],
   [/clabe|spei/, { label: "SPEI", className: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30" }],
+  [/ach_us|ach.*wire/, { label: "ACH / Wire", className: "bg-blue-500/10 text-blue-700 border-blue-500/30" }],
   [/stripe|card|link|apple|google|klarna|ach|cashapp|bizum|ideal|satispay|mbway|crypto/, { label: "Stripe", className: "bg-indigo-500/10 text-indigo-700 border-indigo-500/30" }],
 ];
 const methodTagFor = (m?: string | null): MethodTag | null => {
@@ -256,6 +257,7 @@ const paidLabel = (p?: { provider: string; method: string } | null): MethodTag |
   if (/yape|plin/.test(text)) return methodTagFor("yape");
   if (/binance/.test(text)) return methodTagFor("binance");
   if (/spei|clabe/.test(text)) return methodTagFor("clabe");
+  if (/ach_us|ach.*wire/.test(text)) return methodTagFor("ach_us");
   if (/shopify/.test(text)) return { label: "Shopify", className: "bg-lime-500/10 text-lime-700 border-lime-500/30" };
   if (/manual|transfer/.test(text)) return { label: "Transferencia manual", className: "bg-slate-500/10 text-slate-700 border-slate-500/30" };
   return methodTagFor(p.provider) ?? methodTagFor(p.method);

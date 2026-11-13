@@ -46,6 +46,7 @@ const PROVIDER_LABELS: Record<string, string> = {
   binance_pay: "Binance Pay",
   binance: "Binance Pay",
   clabe_mx: "Transferencia MX (SPEI)",
+  ach_us: "Transferencia ACH / Wire (EE. UU.)",
   spei: "Transferencia MX (SPEI)",
   hotmart: "Hotmart",
   manual: "Manual",

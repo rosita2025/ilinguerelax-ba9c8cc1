@@ -74,6 +74,7 @@ export function OrderSummary({ collapsible = false, locked = false, mainProductI
     selectedMethod === "paypal" || 
     selectedMethod === "binance" ||
     selectedMethod === "clabe" ||
+    selectedMethod === "ach_us" ||
     selectedMethod === "yape" ||
     selectedMethod === "transfer"
   );

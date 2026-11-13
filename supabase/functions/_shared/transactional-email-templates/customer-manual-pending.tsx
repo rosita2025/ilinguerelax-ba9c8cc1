@@ -30,6 +30,11 @@ interface Props {
   clabeNumber?: string
   clabeHolder?: string
   clabeBank?: string
+  achHolder?: string
+  achRouting?: string
+  achAccount?: string
+  achAccountType?: string
+  achBank?: string
 }
 
 const trackingUrl = (orderNumber?: string, customerEmail?: string) => {
@@ -68,6 +73,11 @@ const Email = ({
   clabeNumber,
   clabeHolder,
   clabeBank,
+  achHolder,
+  achRouting,
+  achAccount,
+  achAccountType,
+  achBank,
 }: Props) => (
   <Html lang="es" dir="ltr">
     <Head />
@@ -131,6 +141,7 @@ const Email = ({
           const m = (method || '').toLowerCase()
           const isBinance = m.includes('binance')
           const isClabe = m.includes('spei') || m.includes('clabe') || m.includes('mexic')
+          const isAch = m.includes('ach / wire') || m.includes('ach_us')
           const isYape = m.includes('yape') || m.includes('plin')
           // Only render one block, matching the method chosen by the customer.
           if (isBinance && (binancePayId || binanceAddress)) {
@@ -141,6 +152,19 @@ const Email = ({
                 {binanceAddress && (<Text style={binanceLine}><strong>Dirección:</strong> {binanceAddress}</Text>)}
                 {binanceNetwork && (<Text style={binanceLine}><strong>Red:</strong> {binanceNetwork}</Text>)}
                 <Text style={binanceHint}>Puedes usar tu Pay ID o hash de la transacción como referencia al escribirnos.</Text>
+              </Section>
+            )
+          }
+          if (isAch && (achRouting || achAccount)) {
+            return (
+              <Section style={binanceBox}>
+                <Text style={binanceTitle}>🏦 Datos de transferencia ACH / Wire (Estados Unidos)</Text>
+                {achHolder && (<Text style={binanceLine}><strong>Titular:</strong> {achHolder}</Text>)}
+                {achAccountType && (<Text style={binanceLine}><strong>Tipo de cuenta:</strong> {achAccountType}</Text>)}
+                {achRouting && (<Text style={binanceLine}><strong>Número de ruta (ACH y Wire):</strong> {achRouting}</Text>)}
+                {achAccount && (<Text style={binanceLine}><strong>Número de cuenta:</strong> {achAccount}</Text>)}
+                {achBank && (<Text style={binanceLine}><strong>Banco:</strong> {achBank}</Text>)}
+                <Text style={binanceHint}>Si aún no has transferido, usa estos datos desde tu banco de Estados Unidos por el monto exacto en USD. Solo sirve para transferencias nacionales de EE. UU. Guarda el comprobante como referencia.</Text>
               </Section>
             )
           }

@@ -30,6 +30,7 @@ import { usePurchaseTracking } from "@/hooks/usePurchaseTracking";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 import hotmartLogoFull from "@/assets/hotmart-logo-full.webp";
 import paypalLogo from "@/assets/paypal-logo.png";
+import { PAYPAL_UNAVAILABLE } from "@/lib/paymentAvailability";
 import yapeLogo from "@/assets/yape-logo.webp";
 import oxxoLogo from "@/assets/oxxo-logo.webp";
 import speiLogo from "@/assets/spei-logo.webp";
@@ -1549,7 +1550,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       try { trackPaymentError({ provider: isOxxo ? "stripe_oxxo" : "stripe_hosted", skus: s.items.map((i) => i.id), reason: String(detail).slice(0, 300), value: 0, currency: isOxxo ? "MXN" : "USD" }); } catch { /* noop */ }
       toast({
         title: isOxxo ? (language === "en" ? "We could not create your OXXO voucher" : "No pudimos generar tu ficha de OXXO") : t.errorPayment,
-        description: (isOxxo ? (language === "en" ? "Choose card, SPEI or PayPal. " : "Elige tarjeta, SPEI o PayPal. ") : "") + (detail ? `(${String(detail).slice(0, 140)})` : "No se pudo abrir la página de pago."),
+        description: (isOxxo ? (PAYPAL_UNAVAILABLE ? (language === "en" ? "Choose card or SPEI. " : "Elige tarjeta o SPEI. ") : (language === "en" ? "Choose card, SPEI or PayPal. " : "Elige tarjeta, SPEI o PayPal. ")) : "") + (detail ? `(${String(detail).slice(0, 140)})` : "No se pudo abrir la página de pago."),
         variant: "destructive",
       });
     } catch (err) {
@@ -1974,7 +1975,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const methodsReady = methodsConfig.loaded && !region.loading;
   // Si PayPal está disponible, se "despierta" su función en cuanto carga el checkout: el primer clic ya no paga el arranque en frío.
   useEffect(() => {
-    if (!methodsConfig.paypal) return;
+    if (!methodsConfig.paypal || PAYPAL_UNAVAILABLE) return;
     try {
       void fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/paypal-order-create`, { method: "OPTIONS", mode: "cors" }).catch(() => {});
     } catch { /* sin red */ }
@@ -2455,7 +2456,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         if (m.id === "yape") return methodsConfig.yape && isPeru;
         if (m.id === "binance") return methodsConfig.binance && (country === "PE" || !LATAM_COUNTRIES.has(country)) && country !== "ES"; // sin Binance en Latinoamérica (Perú lo conserva)
         if (m.id === "clabe") return country === "MX";
-        if (m.id === "paypal") return methodsConfig.paypal; // PayPal directo: se activa por región en /admin/checkout-methods
+        if (m.id === "paypal") return !PAYPAL_UNAVAILABLE && methodsConfig.paypal; // PayPal directo: se activa por región en /admin/checkout-methods
 
         // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.
         // México: la transferencia de dLocal Go no se muestra (queda SPEI manual, OXXO y tarjeta).

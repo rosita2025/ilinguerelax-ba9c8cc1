@@ -2387,16 +2387,16 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     {
       id: "ach_us",
       icon: Building2,
-      title: language === "en" ? "Bank transfer (ACH / Wire · USA)"
-        : language === "pt" ? "Transferência bancária (ACH / Wire · EUA)"
-        : language === "fr" ? "Virement bancaire (ACH / Wire · États-Unis)"
-        : language === "it" ? "Bonifico bancario (ACH / Wire · USA)"
-        : "Transferencia bancaria (ACH / Wire · EE. UU.)",
-      sub: language === "en" ? "Pay from your US bank account · verified in 1-24h"
-        : language === "pt" ? "Pague da sua conta bancária dos EUA · verificado em 1-24h"
-        : language === "fr" ? "Payez depuis votre compte bancaire américain · vérifié en 1-24h"
-        : language === "it" ? "Paga dal tuo conto bancario USA · verificato in 1-24h"
-        : "Paga desde tu cuenta bancaria de EE. UU. · verificado en 1-24 h",
+      title: language === "en" ? "Bank transfer (ACH / Wire)"
+        : language === "pt" ? "Transferência ACH / Wire"
+        : language === "fr" ? "Virement ACH / Wire"
+        : language === "it" ? "Bonifico ACH / Wire"
+        : "Transferencia ACH / Wire",
+      sub: language === "en" ? "From your US bank · verified in 1-24h"
+        : language === "pt" ? "Do seu banco dos EUA · verificado em 1-24h"
+        : language === "fr" ? "Depuis votre banque américaine · vérifié en 1-24h"
+        : language === "it" ? "Dalla tua banca USA · verificato in 1-24h"
+        : "Desde tu banco de EE. UU. · verificado en 1-24 h",
       badge: finalPriceLabel,
     },
     {

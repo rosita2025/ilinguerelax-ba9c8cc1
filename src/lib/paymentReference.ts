@@ -59,6 +59,7 @@ export const METHOD_LABELS: Record<string, string> = {
   yape_plin: "Yape / Plin",
   binance_pay: "Binance Pay",
   clabe_mx: "SPEI / CLABE (México)",
+  ach_us: "Transferencia ACH / Wire (EE. UU.)",
   interbank: "Interbank (transferencia)",
   bank_transfer: "Transferencia bancaria",
 };

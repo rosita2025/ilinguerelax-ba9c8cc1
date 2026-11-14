@@ -57,7 +57,7 @@ const BodySchema = z.object({
   currency: z.string().length(3).default("usd"),
   country: z.string().length(2),
   couponCode: z.string().max(20).optional(),
-  // Referencia corta del pedido (ej. PED-7K3QX2): queda en la descripción y los metadatos del pago en Stripe.
+  // Referencia corta del pedido (ej. PED-7K3QX2): queda en los metadatos del pago en Stripe (order_ref), ya NO en la descripción.
   orderRef: z.string().regex(/^PED-[A-Z0-9-]{3,12}$/).optional(),
   // Clic del anuncio de Meta (cookie _fbc/_fbp): se guarda en el pago para que la compra se ligue al anuncio.
   meta: z.object({ fbc: z.string().max(255).optional(), fbp: z.string().max(255).optional() }).optional(),
@@ -194,7 +194,7 @@ Deno.serve(async (req) => {
         currency,
         ...(customerId ? { customer: customerId } : {}),
         receipt_email: email,
-        description: `${body.orderRef ? `[${body.orderRef}] ` : ""}${productSummary || "iLingue Relax Digital"}`.slice(0, 300),
+        description: (productSummary || "iLingue Relax Digital").slice(0, 300), // sin el código PED-… (queda solo en metadata.order_ref)
         payment_method_types: [body.method],
         metadata,
       });
@@ -206,7 +206,7 @@ Deno.serve(async (req) => {
       currency,
       ...(customerId ? { customer: customerId } : {}),
       receipt_email: email,
-      description: `${body.orderRef ? `[${body.orderRef}] ` : ""}${productSummary || "iLingue Relax Digital"}`.slice(0, 300),
+      description: (productSummary || "iLingue Relax Digital").slice(0, 300), // sin el código PED-… (queda solo en metadata.order_ref)
       ...(savesCardForFutureUse(country) ? { setup_future_usage: "off_session" as const } : {}),
       automatic_payment_methods: {
         enabled: true,

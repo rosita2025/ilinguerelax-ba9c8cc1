@@ -148,7 +148,15 @@ const ExpressInner = ({ language, country, currency, onAvailable, available }: I
     <div className={available || (debug && debugNote) ? "space-y-2" : "hidden"}>
       <p className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t.title}</p>
       <ExpressCheckoutElement
-        options={{ buttonHeight: 48, emailRequired: true, phoneNumberRequired: false }}
+        options={{
+          buttonHeight: 48,
+          emailRequired: true,
+          phoneNumberRequired: false,
+          // Solo Apple Pay, Google Pay y Link (sin cambios). Amazon Pay, PayPal y Klarna necesitan redirección y el servidor crea
+          // este pago sin redirecciones (`allow_redirects: "never"`): si aparecía su botón y el comprador lo tocaba, la confirmación
+          // fallaba y el pago quedaba «Incompleto» sin método de pago en Stripe.
+          paymentMethods: { amazonPay: "never", paypal: "never", klarna: "never" },
+        }}
         onReady={(e) => {
           const methods = e.availablePaymentMethods as Record<string, boolean> | undefined;
           const any = !!methods && Object.values(methods).some(Boolean);

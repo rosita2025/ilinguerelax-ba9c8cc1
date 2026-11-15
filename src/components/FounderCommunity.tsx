@@ -16,7 +16,7 @@ const TXT: Record<Lang, {
   kicker: string; hello: string; behind: string; p1: string; p2: string; p3: string; p4: string; bye: string; alt: string;
   badgeFollowers: string; badgeEng: string; badgeEngSub: string; pillHearing: string; pillMkt: string; pillSales: string;
   commKicker: string; commBefore: string; commAfter: string; commText: string; igAlt: string; fbAlt: string;
-  gKicker: string; gTitle: string; gText: string; gAlt: string;
+  gTitle: string; gAlt: string;
 }> = {
   es: {
     kicker: "Conoce a Crady", hello: "¡Hola! Soy Crady,", behind: "detrás de iLingue Relax.",
@@ -26,9 +26,9 @@ const TXT: Record<Lang, {
     p4: "En un año, <b>más de 2.000 personas de varios países</b> ya aprenden con iLingue Relax. El más popular: <b>5.000 palabras en inglés</b>.",
     bye: "¡Mucho gusto! Aprende a tu ritmo, sin vergüenza. 💙", alt: "Crady, detrás de iLingue Relax",
     badgeFollowers: "seguidores", badgeEng: "Ing. Civil", badgeEngSub: "carrera de base", pillHearing: "Discapacidad auditiva", pillMkt: "10 años en marketing", pillSales: "+2.000 personas en un año",
-    commKicker: "Comunidad", commBefore: "Más de", commAfter: "seguidores en Facebook e Instagram", commText: "Mira cómo es la comunidad de iLingue Relax y aprende con nosotros, sin estrés.",
+    commKicker: "Comunidad", commBefore: "Más de", commAfter: "seguidores en Facebook e Instagram", commText: "Mira cómo es la comunidad de iLingue Relax y encuéntranos también en Google.",
     igAlt: "Perfil de Instagram de iLingue Relax (@ilinguerelax)", fbAlt: "Página de Facebook de iLingue Relax: 7,4 mil seguidores",
-    gKicker: "Google", gTitle: "Búscanos en Google", gText: "Así aparece iLingue Relax en Google.", gAlt: "Panel de iLingue Relax en Google: sitio web y descripción de la marca",
+    gTitle: "Búscanos en Google", gAlt: "Panel de iLingue Relax en Google: sitio web y descripción de la marca",
   },
   en: {
     kicker: "Meet Crady", hello: "Hi! I'm Crady,", behind: "the person behind iLingue Relax.",
@@ -38,9 +38,9 @@ const TXT: Record<Lang, {
     p4: "In one year, <b>more than 2,000 people from several countries</b> are already learning with iLingue Relax. The most popular: <b>5,000 English words</b>.",
     bye: "Nice to meet you! Learn at your own pace, without embarrassment. 💙", alt: "Crady, the person behind iLingue Relax",
     badgeFollowers: "followers", badgeEng: "Civil Eng.", badgeEngSub: "base degree", pillHearing: "Hearing disability", pillMkt: "10 years in marketing", pillSales: "2,000+ people in one year",
-    commKicker: "Community", commBefore: "Over", commAfter: "followers on Facebook and Instagram", commText: "See what the iLingue Relax community looks like and learn with us, stress-free.",
+    commKicker: "Community", commBefore: "Over", commAfter: "followers on Facebook and Instagram", commText: "See what the iLingue Relax community looks like and find us on Google too.",
     igAlt: "iLingue Relax Instagram profile (@ilinguerelax)", fbAlt: "iLingue Relax Facebook page: 7.4K followers",
-    gKicker: "Google", gTitle: "Find us on Google", gText: "This is how iLingue Relax appears on Google.", gAlt: "iLingue Relax brand panel on Google: website and brand description",
+    gTitle: "Find us on Google", gAlt: "iLingue Relax brand panel on Google: website and brand description",
   },
   fr: {
     kicker: "Faites connaissance avec Crady", hello: "Bonjour ! Je suis Crady,", behind: "la personne derrière iLingue Relax.",
@@ -50,9 +50,9 @@ const TXT: Record<Lang, {
     p4: "En un an, <b>plus de 2 000 personnes de plusieurs pays</b> apprennent déjà avec iLingue Relax. Le plus populaire : <b>5 000 mots d'anglais</b>.",
     bye: "Enchanté(e) ! Apprenez à votre rythme, sans gêne. 💙", alt: "Crady, la personne derrière iLingue Relax",
     badgeFollowers: "abonnés", badgeEng: "Ing. civil", badgeEngSub: "formation de base", pillHearing: "Handicap auditif", pillMkt: "10 ans en marketing", pillSales: "2 000+ personnes en un an",
-    commKicker: "Communauté", commBefore: "Plus de", commAfter: "abonnés sur Facebook et Instagram", commText: "Découvrez la communauté iLingue Relax et apprenez avec nous, sans stress.",
+    commKicker: "Communauté", commBefore: "Plus de", commAfter: "abonnés sur Facebook et Instagram", commText: "Découvrez la communauté iLingue Relax et retrouvez-nous aussi sur Google.",
     igAlt: "Profil Instagram d'iLingue Relax (@ilinguerelax)", fbAlt: "Page Facebook d'iLingue Relax : 7,4 k abonnés",
-    gKicker: "Google", gTitle: "Trouvez-nous sur Google", gText: "Voici comment iLingue Relax apparaît sur Google.", gAlt: "Fiche de la marque iLingue Relax sur Google : site web et description",
+    gTitle: "Trouvez-nous sur Google", gAlt: "Fiche de la marque iLingue Relax sur Google : site web et description",
   },
   it: {
     kicker: "Conosci Crady", hello: "Ciao! Sono Crady,", behind: "la persona dietro iLingue Relax.",
@@ -62,9 +62,9 @@ const TXT: Record<Lang, {
     p4: "In un anno, <b>più di 2.000 persone di vari paesi</b> imparano già con iLingue Relax. Il più popolare: <b>5.000 parole in inglese</b>.",
     bye: "Piacere! Impara con i tuoi tempi, senza imbarazzo. 💙", alt: "Crady, la persona dietro iLingue Relax",
     badgeFollowers: "follower", badgeEng: "Ing. Civile", badgeEngSub: "laurea di base", pillHearing: "Disabilità uditiva", pillMkt: "10 anni nel marketing", pillSales: "2.000+ persone in un anno",
-    commKicker: "Comunità", commBefore: "Più di", commAfter: "follower su Facebook e Instagram", commText: "Scopri la comunità di iLingue Relax e impara con noi, senza stress.",
+    commKicker: "Comunità", commBefore: "Più di", commAfter: "follower su Facebook e Instagram", commText: "Scopri la comunità di iLingue Relax e trovaci anche su Google.",
     igAlt: "Profilo Instagram di iLingue Relax (@ilinguerelax)", fbAlt: "Pagina Facebook di iLingue Relax: 7,4 mila follower",
-    gKicker: "Google", gTitle: "Trovaci su Google", gText: "Ecco come appare iLingue Relax su Google.", gAlt: "Scheda del marchio iLingue Relax su Google: sito web e descrizione",
+    gTitle: "Trovaci su Google", gAlt: "Scheda del marchio iLingue Relax su Google: sito web e descrizione",
   },
   pt: {
     kicker: "Conheça o Crady", hello: "Olá! Eu sou o Crady,", behind: "a pessoa por trás da iLingue Relax.",
@@ -74,9 +74,9 @@ const TXT: Record<Lang, {
     p4: "Em um ano, <b>mais de 2.000 pessoas de vários países</b> já aprendem com a iLingue Relax. O mais popular: <b>5.000 palavras em inglês</b>.",
     bye: "Prazer! Aprenda no seu ritmo, sem vergonha. 💙", alt: "Crady, a pessoa por trás da iLingue Relax",
     badgeFollowers: "seguidores", badgeEng: "Eng. Civil", badgeEngSub: "formação de base", pillHearing: "Deficiência auditiva", pillMkt: "10 anos em marketing", pillSales: "+2.000 pessoas em um ano",
-    commKicker: "Comunidade", commBefore: "Mais de", commAfter: "seguidores no Facebook e Instagram", commText: "Veja como é a comunidade iLingue Relax e aprenda com a gente, sem estresse.",
+    commKicker: "Comunidade", commBefore: "Mais de", commAfter: "seguidores no Facebook e Instagram", commText: "Veja como é a comunidade iLingue Relax e encontre-nos também no Google.",
     igAlt: "Perfil do Instagram da iLingue Relax (@ilinguerelax)", fbAlt: "Página do Facebook da iLingue Relax: 7,4 mil seguidores",
-    gKicker: "Google", gTitle: "Encontre-nos no Google", gText: "Assim a iLingue Relax aparece no Google.", gAlt: "Painel da marca iLingue Relax no Google: site e descrição",
+    gTitle: "Encontre-nos no Google", gAlt: "Painel da marca iLingue Relax no Google: site e descrição",
   },
 };
 
@@ -114,7 +114,7 @@ const Pill = ({ children }: { children: React.ReactNode }) => (
 
 /**
  * «Conoce a Crady» (mismo modelo que YMT Fitness: foto en arco con dos insignias) + «Más de X seguidores» con 2 celulares del mismo tamaño
- * (Facebook e Instagram) + el panel de Google aparte en fondo claro. Todo sin botones: los celulares son el enlace.
+ * (Facebook e Instagram) + el panel de Google como tercer celular, los 3 en una fila. Todo sin botones: los celulares son el enlace.
  * Solo datos reales dados por la dueña: discapacidad auditiva y su historia, 10 años en marketing, Ingeniería Civil, Facebook 7,4 mil e Instagram 1.818
  * seguidores, más de 2.000 personas de varios países en un año y «5.000 palabras en inglés» como el más popular. Capturas en public/img/comunidad
  * (la de Facebook: a pedido de la dueña se quitó la línea con nombres de seguidores; lo demás, sin tocar).
@@ -176,7 +176,7 @@ export const FounderCommunity = ({ className = "" }: { className?: string }) => 
 
       {/* Comunidad: 2 celulares del mismo tamaño */}
       <section className="bg-secondary/40 px-4 py-6 md:px-6 md:py-8" aria-labelledby="ilr-comunidad">
-        <div className="mx-auto max-w-4xl text-center">
+        <div className="mx-auto max-w-5xl text-center">
           <div className="flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-widest text-primary">
             <span className="h-px w-10 bg-primary" aria-hidden="true" /> {t.commKicker} <span className="h-px w-10 bg-primary" aria-hidden="true" />
           </div>
@@ -184,23 +184,18 @@ export const FounderCommunity = ({ className = "" }: { className?: string }) => 
             {t.commBefore} <span className="text-primary">{group(TOTAL, lang)}</span> {t.commAfter}
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-foreground/80 md:text-lg">{t.commText}</p>
-          <div className="mt-10 grid justify-center gap-10 sm:grid-cols-2">
-            <Phone src="/img/comunidad/facebook.webp" alt={t.fbAlt} href={FACEBOOK_URL} />
-            <Phone src="/img/comunidad/instagram.webp" alt={t.igAlt} href={INSTAGRAM_URL} />
-          </div>
-        </div>
-      </section>
-
-      {/* Google: aparte, fondo claro, sin botones */}
-      <section className="bg-background px-4 py-6 md:px-6 md:py-8" aria-labelledby="ilr-google">
-        <div className="mx-auto max-w-2xl text-center">
-          <div className="flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-widest text-primary">
-            <span className="h-px w-10 bg-primary" aria-hidden="true" /> {t.gKicker} <span className="h-px w-10 bg-primary" aria-hidden="true" />
-          </div>
-          <h2 id="ilr-google" className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-foreground md:text-4xl">{t.gTitle}</h2>
-          <p className="mx-auto mt-3 max-w-md text-base text-foreground/80 md:text-lg">{t.gText}</p>
-          <div className="mt-8">
-            <Phone src="/img/comunidad/google.webp" alt={t.gAlt} href={GOOGLE_URL} />
+          {/* 3 celulares en una fila (escritorio); en celular se deslizan con el dedo. Rótulo de texto, sin botones. */}
+          <div className="mt-8 flex snap-x snap-mandatory gap-8 overflow-x-auto px-2 pb-3 [scrollbar-width:none] md:grid md:grid-cols-3 md:overflow-visible md:px-0">
+            {[
+              { src: "/img/comunidad/facebook.webp", alt: t.fbAlt, href: FACEBOOK_URL, label: "Facebook" },
+              { src: "/img/comunidad/instagram.webp", alt: t.igAlt, href: INSTAGRAM_URL, label: "Instagram" },
+              { src: "/img/comunidad/google.webp", alt: t.gAlt, href: GOOGLE_URL, label: t.gTitle },
+            ].map((it) => (
+              <div key={it.label} className="flex w-[250px] shrink-0 snap-center flex-col items-center gap-4 md:w-auto">
+                <Phone src={it.src} alt={it.alt} href={it.href} />
+                <span className="text-sm font-bold text-primary">{it.label}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>

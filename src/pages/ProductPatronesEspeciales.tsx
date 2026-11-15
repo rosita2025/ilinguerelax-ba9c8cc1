@@ -5,7 +5,6 @@ import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
-import { BlackFridayStrip } from "@/components/BlackFridayStrip";
 import { ProductGallerySlider } from "@/components/ProductGallerySlider";
 import { SupportProofSlider, type SupportShot } from "@/components/SupportProofSlider";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
@@ -488,7 +487,6 @@ const PatronesContent = () => {
         ]}
       />
 
-      <BlackFridayStrip />
 
       {/* Hero */}
 

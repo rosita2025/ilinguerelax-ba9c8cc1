@@ -119,7 +119,7 @@ const COPY = {
       },
       {
         question: "¿Qué métodos de pago aceptan?",
-        answer: "Aceptamos tarjeta de crédito/débito, Apple Pay, Google Pay, PayPal y métodos locales según tu país. El pago se procesa de forma segura.",
+        answer: "Aceptamos tarjeta de crédito/débito, Apple Pay, Google Pay y métodos locales según tu país. El pago se procesa de forma segura.",
       },
     ],
     stickyCta: (price: string) => `LO QUIERO — ${price}`,
@@ -207,7 +207,7 @@ const COPY = {
       },
       {
         question: "What payment methods do you accept?",
-        answer: "We accept credit/debit cards, Apple Pay, Google Pay, PayPal and local methods depending on your country. Payment is processed securely.",
+        answer: "We accept credit/debit cards, Apple Pay, Google Pay and local methods depending on your country. Payment is processed securely.",
       },
     ],
     stickyCta: (price: string) => `I WANT IT — ${price}`,

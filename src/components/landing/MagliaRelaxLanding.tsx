@@ -118,7 +118,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Come posso pagare?",
-    answer: "Con carta di credito o debito e con PayPal, in modo sicuro.",
+    answer: "Con carta di credito o debito, in modo sicuro.",
   },
 ];
 

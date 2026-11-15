@@ -682,7 +682,6 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
               <link rel="preconnect" href="https://m.stripe.com" crossOrigin="anonymous" />
               <link rel="preconnect" href="https://checkout.stripe.com" crossOrigin="anonymous" />
               <link rel="preconnect" href="https://opyitzdvvurdyyyzkwwv.supabase.co" crossOrigin="anonymous" />
-              <link rel="preconnect" href="https://www.paypal.com" crossOrigin="anonymous" />
               <link rel="dns-prefetch" href="https://q.stripe.com" />
               <link rel="preload" as="script" href="https://js.stripe.com/v3" crossOrigin="anonymous" />
             </Helmet>

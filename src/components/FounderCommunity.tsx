@@ -119,9 +119,9 @@ const Pill = ({ children }: { children: React.ReactNode }) => (
  * seguidores, más de 2.000 personas de varios países en un año y «5.000 palabras en inglés» como el más popular. Capturas en public/img/comunidad
  * (la de Facebook: a pedido de la dueña se quitó la línea con nombres de seguidores; lo demás, sin tocar).
  */
-export const FounderCommunity = ({ className = "" }: { className?: string }) => {
+export const FounderCommunity = ({ className = "", lang: forcedLang }: { className?: string; /** Fuerza el idioma (páginas para público hispano). */ lang?: Lang }) => {
   const { language } = useI18n();
-  const lang = (language in TXT ? language : "es") as Lang;
+  const lang = (forcedLang ?? (language in TXT ? language : "es")) as Lang;
   const t = TXT[lang];
 
   return (

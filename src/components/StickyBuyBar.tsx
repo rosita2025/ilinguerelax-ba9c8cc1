@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { formatAmountLocalized, detectCurrency } from "@/i18n";
 import { PaymentBadgesStrip } from "@/components/PaymentBadgesStrip";
+import { LaunchOfferBar } from "@/components/LaunchOfferBar";
 
 
 interface StickyBuyBarProps {
@@ -50,7 +51,7 @@ interface StickyBuyBarProps {
   goesToInternalCheckout?: boolean;
 }
 
-export const StickyBuyBar = ({
+const StickyBuyBarBase = ({
   price,
   originalPrice,
   rating,
@@ -674,5 +675,22 @@ export const StickyBuyBar = ({
         </div>
       </div>
     </div>
+  );
+};
+
+/** Barra de compra fija + cinta superior de precio de lanzamiento (todas las páginas de producto). */
+export const StickyBuyBar = (props: StickyBuyBarProps & { sku?: string }) => {
+  const onExcluded =
+    typeof window !== "undefined" &&
+    (() => {
+      const p = window.location.pathname.toLowerCase();
+      return p.startsWith("/checkout") || p.startsWith("/checkouts") || p.startsWith("/admin") || p.includes("success") || p.startsWith("/gracias") || p.startsWith("/thank");
+    })();
+  const showTopBar = !onExcluded && !props.isLoading && !!props.price;
+  return (
+    <>
+      {showTopBar && <LaunchOfferBar price={props.price} originalPrice={props.originalPrice} lang={props.lang} isPhysical={props.isPhysical} />}
+      <StickyBuyBarBase {...props} />
+    </>
   );
 };

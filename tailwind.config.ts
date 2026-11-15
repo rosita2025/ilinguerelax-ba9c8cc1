@@ -97,6 +97,10 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		keyframes: {
+  			'ilr-marquee': {
+  				from: { transform: 'translateX(0)' },
+  				to: { transform: 'translateX(-50%)' },
+  			},
   			'shake': {
   				'0%, 100%': { transform: 'translateX(0)' },
   				'20%, 60%': { transform: 'translateX(-6px)' },
@@ -156,6 +160,7 @@ export default {
   			}
   		},
   		animation: {
+  			'ilr-marquee': 'ilr-marquee 32s linear infinite',
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out',
   			'float': 'float 3s ease-in-out infinite',

@@ -260,11 +260,16 @@ export default function CheckoutSuccess() {
   // cola, y si el cliente no compra el primero, mostramos el siguiente.
   const [upsellQueue, setUpsellQueue] = useState<UpsellOffer[]>([]);
 
+  // Compradores sin upsell de 1 clic (Europa, LATAM, dLocal, transferencias…: la tarjeta no se guarda o
+  // el pago no fue con Stripe): se les muestra la misma oferta como enlace a la página del producto.
+  // Es la oferta "posterior a la compra" también para quien pagó con Pago rápido y nunca vio el popup.
+  const [linkOffers, setLinkOffers] = useState<UpsellOffer[]>([]);
+
   useEffect(() => {
-    if (!stripeCustomerId || delivery.length === 0) return;
-    // En Europa y LATAM la tarjeta no se guarda, así que no hay upsell de 1 clic que ofrecer.
+    if (delivery.length === 0) return;
     const buyerCountry = buyer.country || (() => { try { return localStorage.getItem("ilr_country") || ""; } catch { return ""; } })();
-    if (buyerCountry && !savesCardForFutureUse(buyerCountry)) return;
+    // En Europa y LATAM la tarjeta no se guarda, así que no hay upsell de 1 clic que ofrecer.
+    const oneClick = !!stripeCustomerId && !(buyerCountry && !savesCardForFutureUse(buyerCountry));
     const mainSku = delivery[0]?.sku;
     if (!mainSku) return;
     const purchased = new Set(delivery.map((d) => d.sku.toLowerCase()));
@@ -279,8 +284,12 @@ export default function CheckoutSuccess() {
             originalPrice: u.originalPrice,
             image: u.image,
           }));
-        setUpsellQueue(pending);
-        if (pending[0]) setUpsellOffer(pending[0]);
+        if (oneClick) {
+          setUpsellQueue(pending);
+          if (pending[0]) setUpsellOffer(pending[0]);
+        } else {
+          setLinkOffers(pending.slice(0, 2));
+        }
       })
       .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -610,6 +619,29 @@ export default function CheckoutSuccess() {
             <p className="text-xs text-muted-foreground">
               {language === "en" ? "Charged to the same card you just used. No need to enter it again." : language === "it" ? "Viene addebitato sulla stessa carta che hai appena usato. Non devi inserirla di nuovo." : "Se cobra a la misma tarjeta que acabas de usar. Sin volver a escribirla."}
             </p>
+          </section>
+        )}
+        {/* Oferta posterior a la compra para quien no tiene el cobro de 1 clic: enlace al producto (sin prometer un precio distinto) */}
+        {linkOffers.length > 0 && (
+          <section className="rounded-xl border-2 border-primary/40 bg-primary/5 p-5 space-y-3">
+            <h2 className="font-semibold text-base">
+              {language === "en" ? "Complete your learning" : language === "it" ? "Completa il tuo apprendimento" : language === "pt" ? "Complete seu aprendizado" : language === "fr" ? "Complétez votre apprentissage" : "Completa tu aprendizaje"}
+            </h2>
+            <ul className="space-y-3">
+              {linkOffers.map((o) => (
+                <li key={o.id} className="flex items-center gap-3">
+                  <img src={o.image} alt="" className="w-14 h-14 rounded-lg object-cover shrink-0" loading="lazy" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm leading-tight">{o.name}</div>
+                  </div>
+                  <Button asChild size="sm" className="shrink-0">
+                    <Link to={`/products/${o.id}?utm_source=checkout-success&utm_medium=postpurchase&utm_campaign=upsell-success`}>
+                      {language === "en" ? "See it" : language === "it" ? "Scopri" : language === "pt" ? "Ver" : language === "fr" ? "Voir" : "Verlo"}
+                    </Link>
+                  </Button>
+                </li>
+              ))}
+            </ul>
           </section>
         )}
         {upsellState === "done" && (

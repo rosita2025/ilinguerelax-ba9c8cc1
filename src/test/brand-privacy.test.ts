@@ -23,6 +23,8 @@ const LEGAL_ALLOWLIST = [
   "src/pages/LicensesPage.tsx",
   "src/pages/TrademarkPage.tsx",
   "src/pages/PrivacyPage.tsx",
+  // Transferencia ACH/Wire de EE. UU.: el banco exige el nombre del titular de la cuenta (dato elegido por el dueño).
+  "src/components/checkout/PaymentMethodsGroup.tsx",
 ];
 
 function walk(dir: string, out: string[] = []): string[] {

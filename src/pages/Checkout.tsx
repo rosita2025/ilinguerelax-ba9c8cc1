@@ -760,6 +760,14 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
                   </p>
                 </div>
 
+                {/* Los extras van ANTES del Pago rápido: quien paga con Apple Pay / Google Pay / Link
+                    no pasa por el popup de upsell, y el botón se vuelve a cotizar solo al agregar uno. */}
+                {catalogItem?.upsells?.length ? (
+                  <SectionErrorBoundary name="upsell-panel" extra={{ slug: catalogItem?.id }}>
+                    <UpsellPanel upsells={catalogItem.upsells} mainProductId={catalogItem.id} />
+                  </SectionErrorBoundary>
+                ) : null}
+
                 {expressReady && (
                 <SectionErrorBoundary name="express-checkout">
                   <Suspense fallback={null}>
@@ -773,12 +781,6 @@ const SUPPORTED_UI_LANGS: readonly string[] = ["es", "en", "fr", "pt", "it"];
                     <BuyerInfoForm />
                   </div>
                 </SectionErrorBoundary>
-
-                {catalogItem?.upsells?.length ? (
-                  <SectionErrorBoundary name="upsell-panel" extra={{ slug: catalogItem?.id }}>
-                    <UpsellPanel upsells={catalogItem.upsells} mainProductId={catalogItem.id} />
-                  </SectionErrorBoundary>
-                ) : null}
 
                 <div id="payment-methods-section">
                   <SectionErrorBoundary name="payment-methods">

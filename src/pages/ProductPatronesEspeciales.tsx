@@ -792,6 +792,9 @@ const PatronesContent = () => {
               <h2 className="text-3xl md:text-4xl font-bold text-foreground">
                 Gracias por <span className="text-primary">su confianza</span>
               </h2>
+              <p className="text-muted-foreground mt-2 max-w-xl mx-auto text-sm md:text-base">
+                Te acompañamos después de comprar: pagos manuales, correos en spam y actualizaciones del material.
+              </p>
             </div>
             <LazyMount minHeight={400} rootMargin={mediaMargin}>
               <SupportProofSlider shots={supportShots} />

@@ -8,6 +8,8 @@ import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { formatAmountLocalized, detectCurrency } from "@/i18n";
 import { PaymentBadgesStrip } from "@/components/PaymentBadgesStrip";
 import { LaunchOfferBar } from "@/components/LaunchOfferBar";
+import { CountryFlag } from "@/components/CountryFlag";
+import { useRegionTier } from "@/hooks/useRegionTier";
 
 
 interface StickyBuyBarProps {
@@ -143,17 +145,13 @@ const StickyBuyBarBase = ({
            p.startsWith("/gracias") || p.startsWith("/thank");
   })();
   const [priceFlash, setPriceFlash] = useState(false);
-  const flagEmojiStyle = {
-    fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
-  } as const;
-  const flagBadge = flag ? (
-    <span
-      role="img"
-      aria-label={`${currencyCode} country flag`}
-      className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-muted px-1.5 text-lg leading-none shadow-sm"
-      style={flagEmojiStyle}
-    >
-      {flag}
+  // Bandera del país del visitante (el mismo país por IP que decide el precio), como imagen. Antes dependía de la moneda
+  // y para PEN, MXN, CRC… salía un globo 🌎. Mientras no se sabe el país, no se muestra bandera.
+  const { country: visitorCountry, loading: countryLoading } = useRegionTier();
+  const flagCode = !countryLoading && /^[A-Za-z]{2}$/.test(visitorCountry || "") ? visitorCountry : "";
+  const flagBadge = flagCode ? (
+    <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-muted px-1.5 shadow-sm">
+      <CountryFlag code={flagCode} label={`${currencyCode} country flag`} />
     </span>
   ) : null;
 
@@ -345,11 +343,7 @@ const StickyBuyBarBase = ({
           className={`w-20 h-20 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-[0_8px_28px_rgba(16,185,129,0.55)] flex flex-col items-center justify-center gap-0.5 font-extrabold ring-2 ring-white/40 transition-transform hover:scale-105 active:scale-95 hidden md:flex ${calmMode ? '' : 'animate-pulse'} ${priceFlash ? 'ring-4 ring-amber-300 scale-110' : ''}`}
         >
           <ShoppingCart className="w-5 h-5" />
-          {flag && (
-            <span role="img" aria-label={`${currencyCode} country flag`} className="text-base leading-none" style={flagEmojiStyle}>
-              {flag}
-            </span>
-          )}
+          {flagCode && <CountryFlag code={flagCode} label={`${currencyCode} country flag`} />}
           <span className="text-[11px] leading-none whitespace-nowrap">{price}</span>
         </button>
         {/* {isPhysical && (

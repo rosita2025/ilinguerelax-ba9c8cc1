@@ -1,3 +1,5 @@
+import { FounderCommunity } from "@/components/FounderCommunity";
+import { SpecialOfferCard } from "@/components/SpecialOfferCard";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -273,6 +275,25 @@ const Product500Preguntas = () => {
       </section>
 
       <ProductReviews productType="english" showReviewForm />
+
+      {/* Quién soy + comunidad y «Oferta especial» antes de las preguntas */}
+      <FounderCommunity lang="es" />
+      <SpecialOfferCard
+        noun="libro"
+        items={[
+          "<b>500 preguntas</b> prácticas en inglés",
+          "Pronunciación adaptada para hispanohablantes",
+          "Situaciones reales del día a día, ideal para conversación y viajes",
+          "Respuestas modelo incluidas",
+          "Entrega digital inmediata y acceso de por vida",
+        ]}
+        priceLabel={tier.priceLabel}
+        originalLabel={tier.originalLabel}
+        ready={pricingReady}
+        onBuy={handleBuy}
+        pill="Pago único · Acceso de por vida"
+        ctaText="QUIERO MI LIBRO"
+      />
 
       <FAQ
         items={[

@@ -1,5 +1,5 @@
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
-import { lazy, Suspense, useMemo, useEffect, useRef, useState } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -12,7 +12,7 @@ import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
 import { Button } from "@/components/ui/button";
-import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2, Download, Lock, FileText, X, ZoomIn } from "lucide-react";
+import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2, Download, Lock, X, ZoomIn } from "lucide-react";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 import { motion } from "framer-motion";
@@ -26,8 +26,6 @@ import { PATRONES_COVER_SOURCE as FAST_COVER_SOURCE, PATRONES_FAST_COVER_URL, PA
 import { getPatronesConnection, isPatronesConstrainedConnection } from "@/lib/patronesNetwork";
 
 // Below-the-fold modules download only when their sections approach the viewport.
-const SegundoBonoGramatica = lazy(() => import("@/components/SegundoBonoGramatica").then(m => ({ default: m.SegundoBonoGramatica })));
-const TercerBonoExamen = lazy(() => import("@/components/TercerBonoExamen").then(m => ({ default: m.TercerBonoExamen })));
 
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
 // ÚNICA regla final para Patrones:
@@ -43,6 +41,8 @@ import patronesPreview2 from "@/assets/patrones-new/patrones-letras-mudas.webp.a
 import patronesPreview3 from "@/assets/patrones-new/patrones-sufijos.webp.asset.json";
 import patronesPreview4 from "@/assets/patrones-new/patrones-contracciones.webp.asset.json";
 import bono1000 from "@/assets/patrones-new/bono-1000-palabras.webp.asset.json";
+import bonoGramaticaImg from "@/assets/patrones-new/bono-gramatica.webp.asset.json";
+import bonoExamenImg from "@/assets/patrones-new/bono-examen.webp.asset.json";
 import resenaMx1 from "@/assets/resena-mx1.webp.asset.json";
 import resenaMx2 from "@/assets/resena-mx2.webp.asset.json";
 import resenaMx3 from "@/assets/resena-mx3.webp.asset.json";
@@ -72,8 +72,10 @@ const supportShots: SupportShot[] = [
   shot("espana-actualizacion", 896, "🇪🇸", "España", "Material actualizado (versión 1.5) para quien ya compró.", "Captura real de WhatsApp: cliente de España recibe la actualización de su pedido"),
 ];
 
-const bonusPreviews = [
-  { src: bono1000.url, alt: "1,000 palabras en inglés con pronunciación para hispanohablantes", caption: "1,000 palabras · pronunciación y fonética" },
+const bonusCards = [
+  { src: bono1000.url, alt: "1,000 palabras en inglés con pronunciación para hispanohablantes", tag: "Bono 1 · Gratis", title: "1,000 palabras en inglés con pronunciación en español", text: "Vocabulario por temas (A1 a B2) con fonética UK/US adaptada.", extra: "Audio en Spotify: Podcast iLingue Relax" },
+  { src: bonoGramaticaImg.url, alt: "Estructuras Gramaticales de inglés A1 a A2: verbos en presente DO/DOES con pronunciación en español", tag: "Bono 2 · Gratis", title: "Estructuras gramaticales desde cero hasta A2", text: "Verbos, afirmativos, negativos, preguntas y pronunciación adaptada.", extra: "" },
+  { src: bonoExamenImg.url, alt: "Examen completo de Patrones Especiales: 98 preguntas con hoja de respuestas incluida", tag: "Bono 3 · Gratis", title: "Examen completo: 98 preguntas", text: "Confirma que dominas los patrones, con hoja de respuestas.", extra: "" },
 ];
 
 const photoReviews = [
@@ -677,51 +679,6 @@ const PatronesContent = () => {
         </div>
       </section>
 
-      {/* Qué incluye */}
-      <section id="incluye" className="py-4 md:py-6">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
-                <Sparkles className="w-4 h-4" /> Todo lo que incluye
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-                1 ebook + <span className="text-gradient">3 bonos gratis</span>
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-              {[
-                { icon: BookOpen, tag: "Ebook principal", title: "Patrones Especiales, Alfabeto y Combinaciones Secretas", text: "Alfabeto, letras mudas, combinaciones, contracciones y mini retos con respuestas." },
-                { icon: Music2, tag: "Bono 1 · Gratis", title: "1,000 palabras con pronunciación", text: "Vocabulario por temas (A1 a B2) con fonética para hispanohablantes y audios en Spotify." },
-                { icon: Lightbulb, tag: "Bono 2 · Gratis", title: "Estructuras gramaticales desde cero", text: "De cero hasta A2, con ejemplos y pronunciación en español." },
-                { icon: FileText, tag: "Bono 3 · Gratis", title: "Examen de 98 preguntas", text: "Comprueba lo aprendido, con hoja de respuestas incluida." },
-              ].map(({ icon: Icon, tag, title, text }) => (
-                <div key={title} className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4 shadow-card">
-                  <div className="w-10 h-10 rounded-full gradient-hero flex items-center justify-center shrink-0">
-                    <Icon className="w-5 h-5 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wide text-primary">{tag}</p>
-                    <h3 className="text-base font-extrabold text-foreground leading-snug">{title}</h3>
-                    <p className="text-sm text-muted-foreground mt-0.5">{text}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Button variant="hero" size="xl" onClick={handleBuy} onPointerEnter={prefetchCheckout} onFocus={prefetchCheckout} onTouchStart={prefetchCheckout} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
-                <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-                {pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
-                <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
-              </Button>
-              <a href="#vista-previa" className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary/30 px-5 py-3 text-sm font-bold text-primary hover:bg-primary/5 transition-colors w-full sm:w-auto">
-                <Eye className="w-4 h-4" /> Ver vista previa
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Vista previa real */}
        <section id="vista-previa" className="py-6 md:py-8 scroll-mt-24">
         <div className="container px-4 md:px-6">
@@ -734,7 +691,7 @@ const PatronesContent = () => {
                 Mira por dentro <span className="text-gradient">antes de comprar</span>
               </h2>
               <p className="text-muted-foreground">
-                 4 páginas reales del ebook. Calidad comprobada.
+                 4 páginas reales del ebook y de los 3 bonos. Calidad comprobada.
               </p>
             </div>
 
@@ -764,66 +721,42 @@ const PatronesContent = () => {
               ))}
             </div>
 
-            {/* Bono 1,000 palabras */}
-            <div className="mt-14">
-              <div className="text-center mb-6">
+            {/* Los 3 bonos en UN solo bloque compacto (antes eran 3 bloques grandes que repetían título, insignia y «El PDF completo se entrega…») */}
+            <div className="mt-8">
+              <div className="text-center mb-5">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/15 text-accent text-sm font-bold mb-3">
-                  <Sparkles className="w-4 h-4" /> Bono incluido GRATIS
+                  <Sparkles className="w-4 h-4" /> 3 bonos incluidos GRATIS
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                  + Bono: <span className="text-gradient">1,000 palabras en inglés</span> con pronunciación en español
+                <h3 className="text-2xl md:text-3xl font-bold text-foreground">
+                  Practica más con <span className="text-gradient">tus 3 bonos</span>
                 </h3>
-                <p className="text-muted-foreground">
-                  Vocabulario esencial organizado por temas (A1 a B2) con fonética UK/US adaptada.
-                </p>
               </div>
-
-              <div className="max-w-2xl mx-auto mb-6 rounded-2xl border border-[#1DB954]/30 bg-[#1DB954]/10 p-4 md:p-5 flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
-                <div className="shrink-0 w-10 h-10 rounded-full bg-[#1DB954] flex items-center justify-center shadow-md">
-                  <Music2 className="w-5 h-5 text-black" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-bold text-foreground">
-                    🎧 Audio disponible: escucha las 1,000 palabras en inglés en Spotify
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Podcast iLingue Relax · Gratis
-                  </p>
-                </div>
-              </div>
-
-               <div className="max-w-3xl mx-auto">
-                {bonusPreviews.map((p, i) => (
-                  <figure key={p.src} className="relative rounded-2xl overflow-hidden border border-accent/30 shadow-card bg-card">
-
-                     <div className="relative aspect-square bg-card overflow-hidden">
-                      <LazyImg
-                        src={p.src}
-                        rootMargin={mediaMargin}
-                        alt={p.alt}
-                        wrapperClassName="absolute inset-0 block"
-                        width={1920}
-                        height={1920}
-                        className="w-full h-full object-contain"
-                      />
+              <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0">
+                {bonusCards.map((c) => (
+                  <figure key={c.tag} className="w-[78%] shrink-0 snap-start overflow-hidden rounded-2xl border border-accent/30 bg-card shadow-card sm:w-[55%] md:w-auto">
+                    <div className="relative aspect-square overflow-hidden bg-card">
+                      <LazyImg src={c.src} rootMargin={mediaMargin} alt={c.alt} wrapperClassName="absolute inset-0 block" width={1254} height={1254} className="h-full w-full object-contain" onContextMenu={(e) => e.preventDefault()} />
                     </div>
-                    <figcaption className="p-3 text-sm font-semibold text-foreground text-center">
-                      {p.caption}
+                    <figcaption className="p-4">
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-primary">{c.tag}</p>
+                      <h4 className="mt-0.5 text-base font-extrabold leading-snug text-foreground">{c.title}</h4>
+                      <p className="mt-1 text-sm text-muted-foreground">{c.text}</p>
+                      {c.extra && <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-foreground"><Music2 className="h-4 w-4 shrink-0 text-[#1DB954]" aria-hidden="true" /> {c.extra}</p>}
                     </figcaption>
                   </figure>
                 ))}
               </div>
-              <p className="text-center text-xs text-muted-foreground mt-4">
-                 El PDF completo se entrega tras la compra.
-              </p>
+              <p className="text-center text-xs text-muted-foreground mt-3">Vistas previas reales. El PDF completo se entrega tras la compra.</p>
             </div>
 
-            <LazyMount minHeight={400} rootMargin={mediaMargin}><Suspense fallback={<div className="min-h-[400px]" />}><SegundoBonoGramatica /></Suspense></LazyMount>
-            <LazyMount minHeight={400} rootMargin={mediaMargin}><Suspense fallback={<div className="min-h-[400px]" />}><TercerBonoExamen /></Suspense></LazyMount>
-
-
-
-
+            {/* Único botón a mitad de página (antes estaba en «Todo lo que incluye», que repetía el ebook y los bonos) */}
+            <div className="mt-6 flex justify-center">
+              <Button variant="hero" size="xl" onClick={handleBuy} onPointerEnter={prefetchCheckout} onFocus={prefetchCheckout} onTouchStart={prefetchCheckout} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-6 py-5 shadow-2xl">
+                <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
+                {pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
+                <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
+              </Button>
+            </div>
           </div>
         </div>
       </section>
@@ -900,12 +833,12 @@ const PatronesContent = () => {
               <div className="text-xs font-extrabold uppercase tracking-widest text-primary">Precio de lanzamiento</div>
               <div className="mt-1 text-5xl font-extrabold text-foreground">{pricingReady ? priceLabel : "…"}</div>
               {pricingReady && originalLabel && <div className="mt-1 text-sm text-muted-foreground">Precio anterior: <span className="line-through">{originalLabel}</span></div>}
-              <span className="mt-3 inline-block rounded-full bg-primary px-3 py-1 text-xs font-bold uppercase tracking-wide text-primary-foreground">Ebook + 3 bonos gratis · Pago único</span>
+              <span className="mt-3 inline-block rounded-full bg-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary-foreground sm:text-xs">Ebook + 3 bonos gratis · Pago único</span>
             </div>
 
-            <Button variant="hero" size="xl" onClick={handleBuy} onPointerEnter={prefetchCheckout} onFocus={prefetchCheckout} onTouchStart={prefetchCheckout} disabled={!pricingReady} className="mt-6 w-full max-w-full px-6 py-5 shadow-2xl">
+            <Button variant="hero" size="xl" onClick={handleBuy} onPointerEnter={prefetchCheckout} onFocus={prefetchCheckout} onTouchStart={prefetchCheckout} disabled={!pricingReady} className="mt-6 h-auto w-full max-w-full whitespace-normal px-4 py-4 text-sm leading-tight shadow-2xl sm:text-base">
               QUIERO MI EBOOK Y MIS BONOS
-              <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
+              <ArrowRight className="w-4 h-4 ml-2 shrink-0" />
             </Button>
           </div>
         </div>

@@ -1,3 +1,5 @@
+import { FounderCommunity } from "@/components/FounderCommunity";
+import { SpecialOfferCard } from "@/components/SpecialOfferCard";
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
@@ -967,6 +969,26 @@ const Product5000 = () => {
           </div>
         </div>
       </section>
+
+      {/* Quién soy + comunidad y «Oferta especial» antes de las preguntas */}
+      <FounderCommunity lang="es" />
+      <SpecialOfferCard
+        noun="ebook"
+        items={[
+          "Ebook de <b>5,000+ palabras</b> con pronunciación adaptada para hispanohablantes",
+          "Fonética internacional UK/USA incluida",
+          "Estructura gramatical desde nivel cero hasta avanzado C1",
+          "Regalo 1: Estructuras gramaticales A1 a B1 <b>gratis</b>",
+          "Regalo 2: Cómo estudiar Inglés Relax en 6 meses <b>gratis</b>",
+          "Entrega digital inmediata y acceso de por vida",
+        ]}
+        priceLabel={displayPrice}
+        originalLabel={displayOriginalPrice}
+        ready={pricing5000Ready}
+        onBuy={handleBuy}
+        pill="Ebook + 2 regalos gratis · Pago único"
+        ctaText="QUIERO MI EBOOK Y MIS REGALOS"
+      />
 
       {/* FAQ Section */}
       <LazyMount minHeight={640} rootMargin={mediaMargin}>

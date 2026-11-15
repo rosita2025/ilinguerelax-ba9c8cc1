@@ -1,3 +1,5 @@
+import { FounderCommunity } from "@/components/FounderCommunity";
+import { SpecialOfferCard } from "@/components/SpecialOfferCard";
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
 import { useEffect, useMemo } from "react";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -521,6 +523,25 @@ const Product8000 = () => {
           </div>
         </div>
       </section>
+
+      {/* Quién soy + comunidad y «Oferta especial» antes de las preguntas */}
+      <FounderCommunity lang="es" />
+      <SpecialOfferCard
+        noun="libro"
+        items={[
+          "Libro digital de <b>8,000 palabras</b> con pronunciación en español",
+          "Fonética UK y USA incluida",
+          "4 bonos <b>gratis</b>: repaso gramatical, ejemplos, errores comunes y notas",
+          "Actualizaciones <b>gratis</b> de por vida",
+          "Soporte personalizado",
+        ]}
+        priceLabel={tier.priceLabel}
+        originalLabel={tier.originalLabel}
+        ready={tier.loaded}
+        onBuy={handleBuyNow}
+        pill="Libro + 4 bonos gratis · Pago único"
+        ctaText="QUIERO MI LIBRO Y MIS BONOS"
+      />
 
       {/* FAQ Section */}
       <FAQ

@@ -1,9 +1,10 @@
-import { Facebook, Instagram } from "lucide-react";
+import { Facebook, Instagram, Search } from "lucide-react";
 import { useI18n } from "@/i18n/I18nContext";
 
 type Lang = "es" | "en" | "fr" | "it" | "pt";
 
 const INSTAGRAM_URL = "https://www.instagram.com/ilinguerelax/";
+const GOOGLE_URL = "https://www.google.com/search?q=iLingue+Relax";
 const FACEBOOK_URL = "https://www.facebook.com/ilinguerelax";
 /** Cifras REALES de las capturas de las cuentas (Facebook 7,4 mil; Instagram 1.818), redondeadas hacia abajo. Actualizar cuando crezcan. */
 const FACEBOOK_FOLLOWERS = 7400;
@@ -13,7 +14,7 @@ const TOTAL = FACEBOOK_FOLLOWERS + INSTAGRAM_FOLLOWERS;
 const TXT: Record<Lang, {
   kicker: string; hello: string; behind: string; p1: string; p2: string; p3: string; bye: string; alt: string;
   badgeFollowers: string; badgeEng: string; badgeEngSub: string; badgeMkt: string;
-  commKicker: string; commBefore: string; commAfter: string; commText: string; igCta: string; fbCta: string; igAlt: string; fbAlt: string;
+  commKicker: string; commBefore: string; commAfter: string; commText: string; igCta: string; fbCta: string; gCta: string; igAlt: string; fbAlt: string; gAlt: string; gLabel: string;
 }> = {
   es: {
     kicker: "Conoce a Crady", hello: "¡Hola! Soy Crady,", behind: "detrás de iLingue Relax.",
@@ -23,7 +24,7 @@ const TXT: Record<Lang, {
     bye: "¡Mucho gusto! Aprende a tu ritmo, sin vergüenza. 💙", alt: "Crady, detrás de iLingue Relax",
     badgeFollowers: "seguidores", badgeEng: "Ing. Civil", badgeEngSub: "carrera de base", badgeMkt: "10 años en marketing",
     commKicker: "Comunidad", commBefore: "Más de", commAfter: "seguidores en Facebook e Instagram", commText: "Mira cómo es la comunidad de iLingue Relax y aprende con nosotros, sin estrés.",
-    igCta: "Sígueme en Instagram", fbCta: "Sígueme en Facebook", igAlt: "Perfil de Instagram de iLingue Relax (@ilinguerelax)", fbAlt: "Página de Facebook de iLingue Relax: 7,4 mil seguidores",
+    igCta: "Sígueme en Instagram", fbCta: "Sígueme en Facebook", gCta: "Búscanos en Google", gAlt: "Panel de iLingue Relax en Google: sitio web y descripción de la marca", gLabel: "En Google", igAlt: "Perfil de Instagram de iLingue Relax (@ilinguerelax)", fbAlt: "Página de Facebook de iLingue Relax: 7,4 mil seguidores",
   },
   en: {
     kicker: "Meet Crady", hello: "Hi! I'm Crady,", behind: "the person behind iLingue Relax.",
@@ -33,7 +34,7 @@ const TXT: Record<Lang, {
     bye: "Nice to meet you! Learn at your own pace, without embarrassment. 💙", alt: "Crady, the person behind iLingue Relax",
     badgeFollowers: "followers", badgeEng: "Civil Eng.", badgeEngSub: "base degree", badgeMkt: "10 years in marketing",
     commKicker: "Community", commBefore: "Over", commAfter: "followers on Facebook and Instagram", commText: "See what the iLingue Relax community looks like and learn with us, stress-free.",
-    igCta: "Follow on Instagram", fbCta: "Follow on Facebook", igAlt: "iLingue Relax Instagram profile (@ilinguerelax)", fbAlt: "iLingue Relax Facebook page: 7.4K followers",
+    igCta: "Follow on Instagram", fbCta: "Follow on Facebook", gCta: "Find us on Google", gAlt: "iLingue Relax brand panel on Google: website and brand description", gLabel: "On Google", igAlt: "iLingue Relax Instagram profile (@ilinguerelax)", fbAlt: "iLingue Relax Facebook page: 7.4K followers",
   },
   fr: {
     kicker: "Faites connaissance avec Crady", hello: "Bonjour ! Je suis Crady,", behind: "la personne derrière iLingue Relax.",
@@ -43,7 +44,7 @@ const TXT: Record<Lang, {
     bye: "Enchanté(e) ! Apprenez à votre rythme, sans gêne. 💙", alt: "Crady, la personne derrière iLingue Relax",
     badgeFollowers: "abonnés", badgeEng: "Ing. civil", badgeEngSub: "formation de base", badgeMkt: "10 ans en marketing",
     commKicker: "Communauté", commBefore: "Plus de", commAfter: "abonnés sur Facebook et Instagram", commText: "Découvrez la communauté iLingue Relax et apprenez avec nous, sans stress.",
-    igCta: "Suivez-moi sur Instagram", fbCta: "Suivez-moi sur Facebook", igAlt: "Profil Instagram d'iLingue Relax (@ilinguerelax)", fbAlt: "Page Facebook d'iLingue Relax : 7,4 k abonnés",
+    igCta: "Suivez-moi sur Instagram", fbCta: "Suivez-moi sur Facebook", gCta: "Trouvez-nous sur Google", gAlt: "Fiche de la marque iLingue Relax sur Google : site web et description", gLabel: "Sur Google", igAlt: "Profil Instagram d'iLingue Relax (@ilinguerelax)", fbAlt: "Page Facebook d'iLingue Relax : 7,4 k abonnés",
   },
   it: {
     kicker: "Conosci Crady", hello: "Ciao! Sono Crady,", behind: "la persona dietro iLingue Relax.",
@@ -53,7 +54,7 @@ const TXT: Record<Lang, {
     bye: "Piacere! Impara con i tuoi tempi, senza imbarazzo. 💙", alt: "Crady, la persona dietro iLingue Relax",
     badgeFollowers: "follower", badgeEng: "Ing. Civile", badgeEngSub: "laurea di base", badgeMkt: "10 anni nel marketing",
     commKicker: "Comunità", commBefore: "Più di", commAfter: "follower su Facebook e Instagram", commText: "Scopri la comunità di iLingue Relax e impara con noi, senza stress.",
-    igCta: "Seguimi su Instagram", fbCta: "Seguimi su Facebook", igAlt: "Profilo Instagram di iLingue Relax (@ilinguerelax)", fbAlt: "Pagina Facebook di iLingue Relax: 7,4 mila follower",
+    igCta: "Seguimi su Instagram", fbCta: "Seguimi su Facebook", gCta: "Trovaci su Google", gAlt: "Scheda del marchio iLingue Relax su Google: sito web e descrizione", gLabel: "Su Google", igAlt: "Profilo Instagram di iLingue Relax (@ilinguerelax)", fbAlt: "Pagina Facebook di iLingue Relax: 7,4 mila follower",
   },
   pt: {
     kicker: "Conheça o Crady", hello: "Olá! Eu sou o Crady,", behind: "a pessoa por trás da iLingue Relax.",
@@ -63,7 +64,7 @@ const TXT: Record<Lang, {
     bye: "Prazer! Aprenda no seu ritmo, sem vergonha. 💙", alt: "Crady, a pessoa por trás da iLingue Relax",
     badgeFollowers: "seguidores", badgeEng: "Eng. Civil", badgeEngSub: "formação de base", badgeMkt: "10 anos em marketing",
     commKicker: "Comunidade", commBefore: "Mais de", commAfter: "seguidores no Facebook e Instagram", commText: "Veja como é a comunidade iLingue Relax e aprenda com a gente, sem estresse.",
-    igCta: "Siga no Instagram", fbCta: "Siga no Facebook", igAlt: "Perfil do Instagram da iLingue Relax (@ilinguerelax)", fbAlt: "Página do Facebook da iLingue Relax: 7,4 mil seguidores",
+    igCta: "Siga no Instagram", fbCta: "Siga no Facebook", gCta: "Encontre-nos no Google", gAlt: "Painel da marca iLingue Relax no Google: site e descrição", gLabel: "No Google", igAlt: "Perfil do Instagram da iLingue Relax (@ilinguerelax)", fbAlt: "Página do Facebook da iLingue Relax: 7,4 mil seguidores",
   },
 };
 
@@ -78,22 +79,21 @@ const Rich = ({ html, className }: { html: string; className?: string }) => (
   <p className={className} dangerouslySetInnerHTML={{ __html: html.replace(/<b>/g, '<b class="text-primary">') }} />
 );
 
-function Phone({ src, alt }: { src: string; alt: string }) {
+/** Celular con la captura COMPLETA (sin recortar), a su altura natural. */
+function Phone({ src, alt, w, h }: { src: string; alt: string; w: number; h: number }) {
   return (
     <div className="relative mx-auto w-[230px] rounded-[2.4rem] bg-neutral-900 p-2.5 shadow-xl ring-8 ring-primary/15 sm:w-[250px]">
       <div className="absolute left-1/2 top-3.5 z-10 h-4 w-20 -translate-x-1/2 rounded-full bg-neutral-900" aria-hidden="true" />
-      <div className="aspect-[11/20] w-full overflow-hidden rounded-[1.9rem] bg-white">
-        <img src={src} alt={alt} loading="lazy" decoding="async" className="w-full" />
-      </div>
+      <img src={src} alt={alt} width={w} height={h} loading="lazy" decoding="async" className="h-auto w-full rounded-[1.9rem] bg-white" />
     </div>
   );
 }
 
 /**
  * «Conoce a Crady» (mismo modelo que YMT Fitness: foto en arco con dos insignias) + «Más de X seguidores en Facebook e Instagram»
- * (capturas REALES de Facebook e Instagram dentro de un celular). Solo datos reales dados por la dueña: discapacidad auditiva y su historia,
+ * (capturas REALES y COMPLETAS de Facebook, Instagram y del panel de Google dentro de celulares). Solo datos reales dados por la dueña: discapacidad auditiva y su historia,
  * 10 años en marketing, Ingeniería Civil, Facebook 7,4 mil e Instagram 1.818 seguidores. Las capturas están en public/img/comunidad
- * (la de Facebook se recortó por abajo para no publicar los nombres de seguidores). No inventar otras cifras.
+ *. No inventar otras cifras.
  */
 export const FounderCommunity = ({ className = "" }: { className?: string }) => {
   const { language } = useI18n();
@@ -114,7 +114,7 @@ export const FounderCommunity = ({ className = "" }: { className?: string }) => 
                 height={896}
                 loading="lazy"
                 decoding="async"
-                className="aspect-[3/4] w-full rounded-t-[999px] rounded-b-2xl border-2 border-primary/50 bg-muted object-cover object-[50%_25%]"
+                className="aspect-[720/893] w-full rounded-t-[999px] rounded-b-2xl border-2 border-primary/50 bg-muted object-cover"
               />
             </div>
             <div className="absolute -left-3 bottom-8 rounded-xl border border-primary/40 bg-background px-3 py-1.5 text-center shadow-md">
@@ -147,7 +147,7 @@ export const FounderCommunity = ({ className = "" }: { className?: string }) => 
 
       {/* Comunidad */}
       <section className="bg-secondary/40 px-4 py-10 md:px-6 md:py-14" aria-labelledby="ilr-comunidad">
-        <div className="mx-auto max-w-4xl text-center">
+        <div className="mx-auto max-w-5xl text-center">
           <div className="flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-widest text-primary">
             <span className="h-px w-10 bg-primary" aria-hidden="true" /> {t.commKicker} <span className="h-px w-10 bg-primary" aria-hidden="true" />
           </div>
@@ -156,21 +156,21 @@ export const FounderCommunity = ({ className = "" }: { className?: string }) => 
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-foreground/80 md:text-lg">{t.commText}</p>
 
-          <div className="mt-10 grid gap-10 sm:grid-cols-2">
-            <div className="flex flex-col items-center gap-5">
-              <Phone src="/img/comunidad/facebook.webp" alt={t.fbAlt} />
-              <a href={FACEBOOK_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border-2 border-primary bg-background px-6 py-3 text-sm font-bold uppercase tracking-wide text-primary shadow-md transition hover:bg-primary hover:text-primary-foreground">
-                <Facebook className="h-5 w-5" aria-hidden="true" /> {t.fbCta}
-              </a>
-              <span className="-mt-2 text-sm font-bold text-primary">iLingue Relax</span>
-            </div>
-            <div className="flex flex-col items-center gap-5">
-              <Phone src="/img/comunidad/instagram.webp" alt={t.igAlt} />
-              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border-2 border-primary bg-background px-6 py-3 text-sm font-bold uppercase tracking-wide text-primary shadow-md transition hover:bg-primary hover:text-primary-foreground">
-                <Instagram className="h-5 w-5" aria-hidden="true" /> {t.igCta}
-              </a>
-              <span className="-mt-2 text-sm font-bold text-primary">@ilinguerelax</span>
-            </div>
+          {/* Celular: deslizable con el dedo; escritorio: 3 columnas */}
+          <div className="mt-10 flex snap-x snap-mandatory gap-8 overflow-x-auto px-2 pb-4 [scrollbar-width:none] md:grid md:grid-cols-3 md:overflow-visible md:px-0">
+            {[
+              { id: "fb", src: "/img/comunidad/facebook.webp", w: 640, h: 1169, alt: t.fbAlt, href: FACEBOOK_URL, cta: t.fbCta, icon: Facebook, handle: "iLingue Relax" },
+              { id: "ig", src: "/img/comunidad/instagram.webp", w: 640, h: 1287, alt: t.igAlt, href: INSTAGRAM_URL, cta: t.igCta, icon: Instagram, handle: "@ilinguerelax" },
+              { id: "g", src: "/img/comunidad/google.webp", w: 640, h: 1319, alt: t.gAlt, href: GOOGLE_URL, cta: t.gCta, icon: Search, handle: t.gLabel },
+            ].map((it) => (
+              <div key={it.id} className="flex w-[250px] shrink-0 snap-center flex-col items-center gap-5 md:w-auto">
+                <Phone src={it.src} alt={it.alt} w={it.w} h={it.h} />
+                <a href={it.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border-2 border-primary bg-background px-5 py-3 text-sm font-bold uppercase tracking-wide text-primary shadow-md transition hover:bg-primary hover:text-primary-foreground">
+                  <it.icon className="h-5 w-5" aria-hidden="true" /> {it.cta}
+                </a>
+                <span className="-mt-2 text-sm font-bold text-primary">{it.handle}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>

@@ -28,6 +28,7 @@ const Languages = lazy(() => import("@/components/Languages").then((m) => ({ def
 const HowItWorks = lazy(() => import("@/components/HowItWorks").then((m) => ({ default: m.HowItWorks })));
 const AllProductsReviews = lazy(() => import("@/components/AllProductsReviews").then((m) => ({ default: m.AllProductsReviews })));
 const InstagramFeed = lazy(() => import("@/components/InstagramFeed").then((m) => ({ default: m.InstagramFeed })));
+const FounderCommunity = lazy(() => import("@/components/FounderCommunity").then((m) => ({ default: m.FounderCommunity })));
 const AboutMe = lazy(() => import("@/components/AboutMe").then((m) => ({ default: m.AboutMe })));
 const Contact = lazy(() => import("@/components/Contact").then((m) => ({ default: m.Contact })));
 const Footer = lazy(() => import("@/components/Footer").then((m) => ({ default: m.Footer })));
@@ -102,6 +103,7 @@ const Index = () => {
       <Deferred minHeight={500}><AllProductsReviews /></Deferred>
       <Deferred minHeight={400}><InstagramFeed /></Deferred>
       <Deferred id="sobre-mi" minHeight={500}><AboutMe /></Deferred>
+      <Deferred minHeight={520}><FounderCommunity /></Deferred>
       <Deferred id="contacto" minHeight={600}><Contact /></Deferred>
       <Deferred minHeight={300}><Footer /></Deferred>
       <IdleMount><WhatsAppButton /></IdleMount>

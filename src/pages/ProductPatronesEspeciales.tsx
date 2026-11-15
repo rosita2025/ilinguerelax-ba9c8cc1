@@ -7,6 +7,7 @@ import { SEO } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
 import { ProductGallerySlider } from "@/components/ProductGallerySlider";
 import { SupportProofSlider, type SupportShot } from "@/components/SupportProofSlider";
+import { FounderCommunity } from "@/components/FounderCommunity";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
 import { FAQ } from "@/components/FAQ";
 import SalesNotification from "@/components/SalesNotification";
@@ -889,6 +890,9 @@ const PatronesContent = () => {
           </div>
         </div>
       </section>
+
+      {/* Quién soy (Gladys) + comunidad de Instagram y Facebook: confianza antes del cierre */}
+      <LazyMount minHeight={520} rootMargin={mediaMargin}><FounderCommunity /></LazyMount>
 
       {/* Cierre: ¿listo? */}
       <section className="py-10 md:py-14">

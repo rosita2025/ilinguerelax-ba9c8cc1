@@ -125,7 +125,7 @@ Deno.serve(async (req) => {
 
     // Crea la sesión en la moneda local del comprador o, con forceUsd, en dólares.
     // Si Stripe no acepta la moneda local (ej. cuenta sin esa moneda), se reintenta solo en USD: el comprador nunca ve un error por la moneda.
-    const createSession = async (forceUsd: boolean): Promise<{ session: { url?: string | null } } | { tooSmall: true }> => {
+    const createSession = async (forceUsd: boolean): Promise<{ session: { url?: string | null } } | { tooSmall: true } | { oxxo: { number: string; url: string; expires_at: string | null; payment_intent: string } }> => {
     const targetCurrency = isOxxo ? "mxn" : forceUsd ? "usd" : currency;
 
     // --- LÓGICA DE ENVÍO (idéntica a create-checkout-prueba) ---
@@ -233,6 +233,31 @@ Deno.serve(async (req) => {
       shipping_usd: String(shippingUsd),
     };
 
+    // OXXO: se crea y confirma el pago AQUÍ con el nombre y el correo del checkout (Stripe no vuelve a pedir el nombre) y se devuelve la ficha.
+    // El webhook entrega por payment_intent.succeeded (metadata.source = checkout-hosted-fallback). Si Stripe no lo permite, sigue con la página de Stripe.
+    if (isOxxo) {
+      try {
+        const pi = await stripe.paymentIntents.create({
+          amount: totalCents,
+          currency: "mxn",
+          payment_method_types: ["oxxo"],
+          payment_method_data: { type: "oxxo", billing_details: { name: fullName || body.contact.email, email: body.contact.email } },
+          payment_method_options: { oxxo: { expires_after_days: 3 } },
+          confirm: true,
+          description: productSummary || "iLingue Relax Digital",
+          receipt_email: body.contact.email,
+          metadata: checkoutMetadata,
+        });
+        const od = (pi as any).next_action?.oxxo_display_details;
+        if (od?.hosted_voucher_url) {
+          return { oxxo: { number: String(od.number ?? ""), url: String(od.hosted_voucher_url), expires_at: od.expires_after ? new Date(od.expires_after * 1000).toISOString() : null, payment_intent: pi.id } };
+        }
+        console.warn("[Stripe Hosted] OXXO directo sin ficha; se usa la página de Stripe", { pi: pi.id, status: pi.status });
+      } catch (oxxoErr) {
+        console.warn("[Stripe Hosted] OXXO directo falló; se usa la página de Stripe:", (oxxoErr as any)?.message);
+      }
+    }
+
     console.log(`[Stripe Hosted Fallback] Creating session. TargetCurrency: ${targetCurrency}, Total: ${totalCents}, Country: ${country}`);
 
     const session = await stripe.checkout.sessions.create({
@@ -275,6 +300,12 @@ Deno.serve(async (req) => {
         JSON.stringify({ error: "El monto total debe ser al menos $0.50 USD" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
+    }
+    if ("oxxo" in created) {
+      return new Response(JSON.stringify({ oxxo: created.oxxo }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
     const session = created.session;
 

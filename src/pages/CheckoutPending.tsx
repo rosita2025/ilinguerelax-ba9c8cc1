@@ -13,6 +13,11 @@ export default function CheckoutPending() {
   const { language } = useI18n();
   const t = getCheckoutStrings(language);
   const isPaypal = (sp.get("provider") || "").toLowerCase() === "paypal";
+  // OXXO directo (Stripe): ficha creada con el nombre y el correo del checkout. Solo se acepta un enlace de Stripe.
+  const rawOxxoUrl = sp.get("oxxo_url") || "";
+  const oxxoUrl = /^https:\/\/[a-z0-9.-]*stripe\.com\//i.test(rawOxxoUrl) ? rawOxxoUrl : "";
+  const oxxoRef = (sp.get("oxxo_ref") || "").replace(/[^0-9A-Za-z -]/g, "").slice(0, 60);
+  const oxxoExp = sp.get("oxxo_exp") || "";
   // PayPal: "ya pagué". Transferencia/efectivo (Mercado Pago): "pago pendiente" con referencia, nombre, producto y monto.
   const supportUrl = isPaypal
     ? buildPaidSupportUrl({ language, orderNumber: sp.get("order"), method: "PayPal" })
@@ -39,6 +44,28 @@ export default function CheckoutPending() {
         </div>
         <h1 className="text-3xl font-bold">{t.paymentPending}</h1>
         <p className="text-muted-foreground">{t.pendingDesc}</p>
+
+        {oxxoUrl && (
+          <div className="rounded-xl border-2 border-primary/40 bg-card p-4 text-left space-y-3">
+            <p className="text-sm text-muted-foreground">
+              {language === "en"
+                ? "Take this number to any OXXO store and pay in cash. Your access arrives by email as soon as OXXO confirms the payment."
+                : "Lleva este número a cualquier tienda OXXO y paga en efectivo. Tu acceso llega por correo en cuanto OXXO confirme el pago."}
+            </p>
+            {oxxoRef && (
+              <div>
+                <div className="text-xs font-semibold uppercase text-muted-foreground">{language === "en" ? "Reference number" : "Número de referencia"}</div>
+                <div className="font-mono text-xl font-bold tracking-wider break-all">{oxxoRef}</div>
+              </div>
+            )}
+            <Button asChild size="lg" className="w-full">
+              <a href={oxxoUrl} target="_blank" rel="noopener noreferrer">{language === "en" ? "View my slip with barcode" : "Ver mi ficha con código de barras"}</a>
+            </Button>
+            {oxxoExp && !Number.isNaN(new Date(oxxoExp).getTime()) && (
+              <p className="text-xs text-muted-foreground">{language === "en" ? "Expires" : "Vence el"} {new Date(oxxoExp).toLocaleString(language === "en" ? "en-US" : "es-MX", { dateStyle: "long", timeStyle: "short" })}.</p>
+            )}
+          </div>
+        )}
 
         <div className="rounded-xl border bg-card p-4 text-left text-sm space-y-2">
           <div className="flex gap-3">

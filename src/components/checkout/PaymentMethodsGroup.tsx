@@ -1549,6 +1549,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
           meta: metaRequestData(),
         },
       });
+      // OXXO directo: la ficha ya está creada con el nombre y el correo del checkout; se va a «pago pendiente» con el número y el enlace.
+      if (isOxxo && data?.oxxo?.url && /^https:\/\/[a-z0-9.-]*stripe\.com\//i.test(String(data.oxxo.url))) {
+        const q = new URLSearchParams({ status: "pending", reason: "oxxo_pending", oxxo_url: String(data.oxxo.url), oxxo_ref: String(data.oxxo.number ?? "").slice(0, 60) });
+        if (data.oxxo.expires_at) q.set("oxxo_exp", String(data.oxxo.expires_at));
+        window.location.href = `/checkouts/pending?${q.toString()}`;
+        return;
+      }
       if (data?.url) {
         window.location.href = data.url; // la espera sigue visible hasta que el navegador cambie de página
         return;

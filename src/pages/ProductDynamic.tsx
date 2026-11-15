@@ -798,17 +798,17 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
               ] : [...SP5K_SKUS, "2-000-palabras-esenciales-para-aprender-coreano-hangul-pronunciacion-para-hispanohablantes-npca"].includes(product.sku) ? (isIt ? [
                 { question: "Quanto tempo ci vuole per la consegna?", answer: "Arriva alla tua email in meno di 5 minuti dopo l'acquisto.", icon: Download },
                 { question: "Qual è il formato?", answer: "PDF digitale di alta qualità (marchio ufficiale iLingue Relax).", icon: FileText },
-                { question: "Quali metodi di pagamento ci sono?", answer: "Pagamenti sicuri con Stripe, carte di credito/debito e PayPal.", icon: CreditCard },
+                { question: "Quali metodi di pagamento ci sono?", answer: "Pagamenti sicuri con Stripe e carte di credito/debito.", icon: CreditCard },
                 { question: "C'è la garanzia di 7 giorni?", answer: "Sì — rimborso totale entro 7 giorni se non hai ancora scaricato i file, o del 50% se li hai già scaricati.", icon: Shield }
               ] : isEs ? [
                 { question: "¿Cuánto tarda la entrega?", answer: "Llega a tu correo en menos de 5 minutos después de la compra.", icon: Download },
                 { question: "¿Cuál es el formato?", answer: "PDF digital de alta calidad (marca oficial iLingue Relax).", icon: FileText },
-                { question: "¿Qué métodos de pago hay?", answer: "Pagos seguros con Stripe, tarjetas de crédito/débito y PayPal.", icon: CreditCard },
+                { question: "¿Qué métodos de pago hay?", answer: "Pagos seguros con Stripe y tarjetas de crédito/débito.", icon: CreditCard },
                 { question: "¿Hay garantía de 7 días?", answer: "Sí — reembolso total dentro de 7 días si aún no descargaste los archivos, o 50% si ya los descargaste.", icon: Shield }
               ] : [
                 { question: "Delivery time?", answer: "Sent to your email within 5 minutes of purchase.", icon: Download },
                 { question: "What is the format?", answer: "High-quality Digital PDF (Official iLingue Relax Brand).", icon: FileText },
-                { question: "Payment methods?", answer: "Secure payments via Stripe, Credit/Debit Cards, and PayPal.", icon: CreditCard },
+                { question: "Payment methods?", answer: "Secure payments via Stripe and Credit/Debit Cards.", icon: CreditCard },
                 { question: "7-Day Guarantee?", answer: "Yes — full refund within 7 days if you haven't downloaded the files yet, or 50% back if you already have.", icon: Shield }
               ]) : (isIt ? [
                 { question: "Consegna?", answer: "Immediata via email.", icon: Download },

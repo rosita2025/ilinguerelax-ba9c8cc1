@@ -344,25 +344,25 @@ export default function CheckoutSuccess() {
 
   // Localized copy for the public / unverified screen (IP-based via useI18n)
   const publicCopy = {
-    it: { title: "Conferma d'ordine privata", body: "Questa pagina mostra i dettagli di un ordine recente ed è disponibile solo per gli acquirenti verificati con un pagamento approvato su Stripe o PayPal.", cta: "Vai al negozio" },
+    it: { title: "Conferma d'ordine privata", body: "Questa pagina mostra i dettagli di un ordine recente ed è disponibile solo per gli acquirenti verificati con un pagamento approvato.", cta: "Vai al negozio" },
     es: {
       title: "Página privada de confirmación",
-      body: "Esta página muestra los detalles de un pedido reciente y solo está disponible para compradores verificados con un pago aprobado en Stripe o PayPal.",
+      body: "Esta página muestra los detalles de un pedido reciente y solo está disponible para compradores verificados con un pago aprobado.",
       cta: "Ir a la tienda",
     },
     en: {
       title: "Private order confirmation",
-      body: "This page shows details of a recent order and is only available to verified buyers with an approved payment in Stripe or PayPal.",
+      body: "This page shows details of a recent order and is only available to verified buyers with an approved payment.",
       cta: "Go to store",
     },
     fr: {
       title: "Confirmation de commande privée",
-      body: "Cette page affiche les détails d'une commande récente et n'est accessible qu'aux acheteurs vérifiés avec un paiement approuvé sur Stripe ou PayPal.",
+      body: "Cette page affiche les détails d'une commande récente et n'est accessible qu'aux acheteurs vérifiés avec un paiement approuvé.",
       cta: "Aller à la boutique",
     },
     pt: {
       title: "Confirmação de pedido privada",
-      body: "Esta página mostra os detalhes de um pedido recente e está disponível apenas para compradores verificados com um pagamento aprovado no Stripe ou PayPal.",
+      body: "Esta página mostra os detalhes de um pedido recente e está disponível apenas para compradores verificados com um pagamento aprovado.",
       cta: "Ir para a loja",
     },
   } as const;

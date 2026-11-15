@@ -903,12 +903,12 @@ const PatronesContent = () => {
               <div className="text-xs font-extrabold uppercase tracking-widest text-primary">Precio de lanzamiento</div>
               <div className="mt-1 text-5xl font-extrabold text-foreground">{pricingReady ? priceLabel : "…"}</div>
               {pricingReady && originalLabel && <div className="mt-1 text-sm text-muted-foreground">Precio anterior: <span className="line-through">{originalLabel}</span></div>}
-              <span className="mt-3 inline-block rounded-full bg-primary px-3 py-1 text-xs font-bold uppercase tracking-wide text-primary-foreground">Ebook + 3 bonos gratis · Pago único</span>
+              <span className="mt-3 inline-block rounded-full bg-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary-foreground sm:text-xs">Ebook + 3 bonos gratis · Pago único</span>
             </div>
 
-            <Button variant="hero" size="xl" onClick={handleBuy} onPointerEnter={prefetchCheckout} onFocus={prefetchCheckout} onTouchStart={prefetchCheckout} disabled={!pricingReady} className="mt-6 w-full max-w-full px-6 py-5 shadow-2xl">
+            <Button variant="hero" size="xl" onClick={handleBuy} onPointerEnter={prefetchCheckout} onFocus={prefetchCheckout} onTouchStart={prefetchCheckout} disabled={!pricingReady} className="mt-6 h-auto w-full max-w-full whitespace-normal px-4 py-4 text-sm leading-tight shadow-2xl sm:text-base">
               QUIERO MI EBOOK Y MIS BONOS
-              <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
+              <ArrowRight className="w-4 h-4 ml-2 shrink-0" />
             </Button>
           </div>
         </div>

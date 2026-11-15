@@ -48,9 +48,9 @@ export const ProductGallerySlider = ({ cover, extras, coverThumb, warm = false }
         <div
           ref={trackRef}
           tabIndex={0}
-          className="flex overflow-x-auto snap-x snap-mandatory rounded-2xl shadow-hero [scrollbar-width:none] [&::-webkit-scrollbar]:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="flex overflow-x-auto snap-x snap-mandatory rounded-2xl bg-white shadow-lg [scrollbar-width:none] [&::-webkit-scrollbar]:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
-          <div className="w-full shrink-0 snap-center" aria-label={`Imagen 1 de ${total}`}>{cover}</div>
+          <div className="w-full shrink-0 snap-center bg-white" aria-label={`Imagen 1 de ${total}`}>{cover}</div>
           {extras.map((x, i) => (
             <div key={x.src} className="w-full shrink-0 snap-center aspect-[4/5] bg-card" aria-label={`Imagen ${i + 2} de ${total}`}>
               {active ? <img src={x.src} alt={x.alt} loading="lazy" decoding="async" draggable={false} className="h-full w-full object-contain" /> : null}

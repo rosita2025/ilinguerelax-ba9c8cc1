@@ -127,7 +127,7 @@ export const FounderCommunity = ({ className = "" }: { className?: string }) => 
   return (
     <div className={className}>
       {/* Quién soy */}
-      <section className="bg-primary/[0.05] px-4 py-10 md:px-6 md:py-14" aria-labelledby="ilr-quien-soy">
+      <section className="bg-primary/[0.05] px-4 py-6 md:px-6 md:py-8" aria-labelledby="ilr-quien-soy">
         <div className="mx-auto grid max-w-5xl items-center gap-10 md:grid-cols-[minmax(0,320px)_minmax(0,1fr)] md:gap-14">
           <figure className="relative mx-auto w-full max-w-[300px] md:mx-0">
             <div className="rounded-t-[999px] rounded-b-3xl bg-primary/15 p-2 shadow-xl">
@@ -175,7 +175,7 @@ export const FounderCommunity = ({ className = "" }: { className?: string }) => 
       </section>
 
       {/* Comunidad: 2 celulares del mismo tamaño */}
-      <section className="bg-secondary/40 px-4 py-10 md:px-6 md:py-14" aria-labelledby="ilr-comunidad">
+      <section className="bg-secondary/40 px-4 py-6 md:px-6 md:py-8" aria-labelledby="ilr-comunidad">
         <div className="mx-auto max-w-4xl text-center">
           <div className="flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-widest text-primary">
             <span className="h-px w-10 bg-primary" aria-hidden="true" /> {t.commKicker} <span className="h-px w-10 bg-primary" aria-hidden="true" />
@@ -192,7 +192,7 @@ export const FounderCommunity = ({ className = "" }: { className?: string }) => 
       </section>
 
       {/* Google: aparte, fondo claro, sin botones */}
-      <section className="bg-background px-4 py-10 md:px-6 md:py-14" aria-labelledby="ilr-google">
+      <section className="bg-background px-4 py-6 md:px-6 md:py-8" aria-labelledby="ilr-google">
         <div className="mx-auto max-w-2xl text-center">
           <div className="flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-widest text-primary">
             <span className="h-px w-10 bg-primary" aria-hidden="true" /> {t.gKicker} <span className="h-px w-10 bg-primary" aria-hidden="true" />

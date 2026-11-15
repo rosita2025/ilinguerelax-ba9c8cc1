@@ -16,18 +16,21 @@ interface FAQProps {
   items: FAQItem[];
   title?: string;
   subtitle?: string;
+  /** Menos espacio en blanco arriba y abajo. */
+  compact?: boolean;
 }
 
 export const FAQ = ({
   items,
   title = "Preguntas Frecuentes",
   subtitle = "Encuentra respuestas a las preguntas más comunes",
+  compact = false,
 }: FAQProps) => {
   return (
-    <section className="py-20 md:py-28 bg-secondary/30">
+    <section className={`${compact ? "py-8 md:py-10" : "py-20 md:py-28"} bg-secondary/30`}>
       <div className="container px-4 md:px-6">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
+          <div className={`text-center ${compact ? "mb-6" : "mb-12"}`}>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-4">
               <HelpCircle className="w-4 h-4" />
               FAQ

@@ -491,7 +491,7 @@ const PatronesContent = () => {
 
       {/* Hero */}
 
-      <section className="pt-4 pb-6 md:pt-8 md:pb-10">
+      <section className="pt-3 pb-3 md:pt-6 md:pb-6">
         {!pricingAdmin.active && (
           <div className="container px-4 md:px-6 mb-6">
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3 text-amber-800">
@@ -581,7 +581,7 @@ const PatronesContent = () => {
                 <p className="text-xs text-muted-foreground mt-2 text-center">Pago único · Sin suscripciones · Descarga inmediata</p>
               </div>
 
-              <div className="mb-6 flex items-center justify-between bg-muted/30 p-3 rounded-xl border border-border/50">
+              <div className="mb-4 flex items-center justify-between bg-muted/30 p-3 rounded-xl border border-border/50">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Pagos Seguros:</span>
                 <PaymentLogos />
               </div>
@@ -589,30 +589,10 @@ const PatronesContent = () => {
 
 
 
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="hero"
-                  size="xl"
-                  className="w-full mb-2 text-lg py-6 shadow-2xl"
-                  onClick={handleBuy}
-                  onPointerEnter={prefetchCheckout}
-                  onFocus={prefetchCheckout}
-                  onTouchStart={prefetchCheckout}
-                  disabled={!pricingReady}
-                >
-                  <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-                  {pricingReady ? `LO QUIERO • ${priceLabel}` : "LO QUIERO"}
-                  <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
-                </Button>
-              </motion.div>
-
-              <a href="#vista-previa" className="mb-3 flex items-center justify-center gap-2 rounded-xl border-2 border-primary/30 bg-primary/5 px-4 py-3 text-sm font-bold text-primary hover:bg-primary/10 transition-colors">
+              <a href="#vista-previa" className="mb-2 flex items-center justify-center gap-2 rounded-xl border-2 border-primary/30 bg-primary/5 px-4 py-3 text-sm font-bold text-primary hover:bg-primary/10 transition-colors">
                 <Eye className="w-4 h-4" /> Ver vista previa del PDF
               </a>
 
-              <p className="text-center text-xs text-muted-foreground mb-6">
-                🔒 Pago seguro • ⬇️ Descarga inmediata • 🛡️ Garantía 7 días
-              </p>
 
 
 
@@ -623,7 +603,7 @@ const PatronesContent = () => {
       </section>
 
       {/* Dolores */}
-      <section className="py-8 md:py-10">
+      <section className="py-4 md:py-6">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-2">
@@ -653,7 +633,7 @@ const PatronesContent = () => {
       </section>
 
       {/* Comparativa: Patrones Especiales vs apps y academias */}
-      <section className="py-6 md:py-8">
+      <section className="py-3 md:py-4">
         <div className="container px-4 md:px-6">
           <div className="max-w-2xl mx-auto">
             <img
@@ -672,7 +652,7 @@ const PatronesContent = () => {
       </section>
 
       {/* Beneficios */}
-      <section className="py-8 md:py-10 bg-muted/30">
+      <section className="py-4 md:py-6 bg-muted/30">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-2">
@@ -698,7 +678,7 @@ const PatronesContent = () => {
       </section>
 
       {/* Qué incluye */}
-      <section id="incluye" className="py-8 md:py-10">
+      <section id="incluye" className="py-4 md:py-6">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-6">
@@ -743,7 +723,7 @@ const PatronesContent = () => {
       </section>
 
       {/* Vista previa real */}
-       <section id="vista-previa" className="py-10 md:py-14 scroll-mt-24">
+       <section id="vista-previa" className="py-6 md:py-8 scroll-mt-24">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-8">
@@ -849,7 +829,7 @@ const PatronesContent = () => {
       </section>
 
       {/* Reseñas (una sola sección: WhatsApp reales + opiniones escritas) */}
-      <section className="py-10 md:py-14 bg-muted/30">
+      <section className="py-6 md:py-8 bg-muted/30">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-6">
@@ -869,7 +849,7 @@ const PatronesContent = () => {
       </section>
 
       {/* Atención posventa (no son reseñas): capturas reales, agradecidos por su confianza */}
-      <section className="py-8 md:py-10">
+      <section className="py-4 md:py-6">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-4">
@@ -891,26 +871,48 @@ const PatronesContent = () => {
         </div>
       </section>
 
-      {/* Quién soy (Gladys) + comunidad de Instagram y Facebook: confianza antes del cierre */}
+      {/* Quién soy (Crady) + comunidad (Facebook, Instagram) + Google: confianza antes del cierre */}
       <LazyMount minHeight={520} rootMargin={mediaMargin}><FounderCommunity /></LazyMount>
 
-      {/* Cierre: ¿listo? */}
-      <section className="py-10 md:py-14">
+      {/* Cierre: «Oferta especial» (mismo formato que el ejemplo). Solo precios reales de la página; sin «% OFF» ni escasez inventados. */}
+      <section className="py-6 md:py-8 bg-gradient-to-b from-primary/10 to-primary/5">
         <div className="container px-4 md:px-6">
-          <div className="max-w-2xl mx-auto text-center rounded-3xl border-2 border-primary/20 bg-primary/5 p-6 md:p-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-              ¿Listo para <span className="text-gradient">pronunciar con seguridad</span>?
+          <div className="max-w-xl mx-auto rounded-3xl border-2 border-primary/30 bg-white p-6 text-center shadow-[0_0_0_8px_hsl(var(--primary)/0.12)] md:p-8">
+            <div className="flex items-center justify-center gap-3 text-xs font-extrabold uppercase tracking-widest text-primary">
+              <span className="h-px w-8 bg-primary" aria-hidden="true" /> Oferta especial <span className="h-px w-8 bg-primary" aria-hidden="true" />
+            </div>
+            <h2 className="mt-3 text-3xl font-extrabold uppercase leading-tight tracking-tight text-foreground md:text-4xl">
+              Con tu ebook <span className="text-primary">vas a acceder a:</span>
             </h2>
-            <p className="text-muted-foreground mb-5">Ebook + 3 bonos gratis · Pago único · Descarga inmediata · Garantía 7 días</p>
-            <Button variant="hero" size="xl" onClick={handleBuy} onPointerEnter={prefetchCheckout} onFocus={prefetchCheckout} onTouchStart={prefetchCheckout} disabled={!pricingReady} className="w-full sm:w-auto max-w-full px-8 py-5 shadow-2xl">
-              <ShoppingCart className="w-5 h-5 mr-2 shrink-0" />
-              {pricingReady ? `LISTO, LO QUIERO • ${priceLabel}` : "LISTO, LO QUIERO"}
+            <ul className="mt-6 space-y-3 text-left">
+              {[
+                "Ebook PDF «Patrones Especiales»",
+                "Bono 1: 1,000 palabras con pronunciación y audios <b>gratis</b>",
+                "Bono 2: Estructuras gramaticales desde cero <b>gratis</b>",
+                "Bono 3: Examen de 98 preguntas con respuestas <b>gratis</b>",
+                "Actualizaciones del material <b>gratis</b>",
+              ].map((x) => (
+                <li key={x} className="flex items-center gap-3 text-sm font-semibold text-foreground md:text-base">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary"><Check className="h-4 w-4" strokeWidth={3} /></span>
+                  <span dangerouslySetInnerHTML={{ __html: x }} />
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-6 rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 p-5">
+              <div className="text-xs font-extrabold uppercase tracking-widest text-primary">Precio de lanzamiento</div>
+              <div className="mt-1 text-5xl font-extrabold text-foreground">{pricingReady ? priceLabel : "…"}</div>
+              {pricingReady && originalLabel && <div className="mt-1 text-sm text-muted-foreground">Precio anterior: <span className="line-through">{originalLabel}</span></div>}
+              <span className="mt-3 inline-block rounded-full bg-primary px-3 py-1 text-xs font-bold uppercase tracking-wide text-primary-foreground">Ebook + 3 bonos gratis · Pago único</span>
+            </div>
+
+            <Button variant="hero" size="xl" onClick={handleBuy} onPointerEnter={prefetchCheckout} onFocus={prefetchCheckout} onTouchStart={prefetchCheckout} disabled={!pricingReady} className="mt-6 w-full max-w-full px-6 py-5 shadow-2xl">
+              QUIERO MI EBOOK Y MIS BONOS
               <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
             </Button>
           </div>
         </div>
       </section>
-
 
       <FAQ
         items={[
@@ -927,6 +929,7 @@ const PatronesContent = () => {
         ]}
         title="Preguntas Frecuentes"
         subtitle="Resolvemos tus dudas"
+        compact
       />
 
       <Footer />

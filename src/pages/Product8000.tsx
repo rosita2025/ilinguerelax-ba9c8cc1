@@ -2,6 +2,7 @@ import { FounderCommunity } from "@/components/FounderCommunity";
 import { LazyMount } from "@/components/LazyImg";
 import { SpecialOfferCard } from "@/components/SpecialOfferCard";
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
+import { prefetchWhenCalm } from "@/lib/idlePrefetch";
 import { useEffect, useMemo } from "react";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
@@ -127,16 +128,10 @@ const Product8000 = () => {
 
   // Precarga el bundle del checkout + los datos del producto mientras el
   // visitante lee, para que "comprar" abra el checkout ya pintado.
-  useEffect(() => {
-    const prefetch = () => { import("@/pages/Checkout"); prefetchCheckoutProduct(ADMIN_SKU_8000); };
-    const w = window as typeof window & { requestIdleCallback?: (cb: () => void) => number };
-    if (typeof w.requestIdleCallback === "function") {
-      w.requestIdleCallback(prefetch);
-      return;
-    }
-    const timeoutId = window.setTimeout(prefetch, 2000);
-    return () => window.clearTimeout(timeoutId);
-  }, []);
+  useEffect(
+    () => prefetchWhenCalm(() => { import("@/pages/Checkout"); prefetchCheckoutProduct(ADMIN_SKU_8000); }),
+    [],
+  );
 
 
   // Meta Pixel ViewContent event - HOTMART PIXEL

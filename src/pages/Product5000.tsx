@@ -1,6 +1,8 @@
 import { FounderCommunity } from "@/components/FounderCommunity";
 import { SpecialOfferCard } from "@/components/SpecialOfferCard";
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
+import { prefetchWhenCalm } from "@/lib/idlePrefetch";
+import { lightCoverUrl, disableImageTransform } from "@/lib/coverImage";
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -229,16 +231,10 @@ const Product5000 = () => {
   // Precarga el paquete de JS del checkout en segundo plano (mismo fix que
   // en ProductDynamic.tsx) para evitar la pantalla en blanco de 3-5s al
   // tocar "comprar".
-  useEffect(() => {
-    const prefetch = () => { import("@/pages/Checkout"); prefetchCheckoutProduct(ADMIN_SKU_5000); };
-    const w = window as typeof window & { requestIdleCallback?: (cb: () => void) => number };
-    if (typeof w.requestIdleCallback === "function") {
-      w.requestIdleCallback(prefetch);
-      return;
-    }
-    const timeoutId = window.setTimeout(prefetch, 2000);
-    return () => window.clearTimeout(timeoutId);
-  }, []);
+  useEffect(
+    () => prefetchWhenCalm(() => { import("@/pages/Checkout"); prefetchCheckoutProduct(ADMIN_SKU_5000); }),
+    [],
+  );
   
   const { isPeru, priceUsd: priceUSD, priceGlobalUsd, priceLatamUsd, priceTiendaUsd, pricePen, country } = tier;
   const isLatam = false; // Internal checkout for everyone
@@ -263,6 +259,9 @@ const Product5000 = () => {
   }, [pricing5000.coverImageUrl, pricing5000.galleryImages, pricing5000.loaded]);
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
   const activeHeroImage = heroImages[Math.min(currentHeroImage, Math.max(heroImages.length - 1, 0))];
+  // La portada (la 1.ª imagen) se pide en versión liviana de 800 px, igual que la pantalla inicial de index.html (una sola descarga); si falla, la original.
+  const [heroFailed, setHeroFailed] = useState(false);
+  const heroSrc = currentHeroImage === 0 && !heroFailed ? (lightCoverUrl(activeHeroImage ?? null) ?? activeHeroImage) : activeHeroImage;
 
   // Meta Pixel ViewContent event - HOTMART PIXEL
   const pixelParams = useMemo(
@@ -481,7 +480,8 @@ const Product5000 = () => {
                 </div>
                 {activeHeroImage ? (
                   <img
-                    src={activeHeroImage}
+                    src={heroSrc}
+                    onError={() => { if (heroSrc !== activeHeroImage) { disableImageTransform(); setHeroFailed(true); } }}
                     alt={
                       currentHeroImage === 0
                         ? "Inglés Relax 5,000 palabras - Libro digital con pronunciación para hispanohablantes y fonética UK/USA"

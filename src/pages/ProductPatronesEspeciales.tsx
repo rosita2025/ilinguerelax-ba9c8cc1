@@ -1,5 +1,5 @@
 import { prefetchCheckoutProduct } from "@/lib/checkoutProductCache";
-import { useMemo, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useMemo, useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
@@ -26,6 +26,21 @@ import { PATRONES_COVER_SOURCE as FAST_COVER_SOURCE, PATRONES_FAST_COVER_URL, PA
 import { getPatronesConnection, isPatronesConstrainedConnection } from "@/lib/patronesNetwork";
 
 // Below-the-fold modules download only when their sections approach the viewport.
+
+// Menú de arriba: solo en computadora (≥ 1024 px). Se descarga SOLO ahí: en celular ni se pide ni se pinta.
+const DesktopNavbar = lazy(() => import("@/components/Navbar").then((m) => ({ default: m.Navbar })));
+const useIsDesktop = () => {
+  const q = "(min-width: 1024px)";
+  const [on, setOn] = useState(() => typeof window !== "undefined" && window.matchMedia(q).matches);
+  useEffect(() => {
+    const m = window.matchMedia(q);
+    const f = () => setOn(m.matches);
+    f();
+    m.addEventListener("change", f);
+    return () => m.removeEventListener("change", f);
+  }, []);
+  return on;
+};
 
 const TIENDA_CHECKOUT_PATH = "/checkouts/patrones-ingles";
 // ÚNICA regla final para Patrones:
@@ -299,6 +314,7 @@ const features = [
 ];
 
 const PatronesContent = () => {
+  const isDesktop = useIsDesktop();
   const { t, currency, countryCode } = useI18n();
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
@@ -491,6 +507,9 @@ const PatronesContent = () => {
       />
 
 
+      {/* Menú de arriba: SOLO en computadora (a pedido de la dueña); en celular y tableta se oculta para que la portada suba. */}
+      {isDesktop && <Suspense fallback={<div className="h-[72px]" aria-hidden="true" />}><DesktopNavbar /></Suspense>}
+
       {/* Hero */}
 
       <section className="pt-3 pb-3 md:pt-6 md:pb-6">
@@ -510,7 +529,7 @@ const PatronesContent = () => {
               <div className="relative">
                 <ProductGallerySlider
                   warm={galleryWarm}
-                  coverThumb={heroLight ?? heroImage ?? undefined}
+                  coverThumb={snapshotCover ? PATRONES_MOBILE_COVER_URL : (heroLight ?? heroImage ?? undefined)}
                   extras={galleryExtras}
                   cover={
                     heroImage ? (

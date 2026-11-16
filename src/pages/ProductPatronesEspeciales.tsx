@@ -4,13 +4,9 @@ import { useNavigate, Link } from "react-router-dom";
 import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
 import { useHotmartPixel, trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { SEO } from "@/components/SEO";
-import { Footer } from "@/components/Footer";
 import { ProductGallerySlider } from "@/components/ProductGallerySlider";
-import { SupportProofSlider, type SupportShot } from "@/components/SupportProofSlider";
-import { FounderCommunity } from "@/components/FounderCommunity";
+import type { SupportShot } from "@/components/SupportProofSlider";
 import { StickyBuyBar } from "@/components/StickyBuyBar";
-import { FAQ } from "@/components/FAQ";
-import SalesNotification from "@/components/SalesNotification";
 import { Button } from "@/components/ui/button";
 import { Star, Check, BookOpen, ArrowRight, ShoppingCart, Smartphone, Lightbulb, CreditCard, Sparkles, Shield, Eye, Music2, Download, Lock, X, ZoomIn } from "lucide-react";
 import { DigitalProductNotice } from "@/components/DigitalProductNotice";
@@ -24,8 +20,29 @@ import { useLocalOverrides } from "@/lib/livePrices";
 import { CheckoutLanguageProvider, useI18n } from "@/i18n/I18nContext";
 import { PATRONES_COVER_SOURCE as FAST_COVER_SOURCE, PATRONES_FAST_COVER_URL, PATRONES_MOBILE_COVER_URL, PATRONES_COVER_SRCSET, PATRONES_COVER_SIZES } from "@/lib/patronesCover";
 import { getPatronesConnection, isPatronesConstrainedConnection } from "@/lib/patronesNetwork";
+import { PATRONES_HERO } from "@/lib/patronesHero";
 
 // Below-the-fold modules download only when their sections approach the viewport.
+
+// Secciones de más abajo: su código se descarga solo al acercarse (antes iban en la descarga inicial y retrasaban el primer dibujo).
+const Footer = lazy(() => import("@/components/Footer").then((m) => ({ default: m.Footer })));
+const FAQ = lazy(() => import("@/components/FAQ").then((m) => ({ default: m.FAQ })));
+const FounderCommunity = lazy(() => import("@/components/FounderCommunity").then((m) => ({ default: m.FounderCommunity })));
+const SupportProofSlider = lazy(() => import("@/components/SupportProofSlider").then((m) => ({ default: m.SupportProofSlider })));
+const SalesNotification = lazy(() => import("@/components/SalesNotification"));
+// El aviso de ventas recientes es lo último en cargar: espera a que la página esté lista.
+const useAfterLoad = (ms: number) => {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const go = () => { const t = window.setTimeout(() => setOn(true), ms); return () => window.clearTimeout(t); };
+    if (document.readyState === "complete") return go();
+    let clear: (() => void) | undefined;
+    const h = () => { clear = go(); };
+    window.addEventListener("load", h, { once: true });
+    return () => { window.removeEventListener("load", h); clear?.(); };
+  }, [ms]);
+  return on;
+};
 
 // Menú de arriba: solo en computadora (≥ 1024 px). Se descarga SOLO ahí: en celular ni se pide ni se pinta.
 const DesktopNavbar = lazy(() => import("@/components/Navbar").then((m) => ({ default: m.Navbar })));
@@ -315,6 +332,7 @@ const features = [
 
 const PatronesContent = () => {
   const isDesktop = useIsDesktop();
+  const showSales = useAfterLoad(4000);
   const { t, currency, countryCode } = useI18n();
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
@@ -566,10 +584,10 @@ const PatronesContent = () => {
 
             <div>
               <p className="text-lg md:text-xl font-bold text-foreground mb-2">
-                Deja de pronunciar el inglés como se escribe.
+                {PATRONES_HERO.headline}
               </p>
               <p className="text-base text-muted-foreground mb-4">
-                Descubre los patrones, letras mudas y combinaciones secretas que cambian el sonido de las palabras, y empieza a hablar con seguridad desde la primera lectura. Método paso a paso hecho para hispanohablantes.
+                {PATRONES_HERO.subtitle}
               </p>
 
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-4">
@@ -591,14 +609,14 @@ const PatronesContent = () => {
 
               <div className="mb-5 rounded-2xl border-2 border-yellow-400 bg-gradient-to-r from-yellow-400/15 to-amber-400/15 p-4 shadow-lg">
                 <p className="text-foreground font-extrabold text-base md:text-lg text-center mb-2">
-                  🎁 Hoy recibes el PDF + 3 BONOS GRATIS
+                  {PATRONES_HERO.bonusTitle}
                 </p>
                 <ul className="space-y-1 text-sm text-foreground">
-                  {["Ebook PDF «Patrones Especiales»", "Bono 1: 1,000 palabras con pronunciación y audios", "Bono 2: Estructuras gramaticales desde cero", "Bono 3: Examen de 98 preguntas con respuestas"].map((x) => (
+                  {PATRONES_HERO.bonusItems.map((x) => (
                     <li key={x} className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />{x}</li>
                   ))}
                 </ul>
-                <p className="text-xs text-muted-foreground mt-2 text-center">Pago único · Sin suscripciones · Descarga inmediata</p>
+                <p className="text-xs text-muted-foreground mt-2 text-center">{PATRONES_HERO.bonusNote}</p>
               </div>
 
               <div className="mb-4 flex items-center justify-between bg-muted/30 p-3 rounded-xl border border-border/50">
@@ -812,7 +830,7 @@ const PatronesContent = () => {
               </h2>
             </div>
             <LazyMount minHeight={400} rootMargin={mediaMargin}>
-              <SupportProofSlider shots={supportShots} />
+              <Suspense fallback={null}><SupportProofSlider shots={supportShots} /></Suspense>
             </LazyMount>
             <p className="text-center text-xs text-muted-foreground mt-4">Capturas reales de WhatsApp, sin editar. Toca una para ampliarla.</p>
           </div>
@@ -820,7 +838,7 @@ const PatronesContent = () => {
       </section>
 
       {/* Quién soy (Crady) + comunidad (Facebook, Instagram) + Google: confianza antes del cierre */}
-      <LazyMount minHeight={520} rootMargin={mediaMargin}><FounderCommunity /></LazyMount>
+      <LazyMount minHeight={520} rootMargin={mediaMargin}><Suspense fallback={null}><FounderCommunity /></Suspense></LazyMount>
 
       {/* Cierre: «Oferta especial» (mismo formato que el ejemplo). Solo precios reales de la página; sin «% OFF» ni escasez inventados. */}
       <section className="py-6 md:py-8 bg-gradient-to-b from-primary/10 to-primary/5">
@@ -862,6 +880,7 @@ const PatronesContent = () => {
         </div>
       </section>
 
+      <LazyMount minHeight={640} rootMargin={mediaMargin}><Suspense fallback={null}>
       <FAQ
         items={[
           { question: "¿Qué son los Patrones Especiales?", answer: "Es un ebook en PDF que te enseña a leer y pronunciar en inglés reconociendo los patrones de letras y combinaciones que se repiten en muchas palabras: letras mudas, combinaciones secretas, contracciones y habla rápida. Está hecho para hispanohablantes.", icon: BookOpen },
@@ -879,8 +898,9 @@ const PatronesContent = () => {
         subtitle="Resolvemos tus dudas"
         compact
       />
+      </Suspense></LazyMount>
 
-      <Footer />
+      <LazyMount minHeight={320} rootMargin={mediaMargin}><Suspense fallback={null}><Footer /></Suspense></LazyMount>
 
       <StickyBuyBar
         sku={ADMIN_SKU}
@@ -902,7 +922,7 @@ const PatronesContent = () => {
 
       <div className="h-20 md:h-16" />
 
-      <SalesNotification productKey="patrones" productImage={heroLight ?? heroImage ?? undefined} />
+      {showSales && <Suspense fallback={null}><SalesNotification productKey="patrones" productImage={heroLight ?? heroImage ?? undefined} /></Suspense>}
     </main>
   );
 };

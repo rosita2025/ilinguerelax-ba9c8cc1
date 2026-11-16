@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { PATRONES_HERO } from "./src/lib/patronesHero";
 import { PATRONES_COVER_SOURCE, PATRONES_FAST_COVER_URL, PATRONES_PRODUCT_SLUG, PATRONES_MOBILE_COVER_URL, PATRONES_COVER_SRCSET, PATRONES_COVER_SIZES } from "./src/lib/patronesCover";
 
 // Start the actual cover request while HTML is parsed, before React or the catalog.
@@ -11,7 +12,16 @@ const patronesCoverPreload = () => ({
   transformIndexHtml(html: string) {
     const hints = `var n=navigator.connection;var low=!!(n&&(n.saveData||/^(slow-2g|2g|3g)$/.test(n.effectiveType)||n.downlink>0&&n.downlink<=1.5));var u=low?${JSON.stringify(PATRONES_MOBILE_COVER_URL)}:${JSON.stringify(PATRONES_FAST_COVER_URL)};`;
     const script = `<script>(function(){if(location.pathname!==${JSON.stringify(`/products/${PATRONES_PRODUCT_SLUG}`)})return;try{var c=localStorage.getItem(${JSON.stringify(`ilr_cover_${PATRONES_PRODUCT_SLUG}`)});if(c&&c!==${JSON.stringify(PATRONES_COVER_SOURCE)})return;}catch(e){}${hints}var l=document.createElement('link');l.rel='preload';l.as='image';if(!low){l.setAttribute('imagesrcset',${JSON.stringify(PATRONES_COVER_SRCSET)});l.setAttribute('imagesizes',${JSON.stringify(PATRONES_COVER_SIZES)});}l.href=u;l.setAttribute('fetchpriority','high');document.head.appendChild(l);})();</script>`;
-    const shell = `<script>(function(){if(location.pathname!==${JSON.stringify(`/products/${PATRONES_PRODUCT_SLUG}`)})return;${hints}var custom=false;try{var c=localStorage.getItem(${JSON.stringify(`ilr_cover_${PATRONES_PRODUCT_SLUG}`)});if(c&&c!==${JSON.stringify(PATRONES_COVER_SOURCE)}){u=c;custom=true;}}catch(e){}var b=document.querySelector('#app-shell .box');if(!b)return;b.style.aspectRatio='4/5';var i=new Image();i.alt='Patrones Especiales en Inglés';i.width=1000;i.height=1250;i.decoding='async';i.setAttribute('fetchpriority','high');i.style.cssText='width:100%;height:auto;display:block;border-radius:inherit';if(!low&&!custom){i.sizes=${JSON.stringify(PATRONES_COVER_SIZES)};i.srcset=${JSON.stringify(PATRONES_COVER_SRCSET)};}i.src=u;b.replaceChildren(i);})();</script>`;
+    const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    // Título y «lo que incluye» en la pantalla inicial (mismo texto que la página; ver src/lib/patronesHero.ts).
+    const heroHtml =
+      `<p style="font-size:18px;font-weight:700;line-height:1.3;margin:0 0 8px">${esc(PATRONES_HERO.headline)}</p>` +
+      `<p style="font-size:15px;line-height:1.5;color:#64748b;margin:0 0 16px">${esc(PATRONES_HERO.subtitle)}</p>` +
+      `<div style="border:2px solid #facc15;background:#fefce8;border-radius:16px;padding:14px">` +
+      `<p style="font-weight:800;text-align:center;margin:0 0 8px">${esc(PATRONES_HERO.bonusTitle)}</p>` +
+      `<ul style="list-style:none;margin:0;padding:0;font-size:14px;line-height:1.7">${PATRONES_HERO.bonusItems.map((x) => `<li>✓ ${esc(x)}</li>`).join("")}</ul>` +
+      `<p style="font-size:12px;color:#64748b;text-align:center;margin:8px 0 0">${esc(PATRONES_HERO.bonusNote)}</p></div>`;
+    const shell = `<script>(function(){if(location.pathname!==${JSON.stringify(`/products/${PATRONES_PRODUCT_SLUG}`)})return;${hints}var custom=false;try{var c=localStorage.getItem(${JSON.stringify(`ilr_cover_${PATRONES_PRODUCT_SLUG}`)});if(c&&c!==${JSON.stringify(PATRONES_COVER_SOURCE)}){u=c;custom=true;}}catch(e){}var b=document.querySelector('#app-shell .box');if(!b)return;b.style.aspectRatio='4/5';var i=new Image();i.alt='Patrones Especiales en Inglés';i.width=1000;i.height=1250;i.decoding='async';i.setAttribute('fetchpriority','high');i.style.cssText='width:100%;height:auto;display:block;border-radius:inherit';if(!low&&!custom){i.sizes=${JSON.stringify(PATRONES_COVER_SIZES)};i.srcset=${JSON.stringify(PATRONES_COVER_SRCSET)};}i.src=u;b.replaceChildren(i);var sh=document.getElementById('app-shell');if(sh){sh.querySelectorAll('.line').forEach(function(n){n.remove();});var d=document.createElement('div');d.style.cssText='margin:0 16px 16px;max-width:560px';d.innerHTML=${JSON.stringify(heroHtml)};sh.appendChild(d);}})();</script>`;
     // Insert at the end of the document: the shell exists before the module runs.
     return html
       // Keep the early catalog promise, but do not download a second copy of the snapshot.

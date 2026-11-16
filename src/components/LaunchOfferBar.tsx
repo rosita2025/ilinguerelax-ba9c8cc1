@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 type Lang = "es" | "en" | "it";
@@ -35,7 +35,8 @@ interface Props {
 export const LaunchOfferBar = ({ price, originalPrice, lang = "es", isPhysical = false }: Props) => {
   const [host, setHost] = useState<HTMLElement | null>(null);
 
-  useEffect(() => {
+  // useLayoutEffect: el espacio de 36 px existe antes del primer pintado y no desplaza la página (CLS).
+  useLayoutEffect(() => {
     const el = document.createElement("div");
     el.setAttribute("data-ilr-launch-bar", "");
     el.style.height = "36px";
@@ -47,22 +48,27 @@ export const LaunchOfferBar = ({ price, originalPrice, lang = "es", isPhysical =
     };
   }, []);
 
-  // Sin cifra (p. ej. «Cargando precio…») no hay cinta: solo se muestra con el precio real.
-  if (!host || !/\d/.test(price)) return null;
+  if (!host) return null;
+  // Sin cifra (p. ej. «Cargando precio…») la cinta sale sin el precio (el alto es fijo, no mueve nada); el precio entra cuando es real.
+  const hasPrice = /\d/.test(price);
   const t = T[lang] ?? T.es;
   const p = parseNum(price);
   const o = parseNum(originalPrice);
-  const pct = isFinite(p) && isFinite(o) && o > p ? Math.round((1 - p / o) * 100) : 0;
+  const pct = hasPrice && isFinite(p) && isFinite(o) && o > p ? Math.round((1 - p / o) * 100) : 0;
 
   const items = (
     <>
       <span>{t.brand}</span>
       <span className="opacity-60" aria-hidden="true">✦</span>
-      <span className="inline-flex items-center gap-2">
-        {t.launch}: <b>{price}</b>
-        {originalPrice && pct > 0 && <s className="font-medium opacity-75">{originalPrice}</s>}
-      </span>
-      <span className="opacity-60" aria-hidden="true">✦</span>
+      {hasPrice && (
+        <>
+          <span className="inline-flex items-center gap-2">
+            {t.launch}: <b>{price}</b>
+            {originalPrice && pct > 0 && <s className="font-medium opacity-75">{originalPrice}</s>}
+          </span>
+          <span className="opacity-60" aria-hidden="true">✦</span>
+        </>
+      )}
       <span>{t.once}</span>
       <span className="opacity-60" aria-hidden="true">✦</span>
       <span>{t.noSubs}</span>

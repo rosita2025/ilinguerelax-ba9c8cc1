@@ -971,7 +971,7 @@ const Product5000 = () => {
       </section>
 
       {/* Quién soy + comunidad y «Oferta especial» antes de las preguntas */}
-      <FounderCommunity lang="es" />
+      <LazyMount minHeight={520} rootMargin="300px"><FounderCommunity lang="es" /></LazyMount>
       <SpecialOfferCard
         noun="ebook"
         items={[

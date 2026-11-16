@@ -680,7 +680,7 @@ export const StickyBuyBar = (props: StickyBuyBarProps & { sku?: string }) => {
       const p = window.location.pathname.toLowerCase();
       return p.startsWith("/checkout") || p.startsWith("/checkouts") || p.startsWith("/admin") || p.includes("success") || p.startsWith("/gracias") || p.startsWith("/thank");
     })();
-  const showTopBar = !onExcluded && !props.isLoading && !!props.price;
+  const showTopBar = !onExcluded;
   return (
     <>
       {showTopBar && <LaunchOfferBar price={props.price} originalPrice={props.originalPrice} lang={props.lang} isPhysical={props.isPhysical} />}

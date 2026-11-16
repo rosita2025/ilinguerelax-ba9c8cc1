@@ -1,4 +1,5 @@
 import { FounderCommunity } from "@/components/FounderCommunity";
+import { LazyMount } from "@/components/LazyImg";
 import { SpecialOfferCard } from "@/components/SpecialOfferCard";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -277,7 +278,7 @@ const Product500Preguntas = () => {
       <ProductReviews productType="english" showReviewForm />
 
       {/* Quién soy + comunidad y «Oferta especial» antes de las preguntas */}
-      <FounderCommunity lang="es" />
+      <LazyMount minHeight={520} rootMargin="300px"><FounderCommunity lang="es" /></LazyMount>
       <SpecialOfferCard
         noun="libro"
         items={[

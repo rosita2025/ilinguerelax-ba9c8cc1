@@ -26,12 +26,20 @@ const asyncMainCss = () => ({
   name: "async-main-css",
   enforce: "post" as const,
   transformIndexHtml(html: string) {
-    return html.replace(
+    let cssHref = "";
+    const out = html.replace(
       /<link rel="stylesheet"([^>]*?) href="(\/assets\/index-[^"]+\.css)"([^>]*)>/,
-      (_m, a, href, b) =>
-        `<link rel="stylesheet"${a} href="${href}"${b} media="print" data-async-css onload="this.media='all';window.__cssReady=1;window.dispatchEvent(new Event('ilr-css-ready'))">` +
-        `<noscript><link rel="stylesheet" href="${href}"></noscript>`,
+      (_m, a, href, b) => {
+        cssHref = href;
+        return (
+          `<link rel="stylesheet"${a} href="${href}"${b} media="print" data-async-css onload="this.media='all';window.__cssReady=1;window.dispatchEvent(new Event('ilr-css-ready'))">` +
+          `<noscript><link rel="stylesheet" href="${href}"></noscript>`
+        );
+      },
     );
+    // Un <link media="print"> se descarga con prioridad BAJA y React espera a que llegue para dibujar: se precarga con prioridad alta
+    // desde el inicio del <head> (el mismo archivo, sin descargarlo dos veces).
+    return cssHref ? out.replace("<head>", `<head><link rel="preload" as="style" crossorigin href="${cssHref}">`) : out;
   },
 });
 

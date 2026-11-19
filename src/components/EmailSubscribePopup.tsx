@@ -41,8 +41,8 @@ const DELAY_MS = 15000;
 // En Patrones el popup no interrumpe la compra: sale entre 2 y 55 min después de entrar (al azar, fijo por sesión).
 const PATRONES_PATH = "/products/patrones-especiales-alfabeto-combinaciones-secretas-ingles";
 const PATRONES_DELAY_KEY = "ilr_popup_patrones_at";
-/** En Patrones el cupón del boletín sale 1 minuto después de entrar (a pedido de la dueña; antes, al azar entre 2 y 55 min). */
-const PATRONES_DELAY_MS = 60_000;
+/** En Patrones el cupón del boletín sale 1 minuto y 55 segundos después de entrar (a pedido de la dueña; antes 1 min, y antes al azar entre 2 y 55 min). */
+const PATRONES_DELAY_MS = 115_000;
 
 export function popupDelayFor(pathname: string, now = Date.now()): number {
   if (!(pathname || "").toLowerCase().startsWith(PATRONES_PATH)) return DELAY_MS;

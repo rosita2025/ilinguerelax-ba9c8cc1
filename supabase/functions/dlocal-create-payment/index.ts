@@ -36,7 +36,8 @@ const BodySchema = z.object({
   country: z.string().length(2),
   paymentType: z.enum(["transfer", "cash", "wallet"]).optional(),
   currency: z.string().length(3).default("USD"),
-  amount: z.number().positive().max(200000).optional(),
+  // Solo una pista (el servidor recalcula el total): el tope de 200000 rechazaba pedidos en COP, CLP, ARS… (US$ 50 ≈ COP 200.000).
+  amount: z.number().positive().max(1_000_000_000).optional(),
   expectedTotalUsd: z.number().positive().max(200000).optional(),
   successUrl: z.string().url(),
   backUrl: z.string().url(),

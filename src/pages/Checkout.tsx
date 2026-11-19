@@ -143,6 +143,25 @@ export default function Checkout() {
   // Cuando el comprador escribe su correo, lo asociamos al acceso ya
   // registrado (misma IP) para poder ver en /admin/checkout-abuse quién
   // dejó datos y no completó la compra. No crea hits nuevos.
+  // Cupón de bienvenida (NEW10, 10 %): quien se suscribió con el popup lo tiene guardado en `ilr_buyer`, pero nunca se aplicaba solo y
+  // el campo «Cupón» está dentro del resumen plegado (en celular casi nadie lo encuentra). Se aplica UNA vez por visita (también con ?cupon=CODIGO).
+  const applyCouponStore = useCheckoutPruebaStore((s) => s.applyCoupon);
+  const couponNow = useCheckoutPruebaStore((s) => s.coupon);
+  useEffect(() => {
+    try {
+      if (couponNow || sessionStorage.getItem("ilr_coupon_auto") === "1") return;
+      const fromUrl = new URLSearchParams(window.location.search).get("cupon");
+      let code = (fromUrl || "").trim().toUpperCase();
+      if (!code) {
+        const saved = JSON.parse(localStorage.getItem("ilr_buyer") || "{}") as { coupon?: string };
+        code = String(saved?.coupon || "").trim().toUpperCase();
+      }
+      if (!code) return;
+      sessionStorage.setItem("ilr_coupon_auto", "1");
+      if (applyCouponStore(code)) toast.success(code === "NEW10" ? "Tu cupón NEW10 (10 % de descuento) ya está aplicado" : `Cupón ${code} aplicado`);
+    } catch { /* sin almacenamiento */ }
+  }, [couponNow, applyCouponStore]);
+
   const buyerEmail = useCheckoutPruebaStore((s) => s.buyer.email);
   const identifiedRef = useRef<string | null>(null);
   useEffect(() => {

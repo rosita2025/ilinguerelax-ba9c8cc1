@@ -48,6 +48,7 @@ import koreanCoverAsset from "@/assets/previews/korean-2000-cover.asset.json";
 import koreanTableAsset from "@/assets/previews/korean-2000-table.asset.json";
 import koreanIndexAsset from "@/assets/previews/korean-2000-index.asset.json";
 import { FounderCommunity } from "@/components/FounderCommunity";
+import { LazyMount } from "@/components/LazyImg";
 
 
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
@@ -782,7 +783,7 @@ const ProductDynamic = ({ forcedSlug }: { forcedSlug?: string } = {}) => {
           )}
 
 
-          <FounderCommunity />
+          <LazyMount minHeight={520} rootMargin="600px"><FounderCommunity /></LazyMount>
 
           {!isCourse && (
           <Suspense fallback={<Skeleton className="h-48 w-full" />}>

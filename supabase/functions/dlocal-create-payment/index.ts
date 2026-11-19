@@ -251,7 +251,10 @@ Deno.serve(async (req) => {
           failures: failures.length
         }, 502);
       }
-      return json({ error: "No pudimos procesar el pago con dLocal Go. Por favor, intenta con otro método.", details: attempt.text, failures: failures.length }, 400);
+      // Motivo real de dLocal (código + mensaje) en `details` para que salga en «Fallos de pago» (antes solo «HTTP 400»).
+      let dlocalWhy = attempt.text.slice(0, 200);
+      try { const j = JSON.parse(attempt.text); dlocalWhy = `${j.code ?? attempt.status}: ${j.message ?? j.error ?? ""}`.slice(0, 200); } catch { /* texto plano */ }
+      return json({ error: "No pudimos procesar el pago con dLocal Go. Por favor, intenta con otro método.", details: { dlocal: [dlocalWhy] }, failures: failures.length }, 400);
     }
 
     const data = JSON.parse(attempt.text);

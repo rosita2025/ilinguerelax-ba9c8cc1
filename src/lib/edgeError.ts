@@ -15,6 +15,10 @@ export async function extractEdgeErrorMessage(error: unknown): Promise<string | 
   if (!error) return null;
 
   if (error instanceof FunctionsHttpError) {
+    // `invokeWithRetry` ya leyó el body (solo se puede leer una vez) y dejó el mensaje en `edgeDetail`: sin esto,
+    // la segunda lectura fallaba y el comprador/admin veían solo «HTTP 400» en vez del motivo real.
+    const saved = (error as { edgeDetail?: string }).edgeDetail;
+    if (typeof saved === "string" && saved) return saved;
     // El detalle viaja en el body de la respuesta.
     try {
       const body = await error.context.json();

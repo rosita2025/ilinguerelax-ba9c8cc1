@@ -87,6 +87,7 @@ const METHOD_RULES: Array<[RegExp, string]> = [
   [/binance/i, "Binance Pay (USDT)"],
   [/spei|clabe/i, "Transferencia SPEI (México)"],
   [/ach_us|ach\s*\/\s*wire/i, "Transferencia ACH / Wire (EE. UU.)"],
+  [/bre[-_ ]?b/i, "Transferencia Bre-B (Colombia)"],
   [/oxxo/i, "Pago en efectivo OXXO (México)"],
   [/pix/i, "PIX (Brasil)"],
   [/nequi/i, "Nequi (Colombia)"],

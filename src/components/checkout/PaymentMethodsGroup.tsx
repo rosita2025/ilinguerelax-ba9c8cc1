@@ -76,7 +76,7 @@ import { loadCheckoutProduct } from "@/lib/checkoutProductCache";
 import type { UpsellItem } from "@/config/checkoutCatalog";
 
 
-type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "stripe_bizum" | "stripe_satispay" | "stripe_ideal" | "stripe_mbway" | "stripe_crypto" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "ach_us" | "paypal" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "stripe_oxxo" | "whop_addi" | "hotmart_separator";
+type Method = "card" | "stripe_ach" | "stripe_cashapp" | "stripe_klarna" | "stripe_bizum" | "stripe_satispay" | "stripe_ideal" | "stripe_mbway" | "stripe_crypto" | "transfer" | "cash" | "yape" | "binance" | "clabe" | "ach_us" | "bre_b_co" | "paypal" | "hotmart" | "dlocal_transfer" | "dlocal_cash" | "dlocal_wallet" | "dlocal_card" | "stripe_oxxo" | "whop_addi" | "hotmart_separator";
 
 const STRIPE_METHODS: Method[] = ["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"];
 const isStripeMethod = (m: Method | null | undefined): boolean => !!m && (STRIPE_METHODS as string[]).includes(m);
@@ -208,7 +208,7 @@ const SECTION_ORDER: MethodSection[] = ["cards", "transfer", "cash", "wallet", "
 const MX_SECTION_ORDER: MethodSection[] = ["cards", "cash", "transfer", "wallet", "other"];
 function methodSection(id: string): MethodSection {
   if (["card", "dlocal_card", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto", "stripe_klarna", "whop_addi"].includes(id)) return "cards";
-  if (["transfer", "stripe_ach", "dlocal_transfer", "clabe", "ach_us"].includes(id)) return "transfer";
+  if (["transfer", "stripe_ach", "dlocal_transfer", "clabe", "ach_us", "bre_b_co"].includes(id)) return "transfer";
   if (["cash", "dlocal_cash", "stripe_oxxo"].includes(id)) return "cash";
   if (["yape", "binance", "paypal", "dlocal_wallet", "stripe_cashapp", "stripe_crypto"].includes(id)) return "wallet";
   return "other";
@@ -246,6 +246,11 @@ const ACH_ACCOUNT = "218587714436";
 const ACH_ACCOUNT_TYPE = "Checking";
 const ACH_BANK = "Lead Bank (Wise)";
 
+// Transferencia Bre-B desde Colombia (cuenta virtual en COP; llave Bre-B). Mínimo COP 5.000 y máximo COP 12.000.000 por depósito; se acredita al instante.
+// Se verifica a mano (como SPEI y ACH): no pasa por dLocal Go.
+const BREB_KEY = "@CB9CI9T68";
+const BREB_HOLDER = "Carmen Rosa Aliaga";
+
 // dLocal Go — moneda de cobro por país (cuando dLocal la soporta).
 const DLOCAL_CURRENCY_BY_COUNTRY: Record<string, string> = {
   MX: "MXN", CO: "COP", BR: "BRL", AR: "ARS", CL: "CLP", PE: "PEN",
@@ -281,7 +286,7 @@ const methodHint = (id: string, language: string): { text: string; cls: string }
     return { text: L("Sin tarjeta", "No card", "Sans carte", "Senza carta", "Sem cartão"), cls: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200" };
   if (id === "stripe_klarna" || id === "whop_addi")
     return { text: L("En cuotas", "Pay later", "En plusieurs fois", "A rate", "Parcelado"), cls: "bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-200" };
-  if (["transfer", "dlocal_transfer", "stripe_ach", "stripe_ideal", "ach_us"].includes(id))
+  if (["transfer", "dlocal_transfer", "stripe_ach", "stripe_ideal", "ach_us", "bre_b_co"].includes(id))
     return { text: L("Desde tu banco", "From your bank", "Depuis votre banque", "Dalla tua banca", "Do seu banco"), cls: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200" };
   return null;
 };
@@ -289,7 +294,7 @@ const methodHint = (id: string, language: string): { text: string; cls: string }
 // Color del icono de cada tipo de método (solo presentación): ayuda a distinguirlos de un vistazo.
 const methodTone = (id: string): string => {
   if (id === "card" || id.startsWith("stripe")) return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300";
-  if (id === "transfer" || id === "dlocal_transfer" || id === "clabe" || id === "ach_us") return "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300";
+  if (id === "transfer" || id === "dlocal_transfer" || id === "clabe" || id === "ach_us" || id === "bre_b_co") return "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300";
   if (id === "cash" || id === "dlocal_cash") return "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300";
   if (id === "yape" || id === "dlocal_wallet" || id === "dlocal_card") return "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300";
   if (id === "paypal") return "bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300";
@@ -631,6 +636,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   const [copied, setCopied] = useState(false);
   const [copiedBinance, setCopiedBinance] = useState(false);
   const [copiedClabe, setCopiedClabe] = useState(false);
+  const [copiedBreb, setCopiedBreb] = useState(false);
   const [copiedAch, setCopiedAch] = useState<"routing" | "account" | null>(null);
   const [hotmartCfg, setHotmartCfg] = useState<HotmartConfig>({ fallbackUrl: null, urlsByCountry: {}, pricesByCountry: {} });
   const [methodError, setMethodError] = useState<{ method: Method; message: string } | null>(null);
@@ -1380,7 +1386,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     setSelectedMethod(m);
     // Yape / Binance / CLABE / dLocal tarjeta: el pago se confirma en su propio
     // panel (sin botón "Comprar ahora"), así que el aviso sale al elegirlos.
-    if (["yape", "binance", "clabe", "ach_us", "dlocal_card"].includes(m)) void offerUpsellThen(null);
+    if (["yape", "binance", "clabe", "ach_us", "bre_b_co", "dlocal_card"].includes(m)) void offerUpsellThen(null);
     if (!["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(m)) setShowStripe(false);
     // Hotmart: no redirige al seleccionar; espera al botón "Comprar ahora".
     // Al colapsar el iframe de Stripe la página se encoge y el scroll salta
@@ -1983,6 +1989,118 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
     } catch { /* noop */ }
   };
 
+  const copyBreb = async () => {
+    try {
+      await navigator.clipboard.writeText(BREB_KEY);
+      setCopiedBreb(true);
+      toast({ title: language === "en" ? "Bre-B key copied" : "Llave Bre-B copiada", description: language === "en" ? "Paste it in your bank app." : "Pégala en la app de tu banco." });
+      setTimeout(() => setCopiedBreb(false), 2000);
+    } catch { /* noop */ }
+  };
+
+  const handleBrebPaid = async () => {
+    if (!valid) { requestBuyerInfo(); return; }
+    const s = useCheckoutPruebaStore.getState();
+    const orderNumber = `ILR-CO-${Math.floor(1000 + Math.random() * 9000)}`;
+    const amountText = local.loading ? `USD $${totalUsd}` : local.formatted;
+    const amountLocal = local.loading ? Number(totalUsd) : Number(local.amount ?? totalUsd);
+    const currencyLocal = local.loading ? "USD" : (local.currency || "COP");
+    const productList = s.items.map((i) => `• ${i.name} x${i.quantity}`).join("\n");
+    const msg =
+      `Hola! 👋 Acabo de pagar por transferencia Bre-B (Colombia).\n\n` +
+      `📦 Orden: ${orderNumber}\n` +
+      `👤 Nombre: ${s.buyer.fullName.trim()}\n` +
+      `📧 Email: ${s.buyer.email.trim()}\n` +
+      `💰 Monto: ${amountText} (USD $${totalUsd})\n` +
+      `🔑 Llave Bre-B: ${BREB_KEY}\n` +
+      `👤 Titular: ${BREB_HOLDER}\n\n` +
+      `Productos:\n${productList}\n\n` +
+      `Adjunto captura del pago. Gracias!`;
+    const waUrl = `https://wa.me/12512724704?text=${encodeURIComponent(msg)}`;
+
+    setMpLoading("bre_b_co");
+    setMethodError(null);
+
+    try {
+      // Si el pago pendiente no se guarda, no se le muestran datos al cliente como si todo estuviera bien.
+      const { error: insertError } = await supabase.from("manual_payments").insert({
+        order_number: orderNumber,
+        buyer_name: s.buyer.fullName.trim(),
+        buyer_email: s.buyer.email.trim().toLowerCase(),
+        buyer_phone: s.buyer.phone ?? null,
+        buyer_country: (region.country || "CO").toUpperCase() || null,
+        amount_usd: Number(totalUsd),
+        amount_local: amountLocal,
+        currency_local: currencyLocal,
+        method: "bre_b_co",
+        items: s.items.map((i) => ({ sku: i.id, name: i.name, quantity: i.quantity, price: i.price })),
+        status: "pending",
+      });
+      if (insertError) throw new Error(insertError.message);
+
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "admin-manual-pending",
+          idempotencyKey: `manual-pending-${orderNumber}`,
+          templateData: {
+            orderNumber,
+            customerName: s.buyer.fullName.trim(),
+            customerEmail: s.buyer.email.trim().toLowerCase(),
+            customerPhone: s.buyer.phone ?? "",
+            customerCountry: (region.country || "CO").toUpperCase(),
+            productName: s.items.map((i) => i.name).join(" + "),
+            amount: amountLocal,
+            currency: currencyLocal,
+            method: "Bre-B (Colombia)",
+            orderDate: new Date().toISOString(),
+          },
+        },
+      }).catch((err) => console.warn("[admin-manual-pending] bre-b notify failed", err));
+
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "customer-manual-pending",
+          recipientEmail: s.buyer.email.trim().toLowerCase(),
+          idempotencyKey: `customer-manual-pending-${orderNumber}`,
+          templateData: {
+            orderNumber,
+            customerName: s.buyer.fullName.trim().split(" ")[0] || s.buyer.fullName.trim(),
+            productName: s.items.map((i) => i.name).join(" + "),
+            amount: amountLocal,
+            currency: currencyLocal,
+            amountUsd: Number(totalUsd),
+            method: "Bre-B (Colombia)",
+            orderDate: new Date().toISOString(),
+            brebKey: BREB_KEY,
+            brebHolder: BREB_HOLDER,
+          },
+        },
+      }).catch((err) => console.warn("[customer-manual-pending] bre-b notify failed", err));
+
+      captureEmailContact({
+        email: s.buyer.email.trim().toLowerCase(),
+        name: s.buyer.fullName.trim(),
+        metadata: { phone: s.buyer.phone ?? "", processor: "manual", paymentType: "bre_b_co", orderNumber },
+      });
+
+      window.open(waUrl, "_blank", "noopener,noreferrer");
+      const q = new URLSearchParams({
+        order: orderNumber,
+        name: s.buyer.fullName.trim(),
+        email: s.buyer.email.trim(),
+        amount: `${amountText} (USD $${totalUsd})`,
+        method: "Bre-B (Colombia)",
+        products: s.items.map((i) => `${i.name} x${i.quantity}`).join(" | "),
+      }).toString();
+      navigate(`/checkouts/pendiente-manual?${q}`);
+    } catch (err) {
+      setMpLoading(null);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setMethodError({ method: "bre_b_co", message: errorMessage });
+      toast({ title: "Error Bre-B", description: errorMessage, variant: "destructive" });
+    }
+  };
+
   const handleAchPaid = async () => {
     if (!valid) { requestBuyerInfo(); return; }
     const s = useCheckoutPruebaStore.getState();
@@ -2407,6 +2525,13 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       badge: finalPriceLabel,
     },
     {
+      id: "bre_b_co",
+      icon: Building2,
+      title: language === "en" ? "Bre-B transfer" : "Transferencia Bre-B",
+      sub: language === "en" ? "Pay from your bank app with our Bre-B key · verified in 1-24h" : "Paga desde la app de tu banco con nuestra llave Bre-B · verificado en 1-24 h",
+      badge: finalPriceLabel,
+    },
+    {
       id: "dlocal_transfer",
       icon: Building2,
       title: language === "en" ? "Transfer"
@@ -2601,6 +2726,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         if (m.id === "yape") return methodsConfig.yape && isPeru;
         if (m.id === "binance") return methodsConfig.binance && (country === "PE" || !LATAM_COUNTRIES.has(country)) && country !== "ES"; // sin Binance en Latinoamérica (Perú lo conserva)
         if (m.id === "clabe") return country === "MX";
+        if (m.id === "bre_b_co") return country === "CO"; // Bre-B manual: solo Colombia (llave Bre-B en COP)
         if (m.id === "ach_us") return country === "US"; // ACH / Wire manual: solo compradores en EE. UU. (cuenta estadounidense, transferencia nacional)
         if (m.id === "paypal") return !PAYPAL_UNAVAILABLE && methodsConfig.paypal; // PayPal directo: se activa por región en /admin/checkout-methods
 
@@ -2667,7 +2793,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   );
   // Colombia: tarjeta, Nequi, Addi, transferencia, efectivo y PayPal (orden pedido por el dueño; lo demás va después).
   if (country === "CO") {
-    const CO_ORDER = ["card", "dlocal_wallet", "whop_addi", "dlocal_transfer", "dlocal_cash", "paypal"];
+    const CO_ORDER = ["card", "dlocal_wallet", "whop_addi", "dlocal_transfer", "bre_b_co", "dlocal_cash", "paypal"];
     const coRank = (id: string) => { const i = CO_ORDER.indexOf(id); return i === -1 ? CO_ORDER.length : i; };
     methods.sort((x, y) => coRank(x.id) - coRank(y.id));
   }
@@ -3153,6 +3279,12 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     <BankBadge label="CLABE" bg="#006341" color="#ffffff" />
                     <BankBadge label="MXN" bg="#ffffff" color="#0A2540" />
                   </div>
+                ) : m.id === "bre_b_co" ? (
+                  <div className="mt-1 flex items-center gap-1 flex-wrap">
+                    <BankBadge label="Bre-B" bg="#0A2540" color="#ffffff" />
+                    <BankBadge label="Llave" bg="#1D4ED8" color="#ffffff" />
+                    <BankBadge label="COP" bg="#ffffff" color="#0A2540" />
+                  </div>
                 ) : m.id === "ach_us" ? (
                   <div className="mt-1 flex items-center gap-1 flex-wrap">
                     <BankBadge label="ACH" bg="#0A2540" color="#ffffff" />
@@ -3570,6 +3702,76 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
               </Suspense>
             )}
 
+            {m.id === "bre_b_co" && isSelected && (
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
+                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 sm:p-5 space-y-4">
+                  <div className="flex items-center gap-3 text-amber-800 dark:text-amber-400">
+                    <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
+                      <Building2 className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-base leading-tight">{language === "en" ? "Bre-B payment instructions" : "Instrucciones de pago Bre-B"}</p>
+                      <p className="text-xs opacity-80">{language === "en" ? "Send the transfer to our Bre-B key from your bank app" : "Transfiere a nuestra llave Bre-B desde la app de tu banco"}</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 bg-white/50 dark:bg-black/20 p-4 rounded-lg border border-amber-100 dark:border-amber-900/20">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{language === "en" ? "Account holder" : "Titular de la cuenta"}</p>
+                      <p className="font-bold text-sm text-neutral-900 dark:text-neutral-100">{BREB_HOLDER}</p>
+                    </div>
+                    <div className="flex justify-between items-start gap-2 pt-2 border-t border-amber-100 dark:border-amber-900/10">
+                      <div>
+                        <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{language === "en" ? "Bre-B key" : "Llave Bre-B"}</p>
+                        <p className="font-mono font-bold text-base tracking-wider text-neutral-900 dark:text-neutral-100 break-all">{BREB_KEY}</p>
+                      </div>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:text-amber-700 hover:bg-amber-100 shrink-0" onClick={copyBreb} aria-label={language === "en" ? "Copy Bre-B key" : "Copiar llave Bre-B"}>
+                        {copiedBreb ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                    <div className="pt-2 border-t border-amber-100 dark:border-amber-900/10">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{language === "en" ? "Currency" : "Divisa"}</p>
+                      <p className="font-bold text-sm text-neutral-900 dark:text-neutral-100">{language === "en" ? "Colombian peso (COP)" : "Peso colombiano (COP)"}</p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg bg-white/50 dark:bg-black/20 p-3 text-center border border-amber-100 dark:border-amber-900/10">
+                    <p className="text-xs text-amber-700/70 dark:text-amber-500/50 uppercase tracking-wider font-bold">{t.amountToPay}</p>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                      {region.loading ? (
+                        <Skeleton className="h-8 w-32 mx-auto" />
+                      ) : (
+                        local.loading || local.isUsd ? `USD $${totalUsd}` : local.formatted
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-amber-900/80 dark:text-amber-300/80">
+                    <MessageCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                    <p>{language === "en" ? "Transfer the exact amount in COP. Bre-B transfers arrive instantly; we confirm your payment by hand within 1-24h." : "Transfiere el monto exacto en pesos colombianos (COP). Las transferencias Bre-B llegan al instante; confirmamos tu pago a mano en 1-24 h."}</p>
+                  </div>
+
+                  <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-amber-900/80 dark:text-amber-300/80 italic">
+                    <MessageCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                    <p>
+                      <strong>{language === "en" ? "Important:" : "Importante:"}</strong> {language === "en" ? "After paying, tap \"I already paid\" and send your proof by WhatsApp or to " : "Después de pagar, toca «Ya pagué» y envía tu comprobante por WhatsApp o a "}<span className="font-bold">hola@ilinguerelax.com</span>.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleBrebPaid}
+                  disabled={mpLoading === "bre_b_co"}
+                  className="w-full bg-[#0A2540] hover:bg-[#081e33] text-white font-bold py-4 rounded-xl transition-colors shadow-lg disabled:opacity-60"
+                >
+                  {t.alreadyPaid}
+                </button>
+
+                <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
+              </div>
+            )}
+
             {m.id === "ach_us" && isSelected && (
               <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
                 <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 sm:p-5 space-y-4">
@@ -3755,7 +3957,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       {/* Con tarjeta no hay botón aparte (el de pagar es el de Stripe) y sin método elegido tampoco.
           Para transferencia, efectivo, dLocal Go y Hotmart se mantiene, sin monto en USD. */}
       {/* Con el pago de Whop abierto el botón es el de Whop: se oculta este para no tener dos botones. */}
-      {!whopPanelOpen && !!selected && selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "ach_us" && selected !== "dlocal_card" && !["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(selected) && (
+      {!whopPanelOpen && !!selected && selected !== "yape" && selected !== "binance" && selected !== "clabe" && selected !== "ach_us" && selected !== "bre_b_co" && selected !== "dlocal_card" && !["card", "stripe_ach", "stripe_cashapp", "stripe_klarna", "stripe_bizum", "stripe_satispay", "stripe_ideal", "stripe_mbway", "stripe_crypto"].includes(selected) && (
         <button
           type="button"
           onClick={handleBuyNow}

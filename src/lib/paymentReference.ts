@@ -61,6 +61,10 @@ export const METHOD_LABELS: Record<string, string> = {
   clabe_mx: "SPEI / CLABE (México)",
   ach_us: "Transferencia ACH / Wire (EE. UU.)",
   bre_b_co: "Transferencia Bre-B (Colombia)",
+  sepa_eu: "Transferencia SEPA (Europa · EUR)",
+  gbp_uk: "Transferencia bancaria (Reino Unido · GBP)",
+  cad_ca: "Transferencia bancaria (Canadá · CAD)",
+  cny_cn: "Transferencia SWIFT (China · CNY)",
   interbank: "Interbank (transferencia)",
   bank_transfer: "Transferencia bancaria",
 };

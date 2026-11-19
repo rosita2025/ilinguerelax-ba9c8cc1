@@ -331,6 +331,8 @@ const PatronesContent = () => {
   const [galleryWarm, setGalleryWarm] = useState(false);
   const constrainedNetwork = isPatronesConstrainedConnection(getPatronesConnection());
   const mediaMargin = constrainedNetwork ? "0px" : "300px";
+  // Vista previa y bonos: empiezan a bajar ~600 px ANTES de llegar (300 px en conexión lenta), no al abrir la página: así no compiten con la portada pero ya están listas al verlas y así ya están listas al verlas.
+  const previewMargin = constrainedNetwork ? "300px" : "600px";
   const checkoutPrefetched = useRef(false);
   const prefetchCheckout = () => {
     if (isPatronesConstrainedConnection(getPatronesConnection())) return;
@@ -699,7 +701,7 @@ const PatronesContent = () => {
                    <div className="relative aspect-square bg-card overflow-hidden">
                     <LazyImg
                       src={p.src}
-                      rootMargin={mediaMargin}
+                      rootMargin={previewMargin}
                       alt={p.alt}
                       wrapperClassName="absolute inset-0 block"
                       width={900}
@@ -728,7 +730,7 @@ const PatronesContent = () => {
                 {bonusCards.map((c) => (
                   <figure key={c.tag} className="w-[78%] shrink-0 snap-start overflow-hidden rounded-2xl border border-accent/30 bg-card shadow-card sm:w-[55%] md:w-auto">
                     <div className="relative aspect-square overflow-hidden bg-card">
-                      <LazyImg src={c.src} rootMargin={mediaMargin} alt={c.alt} wrapperClassName="absolute inset-0 block" width={1254} height={1254} className="h-full w-full object-contain" onContextMenu={(e) => e.preventDefault()} />
+                      <LazyImg src={c.src} rootMargin={previewMargin} alt={c.alt} wrapperClassName="absolute inset-0 block" width={1254} height={1254} className="h-full w-full object-contain" onContextMenu={(e) => e.preventDefault()} />
                     </div>
                     <figcaption className="p-4">
                       <p className="text-[11px] font-bold uppercase tracking-wide text-primary">{c.tag}</p>

@@ -132,6 +132,20 @@ Deno.serve(async (req) => {
       },
     });
 
+    // Solo lo imprescindible (sin descripción, expiración, documento ni dirección). Si dLocal rechaza todos los intentos completos por un
+    // campo opcional, este abre el pago igual. `withNotify: false` quita también el aviso (el estado se confirma por la pantalla de retorno
+    // y por dlocal-sweep-pending).
+    const bareFor = (amount: number, currency: string, withNotify: boolean) => ({
+      amount,
+      currency,
+      country: body.country.toUpperCase(),
+      order_id: orderId,
+      success_url: body.successUrl,
+      back_url: body.backUrl,
+      ...(withNotify ? { notification_url: notificationUrl } : {}),
+      payer: { name: body.payerName, email: body.payerEmail },
+    });
+
     const createPayment = async (payload: Record<string, unknown>) => {
       let lastStatus = 0;
       let lastText = "";
@@ -183,6 +197,11 @@ Deno.serve(async (req) => {
       rest.push({ label: "checkout USD", payload: payloadFor(calculatedUsd, "USD") });
       rest.push({ label: "checkout USD mínimo", payload: payloadFor(calculatedUsd, "USD", { minimal: true }) });
     }
+    // Últimos recursos: payload imprescindible, primero con aviso y después sin él.
+    const bareAmount = localAmount && localAmount > 0 && localCurrency !== "USD" && !restricted ? localAmount : calculatedUsd;
+    const bareCurrency = bareAmount === calculatedUsd ? "USD" : localCurrency;
+    rest.push({ label: `básico ${bareCurrency}`, payload: bareFor(bareAmount, bareCurrency, true) });
+    rest.push({ label: `básico ${bareCurrency} sin aviso`, payload: bareFor(bareAmount, bareCurrency, false) });
       return rest;
     };
 
@@ -197,7 +216,7 @@ Deno.serve(async (req) => {
       for (const next of nextAttempts) {
         attempt = await createPayment(next.payload);
         if (attempt.ok) {
-          usedUsdFallback = next.label.startsWith("checkout USD");
+          usedUsdFallback = String((next.payload as Record<string, unknown>).currency) === "USD";
           break;
         }
         failures.push(`${next.label} [${attempt.status}] ${attempt.text.slice(0, 160)}`);

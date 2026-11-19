@@ -98,6 +98,42 @@ Deno.serve(async (req) => {
       rows = (data || []) as Row[];
     }
 
+    // Errores registrados por el SERVIDOR (p. ej. la respuesta real de dLocal cuando rechaza el pago). Antes solo se leían si fallaba
+    // funnel_events, así que «Fallos de pago» mostraba solo «HTTP 400» del navegador y nunca el motivo de dLocal.
+    if (!error) {
+      try {
+        let sq = admin
+          .from("admin_payment_errors")
+          .select("id, created_at, provider, order_id, error_message, error_kind, country:error_detail->>'country'")
+          .gte("created_at", since)
+          .order("created_at", { ascending: false })
+          .limit(limit);
+        if (body.provider) sq = sq.eq("provider", body.provider);
+        const { data: srv } = await sq;
+        for (const r of (srv || []) as Array<Record<string, string | null>>) {
+          if (body.country && String(r.country || "").toUpperCase() !== body.country.toUpperCase()) continue;
+          const why = [r.error_kind, r.error_message].filter(Boolean).join(" · ").slice(0, 400);
+          rows.push({
+            id: `srv-${r.id}`,
+            created_at: String(r.created_at),
+            provider: r.provider ?? null,
+            error_reason: `Servidor: ${why || "sin detalle"}`,
+            country: r.country ?? null,
+            ip: null,
+            product_id: null,
+            value: null,
+            currency: null,
+            page_path: r.order_id ? `pedido ${r.order_id}` : null,
+            session_id: null,
+            user_agent: null,
+          });
+        }
+        rows.sort((a, b) => b.created_at.localeCompare(a.created_at));
+      } catch (e) {
+        console.warn("admin-payment-errors: no se pudo leer admin_payment_errors", e);
+      }
+    }
+
     const tally = (key: (r: Row) => string) => {
       const m = new Map<string, number>();
       for (const r of rows) {

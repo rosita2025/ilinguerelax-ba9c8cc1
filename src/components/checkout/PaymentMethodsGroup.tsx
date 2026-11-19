@@ -2732,7 +2732,8 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
         // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.
         // México: la transferencia de dLocal Go no se muestra (queda SPEI manual, OXXO y tarjeta).
-        if (m.id === "dlocal_transfer") return country !== "MX" && methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer") && !getDlocalCountry(country)?.transferComingSoon;
+        // Mexico y Colombia: sin la transferencia de dLocal Go (Mexico usa SPEI; Colombia usa Bre-B manual, porque la de dLocal falla con 400).
+        if (m.id === "dlocal_transfer") return country !== "MX" && country !== "CO" && methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer") && !getDlocalCountry(country)?.transferComingSoon;
         // OXXO de Stripe (sin documento): si está encendido en México, reemplaza al OXXO de dLocal, que sí pide documento.
         // México: el OXXO es SIEMPRE el de Stripe (sin documento de identidad); no depende de un interruptor del admin.
         if (m.id === "stripe_oxxo") return country === "MX";
@@ -2793,7 +2794,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
   );
   // Colombia: tarjeta, Nequi, Addi, transferencia, efectivo y PayPal (orden pedido por el dueño; lo demás va después).
   if (country === "CO") {
-    const CO_ORDER = ["card", "dlocal_wallet", "whop_addi", "dlocal_transfer", "bre_b_co", "dlocal_cash", "paypal"];
+    const CO_ORDER = ["card", "dlocal_wallet", "whop_addi", "bre_b_co", "dlocal_cash", "paypal"];
     const coRank = (id: string) => { const i = CO_ORDER.indexOf(id); return i === -1 ? CO_ORDER.length : i; };
     methods.sort((x, y) => coRank(x.id) - coRank(y.id));
   }
@@ -3703,41 +3704,24 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             )}
 
             {m.id === "bre_b_co" && isSelected && (
-              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-4">
-                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 sm:p-5 space-y-4">
-                  <div className="flex items-center gap-3 text-amber-800 dark:text-amber-400">
-                    <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
-                      <Building2 className="w-5 h-5" />
+              <div className="border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 p-4 space-y-3">
+                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 space-y-3">
+                  <p className="font-bold text-base leading-tight text-amber-800 dark:text-amber-400">{language === "en" ? "Send it to our Bre-B key" : "Transfiere a nuestra llave Bre-B"}</p>
+
+                  <div className="flex justify-between items-center gap-2 bg-white/60 dark:bg-black/20 p-3 rounded-lg border border-amber-100 dark:border-amber-900/20">
+                    <div className="min-w-0">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{language === "en" ? "Bre-B key" : "Llave Bre-B"}</p>
+                      <p className="font-mono font-bold text-lg tracking-wide text-neutral-900 dark:text-neutral-100 break-all">{BREB_KEY}</p>
+                      <p className="text-xs text-neutral-600 dark:text-neutral-400">{BREB_HOLDER}</p>
                     </div>
-                    <div>
-                      <p className="font-bold text-base leading-tight">{language === "en" ? "Bre-B payment instructions" : "Instrucciones de pago Bre-B"}</p>
-                      <p className="text-xs opacity-80">{language === "en" ? "Send the transfer to our Bre-B key from your bank app" : "Transfiere a nuestra llave Bre-B desde la app de tu banco"}</p>
-                    </div>
+                    <Button variant="ghost" size="icon" className="h-9 w-9 text-amber-600 hover:text-amber-700 hover:bg-amber-100 shrink-0" onClick={copyBreb} aria-label={language === "en" ? "Copy Bre-B key" : "Copiar llave Bre-B"}>
+                      {copiedBreb ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    </Button>
                   </div>
 
-                  <div className="space-y-3 bg-white/50 dark:bg-black/20 p-4 rounded-lg border border-amber-100 dark:border-amber-900/20">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{language === "en" ? "Account holder" : "Titular de la cuenta"}</p>
-                      <p className="font-bold text-sm text-neutral-900 dark:text-neutral-100">{BREB_HOLDER}</p>
-                    </div>
-                    <div className="flex justify-between items-start gap-2 pt-2 border-t border-amber-100 dark:border-amber-900/10">
-                      <div>
-                        <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{language === "en" ? "Bre-B key" : "Llave Bre-B"}</p>
-                        <p className="font-mono font-bold text-base tracking-wider text-neutral-900 dark:text-neutral-100 break-all">{BREB_KEY}</p>
-                      </div>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-amber-600 hover:text-amber-700 hover:bg-amber-100 shrink-0" onClick={copyBreb} aria-label={language === "en" ? "Copy Bre-B key" : "Copiar llave Bre-B"}>
-                        {copiedBreb ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                      </Button>
-                    </div>
-                    <div className="pt-2 border-t border-amber-100 dark:border-amber-900/10">
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-amber-700/70 dark:text-amber-500/50">{language === "en" ? "Currency" : "Divisa"}</p>
-                      <p className="font-bold text-sm text-neutral-900 dark:text-neutral-100">{language === "en" ? "Colombian peso (COP)" : "Peso colombiano (COP)"}</p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-lg bg-white/50 dark:bg-black/20 p-3 text-center border border-amber-100 dark:border-amber-900/10">
-                    <p className="text-xs text-amber-700/70 dark:text-amber-500/50 uppercase tracking-wider font-bold">{t.amountToPay}</p>
-                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                  <div className="rounded-lg bg-white/60 dark:bg-black/20 p-3 text-center border border-amber-100 dark:border-amber-900/10">
+                    <p className="text-[10px] text-amber-700/70 dark:text-amber-500/50 uppercase tracking-wider font-bold">{t.amountToPay}</p>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100" data-testid="breb-amount">
                       {region.loading ? (
                         <Skeleton className="h-8 w-32 mx-auto" />
                       ) : (
@@ -3746,17 +3730,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                     </p>
                   </div>
 
-                  <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-amber-900/80 dark:text-amber-300/80">
-                    <MessageCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                    <p>{language === "en" ? "Transfer the exact amount in COP. Bre-B transfers arrive instantly; we confirm your payment by hand within 1-24h." : "Transfiere el monto exacto en pesos colombianos (COP). Las transferencias Bre-B llegan al instante; confirmamos tu pago a mano en 1-24 h."}</p>
-                  </div>
-
-                  <div className="flex items-start gap-3 bg-white/40 dark:bg-black/10 p-3 rounded-lg text-[13px] leading-relaxed text-amber-900/80 dark:text-amber-300/80 italic">
-                    <MessageCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                    <p>
-                      <strong>{language === "en" ? "Important:" : "Importante:"}</strong> {language === "en" ? "After paying, tap \"I already paid\" and send your proof by WhatsApp or to " : "Después de pagar, toca «Ya pagué» y envía tu comprobante por WhatsApp o a "}<span className="font-bold">hola@ilinguerelax.com</span>.
-                    </p>
-                  </div>
+                  <p className="text-xs text-amber-900/80 dark:text-amber-300/80">{language === "en" ? "Send the exact amount, then tap \"I already paid\"." : "Envía el monto exacto y toca «Ya pagué»."}</p>
                 </div>
 
                 <button
@@ -3767,8 +3741,6 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
                 >
                   {t.alreadyPaid}
                 </button>
-
-                <p className="text-[11px] text-center text-neutral-500 leading-relaxed">{t.yapeVerifiedBy}</p>
               </div>
             )}
 

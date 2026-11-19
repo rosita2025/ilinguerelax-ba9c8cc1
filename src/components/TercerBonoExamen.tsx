@@ -1,4 +1,5 @@
 import { LazyImg } from "@/components/LazyImg";
+import { lightSet } from "@/lib/patronesLightImages";
 import { Sparkles, BookOpen } from "lucide-react";
 import bonoExamenImg from "@/assets/patrones-new/bono-examen.webp.asset.json";
 
@@ -22,6 +23,7 @@ export const TercerBonoExamen = () => {
          <div className="relative bg-card">
           <LazyImg
             src={bonoExamenImg.url}
+            {...lightSet(bonoExamenImg.url, "(max-width: 639px) 100vw, 500px")}
             alt="Examen Completo — Patrones Especiales: 98 preguntas con hoja de respuestas incluida"
             width={1920}
             height={1920}

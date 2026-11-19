@@ -82,6 +82,7 @@ import resenaMx4 from "@/assets/resena-mx4.webp.asset.json";
 import { PinterestSave } from "@/components/PinterestSave";
 import { LazyImg, LazyMount } from "@/components/LazyImg";
 import patronesComparativaAsset from "@/assets/patrones-new/patrones-comparativa.webp.asset.json";
+import { lightSet, lightThumb } from "@/lib/patronesLightImages";
 import { lightCoverUrl, disableImageTransform, readCachedCover, writeCachedCover } from "@/lib/coverImage";
 
 const previews = [
@@ -396,7 +397,7 @@ const PatronesContent = () => {
   const galleryExtras = useMemo(
     () => (extraViews.length > 0
       ? extraViews.map((src, i) => ({ src, alt: `Patrones Especiales - vista adicional ${i + 1}` }))
-      : previews.map((p) => ({ src: p.src, alt: p.alt }))),
+      : previews.map((p) => ({ src: p.src, alt: p.alt, thumb: lightThumb(p.src), ...lightSet(p.src, "(max-width: 1023px) 75vw, 560px") }))),
     [extraViews],
   );
   
@@ -702,6 +703,7 @@ const PatronesContent = () => {
                    <div className="relative aspect-square bg-card overflow-hidden">
                     <LazyImg
                       src={p.src}
+                      {...lightSet(p.src, "(max-width: 767px) 50vw, 500px")}
                       rootMargin={previewMargin}
                       alt={p.alt}
                       wrapperClassName="absolute inset-0 block"
@@ -731,7 +733,7 @@ const PatronesContent = () => {
                 {bonusCards.map((c) => (
                   <figure key={c.tag} className="w-[78%] shrink-0 snap-start overflow-hidden rounded-2xl border border-accent/30 bg-card shadow-card sm:w-[55%] md:w-auto">
                     <div className="relative aspect-square overflow-hidden bg-card">
-                      <LazyImg src={c.src} rootMargin={previewMargin} alt={c.alt} wrapperClassName="absolute inset-0 block" width={1254} height={1254} className="h-full w-full object-contain" onContextMenu={(e) => e.preventDefault()} />
+                      <LazyImg src={c.src} {...lightSet(c.src, "(max-width: 639px) 75vw, 330px")} rootMargin={previewMargin} alt={c.alt} wrapperClassName="absolute inset-0 block" width={1254} height={1254} className="h-full w-full object-contain" onContextMenu={(e) => e.preventDefault()} />
                     </div>
                     <figcaption className="p-4">
                       <p className="text-[11px] font-bold uppercase tracking-wide text-primary">{c.tag}</p>

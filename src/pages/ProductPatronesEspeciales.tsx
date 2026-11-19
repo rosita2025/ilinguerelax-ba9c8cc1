@@ -319,17 +319,6 @@ const TestimonialSlider = ({ priceLabel }: { priceLabel: string }) => {
 };
 
 
-const features = [
-  "Patrones especiales de pronunciación en inglés",
-  "Alfabeto completo letra por letra",
-  "Combinaciones secretas que cambian el sonido",
-  "Letras mudas explicadas con reglas claras",
-  "Contracciones y habla rápida nativa",
-  "Mini retos prácticos con respuestas",
-  "Método paso a paso para hispanohablantes",
-  "Descarga digital inmediata (PDF)",
-];
-
 const PatronesContent = () => {
   const isDesktop = useIsDesktop();
   const showSales = useAfterLoad(4000);
@@ -641,29 +630,26 @@ const PatronesContent = () => {
       </section>
 
       {/* Dolores */}
-      <section className="py-4 md:py-6">
+      <section className="py-3 md:py-5">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-2">
+            <h2 className="text-2xl md:text-4xl font-bold text-center text-foreground mb-3">
               ¿Te pasa esto cuando <span className="text-gradient">hablas inglés</span>?
             </h2>
-            <p className="text-center text-muted-foreground mb-6">Si dijiste sí a una sola, este ebook es para ti.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
               {[
-                "Lees una palabra y no sabes cómo suena. Escribes una cosa y se pronuncia otra.",
+                "Lees una palabra y no sabes cómo suena: se escribe de una forma y se pronuncia de otra.",
                 "Te da vergüenza hablar porque sientes que vas a pronunciar mal.",
                 "No entiendes a los nativos: hablan rápido y se \"comen\" las palabras.",
-                "Llevas meses o años estudiando y la pronunciación sigue sin mejorar.",
                 "Las letras mudas y las combinaciones raras (gh, ough, tion) te confunden siempre.",
-                "Has probado cursos largos y caros, pero nadie te explica el porqué de los sonidos.",
               ].map((x) => (
-                <div key={x} className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-3 md:p-4">
-                  <span className="text-lg leading-none mt-0.5">❌</span>
-                  <p className="text-foreground text-sm md:text-base">{x}</p>
+                <div key={x} className="flex items-start gap-2.5 rounded-xl border border-destructive/20 bg-destructive/5 p-2.5 md:p-4">
+                  <span className="text-base leading-none mt-0.5">❌</span>
+                  <p className="text-foreground text-sm md:text-base leading-snug">{x}</p>
                 </div>
               ))}
             </div>
-            <p className="text-center text-foreground font-bold text-lg mt-6">
+            <p className="text-center text-foreground font-bold text-base md:text-lg mt-4">
               No es falta de talento. <span className="text-gradient">Es que nadie te enseñó los patrones.</span>
             </p>
           </div>
@@ -689,54 +675,25 @@ const PatronesContent = () => {
         </div>
       </section>
 
-      {/* Beneficios */}
-      <section className="py-4 md:py-6 bg-muted/30">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-2">
-              Lo que vas a <span className="text-gradient">lograr</span>
-            </h2>
-            <p className="text-center text-muted-foreground mb-6">
-              <strong className="text-foreground">Patrones Especiales</strong> te ayuda a leer y pronunciar palabras nuevas reconociendo combinaciones de letras que se repiten en muchas palabras. Con los patrones correctos, pronunciar bien deja de ser suerte.
-            </p>
-            <div className="bg-card rounded-3xl border border-border shadow-card p-6 md:p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {features.map((feature) => (
-                  <div key={feature} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-4 h-4 text-primary-foreground" />
-                    </div>
-                    <span className="text-foreground">{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Vista previa real */}
        <section id="vista-previa" className="py-6 md:py-8 scroll-mt-24">
         <div className="container px-4 md:px-6">
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-3">
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold mb-2">
                 <Eye className="w-4 h-4" /> Vista previa real del PDF
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+              <h2 className="text-2xl md:text-4xl font-bold text-foreground">
                 Mira por dentro <span className="text-gradient">antes de comprar</span>
               </h2>
-              <p className="text-muted-foreground">
-                 4 páginas reales del ebook y de los 3 bonos. Calidad comprobada.
-              </p>
             </div>
 
             
 
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+             <div className="grid grid-cols-2 gap-2 md:gap-4">
               {previews.map((p, i) => (
                 <figure key={p.src} className="relative rounded-2xl overflow-hidden border border-border shadow-card bg-card">
-                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold">
+                  <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[11px] font-bold">
                     Página {i + 1}
                   </div>
                    <div className="relative aspect-square bg-card overflow-hidden">
@@ -750,7 +707,7 @@ const PatronesContent = () => {
                       className="w-full h-full object-contain"
                     />
                   </div>
-                  <figcaption className="p-3 text-sm font-semibold text-foreground text-center">
+                  <figcaption className="p-2 text-xs md:text-sm font-semibold text-foreground text-center leading-tight">
                     {p.caption}
                   </figcaption>
                 </figure>
@@ -758,8 +715,8 @@ const PatronesContent = () => {
             </div>
 
             {/* Los 3 bonos en UN solo bloque compacto (antes eran 3 bloques grandes que repetían título, insignia y «El PDF completo se entrega…») */}
-            <div className="mt-8">
-              <div className="text-center mb-5">
+            <div className="mt-5">
+              <div className="text-center mb-3">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/15 text-accent text-sm font-bold mb-3">
                   <Sparkles className="w-4 h-4" /> 3 bonos incluidos GRATIS
                 </div>

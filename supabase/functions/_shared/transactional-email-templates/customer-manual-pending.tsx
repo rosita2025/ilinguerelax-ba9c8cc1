@@ -37,6 +37,12 @@ interface Props {
   achBank?: string
   brebKey?: string
   brebHolder?: string
+  // Cuentas bancarias manuales (Wise: SEPA, Reino Unido, Canadá, China): datos genéricos para mostrar al cliente.
+  bankTitle?: string
+  bankHolder?: string
+  bankLines?: Array<{ label: string; value: string }>
+  bankName?: string
+  bankHint?: string
 }
 
 const trackingUrl = (orderNumber?: string, customerEmail?: string) => {
@@ -82,6 +88,11 @@ const Email = ({
   achBank,
   brebKey,
   brebHolder,
+  bankTitle,
+  bankHolder,
+  bankLines,
+  bankName,
+  bankHint,
 }: Props) => (
   <Html lang="es" dir="ltr">
     <Head />
@@ -170,6 +181,19 @@ const Email = ({
                 {achAccount && (<Text style={binanceLine}><strong>Número de cuenta:</strong> {achAccount}</Text>)}
                 {achBank && (<Text style={binanceLine}><strong>Banco:</strong> {achBank}</Text>)}
                 <Text style={binanceHint}>Si aún no has transferido, usa estos datos desde tu banco de Estados Unidos por el monto exacto en USD. Solo sirve para transferencias nacionales de EE. UU. Guarda el comprobante como referencia.</Text>
+              </Section>
+            )
+          }
+          if (Array.isArray(bankLines) && bankLines.length > 0) {
+            return (
+              <Section style={binanceBox}>
+                <Text style={binanceTitle}>🏦 Datos de transferencia{bankTitle ? ` · ${bankTitle}` : ''}</Text>
+                {bankHolder && (<Text style={binanceLine}><strong>Titular:</strong> {bankHolder}</Text>)}
+                {bankLines.map((l) => (
+                  <Text key={l.label} style={binanceLine}><strong>{l.label}:</strong> {l.value}</Text>
+                ))}
+                {bankName && (<Text style={binanceLine}><strong>Banco:</strong> {bankName}</Text>)}
+                <Text style={binanceHint}>{bankHint ? `${bankHint} ` : ''}Si aún no has transferido, envía el monto exacto desde tu banco. Luego envía tu comprobante por WhatsApp o a hola@ilinguerelax.com.</Text>
               </Section>
             )
           }

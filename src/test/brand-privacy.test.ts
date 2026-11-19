@@ -25,6 +25,8 @@ const LEGAL_ALLOWLIST = [
   "src/pages/PrivacyPage.tsx",
   // Transferencia ACH/Wire de EE. UU.: el banco exige el nombre del titular de la cuenta (dato elegido por el dueño).
   "src/components/checkout/PaymentMethodsGroup.tsx",
+  // Cuentas de Wise (SEPA, Reino Unido, Canadá, China): igual que ACH, el banco exige el nombre del titular (dato dado por la dueña).
+  "src/lib/manualBankTransfers.ts",
 ];
 
 function walk(dir: string, out: string[] = []): string[] {

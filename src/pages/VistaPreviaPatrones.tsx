@@ -16,6 +16,7 @@ import patronesPreview1 from "@/assets/patrones-new/patrones-20-30.webp.asset.js
 import patronesPreview2 from "@/assets/patrones-new/patrones-letras-mudas.webp.asset.json";
 import patronesPreview3 from "@/assets/patrones-new/patrones-sufijos.webp.asset.json";
 import patronesPreview4 from "@/assets/patrones-new/patrones-contracciones.webp.asset.json";
+import { lightSet } from "@/lib/patronesLightImages";
 import bono1000 from "@/assets/patrones-new/bono-1000-palabras.webp.asset.json";
 import ogImage from "@/assets/og-vista-previa-patrones.jpg.asset.json";
 import resenaMx1 from "@/assets/resena-mx1.webp.asset.json";
@@ -65,6 +66,7 @@ const PreviewGrid = ({
         <div className="relative aspect-square bg-card overflow-hidden">
           <img
             src={p.src}
+            {...lightSet(p.src, "(max-width: 639px) 100vw, 500px")}
             alt={p.alt}
             loading="lazy"
             decoding="async"

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-type Extra = { src: string; alt: string };
+type Extra = { src: string; alt: string; /** Miniatura liviana (opcional). */ thumb?: string; srcSet?: string; sizes?: string };
 
 /**
  * Galería manual tipo Shopify: la primera diapositiva es la portada (se pasa ya armada para conservar su carga
@@ -53,7 +53,7 @@ export const ProductGallerySlider = ({ cover, extras, coverThumb, warm = false }
           <div className="w-full shrink-0 snap-center bg-white" aria-label={`Imagen 1 de ${total}`}>{cover}</div>
           {extras.map((x, i) => (
             <div key={x.src} className="w-full shrink-0 snap-center aspect-[4/5] bg-card" aria-label={`Imagen ${i + 2} de ${total}`}>
-              {active ? <img src={x.src} alt={x.alt} loading="lazy" decoding="async" draggable={false} className="h-full w-full object-contain" /> : null}
+              {active ? <img src={x.src} srcSet={x.srcSet} sizes={x.sizes} alt={x.alt} loading="lazy" decoding="async" draggable={false} className="h-full w-full object-contain" /> : null}
             </div>
           ))}
         </div>
@@ -73,7 +73,7 @@ export const ProductGallerySlider = ({ cover, extras, coverThumb, warm = false }
       </div>
       {total > 1 && (
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-          {[coverThumb, ...extras.map((x) => (active ? x.src : undefined))].map((src, i) => (
+          {[coverThumb, ...extras.map((x) => (active ? (x.thumb ?? x.src) : undefined))].map((src, i) => (
             <button
               key={i}
               type="button"

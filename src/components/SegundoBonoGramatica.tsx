@@ -1,4 +1,5 @@
 import { LazyImg } from "@/components/LazyImg";
+import { lightSet } from "@/lib/patronesLightImages";
 import { Sparkles, BookOpen } from "lucide-react";
 import bonoGramaticaImg from "@/assets/patrones-new/bono-gramatica.webp.asset.json";
 
@@ -22,6 +23,7 @@ export const SegundoBonoGramatica = () => {
          <div className="relative bg-card">
           <LazyImg
             src={bonoGramaticaImg.url}
+            {...lightSet(bonoGramaticaImg.url, "(max-width: 639px) 100vw, 500px")}
             alt="Estructuras Gramaticales de inglés A1 a A2 — Verbos en presente DO/DOES con pronunciación en español"
             width={1254}
             height={1254}

@@ -65,6 +65,7 @@ export function LazyImg({ src, alt, rootMargin = "300px", wrapperClassName = "bl
           alt={alt}
           decoding="async"
           {...rest}
+          srcSet={attempt > 0 ? undefined : rest.srcSet}
           onLoad={(e) => { setLoaded(true); onLoad?.(e); }}
           onError={handleError}
         />

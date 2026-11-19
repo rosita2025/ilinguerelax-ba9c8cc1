@@ -101,7 +101,7 @@ function Phone({ src, alt, href }: { src: string; alt: string; href: string }) {
       <span className="relative block rounded-[2.4rem] bg-neutral-900 p-2.5 shadow-xl ring-8 ring-primary/15 transition hover:ring-primary/30">
         <span className="absolute left-1/2 top-3.5 z-10 h-4 w-20 -translate-x-1/2 rounded-full bg-neutral-900" aria-hidden="true" />
         <span className="block aspect-[640/1320] w-full overflow-hidden rounded-[1.9rem] bg-white">
-          <img src={src} alt={alt} loading="lazy" decoding="async" width={640} className="h-auto w-full" />
+          <img src={src} alt={alt} decoding="async" width={640} className="h-auto w-full" />
         </span>
       </span>
     </a>
@@ -136,7 +136,6 @@ export const FounderCommunity = ({ className = "", lang: forcedLang }: { classNa
                 alt={t.alt}
                 width={720}
                 height={893}
-                loading="lazy"
                 decoding="async"
                 className="aspect-[720/893] w-full rounded-t-[999px] rounded-b-2xl border-2 border-primary/50 bg-muted object-cover"
               />

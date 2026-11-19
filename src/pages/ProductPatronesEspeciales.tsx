@@ -330,7 +330,8 @@ const PatronesContent = () => {
   // Galería: las imágenes extra se piden 2,5 s después de que cargó la portada (nunca en conexiones lentas) o al tocarla.
   const [galleryWarm, setGalleryWarm] = useState(false);
   const constrainedNetwork = isPatronesConstrainedConnection(getPatronesConnection());
-  const mediaMargin = constrainedNetwork ? "0px" : "300px";
+  // Bloques de más abajo (reseñas, posventa, Crady/comunidad, preguntas): se montan ~900 px ANTES de llegar (300 px en conexión lenta; antes 300 px / 0 px) para que ya estén listos al verlos.
+  const mediaMargin = constrainedNetwork ? "300px" : "900px";
   // Vista previa y bonos: empiezan a bajar ~600 px ANTES de llegar (300 px en conexión lenta), no al abrir la página: así no compiten con la portada pero ya están listas al verlas y así ya están listas al verlas.
   const previewMargin = constrainedNetwork ? "300px" : "600px";
   const checkoutPrefetched = useRef(false);

@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
       country: body.country.toUpperCase(),
       skus: skus.join(","),
     });
-    const notificationUrl = `${supabaseUrl}/functions/v1/dlocal-go-webhook?${notifyParams.toString()}`;
+    const notificationUrl = `${supabaseUrl}/functions/v1/dlocal-webhook?${notifyParams.toString()}`;
 
     const localCurrency = (body.currency || "USD").toUpperCase();
     const localAmount = await localTotalFromPricing(pricing, localCurrency);

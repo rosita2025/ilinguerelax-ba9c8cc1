@@ -441,7 +441,7 @@ serve(async (req) => {
         .from("order_events")
         .select("order_number, customer_email, provider, event, status, amount, currency, metadata, created_at")
         .eq("event", "payment_paid")
-        .in("provider", ["stripe", "dlocal", "dlocalgo", "dlocal_go", "mercadopago", "mercado_pago", "mp", "paypal"])
+        .in("provider", ["stripe", "dlocal", "dlocalgo", "dlocal_go", "mercadopago", "mercado_pago", "mp", "paypal", "whop"])
         .gte("created_at", fromDate.toISOString())
         .lte("created_at", toDate.toISOString()),
     ]);
@@ -672,7 +672,7 @@ serve(async (req) => {
     // columna `provider` (sin JSON en referrer), por eso se revisan ambas.
     const GATEWAY_PROVIDERS = [
       "stripe", "paypal", "mercadopago", "mercado_pago", "mp",
-      "dlocal", "dlocalgo", "dlocal_go", "hotmart",
+      "dlocal", "dlocalgo", "dlocal_go", "hotmart", "whop",
     ];
     for (const ev of [...(storeGatewayRes.data ?? []), ...orderEventsGatewayRows] as any[]) {
       let m: any = {};
@@ -692,7 +692,7 @@ serve(async (req) => {
         let m: any = {};
         try { m = ev.referrer && ev.referrer.startsWith("{") ? JSON.parse(ev.referrer) : {}; } catch { m = {}; }
         const p = String(m.provider || ev.provider || "").toLowerCase();
-        if (!p.startsWith("dlocal")) continue;
+        if (!p.startsWith("dlocal") && p !== "whop") continue; // Whop cobra en COP/CLP/ARS: el ingreso en US$ sale del pedido (order_created)
         const on = String(m.order_id || m.order_number || ev.session_id || "");
         if (on.startsWith("ILR-")) wanted.add(on);
       }
@@ -726,7 +726,7 @@ serve(async (req) => {
       const currency = String(ev.currency || "USD").toUpperCase();
       const rawAmount = Number(ev.value || 0);
       const dlOn = String(meta.order_id || meta.order_number || ev.session_id || "");
-      const usdAmount = provider.startsWith("dlocal") && dlocalUsdByOrder.has(dlOn)
+      const usdAmount = (provider.startsWith("dlocal") || provider === "whop") && dlocalUsdByOrder.has(dlOn)
         ? dlocalUsdByOrder.get(dlOn)!
         : (currency === "USD" ? rawAmount : toUsd(rawAmount, currency));
       const status = String(meta.status || "approved").toLowerCase();

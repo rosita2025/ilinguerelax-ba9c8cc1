@@ -40,6 +40,7 @@ const PROVIDER_LABELS: Record<string, string> = {
   dlocal: "dLocal Go",
   dlocalgo: "dLocal Go",
   dlocal_go: "dLocal Go",
+  whop: "Whop (Nequi · Addi · Mercado Pago)",
   yape_plin: "Yape / Plin",
   yape: "Yape",
   plin: "Plin",
@@ -781,7 +782,7 @@ const AdminAnalytics = () => {
               <Card className="p-4">
                 <div className="flex items-center justify-between mb-3 gap-2">
                   <h2 className="font-semibold text-sm md:text-base">Compras por método de pago</h2>
-                  <span className="text-xs text-muted-foreground">Stripe · Mercado Pago · PayPal · dLocal Go · Yape/Plin · Binance · SPEI MX · Hotmart</span>
+                  <span className="text-xs text-muted-foreground">Stripe · Mercado Pago · PayPal · dLocal Go · Whop · Yape/Plin · Binance · SPEI MX · Hotmart</span>
                 </div>
                 {data.providers.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Sin compras en este rango.</p>

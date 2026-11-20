@@ -30,7 +30,7 @@ import { usePurchaseTracking } from "@/hooks/usePurchaseTracking";
 import hotmartLogo from "@/assets/hotmart-logo.png.asset.json";
 import hotmartLogoFull from "@/assets/hotmart-logo-full.webp";
 import paypalLogo from "@/assets/paypal-logo.png";
-import { PAYPAL_UNAVAILABLE } from "@/lib/paymentAvailability";
+import { PAYPAL_UNAVAILABLE, DLOCAL_UNAVAILABLE } from "@/lib/paymentAvailability";
 import { MANUAL_BANKS, isManualBankId, manualBankFor, bankAmount, bankTitle, bankNote, bankText, type ManualBankId } from "@/lib/manualBankTransfers";
 import yapeLogo from "@/assets/yape-logo.webp";
 import oxxoLogo from "@/assets/oxxo-logo.webp";
@@ -1095,6 +1095,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
 
   const payDlocal = async (kind: "transfer" | "cash" | "wallet") => {
     const dlMethod: Method = kind === "cash" ? "dlocal_cash" : kind === "wallet" ? "dlocal_wallet" : "dlocal_transfer";
+    if (DLOCAL_UNAVAILABLE) {
+      toast({ title: language === "en" ? "This payment method is not available right now" : "Este método de pago no está disponible ahora", description: language === "en" ? "Choose another payment method." : "Elige otro método de pago.", variant: "destructive" });
+      return;
+    }
     if (!valid) { requestBuyerInfo(); return; }
     if (redirectingRef.current) return;
     // Los rieles de dLocal Go en efectivo Y transferencia (OXXO, SPEI vía
@@ -1473,6 +1477,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       if (selected === "dlocal_wallet") {
         // Colombia con Whop encendido en /admin/checkout-methods: Nequi por Whop; si no está disponible, dLocal Go como siempre.
         if (whopEnabled && (await payWhop("wallet"))) return;
+        if (DLOCAL_UNAVAILABLE) {
+          toast({ title: language === "en" ? "This wallet is not available right now" : "Esta billetera no está disponible ahora", description: language === "en" ? "Choose another payment method." : "Elige otro método de pago.", variant: "destructive" });
+          return;
+        }
         await payDlocal("wallet");
         return;
       }
@@ -2858,17 +2866,17 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         // dLocal Go: solo se muestra el rail que realmente existe en el país del cliente.
         // México: la transferencia de dLocal Go no se muestra (queda SPEI manual, OXXO y tarjeta).
         // Mexico y Colombia: sin la transferencia de dLocal Go (Mexico usa SPEI; Colombia usa Bre-B manual, porque la de dLocal falla con 400).
-        if (m.id === "dlocal_transfer") return country !== "MX" && country !== "CO" && methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer") && !getDlocalCountry(country)?.transferComingSoon;
+        if (m.id === "dlocal_transfer") return !DLOCAL_UNAVAILABLE && country !== "MX" && country !== "CO" && methodsConfig.dlocalTransfer && dlocalSupports(country, "transfer") && !getDlocalCountry(country)?.transferComingSoon;
         // OXXO de Stripe (sin documento): si está encendido en México, reemplaza al OXXO de dLocal, que sí pide documento.
         // México: el OXXO es SIEMPRE el de Stripe (sin documento de identidad); no depende de un interruptor del admin.
         if (m.id === "stripe_oxxo") return country === "MX";
         // México: el OXXO de dLocal Go (que pide CURP o RFC) no se muestra nunca.
-        if (m.id === "dlocal_cash") return country !== "MX" && methodsConfig.dlocalCash && dlocalSupports(country, "cash") && !getDlocalCountry(country)?.cashComingSoon;
+        if (m.id === "dlocal_cash") return !DLOCAL_UNAVAILABLE && country !== "MX" && methodsConfig.dlocalCash && dlocalSupports(country, "cash") && !getDlocalCountry(country)?.cashComingSoon;
         // Tarjeta dLocal DESACTIVADA. Billetera digital sigue activa.
         if (m.id === "dlocal_card") return false;
         // Con Whop encendido, la billetera es la de Whop (reemplaza a la de dLocal Go en Colombia, Chile y Argentina).
         // México: sin Mercado Pago ni otra billetera de dLocal Go.
-        if (m.id === "dlocal_wallet") return country !== "MX" && (whopEnabled || methodsConfig.dlocalWallet && dlocalSupports(country, "wallet") && !getDlocalCountry(country)?.walletComingSoon);
+        if (m.id === "dlocal_wallet") return country !== "MX" && (whopEnabled || (!DLOCAL_UNAVAILABLE && methodsConfig.dlocalWallet && dlocalSupports(country, "wallet") && !getDlocalCountry(country)?.walletComingSoon));
 
 
 

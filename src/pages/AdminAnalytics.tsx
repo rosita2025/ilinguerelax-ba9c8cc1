@@ -56,7 +56,7 @@ const PROVIDER_LABELS: Record<string, string> = {
   spei: "Transferencia MX (SPEI)",
   hotmart: "Hotmart",
   manual: "Manual",
-  otros: "Otros",
+  otros: "Otros (solo el navegador, sin pedido)",
 };
 
 interface AnalyticsData {
@@ -74,6 +74,7 @@ interface AnalyticsData {
     cartSessions: number;
   };
   providers: Array<{ provider: string; count: number; pending: number; revenue: number }>;
+  unmatchedPurchases: Array<{ at: string; country: string; product: string; amount: number; currency: string; amountUsd: number; session: string; referrer: string }>;
   pendingOrders: Array<{
     orderNumber: string;
     provider: string;
@@ -272,6 +273,16 @@ const normalizeAnalyticsData = (value: Partial<AnalyticsData> | null | undefined
       count: toNumber(p?.count),
       pending: toNumber(p?.pending),
       revenue: toNumber(p?.revenue),
+    })),
+    unmatchedPurchases: toArray(value?.unmatchedPurchases).slice(0, 50).map((u) => ({
+      at: toText(u?.at, ""),
+      country: toText(u?.country, "??"),
+      product: toText(u?.product, ""),
+      amount: toNumber(u?.amount),
+      currency: toText(u?.currency, "USD"),
+      amountUsd: toNumber(u?.amountUsd),
+      session: toText(u?.session, ""),
+      referrer: toText(u?.referrer, ""),
     })),
     pendingOrders: toArray(value?.pendingOrders).slice(0, 100).map((p) => ({
       orderNumber: toText(p?.orderNumber, "-"),
@@ -797,6 +808,19 @@ const AdminAnalytics = () => {
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+                {data.unmatchedPurchases.length > 0 && (
+                  <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
+                    <p className="font-semibold">«Otros»: {data.unmatchedPurchases.length} compra{data.unmatchedPurchases.length === 1 ? "" : "s"} que solo avisó el navegador (la página de «gracias») y no tiene pedido guardado de Stripe, dLocal, Whop ni transferencia manual.</p>
+                    <p className="mt-1">Puede ser una compra real cuyo aviso de la pasarela no llegó, o una visita a la página de «gracias» (prueba tuya o del equipo). Revísala en Stripe por fecha e importe.</p>
+                    <ul className="mt-2 space-y-1">
+                      {data.unmatchedPurchases.map((u, i) => (
+                        <li key={`${u.at}-${i}`} className="tabular-nums">
+                          {peruDateTime(u.at)} · {u.country} · {u.product} · {u.amount.toLocaleString()} {u.currency}{u.currency !== "USD" ? ` (≈ ${money(u.amountUsd)})` : ""}{u.session ? ` · sesión ${u.session}` : ""}{u.referrer ? ` · ${u.referrer}` : ""}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
               </Card>

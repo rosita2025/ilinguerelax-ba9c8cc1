@@ -579,6 +579,9 @@ serve(async (req) => {
     };
     let hotmartPendingCount = 0;
     let storePendingCount = 0;
+    // Compras «Otros»: las avisó el NAVEGADOR (página /checkouts/success con importe) y ningún pedido guardado coincide
+    // (ni Stripe, ni dLocal, ni Whop, ni manual). Se listan en el panel para poder ver cuál fue.
+    const unmatchedPurchases: Array<{ at: string; country: string; product: string; amount: number; currency: string; amountUsd: number; session: string; referrer: string }> = [];
 
     // Detalle de compras PENDIENTES (no cuentan como venta hasta aprobarse).
     // Se muestran en /admin/analytics con proveedor, estado y último intento
@@ -792,14 +795,25 @@ serve(async (req) => {
       if (duplicatedByWebhook) continue;
 
       const currency = String(ev.currency || "USD").toUpperCase();
+      const usdOtros = currency === "USD" ? rawAmount : toUsd(rawAmount, currency);
       realPurchases.push({
         at: ev.created_at,
         productId: pid,
         country: ev.country || "??",
-        usd: currency === "USD" ? rawAmount : toUsd(rawAmount, currency),
+        usd: usdOtros,
         source: "store",
         pending: false,
         provider: "otros",
+      });
+      unmatchedPurchases.push({
+        at: ev.created_at,
+        country: String(ev.country || "??"),
+        product: pid,
+        amount: rawAmount,
+        currency,
+        amountUsd: usdOtros,
+        session: String(ev.session_id || "").slice(0, 12),
+        referrer: String(ev.referrer || "").slice(0, 80),
       });
       alreadyIngested.push({ at: eventAt, productId: pid, country: evCountry });
     }
@@ -1206,6 +1220,13 @@ serve(async (req) => {
             revenue: Number(v.revenue.toFixed(2)),
           }))
           .sort((a, b) => b.count - a.count || b.revenue - a.revenue),
+
+        // Compras «Otros» (solo las avisó el navegador, sin pedido guardado).
+        unmatchedPurchases: unmatchedPurchases.slice(0, 50).map((u) => ({
+          ...u,
+          amount: Number(u.amount.toFixed(2)),
+          amountUsd: Number(u.amountUsd.toFixed(2)),
+        })),
 
         // Compras pendientes (no cuentan como venta hasta aprobarse), con
         // proveedor, estado y último intento de verificación.

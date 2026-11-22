@@ -2704,7 +2704,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       title: "OXXO",
       sub: language === "en" ? "Get a voucher and pay cash at any OXXO. No ID needed."
         : language === "pt" ? "Gere um voucher e pague em dinheiro em qualquer OXXO."
-        : "Genera tu ficha y paga en efectivo en cualquier OXXO. Sin pedir identificación.",
+        : "Genera tu ficha y paga en efectivo en cualquier OXXO.",
       badge: finalPriceLabel,
       badges: [{ label: "OXXO", bg: "#E31E24", color: "#ffffff" }],
     },
@@ -4146,8 +4146,14 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
             {language === "en" ? "Creating your OXXO voucher…" : "Generando tu ficha de OXXO…"}
           </p>
           <p className="text-sm text-neutral-600 dark:text-neutral-300">
-            {language === "en" ? "We are taking you to Stripe's secure page." : "Te llevamos a la página segura de Stripe. No cierres esta ventana."}
+            {language === "en" ? "It takes a few seconds. Please do not close this window." : "Tarda unos segundos. No cierres esta ventana."}
           </p>
+          <ul className="mt-1 space-y-1 text-left text-sm text-neutral-700 dark:text-neutral-200">
+            <li>{language === "en" ? "✓ Secure payment processed by Stripe" : "✓ Pago seguro procesado por Stripe"}</li>
+            <li>{language === "en" ? "✓ Nothing is charged now: you pay in cash at the store" : "✓ No se cobra nada ahora: pagas en efectivo en la tienda"}</li>
+            <li>{language === "en" ? "✓ No card and no ID needed" : "✓ Sin tarjeta y sin identificación"}</li>
+            <li>{language === "en" ? "✓ Your access arrives by email once OXXO confirms" : "✓ Tu acceso llega a tu correo cuando OXXO confirme el pago"}</li>
+          </ul>
         </div>
       )}
 

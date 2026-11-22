@@ -2704,7 +2704,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       title: "OXXO",
       sub: language === "en" ? "Get a voucher and pay cash at any OXXO. No ID needed."
         : language === "pt" ? "Gere um voucher e pague em dinheiro em qualquer OXXO."
-        : "Genera tu ficha y paga en efectivo en cualquier OXXO. Sin tarjeta ni identificación; no pagas nada ahora.",
+        : "Genera tu ficha y paga en efectivo en cualquier OXXO.",
       badge: finalPriceLabel,
       badges: [{ label: "OXXO", bg: "#E31E24", color: "#ffffff" }],
     },

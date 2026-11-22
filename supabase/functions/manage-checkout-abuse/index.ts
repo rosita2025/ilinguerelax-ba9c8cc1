@@ -432,7 +432,7 @@ Deno.serve(async (req) => {
           const cur = extras.get(em) ?? { email: em, ip, first: at, last: at, country: null, city: null, ua: null, slugs: new Set<string>(), sources: new Set<string>(), cart: null, converted: false };
           if (at > cur.last) cur.last = at;
           if (at < cur.first) cur.first = at;
-          if (ip && !ip.startsWith("carrito:") && cur.ip.startsWith("carrito:")) cur.ip = ip;
+          if (ip && !ip.startsWith("carrito:") && !ip.startsWith("compra:") && (cur.ip.startsWith("carrito:") || cur.ip.startsWith("compra:"))) cur.ip = ip;
           cur.country = cur.country || patch.country || null;
           cur.city = cur.city || patch.city || null;
           cur.ua = cur.ua || patch.ua || null;
@@ -482,10 +482,39 @@ Deno.serve(async (req) => {
           const m = String(c.metadata?.payment_method ?? "").trim().toLowerCase();
           if (m && !methodByEmail.has(String(c.email).toLowerCase())) methodByEmail.set(String(c.email).toLowerCase(), m);
         }
+        // D) COMPRAS confirmadas del rango (pagos aprobados por la pasarela y pagos manuales verificados): quien compró SIEMPRE sale
+        // en la lista como «Compró», aunque su visita no se registrara (Pago rápido, Apple Pay, otro dispositivo) o la ocultara el filtro.
+        const paidExtra = new Map<string, { provider: string; method: string }>();
+        const { data: paidEvs } = await admin
+          .from("order_events")
+          .select("customer_email, provider, method, status, event, created_at")
+          .gte("created_at", since)
+          .lt("created_at", until)
+          .or("status.in.(paid,approved,completed,succeeded),event.ilike.%paid%,event.ilike.%approved%")
+          .limit(1000);
+        for (const r of (paidEvs || []) as { customer_email: string | null; provider: string | null; method: string | null; created_at: string }[]) {
+          const em = String(r.customer_email ?? "").trim().toLowerCase();
+          if (!em) continue;
+          touch(em, `compra:${em}`, r.created_at, { converted: true });
+          if (!paidExtra.has(em)) paidExtra.set(em, { provider: String(r.provider ?? "").toLowerCase(), method: String(r.method ?? "").toLowerCase() });
+        }
+        const { data: manualPaid } = await admin
+          .from("manual_payments")
+          .select("buyer_email, method, status, created_at")
+          .eq("status", "verified")
+          .gte("created_at", since)
+          .lt("created_at", until)
+          .limit(500);
+        for (const r of (manualPaid || []) as { buyer_email: string | null; method: string | null; created_at: string }[]) {
+          const em = String(r.buyer_email ?? "").trim().toLowerCase();
+          if (!em) continue;
+          touch(em, `compra:${em}`, r.created_at, { converted: true });
+          if (!paidExtra.has(em)) paidExtra.set(em, { provider: "manual", method: String(r.method ?? "").toLowerCase() });
+        }
         if (extras.size) {
           const boughtExtra = await getPurchasedEmails(admin, [...extras.keys()]);
           for (const x of extras.values()) {
-            const hasVisit = !x.ip.startsWith("carrito:");
+            const hasVisit = !x.ip.startsWith("carrito:") && !x.ip.startsWith("compra:");
             top.push({
               ip: x.ip,
               count: hasVisit ? 1 : 0,
@@ -496,7 +525,7 @@ Deno.serve(async (req) => {
               cart: x.cart,
               payment_method: methodByEmail.get(x.email) ?? null,
               actions: {},
-              paid_by: null,
+              paid_by: paidExtra.get(x.email) ?? null,
               providers: [...(providersByEmail.get(x.email) ?? [])],
               slugs: [...x.slugs].slice(0, 5),
               sources: [...x.sources],

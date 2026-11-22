@@ -3,6 +3,8 @@ import { type StripeEnv, createStripeClient } from "../_shared/stripe.ts";
 import { normalizeSkus } from "../_shared/digitalSku.ts";
 import { resolveServerPricing, PricingError, isRestrictedCurrency, tierForCountry } from "../_shared/catalogPricing.ts";
 import { localAmountFromUsd } from "../_shared/fxRates.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
 
 // Monedas "sin decimales" según Stripe (misma lógica que create-checkout-prueba).
 const ZERO_DECIMAL_CURRENCIES = new Set([
@@ -250,6 +252,44 @@ Deno.serve(async (req) => {
         });
         const od = (pi as any).next_action?.oxxo_display_details;
         if (od?.hosted_voucher_url) {
+          // Correo con la ficha (número, enlace y vencimiento) para que no la pierda, y pedido «pendiente» para el recordatorio del día siguiente.
+          // Mismo número de pedido que usa stripe-webhook al cobrar (ILR-ST-…): así el recordatorio se detiene solo cuando paga. Un fallo aquí NO frena la ficha.
+          try {
+            const orderNumber = `ILR-ST-${String(pi.id).slice(-8).toUpperCase()}`;
+            const expiresIso = od.expires_after ? new Date(od.expires_after * 1000).toISOString() : null;
+            const amountMxn = totalCents / 100;
+            const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+            await sb.from("order_events").insert({
+              order_number: orderNumber,
+              customer_email: body.contact.email,
+              provider: "stripe",
+              event: "payment_pending",
+              status: "pending",
+              method: "oxxo",
+              reference: pi.id,
+              amount: amountMxn,
+              currency: "MXN",
+              metadata: { productName: productSummary, skus: deliverySkus, voucher_url: String(od.hosted_voucher_url), reference: String(od.number ?? ""), expires_at: expiresIso, source: "create-checkout-hosted" },
+            });
+            await sendInternalEmail({
+              templateName: "oxxo-voucher",
+              recipientEmail: body.contact.email,
+              idempotencyKey: `oxxo-voucher-${pi.id}`,
+              templateData: {
+                customerName: body.contact.firstName,
+                customerEmail: body.contact.email,
+                productName: productSummary,
+                amount: amountMxn,
+                currency: "MXN",
+                reference: String(od.number ?? ""),
+                voucherUrl: String(od.hosted_voucher_url),
+                expiresAt: expiresIso,
+                orderNumber,
+              },
+            });
+          } catch (mailErr) {
+            console.warn("[Stripe Hosted] OXXO: no se pudo enviar el correo de la ficha:", (mailErr as any)?.message);
+          }
           return { oxxo: { number: String(od.number ?? ""), url: String(od.hosted_voucher_url), expires_at: od.expires_after ? new Date(od.expires_after * 1000).toISOString() : null, payment_intent: pi.id } };
         }
         console.warn("[Stripe Hosted] OXXO directo sin ficha; se usa la página de Stripe", { pi: pi.id, status: pi.status });

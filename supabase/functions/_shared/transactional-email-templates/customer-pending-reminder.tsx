@@ -31,6 +31,10 @@ interface Props {
   method?: string
   day?: number
   isLast?: boolean
+  /** Solo OXXO: enlace de la ficha, número de referencia y vencimiento. */
+  voucherUrl?: string
+  reference?: string
+  expiresAt?: string
 }
 
 const trackingUrl = (orderNumber?: string, customerEmail?: string) => {
@@ -77,6 +81,9 @@ const Email = ({
   method,
   day,
   isLast,
+  voucherUrl,
+  reference,
+  expiresAt,
 }: Props) => (
   <Html lang="es" dir="ltr">
     <Head />
@@ -99,6 +106,21 @@ const Email = ({
             nombre, pedido <strong>#{orderNumber || '—'}</strong>, producto y método de pago. También puedes escribir a <strong>hola@ilinguerelax.com</strong>.
           </Text>
         </Section>
+
+        {voucherUrl ? (
+          <Section style={cardHi}>
+            <Text style={hiTitle}>🧾 Tu ficha de OXXO sigue activa</Text>
+            {reference ? <Text style={hiLine}>Número de referencia: <strong>{reference}</strong></Text> : null}
+            {expiresAt && !Number.isNaN(new Date(expiresAt).getTime()) ? (
+              <Text style={hiLine}>
+                Vence el {new Intl.DateTimeFormat('es-MX', { dateStyle: 'long', timeStyle: 'short', timeZone: 'America/Mexico_City' }).format(new Date(expiresAt))}.
+              </Text>
+            ) : null}
+            <Text style={{ textAlign: 'center' as const, margin: '12px 0 4px' }}>
+              <a href={voucherUrl} style={trackBtn}>Ver mi ficha con código de barras</a>
+            </Text>
+          </Section>
+        ) : null}
 
         <Section style={card}>
           <Row>

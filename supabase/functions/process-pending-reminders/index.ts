@@ -239,8 +239,19 @@ Deno.serve(async (req) => {
         continue;
       }
 
+      // OXXO (Stripe): la ficha vale 3 días, así que solo se manda el recordatorio del día 1; el del día 3 llegaría con la ficha vencida.
+      const isOxxo = String(r.method ?? "").toLowerCase() === "oxxo";
+      if (isOxxo && stepIndex >= 1) {
+        await supabase
+          .from("pending_payment_reminders")
+          .update({ resolved: true, resolved_reason: "vencido", resolved_at: new Date().toISOString() })
+          .eq("id", r.id);
+        result.resolved++;
+        continue;
+      }
+
       const day = STEP_DAYS[stepIndex];
-      const isLast = stepIndex === STEP_DAYS.length - 1;
+      const isLast = !isOxxo && stepIndex === STEP_DAYS.length - 1;
 
       // Guarda anti-duplicados 1: nunca dos correos del mismo pedido en <20 h,
       // aunque el cron se solape o el pedido llegue con días vencidos.
@@ -285,6 +296,24 @@ Deno.serve(async (req) => {
         .select("id");
       if (!claimed || claimed.length === 0) continue;
 
+      // Ficha de OXXO: se repite el enlace, el número y el vencimiento guardados al crearla.
+      let oxxoData: { voucherUrl?: string; reference?: string; expiresAt?: string } = {};
+      if (isOxxo) {
+        const { data: pend } = await supabase
+          .from("order_events")
+          .select("metadata")
+          .eq("order_number", r.order_number)
+          .eq("event", "payment_pending")
+          .order("created_at", { ascending: false })
+          .limit(1);
+        const md = ((pend ?? [])[0]?.metadata ?? {}) as Record<string, unknown>;
+        oxxoData = {
+          voucherUrl: typeof md.voucher_url === "string" ? md.voucher_url : undefined,
+          reference: typeof md.reference === "string" ? md.reference : undefined,
+          expiresAt: typeof md.expires_at === "string" ? md.expires_at : undefined,
+        };
+      }
+
       const { error } = await sendInternalEmail({
         ...{
           templateName: "customer-pending-reminder",
@@ -300,6 +329,7 @@ Deno.serve(async (req) => {
             method: r.method ?? "",
             day,
             isLast,
+            ...oxxoData,
           },
         },
       });

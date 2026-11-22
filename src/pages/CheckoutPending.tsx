@@ -1,6 +1,7 @@
 import { useSearchParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Clock, Mail, MessageCircle } from "lucide-react";
+import { Clock, Mail, MessageCircle, Copy, Check } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/I18nContext";
 import { buildPaidSupportUrl, buildPendingSupportUrl } from "@/lib/support";
@@ -18,6 +19,10 @@ export default function CheckoutPending() {
   const oxxoUrl = /^https:\/\/[a-z0-9.-]*stripe\.com\//i.test(rawOxxoUrl) ? rawOxxoUrl : "";
   const oxxoRef = (sp.get("oxxo_ref") || "").replace(/[^0-9A-Za-z -]/g, "").slice(0, 60);
   const oxxoExp = sp.get("oxxo_exp") || "";
+  const [copied, setCopied] = useState(false);
+  const copyRef = async () => {
+    try { await navigator.clipboard.writeText(oxxoRef); setCopied(true); window.setTimeout(() => setCopied(false), 2000); } catch { /* sin portapapeles */ }
+  };
   // PayPal: "ya pagué". Transferencia/efectivo (Mercado Pago): "pago pendiente" con referencia, nombre, producto y monto.
   const supportUrl = isPaypal
     ? buildPaidSupportUrl({ language, orderNumber: sp.get("order"), method: "PayPal" })
@@ -47,15 +52,21 @@ export default function CheckoutPending() {
 
         {oxxoUrl && (
           <div className="rounded-xl border-2 border-primary/40 bg-card p-4 text-left space-y-3">
-            <p className="text-sm text-muted-foreground">
-              {language === "en"
-                ? "Take this number to any OXXO store and pay in cash. Your access arrives by email as soon as OXXO confirms the payment."
-                : "Lleva este número a cualquier tienda OXXO y paga en efectivo. Tu acceso llega por correo en cuanto OXXO confirme el pago."}
-            </p>
+            <p className="text-sm font-semibold">{language === "en" ? "Your OXXO slip is ready. Nothing has been charged yet." : "Tu ficha de OXXO está lista. Todavía no se te cobró nada."}</p>
+            <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+              <li>{language === "en" ? "Open your slip (button below) or show the reference number at any OXXO." : "Abre tu ficha (botón de abajo) o dicta el número de referencia en cualquier OXXO."}</li>
+              <li>{language === "en" ? "Pay the amount in cash at the register." : "Paga el monto en efectivo en caja."}</li>
+              <li>{language === "en" ? "Your access arrives by email as soon as OXXO confirms the payment." : "Tu acceso llega por correo en cuanto OXXO confirme el pago."}</li>
+            </ol>
             {oxxoRef && (
               <div>
                 <div className="text-xs font-semibold uppercase text-muted-foreground">{language === "en" ? "Reference number" : "Número de referencia"}</div>
-                <div className="font-mono text-xl font-bold tracking-wider break-all">{oxxoRef}</div>
+                <div className="flex items-center gap-2">
+                  <div className="font-mono text-xl font-bold tracking-wider break-all">{oxxoRef}</div>
+                  <button type="button" onClick={copyRef} className="inline-flex shrink-0 items-center gap-1 rounded-md border px-2 py-1 text-xs font-semibold text-primary" aria-label={language === "en" ? "Copy reference number" : "Copiar número de referencia"}>
+                    {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {copied ? (language === "en" ? "Copied" : "Copiado") : (language === "en" ? "Copy" : "Copiar")}
+                  </button>
+                </div>
               </div>
             )}
             <Button asChild size="lg" className="w-full">
@@ -64,6 +75,7 @@ export default function CheckoutPending() {
             {oxxoExp && !Number.isNaN(new Date(oxxoExp).getTime()) && (
               <p className="text-xs text-muted-foreground">{language === "en" ? "Expires" : "Vence el"} {new Date(oxxoExp).toLocaleString(language === "en" ? "en-US" : "es-MX", { dateStyle: "long", timeStyle: "short" })}.</p>
             )}
+            <p className="text-xs text-muted-foreground">{language === "en" ? "Secure payment processed by Stripe. It can take a little while to confirm after you pay; if you have questions, write to us on WhatsApp below." : "Pago seguro procesado por Stripe. Puede tardar un poco en confirmarse después de pagar; si tienes dudas, escríbenos por WhatsApp abajo."}</p>
           </div>
         )}
 

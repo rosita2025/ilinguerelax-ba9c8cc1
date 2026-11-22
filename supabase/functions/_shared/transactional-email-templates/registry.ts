@@ -7,6 +7,7 @@ import { template as customerPendingReminder } from './customer-pending-reminder
 import { template as productVersionUpdate } from './product-version-update.tsx'
 import { template as productLaunch } from './product-launch.tsx'
 import { template as postpurchaseUpsell } from './postpurchase-upsell.tsx'
+import { template as oxxoVoucher } from './oxxo-voucher.tsx'
 
 export interface TemplateEntry {
   component: (props: any) => any
@@ -26,4 +27,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'product-version-update': productVersionUpdate,
   'product-launch': productLaunch,
   'postpurchase-upsell': postpurchaseUpsell,
+  'oxxo-voucher': oxxoVoucher,
 }

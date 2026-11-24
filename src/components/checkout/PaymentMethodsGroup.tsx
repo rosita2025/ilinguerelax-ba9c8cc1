@@ -2704,7 +2704,7 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
       title: "OXXO",
       sub: language === "en" ? "Get a voucher and pay cash at any OXXO. No ID needed."
         : language === "pt" ? "Gere um voucher e pague em dinheiro em qualquer OXXO."
-        : "Genera tu ficha y paga en efectivo en cualquier OXXO.",
+        : "Paga en efectivo en cualquier OXXO.",
       badge: finalPriceLabel,
       badges: [{ label: "OXXO", bg: "#E31E24", color: "#ffffff" }],
     },
@@ -4143,10 +4143,10 @@ export const PaymentMethodsGroup = memo(function PaymentMethodsGroup({ parentSku
         <div className="fixed inset-0 z-[80] flex flex-col items-center justify-center gap-3 bg-white/90 px-6 text-center backdrop-blur-sm dark:bg-neutral-950/90" role="status" aria-live="polite">
           <Loader2 className="h-9 w-9 animate-spin text-emerald-600" />
           <p className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-            {language === "en" ? "Creating your OXXO voucher…" : "Generando tu ficha de OXXO…"}
+            {language === "en" ? "Opening Stripe's secure page…" : "Abriendo la página segura de Stripe…"}
           </p>
           <p className="text-sm text-neutral-600 dark:text-neutral-300">
-            {language === "en" ? "It takes a few seconds. Please do not close this window." : "Tarda unos segundos. No cierres esta ventana."}
+            {language === "en" ? "There you enter your name, accept and see your OXXO slip. Please do not close this window." : "Ahí escribes tu nombre, aceptas y ves tu ficha de OXXO. No cierres esta ventana."}
           </p>
           <ul className="mt-1 space-y-1 text-left text-sm text-neutral-700 dark:text-neutral-200">
             <li>{language === "en" ? "✓ Secure payment processed by Stripe" : "✓ Pago seguro procesado por Stripe"}</li>

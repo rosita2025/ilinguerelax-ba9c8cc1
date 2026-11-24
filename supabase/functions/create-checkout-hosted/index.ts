@@ -6,13 +6,6 @@ import { localAmountFromUsd } from "../_shared/fxRates.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendInternalEmail } from "../_shared/sendInternalEmail.ts";
 
-/**
- * OXXO: FICHA DIRECTA APAGADA (a pedido de la dueña). En vez de crear la ficha desde aquí (PaymentIntent propio), el comprador va a la
- * página segura de Stripe solo con OXXO: escribe su nombre, acepta y ve su ficha; al volver queda «pendiente» hasta que pague.
- * El código de la ficha directa (y su correo `oxxo-voucher`) se conserva: ponerlo en `true` para volver a usarla.
- */
-const OXXO_DIRECT_VOUCHER = false;
-
 // Monedas "sin decimales" según Stripe (misma lógica que create-checkout-prueba).
 const ZERO_DECIMAL_CURRENCIES = new Set([
   "bif", "clp", "djf", "gnf", "jpy", "kmf", "krw", "mga",
@@ -244,7 +237,7 @@ Deno.serve(async (req) => {
 
     // OXXO: se crea y confirma el pago AQUÍ con el nombre y el correo del checkout (Stripe no vuelve a pedir el nombre) y se devuelve la ficha.
     // El webhook entrega por payment_intent.succeeded (metadata.source = checkout-hosted-fallback). Si Stripe no lo permite, sigue con la página de Stripe.
-    if (isOxxo && OXXO_DIRECT_VOUCHER) {
+    if (isOxxo) {
       try {
         const pi = await stripe.paymentIntents.create({
           amount: totalCents,

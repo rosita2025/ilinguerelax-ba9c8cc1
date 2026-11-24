@@ -290,7 +290,7 @@ export default function AdminCheckoutMethods() {
   const [syncingDlocal, setSyncingDlocal] = useState(false);
 
 
-  async function load() {
+  async function load(opts: { sync?: boolean } = {}) {
     invalidateCheckoutMethodsCache();
     setLoading(true);
     const { data, error } = await adminInvoke<any>("manage-checkout-methods", { body: { action: "list" } });
@@ -300,7 +300,45 @@ export default function AdminCheckoutMethods() {
     setRegions(regs);
     setMethods(mets);
     setLoading(false);
-    void syncDlocalCoverage(regs, mets);
+    if (opts.sync !== false) void syncDlocalCoverage(regs, mets);
+  }
+
+  /**
+   * Crea los métodos dLocal Go (transferencia, efectivo y billetera) que FALTAN en cada región, según la cobertura real por país
+   * (/admin/dlocal). Se llama al abrir la página y desde el botón «Sincronizar etiquetas dLocal».
+   */
+  async function createMissingDlocal(regs: Region[], mets: Method[]): Promise<{ changed: string[]; errors: string[] }> {
+    const changed: string[] = [];
+    const errors: string[] = [];
+    const DLOCAL_KEYS = ["dlocal_transfer", "dlocal_cash", "dlocal_wallet", "dlocal_mercadopago"];
+    for (const r of regs) {
+      const codes = (r.country_codes || []).map((c) => c.toUpperCase());
+      if (!codes.some((c) => !!getDlocalCountry(c))) continue;
+      for (const key of DLOCAL_KEYS) {
+        if (mets.some((m) => m.region_code === r.code && m.method_key === key)) continue;
+        const def = CHECKOUT_METHODS.find((d) => d.key === key);
+        if (!def) continue;
+        if (def.countryCodes?.length && !def.countryCodes.some((c) => codes.includes(c))) continue;
+        const should = dlocalCoverageEnabled(key, r.country_codes || []);
+        if (should !== true) continue;
+        const note = dlocalNoteForCountries(key, r.country_codes || []) || def.note;
+        const label = dlocalLabelForCountries(key, r.country_codes || []) || def.label;
+        const payload: Method = {
+          id: "", region_code: r.code, method_key: key, label, note, icon: def.icon,
+          enabled: true,
+          sort_order: mets.filter((x) => x.region_code === r.code).length + 1,
+        };
+        const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
+          body: { action: "save_method", method: payload },
+        });
+        if (error || data?.error) {
+          errors.push(`${r.code} · ${label}: ${error?.message || data?.error}`);
+          continue;
+        }
+        changed.push(`${r.flag || ""} ${r.code} · ${label} (agregado)`);
+      }
+    }
+    return { changed, errors };
   }
 
   /**
@@ -315,8 +353,19 @@ export default function AdminCheckoutMethods() {
       const should = dlocalCoverageEnabled(m.method_key, r.country_codes || []);
       return should !== null && should !== m.enabled;
     });
-    if (!pending.length) return;
     const results: string[] = [];
+    // Primero crea los métodos dLocal que no existen en la región (si nunca se crearon, el checkout no los ofrece).
+    const created = await createMissingDlocal(regs, mets);
+    results.push(...created.changed);
+    if (created.errors.length) toast.error(`⚠️ No se pudo agregar dLocal Go (${created.errors.length})`, { description: created.errors.slice(0, 4).join(" — "), duration: 12000 });
+    if (created.changed.length) { await load({ sync: false }); }
+    if (!pending.length) {
+      if (results.length) {
+        invalidateCheckoutMethodsCache();
+        toast.success(`🔄 dLocal Go agregado a /admin/checkout-methods (${results.length})`, { description: results.slice(0, 6).join(" — "), duration: 8000 });
+      }
+      return;
+    }
     for (const m of pending) {
       const r = byCode.get(m.region_code)!;
       const should = dlocalCoverageEnabled(m.method_key, r.country_codes || [])!;
@@ -376,36 +425,10 @@ export default function AdminCheckoutMethods() {
         );
       }
 
-      // 2) Crear los métodos dLocal que FALTAN en cada región (transferencia,
-      //    efectivo y billetera digital) según la cobertura real por país.
-      const DLOCAL_KEYS = ["dlocal_transfer", "dlocal_cash", "dlocal_wallet", "dlocal_mercadopago"];
-      for (const r of regions) {
-        const codes = (r.country_codes || []).map((c) => c.toUpperCase());
-        if (!codes.some((c) => !!getDlocalCountry(c))) continue;
-        for (const key of DLOCAL_KEYS) {
-          if (methods.some((m) => m.region_code === r.code && m.method_key === key)) continue;
-          const def = CHECKOUT_METHODS.find((d) => d.key === key);
-          if (!def) continue;
-          if (def.countryCodes?.length && !def.countryCodes.some((c) => codes.includes(c))) continue;
-          const should = dlocalCoverageEnabled(key, r.country_codes || []);
-          if (should !== true) continue;
-          const note = dlocalNoteForCountries(key, r.country_codes || []) || def.note;
-          const label = dlocalLabelForCountries(key, r.country_codes || []) || def.label;
-          const payload: Method = {
-            id: "", region_code: r.code, method_key: key, label, note, icon: def.icon,
-            enabled: true,
-            sort_order: methods.filter((x) => x.region_code === r.code).length + 1,
-          };
-          const { data, error } = await adminInvoke<any>("manage-checkout-methods", {
-            body: { action: "save_method", method: payload },
-          });
-          if (error || data?.error) {
-            errors.push(`${r.code} · ${label}: ${error?.message || data?.error}`);
-            continue;
-          }
-          changed.push(`${r.flag || ""} ${r.code} · ${label} (agregado)`);
-        }
-      }
+      // 2) Crear los métodos dLocal que FALTAN en cada región (transferencia, efectivo y billetera) según la cobertura real por país.
+      const created = await createMissingDlocal(regions, methods);
+      changed.push(...created.changed);
+      errors.push(...created.errors);
       await load();
       invalidateCheckoutMethodsCache();
       if (errors.length) {

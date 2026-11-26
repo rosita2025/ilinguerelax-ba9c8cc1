@@ -323,7 +323,7 @@ const TestimonialSlider = ({ priceLabel }: { priceLabel: string }) => {
 const PatronesContent = () => {
   const isDesktop = useIsDesktop();
   const showSales = useAfterLoad(4000);
-  const { t, currency, countryCode } = useI18n();
+  const { t, currency, countryCode, language } = useI18n();
   const navigate = useNavigate();
   const addItem = useCheckoutPruebaStore((s) => s.addItem);
   
@@ -799,8 +799,10 @@ const PatronesContent = () => {
         </div>
       </section>
 
-      {/* Quién soy (Crady) + comunidad (Facebook, Instagram) + Google: confianza antes del cierre */}
-      <LazyMount minHeight={520} rootMargin={mediaMargin}><Suspense fallback={null}><FounderCommunity /></Suspense></LazyMount>
+      {/* Quién soy (Crady) + comunidad (Facebook, Instagram) + Google: confianza antes del cierre. En inglés se OCULTA (decisión de la dueña, solo en Patrones). */}
+      {language !== "en" && (
+        <LazyMount minHeight={520} rootMargin={mediaMargin}><Suspense fallback={null}><FounderCommunity /></Suspense></LazyMount>
+      )}
 
       {/* Cierre: «Oferta especial» (mismo formato que el ejemplo). Solo precios reales de la página; sin «% OFF» ni escasez inventados. */}
       <section className="py-6 md:py-8 bg-gradient-to-b from-primary/10 to-primary/5">

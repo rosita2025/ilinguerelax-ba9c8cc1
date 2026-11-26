@@ -120,10 +120,10 @@ const Pill = ({ children }: { children: React.ReactNode }) => (
  * (la de Facebook: a pedido de la dueña se quitó la línea con nombres de seguidores; lo demás, sin tocar).
  */
 /**
- * Foto de «Quién soy». A pedido de la dueña se OCULTA (privacidad): mientras sea `null` no sale ni la foto ni sus dos insignias flotantes y el texto
- * ocupa todo el ancho. Para volver a mostrar una foto (por ejemplo una sin cara), poner aquí su ruta en /public, p. ej. "/images/crady-ilingue-relax.webp".
+ * Foto de «Quién soy». Por privacidad ya NO es la foto con cara: a pedido de la dueña es una foto SUYA sin cara (de espaldas en una silla colgante).
+ * Si vuelve a ocultarse, poner `null`: no sale ni la foto ni sus dos insignias flotantes y el texto ocupa todo el ancho.
  */
-const FOUNDER_PHOTO_SRC: string | null = null;
+const FOUNDER_PHOTO_SRC: string | null = "/images/crady-ilingue-relax.webp";
 
 export const FounderCommunity = ({ className = "", lang: forcedLang }: { className?: string; /** Fuerza el idioma (páginas para público hispano). */ lang?: Lang }) => {
   const { language } = useI18n();

@@ -3,6 +3,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BookOpen, Heart, Target, Users, Award, Globe, Instagram, Facebook, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
+import { lazy, Suspense } from "react";
+import { LazyMount } from "@/components/LazyImg";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Helmet } from "react-helmet-async";
 
@@ -11,6 +13,8 @@ const fadeInUp = {
   animate: { opacity: 1, y: 0 },
   transition: { duration: 0.5, ease: "easeOut" }
 };
+
+const FounderCommunity = lazy(() => import("@/components/FounderCommunity").then((m) => ({ default: m.FounderCommunity })));
 
 const staggerContainer = {
   animate: {
@@ -80,6 +84,9 @@ const AboutPage = () => {
           </motion.div>
         </div>
       </motion.section>
+
+      {/* Quién soy (Crady) + comunidad: la historia de la fundadora, con foto sin cara. Esta página está en español. */}
+      <LazyMount minHeight={520}><Suspense fallback={null}><FounderCommunity lang="es" /></Suspense></LazyMount>
 
       {/* Main Content */}
       <section className="py-20 md:py-28">

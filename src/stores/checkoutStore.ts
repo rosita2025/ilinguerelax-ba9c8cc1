@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { getVisitorCountryCode } from "@/lib/euConsent";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { trackHotmartEvent } from "@/hooks/useMetaPixel";
 import { formatCurrencyAmount } from "@/i18n";
@@ -128,6 +129,14 @@ const VALID_COUPONS: Record<string, number> = {
 };
 
 /**
+ * Cupones con CONDICIONES (espejo de `RESTRICTED_COUPONS` en supabase/functions/_shared/catalogPricing.ts): PERU30 = 30 % solo para compradores de
+ * Perú y solo si el carrito lleva Patrones especiales. El servidor lo vuelve a comprobar con el país y los SKU del carrito.
+ */
+export const RESTRICTED_COUPONS: Record<string, { percent: number; countries: string[]; idPattern: RegExp }> = {
+  PERU30: { percent: 30, countries: ["PE"], idPattern: /patrones/i },
+};
+
+/**
  * Cupones de prueba con total fijo en USD — SE ELIMINARON de aquí porque
  * quedaron activos en producción por error. Cualquiera que encontrara o
  * adivinara uno de estos códigos ("DLTEST1", "FIXED1", "PRUEBA1",
@@ -248,6 +257,14 @@ export const useCheckoutPruebaStore = create<PruebaStore>()(
             ? Math.round((1 - fixedTotal / subtotal) * 10000) / 100
             : 0;
           set({ coupon: upper, couponPercent: percent });
+          return true;
+        }
+        const restricted = RESTRICTED_COUPONS[upper];
+        if (restricted) {
+          const okCountry = restricted.countries.includes(getVisitorCountryCode());
+          const okCart = get().items.some((i) => restricted.idPattern.test(i.id));
+          if (!okCountry || !okCart) return false;
+          set({ coupon: upper, couponPercent: restricted.percent });
           return true;
         }
         const percent = VALID_COUPONS[upper];

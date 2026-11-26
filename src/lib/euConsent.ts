@@ -53,3 +53,12 @@ export function ensureVisitorCountry(): void {
     })
     .catch(() => { /* sin país: se usa la zona horaria */ });
 }
+
+/** País del visitante ya detectado (2 letras) o "" si aún no se sabe. */
+export const getVisitorCountryCode = (): string => {
+  if (typeof window === "undefined") return "";
+  try {
+    const c = (localStorage.getItem(COUNTRY_KEY) || "").toUpperCase();
+    return c.length === 2 ? c : "";
+  } catch { return ""; }
+};

@@ -31,7 +31,7 @@ import { CheckoutTestimonials } from "@/components/checkout/CheckoutTestimonials
 import { PaymentLogos } from "@/components/checkout/PaymentLogos";
 
 
-import { useCheckoutPruebaStore } from "@/stores/checkoutStore";
+import { useCheckoutPruebaStore, RESTRICTED_COUPONS } from "@/stores/checkoutStore";
 import { useRegionTier } from "@/hooks/useRegionTier";
 import { CheckoutLanguageProvider, useI18n } from "@/i18n/I18nContext";
 import { getCheckoutUI } from "@/i18n/checkoutUI";
@@ -147,6 +147,15 @@ export default function Checkout() {
   // el campo «Cupón» está dentro del resumen plegado (en celular casi nadie lo encuentra). Se aplica UNA vez por visita (también con ?cupon=CODIGO).
   const applyCouponStore = useCheckoutPruebaStore((s) => s.applyCoupon);
   const couponNow = useCheckoutPruebaStore((s) => s.coupon);
+  // Cupones con condiciones (PERU30: solo Perú y solo con Patrones): el producto entra al carrito y el país se detecta DESPUÉS de montar la página,
+  // así que se vuelve a intentar cuando cambia el carrito o llega el país (en vez de rendirse al primer intento).
+  const cartCount = useCheckoutPruebaStore((s) => s.items.length);
+  const [countryTick, setCountryTick] = useState(0);
+  useEffect(() => {
+    const h = () => setCountryTick((t) => t + 1);
+    window.addEventListener("ilr-country", h);
+    return () => window.removeEventListener("ilr-country", h);
+  }, []);
   useEffect(() => {
     try {
       if (couponNow || sessionStorage.getItem("ilr_coupon_auto") === "1") return;
@@ -157,10 +166,14 @@ export default function Checkout() {
         code = String(saved?.coupon || "").trim().toUpperCase();
       }
       if (!code) return;
-      sessionStorage.setItem("ilr_coupon_auto", "1");
-      if (applyCouponStore(code)) toast.success(code === "NEW10" ? "Tu cupón NEW10 (10 % de descuento) ya está aplicado" : `Cupón ${code} aplicado`);
+      if (applyCouponStore(code)) {
+        sessionStorage.setItem("ilr_coupon_auto", "1");
+        toast.success(code === "NEW10" ? "Tu cupón NEW10 (10 % de descuento) ya está aplicado" : `Cupón ${code} aplicado`);
+      } else if (!RESTRICTED_COUPONS[code]) {
+        sessionStorage.setItem("ilr_coupon_auto", "1");
+      }
     } catch { /* sin almacenamiento */ }
-  }, [couponNow, applyCouponStore]);
+  }, [couponNow, applyCouponStore, cartCount, countryTick]);
 
   const buyerEmail = useCheckoutPruebaStore((s) => s.buyer.email);
   const identifiedRef = useRef<string | null>(null);

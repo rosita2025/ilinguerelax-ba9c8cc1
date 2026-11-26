@@ -57,9 +57,27 @@ export function fixedTotalForCoupon(code: string | null | undefined): number | n
   return typeof total === "number" && total > 0 ? total : null;
 }
 
-export function resolveCouponPercent(code: string | null | undefined): number {
+/**
+ * Cupones con CONDICIONES (espejo de `RESTRICTED_COUPONS` en src/stores/checkoutStore.ts). PERU30: 30 % SOLO para compradores de Perú y SOLO si el
+ * carrito lleva Patrones especiales (el descuento se aplica al total del carrito, igual que los demás cupones). Para mandarlo por WhatsApp.
+ */
+const PATRONES_SKU = "patrones-especiales-alfabeto-combinaciones-secretas-ingles";
+const RESTRICTED_COUPONS: Record<string, { percent: number; countries: string[]; requiresSku: string }> = {
+  PERU30: { percent: 30, countries: ["PE"], requiresSku: PATRONES_SKU },
+};
+
+export function resolveCouponPercent(
+  code: string | null | undefined,
+  ctx?: { country?: string | null; skus?: string[] },
+): number {
   const upper = String(code || "").trim().toUpperCase();
   if (!upper) return 0;
+  const restricted = RESTRICTED_COUPONS[upper];
+  if (restricted) {
+    const country = String(ctx?.country || "").trim().toUpperCase();
+    if (!ctx || !restricted.countries.includes(country) || !(ctx.skus ?? []).includes(restricted.requiresSku)) return 0;
+    return Math.min(restricted.percent, 90);
+  }
   const pct = VALID_COUPONS[upper];
   if (typeof pct !== "number") return 0;
   return Math.min(pct, 90);
@@ -341,7 +359,7 @@ export async function resolveServerPricing(opts: {
     return { items: priced, couponPercent: 0, couponCode: code, totalUsd };
   }
 
-  const couponPercent = resolveCouponPercent(opts.couponCode);
+  const couponPercent = resolveCouponPercent(opts.couponCode, { country: opts.country, skus: priced.map((i) => i.sku) });
   const couponCode = couponPercent > 0 ? String(opts.couponCode).trim().toUpperCase() : null;
 
   const totalCents = priced.reduce(

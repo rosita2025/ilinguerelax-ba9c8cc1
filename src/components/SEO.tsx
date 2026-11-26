@@ -287,6 +287,7 @@ export const SEO = ({
       learn: "Aprender idiomas",
       "vista-previa": "Vista previa",
       "sobre-nosotros": "Sobre nosotros",
+      "historia-de-crady": "Historia de Crady",
       contacto: "Contacto",
       faq: "Preguntas frecuentes",
       privacidad: "Política de privacidad",

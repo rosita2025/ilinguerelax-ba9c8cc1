@@ -7,6 +7,7 @@ import { lazy, Suspense } from "react";
 import { LazyMount } from "@/components/LazyImg";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -87,6 +88,7 @@ const AboutPage = () => {
 
       {/* Quién soy (Crady) + comunidad: la historia de la fundadora, con foto sin cara. Esta página está en español. */}
       <LazyMount minHeight={520}><Suspense fallback={null}><FounderCommunity lang="es" /></Suspense></LazyMount>
+      <div className="bg-primary/[0.05] pb-6 text-center"><Link to="/historia-de-crady" className="text-base font-bold text-primary underline">Lee la historia completa de Crady →</Link></div>
 
       {/* Main Content */}
       <section className="py-20 md:py-28">

@@ -75,6 +75,7 @@ const HotmartSuccess = lazy(() => import("./pages/HotmartSuccess"));
 const HotmartPending = lazy(() => import("./pages/HotmartPending"));
 const HotmartCreditPending = lazy(() => import("./pages/HotmartCreditPending"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
+const CradyStoryPage = lazy(() => import("./pages/CradyStoryPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const FAQPage = lazy(() => import("./pages/FAQPage"));
 const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
@@ -343,6 +344,7 @@ const App = () => (
                   <Route path="/hotmart-pending" element={<HotmartPending />} />
                   <Route path="/hotmart-credit-pending" element={<HotmartCreditPending />} />
                   <Route path="/sobre-nosotros" element={<AboutPage />} />
+                  <Route path="/historia-de-crady" element={<CradyStoryPage />} />
                   <Route path="/contacto" element={<ContactPage />} />
                   <Route path="/contact" element={<Navigate to="/contacto" replace />} />
                   <Route path="/about" element={<Navigate to="/sobre-nosotros" replace />} />

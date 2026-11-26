@@ -119,6 +119,12 @@ const Pill = ({ children }: { children: React.ReactNode }) => (
  * seguidores, más de 2.000 personas de varios países en un año y «5.000 palabras en inglés» como el más popular. Capturas en public/img/comunidad
  * (la de Facebook: a pedido de la dueña se quitó la línea con nombres de seguidores; lo demás, sin tocar).
  */
+/**
+ * Foto de «Quién soy». A pedido de la dueña se OCULTA (privacidad): mientras sea `null` no sale ni la foto ni sus dos insignias flotantes y el texto
+ * ocupa todo el ancho. Para volver a mostrar una foto (por ejemplo una sin cara), poner aquí su ruta en /public, p. ej. "/images/crady-ilingue-relax.webp".
+ */
+const FOUNDER_PHOTO_SRC: string | null = null;
+
 export const FounderCommunity = ({ className = "", lang: forcedLang }: { className?: string; /** Fuerza el idioma (páginas para público hispano). */ lang?: Lang }) => {
   const { language } = useI18n();
   const lang = (forcedLang ?? (language in TXT ? language : "es")) as Lang;
@@ -128,11 +134,12 @@ export const FounderCommunity = ({ className = "", lang: forcedLang }: { classNa
     <div className={className}>
       {/* Quién soy */}
       <section className="bg-primary/[0.05] px-4 py-6 md:px-6 md:py-8" aria-labelledby="ilr-quien-soy">
-        <div className="mx-auto grid max-w-5xl items-center gap-10 md:grid-cols-[minmax(0,320px)_minmax(0,1fr)] md:gap-14">
+        <div className={`mx-auto grid items-center gap-10 md:gap-14 ${FOUNDER_PHOTO_SRC ? "max-w-5xl md:grid-cols-[minmax(0,320px)_minmax(0,1fr)]" : "max-w-3xl"}`}>
+          {FOUNDER_PHOTO_SRC && (
           <figure className="relative mx-auto w-full max-w-[300px] md:mx-0">
             <div className="rounded-t-[999px] rounded-b-3xl bg-primary/15 p-2 shadow-xl">
               <img
-                src="/images/crady-ilingue-relax.webp"
+                src={FOUNDER_PHOTO_SRC}
                 alt={t.alt}
                 width={720}
                 height={893}
@@ -149,6 +156,7 @@ export const FounderCommunity = ({ className = "", lang: forcedLang }: { classNa
               <div className="text-[10px] font-bold uppercase tracking-wider text-foreground/70">{t.badgeEngSub}</div>
             </div>
           </figure>
+          )}
 
           <div>
             <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-primary">

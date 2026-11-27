@@ -393,7 +393,7 @@ export const useHotmartPixel = (params: ViewContentParams) => {
     }
 
     if (typeof window !== "undefined" && hasPixelConsent()) {
-      if (window.fbq) window.fbq("track", "ViewContent", { ...normalizedParams, eventID: eventId });
+      if (window.fbq) window.fbq("track", "ViewContent", { ...normalizedParams }, { eventID: eventId });
       if (window.ttq) window.ttq.track("ViewContent", { 
         content_id: normalizedParams.content_ids?.[0],
         content_type: "product",
@@ -460,7 +460,7 @@ export const trackHotmartEvent = (
     : generateEventId();
   const isDupForAds = typeof window !== "undefined" && hasPixelConsent() ? isRecentDuplicateEvent(eventName, pixelParams) : false;
   if (typeof window !== "undefined" && hasPixelConsent() && !isDupForAds) {
-    if (window.fbq) window.fbq("track", eventName, { ...pixelParams, eventID: eventId });
+    if (window.fbq) window.fbq("track", eventName, { ...pixelParams }, { eventID: eventId });
     if (window.ttq && (eventName === "AddToCart" || eventName === "InitiateCheckout" || eventName === "CompleteRegistration" || eventName === "Purchase")) {
       window.ttq.track(eventName, {
         content_id: pixelParams.content_ids?.[0] || pixelParams.product_id,
@@ -483,7 +483,7 @@ export const useHotmartPixelPageView = () => {
     ensurePixelReady();
     if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
       const eventId = generateEventId();
-      window.fbq("track", "PageView", { eventID: eventId });
+      window.fbq("track", "PageView", {}, { eventID: eventId });
     }
     // No logging for internal traffic to avoid polluting funnel stats
     if (!isInternalTraffic()) {
@@ -500,8 +500,7 @@ export const useHotmartPixelContact = () => {
       window.fbq("track", "ViewContent", {
         content_name: "Contact Page",
         content_category: "Page",
-        eventID: eventId,
-      });
+      }, { eventID: eventId });
     }
   }, []);
 };
@@ -514,7 +513,7 @@ export const trackLead = (
   ensurePixelReady();
   const eventId = generateEventId();
   if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
-    window.fbq("track", "Lead", { ...params, eventID: eventId });
+    window.fbq("track", "Lead", { ...params }, { eventID: eventId });
   }
   sendCapiEvent("Lead", eventId, params, email);
   logFunnelEvent("Lead", params);
@@ -571,7 +570,7 @@ export const useMetaPixelViewContent = (params: ViewContentParams, _pixelId?: st
     ensurePixelReady();
     if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
       const eventId = generateEventId();
-      window.fbq("track", "ViewContent", { ...params, eventID: eventId });
+      window.fbq("track", "ViewContent", { ...params }, { eventID: eventId });
     }
     logFunnelEvent("ViewContent", params as unknown as Record<string, unknown>);
     markViewContentFired(params as unknown as Record<string, unknown>);

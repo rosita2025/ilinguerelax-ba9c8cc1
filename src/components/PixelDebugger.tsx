@@ -42,7 +42,7 @@ export const PixelDebugger = () => {
       if (args[0] === 'track') {
         const eventName = args[1];
         const params = args[2];
-        const eventId = params?.eventID || "n/a";
+        const eventId = args[3]?.eventID || params?.eventID || "n/a";
         
         const newEvent: PixelEvent = {
           timestamp: new Date().toLocaleTimeString(),

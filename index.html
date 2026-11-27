@@ -260,8 +260,10 @@
           t.src=v;s=b.getElementsByTagName(e)[0];
           s.parentNode.insertBefore(t,s)}(window, document,'script',
           'https://connect.facebook.net/en_US/fbevents.js');
-          fbq('init', '24959578143733255');
-          fbq('track', 'PageView');
+          // La app ya pudo iniciar el Pixel antes (visitas de anuncios): iniciarlo dos veces duplica eventos. Solo se inicia si nadie lo hizo,
+          // y el PageView se envía una sola vez por carga (lo marca __ilrPvSent, que también respeta la página de inicio).
+          if (!window.__ilrFbInit) { fbq('init', '24959578143733255'); window.__ilrFbInit = true; }
+          if (!window.__ilrPvSent) { window.__ilrPvSent = true; fbq('track', 'PageView'); }
         }, 3500);
       });
     </script>

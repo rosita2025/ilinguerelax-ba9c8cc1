@@ -335,6 +335,7 @@ const ensurePixelReady = () => {
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '${HOTMART_PIXEL_ID}');
+    window.__ilrFbInit = true;
   `;
   document.head.appendChild(script);
 
@@ -481,7 +482,10 @@ export const trackHotmartEvent = (
 export const useHotmartPixelPageView = () => {
   useEffect(() => {
     ensurePixelReady();
-    if (typeof window !== "undefined" && window.fbq && hasPixelConsent()) {
+    // Un solo PageView por carga: index.html y esta página comparten la marca __ilrPvSent (si no, la página de inicio contaba dos).
+    const w = window as unknown as { __ilrPvSent?: boolean };
+    if (typeof window !== "undefined" && window.fbq && hasPixelConsent() && !w.__ilrPvSent) {
+      w.__ilrPvSent = true;
       const eventId = generateEventId();
       window.fbq("track", "PageView", {}, { eventID: eventId });
     }

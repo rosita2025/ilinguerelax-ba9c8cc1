@@ -22,3 +22,18 @@ describe("fbq envía eventID como opción", () => {
     expect((purchase[2] as Record<string, unknown>).eventID).toBeUndefined();
   });
 });
+
+// index.html y la app comparten marcas para no iniciar el Pixel dos veces ni mandar dos PageView por carga.
+import { readFileSync } from "node:fs";
+describe("Pixel: sin doble inicio ni doble PageView", () => {
+  it("index.html solo inicia el Pixel si la app no lo hizo y marca el PageView", () => {
+    const html = readFileSync("index.html", "utf8");
+    expect(html).toContain("if (!window.__ilrFbInit)");
+    expect(html).toContain("if (!window.__ilrPvSent)");
+  });
+  it("la app marca __ilrFbInit al iniciar el Pixel y __ilrPvSent al mandar PageView", () => {
+    const src = readFileSync("src/hooks/useMetaPixel.ts", "utf8");
+    expect(src).toContain("window.__ilrFbInit = true;");
+    expect(src).toContain("w.__ilrPvSent = true;");
+  });
+});
